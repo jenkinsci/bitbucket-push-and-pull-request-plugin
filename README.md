@@ -7,10 +7,6 @@ full pull request support and adapting it to the recent security policies of Jen
 This plugin supports the bitbucket rest api v2.x.
 
 
-To install the plugin import in the hpi file: 
-<https://github.com/cdelmonte-zg/bitbucket-push-and-pull-request/blob/develop/target/bitbucket-push-and-pull-request.hpi>
-
-
 # Pipeline script
 Example of pipeline code for building on pull-request create event. It merge from source to target in the PR.
 
