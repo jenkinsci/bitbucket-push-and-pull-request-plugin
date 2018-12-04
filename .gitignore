@@ -1,0 +1,16 @@
+target/*
+work/*
+.settings/*
+.classpath
+.project
+.idea
+*.iml
+.DS_Store
+**/.DS_Store
+
+etc/*
+node/*
+node_modules/*
+/npm-debug.log
+/yarn.lock
+

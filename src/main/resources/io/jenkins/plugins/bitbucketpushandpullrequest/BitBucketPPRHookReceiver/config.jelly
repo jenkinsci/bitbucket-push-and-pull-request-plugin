@@ -1,0 +1,4 @@
+<?jelly escape-by-default='true'?>
+<div>
+  Integrates with Bitbucket (rest api version >=2.0) triggering on push and pull requests
+</div>
