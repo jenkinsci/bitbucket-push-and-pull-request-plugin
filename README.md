@@ -9,7 +9,7 @@ Apart of a lot of refactoring, the major changes are:
 - Introduction of Models and security improvements
 
 
-This plugin supports the bitbucket rest api v2.x+ and requires a Jenkins 2.102+ 
+This plugin supports the bitbucket rest api v2.x+ 
 
 
 # Pipeline script
