@@ -50,6 +50,7 @@ package io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest;
 import java.io.File;
 import java.io.IOException;
 
+import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 import hudson.Extension;
@@ -74,7 +75,6 @@ public class BitBucketPPRPullRequestUpdatedActionFilter extends BitBucketPPRPull
     return new BitBucketPPRPullRequestUpdatedCause(pollingLog, pullRequestAction);
   }
   
-  @Symbol("BitBucketPullRequestUpdatedActionFilter")
   @Extension
   public static class ActionFilterDescriptorImpl extends BitBucketPPRPullRequestActionDescriptor {
 

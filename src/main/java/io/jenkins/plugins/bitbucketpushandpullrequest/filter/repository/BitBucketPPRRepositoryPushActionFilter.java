@@ -99,7 +99,6 @@ public class BitBucketPPRRepositoryPushActionFilter extends BitBucketPPRReposito
     return new BitBucketPPRRepositoryCause(pollingLog, bitbucketAction);
   }
   
-  @Symbol("BitBucketPushActionFilter")
   @Extension
   public static class ActionFilterDescriptorImpl extends BitBucketPPRRepositoryActionDescriptor {
 

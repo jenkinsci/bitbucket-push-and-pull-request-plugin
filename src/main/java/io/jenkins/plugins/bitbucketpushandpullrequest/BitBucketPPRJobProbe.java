@@ -3,46 +3,40 @@
  * 
  * Copyright (C) 2018, CloudBees, Inc.
  * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
+ * associated documentation files (the "Software"), to deal in the Software without restriction,
+ * including without limitation the rights to use, copy, modify, merge, publish, distribute,
+ * sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
  * 
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * The above copyright notice and this permission notice shall be included in all copies or
+ * substantial portions of the Software.
  * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT
+ * NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+ * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  ******************************************************************************/
 /*
  * The MIT License
  *
  * Copyright (c) 2018, CloudBees, Inc..
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
+ * associated documentation files (the "Software"), to deal in the Software without restriction,
+ * including without limitation the rights to use, copy, modify, merge, publish, distribute,
+ * sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
  *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * The above copyright notice and this permission notice shall be included in all copies or
+ * substantial portions of the Software.
  *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT
+ * NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+ * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
 package io.jenkins.plugins.bitbucketpushandpullrequest;
@@ -80,7 +74,8 @@ public class BitBucketPPRJobProbe {
   private BitBucketPPREvent bitbucketEvent;
   private BitBucketPPRAction bitbucketAction;
 
-  public void triggerMatchingJobs(BitBucketPPREvent bitbucketEvent, BitBucketPPRAction bitbucketAction) {
+  public void triggerMatchingJobs(BitBucketPPREvent bitbucketEvent,
+      BitBucketPPRAction bitbucketAction) {
     this.bitbucketEvent = bitbucketEvent;
     this.bitbucketAction = bitbucketAction;
 
@@ -159,34 +154,53 @@ public class BitBucketPPRJobProbe {
         return true;
       }
     }
+
     return false;
   }
 
   private boolean match(SCM scm, URIish url) {
     if (scm instanceof GitSCM) {
-      for (RemoteConfig remoteConfig : ((GitSCM) scm).getRepositories()) {
-        for (URIish urIish : remoteConfig.getURIs()) {
-          LOGGER.log(Level.FINEST, "Comparing {0} and {1} looselyMatches",
-              new Object[] {urIish.toString(), url.toString()});
-          if (GitStatus.looselyMatches(urIish, url)) {
-            LOGGER.log(Level.FINEST, "{0} and {1} looselyMatched successfully",
-                new Object[] {urIish.toString(), url.toString()});
-            return true;
-          }
-        }
-      }
+      return matchGitScm(scm, url);
     } else if (scm instanceof MercurialSCM) {
-      try {
-        URI hgUri = new URI(((MercurialSCM) scm).getSource());
-        String remote = url.toString();
-        if (looselyMatches(hgUri, remote)) {
+      return matchMercurialScm(scm, url);
+    }
+
+    return false;
+  }
+
+  private boolean matchMercurialScm(SCM scm, URIish url) {
+    try {
+      URI hgUri = new URI(((MercurialSCM) scm).getSource());
+      String remote = url.toString();
+      if (looselyMatches(hgUri, remote)) {
+        return true;
+      }
+    } catch (URISyntaxException ex) {
+      LOGGER.log(Level.SEVERE, "Could not parse jobSource uri: {0} ", ex);
+    }
+
+    return false;
+  }
+
+  private boolean matchGitScm(SCM scm, URIish url) {
+    for (RemoteConfig remoteConfig : ((GitSCM) scm).getRepositories()) {
+      for (URIish urIish : remoteConfig.getURIs()) {
+        LOGGER.log(Level.FINE, "Trying to match {0} ", urIish.toString() + "<-->" + url.toString());
+        if (GitStatus.looselyMatches(parseBitBucketUrIish(urIish), url)) {
           return true;
         }
-      } catch (URISyntaxException ex) {
-        LOGGER.log(Level.SEVERE, "Could not parse jobSource uri: {0} ", ex);
       }
     }
+
     return false;
+  }
+
+  // needed cause the ssh and https URI differs in Bitbucket Server.
+  private URIish parseBitBucketUrIish(URIish urIish) {
+    if (urIish.getPath().startsWith("/scm")) {
+      urIish = urIish.setPath(urIish.getPath().substring(4));
+    }
+    return urIish;
   }
 
   private boolean looselyMatches(URI notifyUri, String repository) {
@@ -200,6 +214,7 @@ public class BitBucketPPRJobProbe {
       LOGGER.log(Level.SEVERE, "Could not parse repository uri: {0}, {1}",
           new Object[] {repository, ex});
     }
+
     return result;
   }
 }

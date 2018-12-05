@@ -54,6 +54,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.logging.Logger;
 
+import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 import hudson.Extension;
@@ -91,7 +92,6 @@ public class BitBucketPPRPullRequestApprovedActionFilter extends BitBucketPPRPul
     return new BitBucketPPRPullRequestApprovedCause(pollingLog, pullRequestAction);
   }
   
-  @Symbol("BitBucketPullRequestApprovedActionFilter")
   @Extension
   public static class ActionFilterDescriptorImpl extends BitBucketPPRPullRequestActionDescriptor {
 

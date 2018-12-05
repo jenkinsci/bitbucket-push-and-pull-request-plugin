@@ -51,6 +51,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
+import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 import hudson.Extension;
@@ -82,7 +83,6 @@ public class BitBucketPPRPullRequestTriggerFilter extends BitBucketPPRTriggerFil
     return actionFilter.getCause(pollingLog, pullRequestAction);
   }
 
-  @Symbol("BitBucketPullRequestTriggerFilter")
   @Extension
   public static class FilterDescriptorImpl extends BitBucketPPRTriggerFilterDescriptor {
     

@@ -262,7 +262,7 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
     }
   }
 
-  @Symbol("BitBucketTrigger")
+  @Symbol("bitBucketTrigger")
   @Extension
   public static class DescriptorImpl extends TriggerDescriptor {
     private transient final SequentialExecutionQueue queue =
