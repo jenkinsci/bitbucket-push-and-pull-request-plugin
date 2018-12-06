@@ -265,7 +265,7 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
   @Symbol("bitBucketTrigger")
   @Extension
   public static class DescriptorImpl extends TriggerDescriptor {
-    private transient final SequentialExecutionQueue queue =
+    private final SequentialExecutionQueue queue =
         new SequentialExecutionQueue(Jenkins.MasterComputer.threadPoolForRemoting);
 
     @Override
