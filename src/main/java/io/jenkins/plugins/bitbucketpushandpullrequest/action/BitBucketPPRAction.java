@@ -53,11 +53,9 @@ import java.util.logging.Logger;
 import javax.annotation.Nonnull;
 
 import hudson.EnvVars;
-import hudson.model.AbstractBuild;
 import hudson.model.EnvironmentContributingAction;
 import hudson.model.InvisibleAction;
 import hudson.model.Run;
-import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRChange;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
 
 
