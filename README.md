@@ -4,12 +4,21 @@
 This plugin is based on the Sazo's fork (<https://github.com/sazo/bitbucket-plugin>)
 of the official Bitbucket Plugin (<https://plugins.jenkins.io/bitbucket>).
 
-Apart of a lot of refactoring, the major changes are:
-- the usage of Gson instead of net.sf.json.JSONObject (from Jenkins 2.102+ JSONObject is blacklisted)
+The new features introduced by bitbucket-push-and-pull-request are:
+- support of pull requests (thanks Sazo)
+- usage of Gson instead of net.sf.json.JSONObject (blacklisted starting from Jenkins 2.102+)
 - Introduction of Models and security improvements
 
+bitbucket-push-and-pull-request supports the bitbucket rest api v2.x+
 
-This plugin supports the bitbucket rest api v2.x+ 
+# Why another BitBucket plugin?
+
+The main reasons why we should have IMHO a new bitbucket plugin are not only related to the missing pull request functionality.
+In particular:
+
+- The official bitbucket plugin uses JSONObject, which was blacklisted by the JEP-200, causing now an exception  UnsupportedOperationException: Refusing to marshal net.sf.json.JSONObject for security reasons (see:  <https://github.com/jenkinsci/bitbucket-plugin/search?q=JSONObject&unscoped_q=JSONObject> )         
+  
+- Furthermore, the official bitbucket plugin is missing of any kind of development at this time, as you can see reading the comments on the wiki page: <https://wiki.jenkins.io/display/JENKINS/BitBucket+Plugin>
 
 
 # Pipeline script
