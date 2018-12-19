@@ -1,17 +1,20 @@
 
-# bitbucket-push-and-pull-request
+# Bitbucket Push and Pull Request Plugin
 
-This plugin is based on the Sazo's fork (<https://github.com/sazo/bitbucket-plugin>)
+
+Plugin for Jenkins **v2.138.2 or later**, that trigger builds on Bitbucket's push and pull requests.
+It's based on the Sazo's fork (<https://github.com/sazo/bitbucket-plugin>)
 of the official Bitbucket Plugin (<https://plugins.jenkins.io/bitbucket>).
 
-The new features introduced by bitbucket-push-and-pull-request are:
+The new features introduced by Bitbucket Push and Pull Request are:
 - support of pull requests (thanks Sazo)
 - usage of Gson instead of net.sf.json.JSONObject (blacklisted starting from Jenkins 2.102+)
 - Introduction of Models and security improvements
 
-bitbucket-push-and-pull-request supports the bitbucket rest api v2.x+
+Bitbucket Push and Pull Request supports the Bitbucket rest api v2.x+ and later.
 
-# Why another BitBucket plugin?
+
+#### Why another BitBucket plugin?
 
 The main reasons why we should have IMHO a new bitbucket plugin are not only related to the missing pull request functionality.
 In particular:
