@@ -143,11 +143,16 @@
 		</dependency>
 	</dependencies>
 
-	<!-- Assuming you want to host on @jenkinsci: <url>https://wiki.jenkins.io/display/JENKINS/TODO+Plugin</url> 
-		<scm> <connection>scm:git:git://github.com/jenkinsci/${project.artifactId}-plugin.git</connection> 
-		<developerConnection>scm:git:git@github.com:jenkinsci/${project.artifactId}-plugin.git</developerConnection> 
-		<url>https://github.com/jenkinsci/${project.artifactId}-plugin</url> </scm> -->
-	<repositories>
+  <url>https://wiki.jenkins.io/display/JENKINS/Bitbucket+Push+And+Pull+Request+Plugin</url>
+	
+  <scm>
+    <connection>scm:git:git://github.com/jenkinsci/${project.artifactId}-plugin.git</connection> 
+	<developerConnection>scm:git:git@github.com:jenkinsci/${project.artifactId}-plugin.git</developerConnection> 
+	<url>https://github.com/jenkinsci/${project.artifactId}-plugin</url>
+    <tag>bitbucket-push-and-pull-request-1.1</tag>
+  </scm>
+	
+  <repositories>
 		<repository>
 			<id>repo.jenkins-ci.org</id>
 			<url>https://repo.jenkins-ci.org/public/</url>
@@ -172,7 +177,4 @@
 		</plugins>
 	</build>
 
-  <scm>
-    <tag>bitbucket-push-and-pull-request-1.1</tag>
-  </scm>
 </project>
