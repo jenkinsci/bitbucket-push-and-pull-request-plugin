@@ -52,7 +52,6 @@ import net.sf.json.JSONObject;
 
 @RunWith(MockitoJUnitRunner.class)
 public class BitBucketPPRPullRequestPayloadProcessorTest {
-
   Gson gson = new Gson();
   @Mock
   private BitBucketPPRJobProbe probe;
@@ -92,7 +91,7 @@ public class BitBucketPPRPullRequestPayloadProcessorTest {
     verify(probe).triggerMatchingJobs(eventCaptor.capture(), actionCaptor.capture());
 
     assertEquals(bitbucketEvent, eventCaptor.getValue());
-    assertEquals(payload, actionCaptor.getValue().getPayload());;
+    assertEquals(payload, actionCaptor.getValue().getPayload());
   }
 
 
@@ -127,7 +126,6 @@ public class BitBucketPPRPullRequestPayloadProcessorTest {
     } catch (JsonSyntaxException e) {
       e.printStackTrace();
     }
-
     
     try {
       pullRequestPayloadProcessor.processPayload(payload);

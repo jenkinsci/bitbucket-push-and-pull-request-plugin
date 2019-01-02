@@ -32,7 +32,6 @@ import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
 
 @RunWith(MockitoJUnitRunner.class)
 public class BitBucketPPRRepositoryPayloadProcessorTest {
-
   Gson gson = new Gson();
   @Mock
   private BitBucketPPRJobProbe probe;
