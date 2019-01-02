@@ -14,6 +14,8 @@ The new features introduced by Bitbucket Push and Pull Request are:
 Bitbucket Push and Pull Request supports the Bitbucket rest api v2.x+ and later.
 
 
+**For infos about the plugin's configuration please visit the webpage** <https://plugins.jenkins.io/bitbucket-push-and-pull-request>
+
 #### Why another BitBucket plugin?
 
 The main reasons why we should have IMHO a new bitbucket plugin are not only related to the missing pull request functionality.

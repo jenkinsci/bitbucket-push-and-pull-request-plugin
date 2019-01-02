@@ -32,7 +32,6 @@ import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
 
 @RunWith(MockitoJUnitRunner.class)
 public class BitBucketPPRRepositoryPayloadProcessorTest {
-
   Gson gson = new Gson();
   @Mock
   private BitBucketPPRJobProbe probe;
@@ -57,17 +56,14 @@ public class BitBucketPPRRepositoryPayloadProcessorTest {
 
     JsonReader reader = null;
 
-    InputStreamReader isr = null;
     try {
       ClassLoader classloader = Thread.currentThread().getContextClassLoader();
       InputStream is = classloader.getResourceAsStream("repo_push.json");
-      isr = new InputStreamReader(is, StandardCharsets.UTF_8);
+      InputStreamReader isr = new InputStreamReader(is, StandardCharsets.UTF_8);
       reader = new JsonReader(isr);
     } catch (Exception e) {
       e.printStackTrace();
     }
-
-    System.out.println(isr);
     
     BitBucketPPRPayload payload = gson.fromJson(reader, BitBucketPPRNewPayload.class);
 
