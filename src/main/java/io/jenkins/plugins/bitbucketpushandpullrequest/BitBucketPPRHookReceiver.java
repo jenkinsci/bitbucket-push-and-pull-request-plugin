@@ -86,15 +86,11 @@ public class BitBucketPPRHookReceiver implements UnprotectedRootAction {
       BitBucketPPRPayload payload = null;
       BitBucketPPREvent bitbucketEvent = null;
 
-      if (USER_AGENT.equals(request.getHeader("user-agent"))) {
+      if (request.getHeader("x-event-key") != null) {
         LOGGER.log(Level.INFO, "Received new x-event-key service payload");
         bitbucketEvent = new BitBucketPPREvent(request.getHeader("x-event-key"));
         payload = gson.fromJson(inputStream, BitBucketPPRNewPayload.class);
-      } else {
-        LOGGER.log(Level.INFO, "Received old POST service payload");
-        bitbucketEvent = new BitBucketPPREvent("repo:post");
-        payload = gson.fromJson(inputStream, BitBucketPPROldPost.class);
-      }
+      } 
 
       BitBucketPPRPayloadProcessor bitbucketPayloadProcessor =
           BitBucketPPRPayloadProcessorFactory.createProcessor(bitbucketEvent);

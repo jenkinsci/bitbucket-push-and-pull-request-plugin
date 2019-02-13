@@ -30,6 +30,8 @@ public final class BitBucketPPRConsts {
   public static final String REPOSITORY_EVENT = "repo";
   public static final String REPOSITORY_PUSH = "push";
   public static final String REPOSITORY_POST = "post";
+  
+  public static final String REPOSITORY_SERVER_PUSH = "refs_changed";
 
   public static final String PULL_REQUEST_EVENT = "pullrequest";
   public static final String PULL_REQUEST_CREATED = "created";
