@@ -21,26 +21,58 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  ******************************************************************************/
-package io.jenkins.plugins.bitbucketpushandpullrequest.model;
+package io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Date;
+
+import com.google.gson.annotations.SerializedName;
 
 
-public class BitBucketPPRPush implements Serializable {
-  private List<BitBucketPPRChange> changes = new ArrayList<>();
+public class BitBucketPPRParticipant implements Serializable {
+  private String type;
+  private BitBucketPPRActor user;
+  private String role;
+  private boolean approved;
+  private @SerializedName("participated_on") Date participatedOn;
 
-  public List<BitBucketPPRChange> getChanges() {
-    return changes;
+  public String getType() {
+    return type;
   }
 
-  public void setChanges(List<BitBucketPPRChange> changes) {
-    this.changes = changes;
+  public void setType(String type) {
+    this.type = type;
   }
 
-  @Override
-  public String toString() {
-    return "Push [changes=" + changes + "]";
+  public BitBucketPPRActor getUser() {
+    return user;
+  }
+
+  public void setUser(BitBucketPPRActor user) {
+    this.user = user;
+  }
+
+  public String getRole() {
+    return role;
+  }
+
+  public void setRole(String role) {
+    this.role = role;
+  }
+
+  public boolean getApproved() {
+    return approved;
+  }
+
+  public void setApproved(boolean approved) {
+    this.approved = approved;
+  }
+
+  public Date getParticipatedOn() {
+    return (Date) participatedOn.clone();
+  }
+
+  public void setParticipatedOn(final Date participatedOn) {
+    this.participatedOn = new Date(participatedOn.getTime());;
   }
 }

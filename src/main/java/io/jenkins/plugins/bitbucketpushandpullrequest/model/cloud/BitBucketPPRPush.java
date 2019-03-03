@@ -21,29 +21,26 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  ******************************************************************************/
-package io.jenkins.plugins.bitbucketpushandpullrequest.processor;
+package io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud;
 
-import javax.annotation.Nonnull;
-
-import io.jenkins.plugins.bitbucketpushandpullrequest.BitBucketPPRJobProbe;
-import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
-import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRPullRequestAction;
-import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
-import io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud.BitBucketPPREvent;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 
-public class BitBucketPPRPullRequestPayloadProcessor extends BitBucketPPRPayloadProcessor {
-  public BitBucketPPRPullRequestPayloadProcessor(BitBucketPPRJobProbe jobProbe, BitBucketPPREvent bitbucketEvent) {
-    super(jobProbe, bitbucketEvent);
+public class BitBucketPPRPush implements Serializable {
+  private List<BitBucketPPRChange> changes = new ArrayList<>();
+
+  public List<BitBucketPPRChange> getChanges() {
+    return changes;
+  }
+
+  public void setChanges(List<BitBucketPPRChange> changes) {
+    this.changes = changes;
   }
 
   @Override
-  public void processPayload(BitBucketPPRPayload payload) {
-    BitBucketPPRAction action = buildActionForJobs(payload);
-    jobProbe.triggerMatchingJobs(bitbucketEvent, action);
-  }
-
-  private BitBucketPPRAction buildActionForJobs(@Nonnull BitBucketPPRPayload payload) {
-    return new BitBucketPPRPullRequestAction(payload);
+  public String toString() {
+    return "Push [changes=" + changes + "]";
   }
 }

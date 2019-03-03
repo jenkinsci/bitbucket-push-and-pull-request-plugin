@@ -26,8 +26,8 @@ package io.jenkins.plugins.bitbucketpushandpullrequest.processor;
 import javax.annotation.Nonnull;
 
 import io.jenkins.plugins.bitbucketpushandpullrequest.BitBucketPPRJobProbe;
-import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPREvent;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
+import io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud.BitBucketPPREvent;
 
 
 public abstract class BitBucketPPRPayloadProcessor {

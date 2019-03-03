@@ -21,35 +21,27 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  ******************************************************************************/
-package io.jenkins.plugins.bitbucketpushandpullrequest.model;
+package io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud;
 
 import java.io.Serializable;
 
-public class BitBucketPPRDestination implements Serializable {
-  private BitBucketPPRBranch branch;
-  private BitBucketPPRCommit commit;
-  private BitBucketPPRRepository repository;
-  public BitBucketPPRBranch getBranch() {
-    return branch;
+public class BitBucketPPRLinks implements Serializable {
+  BitBucketPPRHtml html;
+  private BitBucketPPRSelf self;
+  
+    public BitBucketPPRHtml getHtml() {
+    return html;
   }
-  public void setBranch(BitBucketPPRBranch branch) {
-    this.branch = branch;
+
+  public void setHtml(BitBucketPPRHtml html) {
+    this.html = html;
   }
-  public BitBucketPPRCommit getCommit() {
-    return commit;
+
+  public BitBucketPPRSelf getSelf() {
+    return self;
   }
-  public void setCommit(BitBucketPPRCommit commit) {
-    this.commit = commit;
-  }
-  public BitBucketPPRRepository getRepository() {
-    return repository;
-  }
-  public void setRepository(BitBucketPPRRepository repository) {
-    this.repository = repository;
-  }
-  @Override
-  public String toString() {
-    return "BitBucketPPRDestination [branch=" + branch + ", commit=" + commit + ", repository=" + repository
-        + "]";
+
+  public void setSelf(BitBucketPPRSelf self) {
+    this.self = self;
   }
 }

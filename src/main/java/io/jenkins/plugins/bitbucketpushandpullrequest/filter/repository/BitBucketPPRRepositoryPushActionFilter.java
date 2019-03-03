@@ -24,20 +24,23 @@ package io.jenkins.plugins.bitbucketpushandpullrequest.filter.repository;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.logging.Logger;
 
-import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 import hudson.Extension;
+import io.jenkins.plugins.bitbucketpushandpullrequest.BitBucketPPRTrigger;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.cause.BitBucketPPRTriggerCause;
 import io.jenkins.plugins.bitbucketpushandpullrequest.cause.repository.BitBucketPPRRepositoryCause;
 
 
 public class BitBucketPPRRepositoryPushActionFilter extends BitBucketPPRRepositoryActionFilter {
+  private static final Logger LOGGER = Logger.getLogger(BitBucketPPRTrigger.class.getName());
+
   public boolean triggerAlsoIfTagPush;
   public String allowedBranches;
-
+  
   @DataBoundConstructor
   public BitBucketPPRRepositoryPushActionFilter(boolean triggerAlsoIfTagPush,
       String allowedBranches) {
@@ -48,7 +51,7 @@ public class BitBucketPPRRepositoryPushActionFilter extends BitBucketPPRReposito
   @Override
   public boolean shouldTriggerBuild(BitBucketPPRAction bitbucketAction) {
     if (bitbucketAction.getType().equals("branch") || this.triggerAlsoIfTagPush) {
-
+      
       if (this.allowedBranches.length() > 0) {
         String[] buffer = this.allowedBranches.split(",");
 

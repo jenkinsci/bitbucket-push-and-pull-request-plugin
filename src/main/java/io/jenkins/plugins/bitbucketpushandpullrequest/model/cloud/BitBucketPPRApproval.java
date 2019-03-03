@@ -21,18 +21,35 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  ******************************************************************************/
-package io.jenkins.plugins.bitbucketpushandpullrequest.model;
+package io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud;
 
 import java.io.Serializable;
+import java.util.Date;
 
-public class BitBucketPPRLinks implements Serializable {
-  BitBucketPPRHtml html;
-  
-    public BitBucketPPRHtml getHtml() {
-    return html;
+
+public class BitBucketPPRApproval implements Serializable {
+  private Date date;
+  BitBucketPPRActor user;
+
+  public BitBucketPPRActor getUser() {
+    return user;
   }
 
-  public void setHtml(BitBucketPPRHtml html) {
-    this.html = html;
+  public void setUser(BitBucketPPRActor user) {
+    this.user = user;
+  }
+
+
+  public Date getDate() {
+    return (Date) date.clone();
+  }
+
+  public void setDate(final Date date) {
+    this.date = new Date(date.getTime());
+  }
+
+  @Override
+  public String toString() {
+    return "BitBucketPPRApproval [date=" + getDate() + ", user=" + user + "]";
   }
 }

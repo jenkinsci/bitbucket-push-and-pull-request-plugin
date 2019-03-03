@@ -21,21 +21,25 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  ******************************************************************************/
-package io.jenkins.plugins.bitbucketpushandpullrequest.model;
+package io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud;
 
 import java.io.Serializable;
 
 import com.google.gson.annotations.SerializedName;
 
 
-public class BitBucketPPROwner implements Serializable {
-  private String username;
-  private String type;
-  
+public class BitBucketPPRActor implements Serializable {
+  String username;
+
   @SerializedName("display_name")
-  private String displayName;
-  private String uuid;
+  String displayName;
+
+  @SerializedName("account_id")
+  String accountId;
+  String type;
   BitBucketPPRLinks links;
+  String nickname;
+  String uuid;
 
   public String getUsername() {
     return username;
@@ -43,14 +47,6 @@ public class BitBucketPPROwner implements Serializable {
 
   public void setUsername(String username) {
     this.username = username;
-  }
-
-  public String getType() {
-    return type;
-  }
-
-  public void setType(String type) {
-    this.type = type;
   }
 
   public String getDisplayName() {
@@ -61,6 +57,38 @@ public class BitBucketPPROwner implements Serializable {
     this.displayName = displayName;
   }
 
+  public String getAccountId() {
+    return accountId;
+  }
+
+  public void setAccountId(String accountId) {
+    this.accountId = accountId;
+  }
+
+  public String getType() {
+    return type;
+  }
+
+  public void setType(String type) {
+    this.type = type;
+  }
+
+  public BitBucketPPRLinks getLinks() {
+    return links;
+  }
+
+  public void setLinks(BitBucketPPRLinks links) {
+    this.links = links;
+  }
+
+  public String getNickname() {
+    return nickname;
+  }
+
+  public void setNickname(String nickname) {
+    this.nickname = nickname;
+  }
+
   public String getUuid() {
     return uuid;
   }
@@ -69,17 +97,10 @@ public class BitBucketPPROwner implements Serializable {
     this.uuid = uuid;
   }
 
-  public BitBucketPPRLinks getLinks() {
-    return this.links;
-  }
-
-  public void setLinks(BitBucketPPRLinks links) {
-    this.links = links;
-  }
-
   @Override
   public String toString() {
-    return "BitBucketPPROwner [username=" + username + ", type=" + type + ", displayName=" + displayName
-        + ", uuid=" + uuid + ", BitBucketPPRLinks=" + links + "]";
+    return "BitBucketPPRActor [username=" + username + ", displayName=" + displayName + ", accountId="
+        + accountId + ", type=" + type + ", links=" + links + ", nickname=" + nickname + ", uuid="
+        + uuid + "]";
   }
 }

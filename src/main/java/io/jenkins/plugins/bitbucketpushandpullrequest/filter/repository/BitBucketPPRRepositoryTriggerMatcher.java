@@ -27,7 +27,7 @@ import java.util.logging.Logger;
 
 import io.jenkins.plugins.bitbucketpushandpullrequest.filter.BitBucketPPREventTriggerMatcher;
 import io.jenkins.plugins.bitbucketpushandpullrequest.filter.BitBucketPPRTriggerFilter;
-import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPREvent;
+import io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud.BitBucketPPREvent;
 import io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConsts;
 
 
@@ -41,6 +41,7 @@ public class BitBucketPPRRepositoryTriggerMatcher implements BitBucketPPREventTr
     LOGGER.log(Level.INFO, () -> "" + bitbucketEvent.toString());
 
     return (triggerFilter.getActionFilter() instanceof BitBucketPPRRepositoryPushActionFilter
-        && BitBucketPPRConsts.REPOSITORY_PUSH.equals(bitbucketEvent.getAction()));
+        && (BitBucketPPRConsts.REPOSITORY_PUSH.equals(bitbucketEvent.getAction())
+            || BitBucketPPRConsts.REPOSITORY_SERVER_PUSH.equals(bitbucketEvent.getAction())));
   }
 }

@@ -21,24 +21,34 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  ******************************************************************************/
-package io.jenkins.plugins.bitbucketpushandpullrequest.model;
+package io.jenkins.plugins.bitbucketpushandpullrequest.model.server;
 
 import java.io.Serializable;
+import java.util.Arrays;
 
 
-public class BitBucketPPRHtml implements Serializable {
+public class BitBucketPPRServerClone implements Serializable {
   private String href;
+  private String name;
 
   public String getHref() {
     return href;
   }
-
+  
   public void setHref(String href) {
     this.href = href;
   }
 
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
+
   @Override
   public String toString() {
-    return "BitBucketPPRHtml [href=" + href + "]";
-  }
+    return "BitBucketPPRServerClone [href=" + href + ", name=" + name + "]";
+  } 
 }

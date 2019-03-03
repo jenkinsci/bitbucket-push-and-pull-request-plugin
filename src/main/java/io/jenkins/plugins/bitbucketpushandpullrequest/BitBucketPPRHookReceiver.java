@@ -40,10 +40,12 @@ import com.google.gson.Gson;
 
 import hudson.Extension;
 import hudson.model.UnprotectedRootAction;
-import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPREvent;
-import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRNewPayload;
-import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPROldPost;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
+import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPayloadFactory;
+import io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud.BitBucketPPREvent;
+import io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud.BitBucketPPRNewPayload;
+import io.jenkins.plugins.bitbucketpushandpullrequest.model.old.BitBucketPPROldPost;
+import io.jenkins.plugins.bitbucketpushandpullrequest.model.server.BitBucketPPRServerPayload;
 import io.jenkins.plugins.bitbucketpushandpullrequest.processor.BitBucketPPRPayloadProcessor;
 import io.jenkins.plugins.bitbucketpushandpullrequest.processor.BitBucketPPRPayloadProcessorFactory;
 
@@ -86,12 +88,20 @@ public class BitBucketPPRHookReceiver implements UnprotectedRootAction {
       BitBucketPPRPayload payload = null;
       BitBucketPPREvent bitbucketEvent = null;
 
-      if (request.getHeader("x-event-key") != null) {
-        LOGGER.log(Level.INFO, "Received new x-event-key service payload");
-        bitbucketEvent = new BitBucketPPREvent(request.getHeader("x-event-key"));
-        payload = gson.fromJson(inputStream, BitBucketPPRNewPayload.class);
-      } 
 
+      if (request.getHeader("x-event-key") != null) {
+        LOGGER.log(Level.INFO, "Received x-event-key payload from bb server");
+        bitbucketEvent = new BitBucketPPREvent(request.getHeader("x-event-key"));
+      } else {
+        LOGGER.log(Level.INFO, "Received old POST payload. (Deprecated, it will be removed.)");
+        bitbucketEvent = new BitBucketPPREvent("repo:post");
+      }
+
+      try {payload = gson.fromJson(inputStream,
+          BitBucketPayloadFactory.getInstance(bitbucketEvent).getClass());
+      } catch(Exception e) {
+        LOGGER.warning(e.getMessage());
+      }
       BitBucketPPRPayloadProcessor bitbucketPayloadProcessor =
           BitBucketPPRPayloadProcessorFactory.createProcessor(bitbucketEvent);
       bitbucketPayloadProcessor.processPayload(payload);

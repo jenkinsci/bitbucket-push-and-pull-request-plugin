@@ -25,9 +25,9 @@ import com.google.gson.stream.JsonReader;
 
 import io.jenkins.plugins.bitbucketpushandpullrequest.BitBucketPPRJobProbe;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
-import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPREvent;
-import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRNewPayload;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
+import io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud.BitBucketPPREvent;
+import io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud.BitBucketPPRNewPayload;
 
 
 @RunWith(MockitoJUnitRunner.class)

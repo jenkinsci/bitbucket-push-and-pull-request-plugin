@@ -21,58 +21,42 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  ******************************************************************************/
-package io.jenkins.plugins.bitbucketpushandpullrequest.model;
+package io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud;
 
 import java.io.Serializable;
-import java.util.Date;
-
-import com.google.gson.annotations.SerializedName;
 
 
-public class BitBucketPPRParticipant implements Serializable {
-  private String type;
-  private BitBucketPPRActor user;
-  private String role;
-  private boolean approved;
-  private @SerializedName("participated_on") Date participatedOn;
+public class BitBucketPPRSource implements Serializable {
+  private BitBucketPPRBranch branch;
+  private BitBucketPPRCommit commit;
+  private BitBucketPPRRepository repository;
 
-  public String getType() {
-    return type;
+  public BitBucketPPRCommit getCommit() {
+    return commit;
   }
 
-  public void setType(String type) {
-    this.type = type;
+  public void setCommit(BitBucketPPRCommit commit) {
+    this.commit = commit;
   }
 
-  public BitBucketPPRActor getUser() {
-    return user;
+  public BitBucketPPRRepository getRepository() {
+    return repository;
   }
 
-  public void setUser(BitBucketPPRActor user) {
-    this.user = user;
+  public void setRepository(BitBucketPPRRepository repository) {
+    this.repository = repository;
   }
 
-  public String getRole() {
-    return role;
+  public BitBucketPPRBranch getBranch() {
+    return branch;
   }
 
-  public void setRole(String role) {
-    this.role = role;
+  public void setBranch(BitBucketPPRBranch branch) {
+    this.branch = branch;
   }
 
-  public boolean getApproved() {
-    return approved;
-  }
-
-  public void setApproved(boolean approved) {
-    this.approved = approved;
-  }
-
-  public Date getParticipatedOn() {
-    return (Date) participatedOn.clone();
-  }
-
-  public void setParticipatedOn(final Date participatedOn) {
-    this.participatedOn = new Date(participatedOn.getTime());;
+  @Override
+  public String toString() {
+    return "BitBucketPPRSource [branch=" + branch + ", commit=" + commit + ", repository=" + repository + "]";
   }
 }

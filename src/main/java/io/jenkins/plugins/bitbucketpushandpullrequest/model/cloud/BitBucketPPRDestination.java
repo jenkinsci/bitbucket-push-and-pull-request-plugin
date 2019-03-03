@@ -21,61 +21,35 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  ******************************************************************************/
-package io.jenkins.plugins.bitbucketpushandpullrequest.model;
+package io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud;
 
 import java.io.Serializable;
 
-
-public class BitBucketPPRProject implements Serializable {
-  BitBucketPPRLinks links;
-  private String type;
-  private String uuid;
-  private String key;
-  private String name;
-
-  public BitBucketPPRLinks getLinks() {
-    return links;
+public class BitBucketPPRDestination implements Serializable {
+  private BitBucketPPRBranch branch;
+  private BitBucketPPRCommit commit;
+  private BitBucketPPRRepository repository;
+  public BitBucketPPRBranch getBranch() {
+    return branch;
   }
-
-  public void setLinks(BitBucketPPRLinks links) {
-    this.links = links;
+  public void setBranch(BitBucketPPRBranch branch) {
+    this.branch = branch;
   }
-
-  public String getType() {
-    return type;
+  public BitBucketPPRCommit getCommit() {
+    return commit;
   }
-
-  public void setType(String type) {
-    this.type = type;
+  public void setCommit(BitBucketPPRCommit commit) {
+    this.commit = commit;
   }
-
-  public String getUuid() {
-    return uuid;
+  public BitBucketPPRRepository getRepository() {
+    return repository;
   }
-
-  public void setUuid(String uuid) {
-    this.uuid = uuid;
+  public void setRepository(BitBucketPPRRepository repository) {
+    this.repository = repository;
   }
-
-  public String getKey() {
-    return key;
-  }
-
-  public void setKey(String key) {
-    this.key = key;
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  public void setName(String name) {
-    this.name = name;
-  }
-
   @Override
   public String toString() {
-    return "BitBucketPPRProject [links=" + links + ", type=" + type + ", uuid=" + uuid + ", key=" + key
-        + ", name=" + name + "]";
+    return "BitBucketPPRDestination [branch=" + branch + ", commit=" + commit + ", repository=" + repository
+        + "]";
   }
 }

@@ -21,75 +21,24 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  ******************************************************************************/
-package io.jenkins.plugins.bitbucketpushandpullrequest.model;
+package io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud;
 
 import java.io.Serializable;
 
-import com.google.gson.annotations.SerializedName;
 
+public class BitBucketPPRHtml implements Serializable {
+  private String href;
 
-public class BitBucketPPRChange implements Serializable {
-  private boolean forced;
-  BitBucketPPRLinks links;
-  private boolean truncated;
-  private boolean created;
-  private boolean closed;
-  
-  @SerializedName("new")
-  BitBucketPPRNew newChange;
-
-  public boolean isForced() {
-    return forced;
+  public String getHref() {
+    return href;
   }
 
-  public void setForced(boolean forced) {
-    this.forced = forced;
-  }
-
-  public BitBucketPPRLinks getLinks() {
-    return links;
-  }
-
-  public void setLinks(BitBucketPPRLinks links) {
-    this.links = links;
-  }
-
-  public boolean isTruncated() {
-    return truncated;
-  }
-
-  public void setTruncated(boolean truncated) {
-    this.truncated = truncated;
-  }
-
-
-  public boolean getCreated() {
-    return created;
-  }
-
-  public void setCreated(boolean created) {
-    this.created = created;
-  }
-
-  public boolean getClosed() {
-    return closed;
-  }
-
-  public void setClosed(boolean closed) {
-    this.closed = closed;
-  }
-
-  public BitBucketPPRNew getNewChange() {
-    return newChange;
-  }
-
-  public void setNewChange(BitBucketPPRNew newChange) {
-    this.newChange = newChange;
+  public void setHref(String href) {
+    this.href = href;
   }
 
   @Override
   public String toString() {
-    return "BitBucketPPRChange [forced=" + forced + ", links=" + links + ", truncated=" + truncated
-        + ", created=" + created + ", closed=" + closed + ", newChange=" + newChange + "]";
+    return "BitBucketPPRHtml [href=" + href + "]";
   }
 }

@@ -21,24 +21,23 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  ******************************************************************************/
-package io.jenkins.plugins.bitbucketpushandpullrequest.model;
+package io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud;
 
 import java.io.Serializable;
 
+public class BitBucketPPRBranch implements Serializable {
+  private String name;
 
-public class BitBucketPPRCommit implements Serializable {
-  private String hash;
-
-  public String getHash() {
-    return hash;
+  public String getName() {
+    return name;
   }
 
-  public void setHash(String hash) {
-    this.hash = hash;
+  public void setName(String name) {
+    this.name = name;
   }
 
   @Override
   public String toString() {
-    return "BitBucketPPRCommit [hash=" + hash + "]";
+    return "BitBucketPPRBranch [name=" + name + "]";
   }
 }

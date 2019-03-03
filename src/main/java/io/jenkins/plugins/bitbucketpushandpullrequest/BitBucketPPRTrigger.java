@@ -55,8 +55,8 @@ import io.jenkins.plugins.bitbucketpushandpullrequest.filter.BitBucketPPRTrigger
 import io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.BitBucketPPRPullRequestTriggerFilter;
 import io.jenkins.plugins.bitbucketpushandpullrequest.filter.repository.BitBucketPPRRepositoryPushActionFilter;
 import io.jenkins.plugins.bitbucketpushandpullrequest.filter.repository.BitBucketPPRRepositoryTriggerFilter;
-import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPREvent;
-import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRProject;
+import io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud.BitBucketPPREvent;
+import io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud.BitBucketPPRProject;
 import jenkins.model.Jenkins;
 import jenkins.model.ParameterizedJobMixIn;
 import jenkins.triggers.SCMTriggerItem;
@@ -65,6 +65,7 @@ import jenkins.triggers.SCMTriggerItem;
 public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
   private static final Logger LOGGER = Logger.getLogger(BitBucketPPRTrigger.class.getName());
   private List<BitBucketPPRTriggerFilter> triggers;
+  private String repositoryName;
 
 
   @DataBoundConstructor
@@ -96,6 +97,9 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
     final List<BitBucketPPRTriggerFilter> matchingFilters =
         filterMatcher.getMatchingFilters(bitbucketEvent, triggers);
 
+    
+    LOGGER.info(bitbucketAction.getRepositoryName());
+    
     if (matchingFilters != null && !matchingFilters.isEmpty()) {
       BitBucketPPRPollingRunnable bitbucketPollingRunnable =
           new BitBucketPPRPollingRunnable(job, getLogFile(), new BitBucketPPRPollResultListener() {

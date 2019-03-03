@@ -21,13 +21,20 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  ******************************************************************************/
-package io.jenkins.plugins.bitbucketpushandpullrequest.model;
+package io.jenkins.plugins.bitbucketpushandpullrequest.model.old;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 import com.google.gson.annotations.SerializedName;
+
+import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
+import io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud.BitBucketPPRActor;
+import io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud.BitBucketPPRApproval;
+import io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud.BitBucketPPRPullRequest;
+import io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud.BitBucketPPRPush;
+import io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud.BitBucketPPRRepository;
 
 
 public class BitBucketPPROldPost implements BitBucketPPRPayload, Serializable {
