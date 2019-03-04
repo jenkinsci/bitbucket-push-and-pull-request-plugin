@@ -25,11 +25,15 @@ package io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud;
 
 import java.io.Serializable;
 
+import com.google.gson.annotations.SerializedName;
+
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRHtml;
 
 public class BitBucketPPRLinks implements Serializable {
   BitBucketPPRHtml html;
-  private BitBucketPPRSelf self;
+  
+  @SerializedName("self")
+  private BitBucketPPRSelf selfProperty;
   
     public BitBucketPPRHtml getHtml() {
     return html;
@@ -40,10 +44,15 @@ public class BitBucketPPRLinks implements Serializable {
   }
 
   public BitBucketPPRSelf getSelf() {
-    return self;
+    return selfProperty;
   }
 
-  public void setSelf(BitBucketPPRSelf self) {
-    this.self = self;
+  public void setSelf(BitBucketPPRSelf selfProperty) {
+    this.selfProperty = selfProperty;
+  }
+
+  @Override
+  public String toString() {
+    return "BitBucketPPRLinks [html=" + html + ", selfProperty=" + selfProperty + "]";
   }
 }

@@ -23,12 +23,17 @@ package io.jenkins.plugins.bitbucketpushandpullrequest.model.server;
 import java.io.Serializable;
 import java.util.Arrays;
 
+import com.google.gson.annotations.SerializedName;
+
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud.BitBucketPPRSelf;
 
 
 public class BitBucketPPRServerLinks implements Serializable {
+  
   BitBucketPPRServerClone[] clone;
-  private BitBucketPPRSelf[] self;
+  
+  @SerializedName("self")
+  private BitBucketPPRSelf[] selfProperty;
 
   public BitBucketPPRServerClone[] getClone() {
     return clone;
@@ -39,16 +44,16 @@ public class BitBucketPPRServerLinks implements Serializable {
   }
 
   public BitBucketPPRSelf[] getSelf() {
-    return self;
+    return selfProperty;
   }
 
   public void setSelf(BitBucketPPRSelf[] self) {
-    this.self = self;
+    this.selfProperty = self;
   }
 
   @Override
   public String toString() {
-    return "BitBucketPPRServerLinks [clone=" + Arrays.toString(clone) + ", self="
-        + Arrays.toString(self) + "]";
+    return "BitBucketPPRServerLinks [clone=" + Arrays.toString(clone) + ", selfProperty="
+        + Arrays.toString(selfProperty) + "]";
   }
 }
