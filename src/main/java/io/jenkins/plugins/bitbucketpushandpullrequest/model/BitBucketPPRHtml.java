@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  ******************************************************************************/
-package io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud;
+package io.jenkins.plugins.bitbucketpushandpullrequest.model;
 
 import java.io.Serializable;
 

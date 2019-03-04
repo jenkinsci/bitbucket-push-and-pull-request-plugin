@@ -25,6 +25,8 @@ package io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud;
 
 import java.io.Serializable;
 
+import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRHtml;
+
 public class BitBucketPPRLinks implements Serializable {
   BitBucketPPRHtml html;
   private BitBucketPPRSelf self;

@@ -40,7 +40,7 @@ public class BitBucketPPRRepositoryPushActionFilter extends BitBucketPPRReposito
 
   public boolean triggerAlsoIfTagPush;
   public String allowedBranches;
-  
+
   @DataBoundConstructor
   public BitBucketPPRRepositoryPushActionFilter(boolean triggerAlsoIfTagPush,
       String allowedBranches) {
@@ -50,9 +50,12 @@ public class BitBucketPPRRepositoryPushActionFilter extends BitBucketPPRReposito
 
   @Override
   public boolean shouldTriggerBuild(BitBucketPPRAction bitbucketAction) {
-    if (bitbucketAction.getType().equals("branch") || this.triggerAlsoIfTagPush) {
-      
+    if (bitbucketAction.getType().equalsIgnoreCase("BRANCH")
+        || bitbucketAction.getType().equalsIgnoreCase("UPDATE") || this.triggerAlsoIfTagPush) {
+
+      LOGGER.info("Should trigger build?");
       if (this.allowedBranches.length() > 0) {
+        LOGGER.info("Allowed branches are set.");
         String[] buffer = this.allowedBranches.split(",");
 
         String[] branches = new String[buffer.length];
@@ -60,11 +63,12 @@ public class BitBucketPPRRepositoryPushActionFilter extends BitBucketPPRReposito
           branches[i] = buffer[i].trim();
 
         for (String branch : branches) {
-          if (bitbucketAction.getBranchName().equals(branch)) {
+          if (bitbucketAction.getBranchName().equalsIgnoreCase(branch)) {
             return true;
           }
         }
       } else {
+        LOGGER.info("allowed branches are not set.");
         return true;
       }
     }
