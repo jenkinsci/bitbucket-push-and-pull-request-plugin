@@ -34,6 +34,7 @@ import io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.BitBuck
 import io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.BitBucketPPRPullRequestUpdatedActionFilter;
 import io.jenkins.plugins.bitbucketpushandpullrequest.filter.repository.BitBucketPPRRepositoryPushActionFilter;
 import io.jenkins.plugins.bitbucketpushandpullrequest.filter.repository.BitBucketPPRRepositoryTriggerFilter;
+import javaposse.jobdsl.dsl.helpers.step.StepContext;
 import javaposse.jobdsl.dsl.helpers.triggers.TriggerContext;
 import javaposse.jobdsl.plugin.ContextExtensionPoint;
 import javaposse.jobdsl.plugin.DslExtensionMethod;

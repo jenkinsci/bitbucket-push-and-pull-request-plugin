@@ -7,7 +7,7 @@ of the official Bitbucket Plugin (<https://plugins.jenkins.io/bitbucket>).
 
 The new features introduced by Bitbucket Push and Pull Request are:
 - improved support of pushs for Bitbucket cloud (rest api v2.x+) and Bitbucket server (5.14+)
-- support of pull requests for Bitbucket cloud (rest api v2.x+)
+- support of pull requests for Bitbucket cloud (rest api v2.x+) (thanks Sazo)
 - usage of Gson instead of net.sf.json.JSONObject (blacklisted starting from Jenkins 2.102+)
 - Introduction of Models and security improvements
 
@@ -20,6 +20,77 @@ Bitbucket Push and Pull Request supports the
 # Roadmap
 - introduce pullrequests for Bitbucket server 5.14+ and later
 - improve DSL pipelines scripting
+
+
+# Dsl Job snippets
+```
+job('example-pull-request-created') {
+  	triggers{
+  		bitbucketPullRequestCreatedAction()
+  	}
+  	scm {
+		git {
+		    remote {
+		        url("https://git.company.domain/scm/~username/telegram.git")
+		    }
+		}
+	}
+    steps {
+        shell('echo START pull request created')
+    }
+}
+
+job('example-pull-request-updated') {
+  	triggers{
+  		bitbucketPullRequestUpdatedAction()
+  	}
+  	scm {
+		git {
+		    remote {
+		        url("https://git.company.domain/scm/~username/telegram.git")
+		    }
+		}
+	}
+    steps {
+        shell('echo START pull request updated')
+    }
+}
+
+// bitbucketPullRequestApprovedAction(boolean onlyIfReviewersApproved)
+job('example-pull-request-approved') {
+  	triggers{
+  		bitbucketPullRequestApprovedAction(false)
+  	}
+  	scm {
+		git {
+		    remote {
+		        url("https://git.company.domain/scm/~username/telegram.git")
+		    }
+		}
+	}
+    steps {
+        shell('echo START pull request approved')
+    }
+}
+
+// bitbucketRepositoryPushAction(boolean triggerAlsoIfTagPush, String allowedBranches)
+job('example-push') {
+  	triggers{
+  		bitbucketRepositoryPushAction(false, "")
+  	}
+  	scm {
+		git {
+		    remote {
+		        url("https://git.company.domain/scm/~username/telegram.git")
+		    }
+		}
+	}
+    steps {
+        shell('echo START push')
+    }
+}
+```
+
 
 # Pipeline script
 Example of pipeline code for building on pull-request create event. It merge from source to target in the PR.
