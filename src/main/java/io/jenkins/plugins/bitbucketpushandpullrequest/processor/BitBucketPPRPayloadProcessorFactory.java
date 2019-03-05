@@ -28,7 +28,7 @@ import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRCo
 import javax.naming.OperationNotSupportedException;
 
 import io.jenkins.plugins.bitbucketpushandpullrequest.BitBucketPPRJobProbe;
-import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPREvent;
+import io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud.BitBucketPPREvent;
 
 
 public final class BitBucketPPRPayloadProcessorFactory {
@@ -49,11 +49,13 @@ public final class BitBucketPPRPayloadProcessorFactory {
 
     BitBucketPPRPayloadProcessor processor = null;
 
-    if (REPOSITORY_EVENT.equals(bitbucketEvent.getEvent())) {
-      if (REPOSITORY_PUSH.equals(bitbucketEvent.getAction())) {
+    if (REPOSITORY_EVENT.equalsIgnoreCase(bitbucketEvent.getEvent())) {
+      if (REPOSITORY_PUSH.equalsIgnoreCase(bitbucketEvent.getAction())) {
         processor = new BitBucketPPRRepositoryPayloadProcessor(probe, bitbucketEvent);
-      } else if (REPOSITORY_POST.equals(bitbucketEvent.getAction())) {
+      } else if (REPOSITORY_POST.equalsIgnoreCase(bitbucketEvent.getAction())) {
         processor = new BitBucketPPROldPostPayloadProcessor(probe, bitbucketEvent);
+      } else if (REPOSITORY_SERVER_PUSH.equalsIgnoreCase(bitbucketEvent.getAction())) {
+        processor = new BitBucketPPRRepositoryServerPayloadProcessor(probe, bitbucketEvent);
       }
     } else if (PULL_REQUEST_EVENT.equals(bitbucketEvent.getEvent())) {
       processor = new BitBucketPPRPullRequestPayloadProcessor(probe, bitbucketEvent);

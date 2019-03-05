@@ -21,35 +21,75 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  ******************************************************************************/
-package io.jenkins.plugins.bitbucketpushandpullrequest.model;
+package io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud;
 
 import java.io.Serializable;
-import java.util.Date;
+
+import com.google.gson.annotations.SerializedName;
 
 
-public class BitBucketPPRApproval implements Serializable {
-  private Date date;
-  BitBucketPPRActor user;
+public class BitBucketPPRChange implements Serializable {
+  private boolean forced;
+  BitBucketPPRLinks links;
+  private boolean truncated;
+  private boolean created;
+  private boolean closed;
+  
+  @SerializedName("new")
+  BitBucketPPRNew newChange;
 
-  public BitBucketPPRActor getUser() {
-    return user;
+  public boolean isForced() {
+    return forced;
   }
 
-  public void setUser(BitBucketPPRActor user) {
-    this.user = user;
+  public void setForced(boolean forced) {
+    this.forced = forced;
+  }
+
+  public BitBucketPPRLinks getLinks() {
+    return links;
+  }
+
+  public void setLinks(BitBucketPPRLinks links) {
+    this.links = links;
+  }
+
+  public boolean isTruncated() {
+    return truncated;
+  }
+
+  public void setTruncated(boolean truncated) {
+    this.truncated = truncated;
   }
 
 
-  public Date getDate() {
-    return (Date) date.clone();
+  public boolean getCreated() {
+    return created;
   }
 
-  public void setDate(final Date date) {
-    this.date = new Date(date.getTime());
+  public void setCreated(boolean created) {
+    this.created = created;
+  }
+
+  public boolean getClosed() {
+    return closed;
+  }
+
+  public void setClosed(boolean closed) {
+    this.closed = closed;
+  }
+
+  public BitBucketPPRNew getNewChange() {
+    return newChange;
+  }
+
+  public void setNewChange(BitBucketPPRNew newChange) {
+    this.newChange = newChange;
   }
 
   @Override
   public String toString() {
-    return "BitBucketPPRApproval [date=" + getDate() + ", user=" + user + "]";
+    return "BitBucketPPRChange [forced=" + forced + ", links=" + links + ", truncated=" + truncated
+        + ", created=" + created + ", closed=" + closed + ", newChange=" + newChange + "]";
   }
 }

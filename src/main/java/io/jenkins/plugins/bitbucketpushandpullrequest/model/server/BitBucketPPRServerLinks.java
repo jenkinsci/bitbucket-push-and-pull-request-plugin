@@ -18,33 +18,35 @@
  * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  ******************************************************************************/
+package io.jenkins.plugins.bitbucketpushandpullrequest.model.server;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.google.gson.annotations.SerializedName;
 
 
-package io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest;
+public class BitBucketPPRServerLinks implements Serializable {
+  @SerializedName("clone")
+  private List<BitBucketPPRServerClone> cloneProperty = new ArrayList<>();
 
-import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConsts.*;
+  @SerializedName("self")
+  private List<BitBucketPPRServerSelf> selfProperty = new ArrayList<>();
 
-import io.jenkins.plugins.bitbucketpushandpullrequest.filter.BitBucketPPREventTriggerMatcher;
-import io.jenkins.plugins.bitbucketpushandpullrequest.filter.BitBucketPPRTriggerFilter;
-import io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud.BitBucketPPREvent;
+  public List<BitBucketPPRServerClone> getCloneProperty() {
+    return new ArrayList<>(cloneProperty);
+  }
 
+  public void setCloneProperty(List<BitBucketPPRServerClone> cloneProperty) {
+    this.cloneProperty = cloneProperty;
+  }
 
-public class BitBucketPPRPullRequestTriggerMatcher implements BitBucketPPREventTriggerMatcher {
-  @Override
-  public boolean matchesAction(BitBucketPPREvent bitbucketEvent,
-      BitBucketPPRTriggerFilter triggerFilter) {
-    if (PULL_REQUEST_APPROVED.equals(bitbucketEvent.getAction())
-        && triggerFilter.getActionFilter() instanceof BitBucketPPRPullRequestApprovedActionFilter) {
-      return true;
-    }
-    if (PULL_REQUEST_UPDATED.equals(bitbucketEvent.getAction())
-        && triggerFilter.getActionFilter() instanceof BitBucketPPRPullRequestUpdatedActionFilter) {
-      return true;
-    }
-    if (PULL_REQUEST_CREATED.equals(bitbucketEvent.getAction())
-        && triggerFilter.getActionFilter() instanceof BitBucketPPRPullRequestCreatedActionFilter) {
-      return true;
-    }
-    return false;
+  public List<BitBucketPPRServerSelf> getSelfProperty() {
+    return new ArrayList<>(selfProperty);
+  }
+
+  public void setSelfProperty(List<BitBucketPPRServerSelf> selfProperty) {
+    this.selfProperty = selfProperty;
   }
 }

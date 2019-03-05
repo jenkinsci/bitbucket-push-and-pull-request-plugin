@@ -18,26 +18,59 @@
  * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  ******************************************************************************/
+package io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud;
 
-
-package io.jenkins.plugins.bitbucketpushandpullrequest.action;
-
-import javax.annotation.Nonnull;
+import com.google.gson.annotations.SerializedName;
 
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
-import io.jenkins.plugins.bitbucketpushandpullrequest.model.old.BitBucketPPROldRepository;
 
 
-public class BitBucketPPROldPostAction extends BitBucketPPRAction {
+public class BitBucketPPRNewPayload implements BitBucketPPRPayload {
+  private BitBucketPPRPush push;
 
-  public BitBucketPPROldPostAction(@Nonnull BitBucketPPRPayload payload) {
-    super(payload);
+  private BitBucketPPRRepository repository;
+  private BitBucketPPRActor actor;
+  private @SerializedName("pullrequest") BitBucketPPRPullRequest pullRequest;
+  private BitBucketPPRApproval approval;
 
-    BitBucketPPROldRepository repo = payload.getOldRepository();
 
-    this.user = payload.getUser();
-    this.scmUrl = payload.getCanonUrl() + repo.getAbsoluteUrl();
-    this.scm = repo.getScm();
+  public BitBucketPPRPush getPush() {
+    return push;
   }
 
+  public void setPush(BitBucketPPRPush push) {
+    this.push = push;
+  }
+
+  public BitBucketPPRRepository getRepository() {
+    return repository;
+  }
+
+  public void setRepository(BitBucketPPRRepository repository) {
+    this.repository = repository;
+  }
+
+  public BitBucketPPRActor getActor() {
+    return actor;
+  }
+
+  public void setActor(BitBucketPPRActor actor) {
+    this.actor = actor;
+  }
+
+  public BitBucketPPRPullRequest getPullRequest() {
+    return pullRequest;
+  }
+
+  public void setPullRequest(BitBucketPPRPullRequest pullRequest) {
+    this.pullRequest = pullRequest;
+  }
+
+  public BitBucketPPRApproval getApproval() {
+    return approval;
+  }
+
+  public void setApproval(BitBucketPPRApproval approval) {
+    this.approval = approval;
+  }
 }

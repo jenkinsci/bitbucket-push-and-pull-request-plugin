@@ -21,48 +21,24 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  ******************************************************************************/
-package io.jenkins.plugins.bitbucketpushandpullrequest.model;
+package io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud;
 
 import java.io.Serializable;
 
-import com.google.gson.annotations.SerializedName;
 
-
-public class BitBucketPPRActor implements Serializable {
-  String username;
-
-  @SerializedName("display_name")
-  String displayName;
-
-  @SerializedName("account_id")
-  String accountId;
-  String type;
+public class BitBucketPPRProject implements Serializable {
   BitBucketPPRLinks links;
-  String nickname;
-  String uuid;
+  private String type;
+  private String uuid;
+  private String key;
+  private String name;
 
-  public String getUsername() {
-    return username;
+  public BitBucketPPRLinks getLinks() {
+    return links;
   }
 
-  public void setUsername(String username) {
-    this.username = username;
-  }
-
-  public String getDisplayName() {
-    return displayName;
-  }
-
-  public void setDisplayName(String displayName) {
-    this.displayName = displayName;
-  }
-
-  public String getAccountId() {
-    return accountId;
-  }
-
-  public void setAccountId(String accountId) {
-    this.accountId = accountId;
+  public void setLinks(BitBucketPPRLinks links) {
+    this.links = links;
   }
 
   public String getType() {
@@ -73,22 +49,6 @@ public class BitBucketPPRActor implements Serializable {
     this.type = type;
   }
 
-  public BitBucketPPRLinks getLinks() {
-    return links;
-  }
-
-  public void setLinks(BitBucketPPRLinks links) {
-    this.links = links;
-  }
-
-  public String getNickname() {
-    return nickname;
-  }
-
-  public void setNickname(String nickname) {
-    this.nickname = nickname;
-  }
-
   public String getUuid() {
     return uuid;
   }
@@ -97,10 +57,25 @@ public class BitBucketPPRActor implements Serializable {
     this.uuid = uuid;
   }
 
+  public String getKey() {
+    return key;
+  }
+
+  public void setKey(String key) {
+    this.key = key;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
+
   @Override
   public String toString() {
-    return "BitBucketPPRActor [username=" + username + ", displayName=" + displayName + ", accountId="
-        + accountId + ", type=" + type + ", links=" + links + ", nickname=" + nickname + ", uuid="
-        + uuid + "]";
+    return "BitBucketPPRProject [links=" + links + ", type=" + type + ", uuid=" + uuid + ", key=" + key
+        + ", name=" + name + "]";
   }
 }

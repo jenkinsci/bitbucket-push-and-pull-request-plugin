@@ -25,7 +25,7 @@
 
 package io.jenkins.plugins.bitbucketpushandpullrequest.filter;
 
-import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPREvent;
+import io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud.BitBucketPPREvent;
 
 
 public interface BitBucketPPREventTriggerMatcher {

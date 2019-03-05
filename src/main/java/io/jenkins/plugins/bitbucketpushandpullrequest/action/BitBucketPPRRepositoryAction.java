@@ -30,8 +30,8 @@ import java.util.logging.Logger;
 
 import javax.annotation.Nonnull;
 
-import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRChange;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
+import io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud.BitBucketPPRChange;
 
 
 public class BitBucketPPRRepositoryAction extends BitBucketPPRAction {
@@ -39,7 +39,7 @@ public class BitBucketPPRRepositoryAction extends BitBucketPPRAction {
 
   public BitBucketPPRRepositoryAction(@Nonnull BitBucketPPRPayload payload) {
     super(payload);
-
+    
     for (BitBucketPPRChange change : payload.getPush().getChanges()) {
       if (change.getNewChange() != null) {
         this.branchName = change.getNewChange().getName();
@@ -47,7 +47,7 @@ public class BitBucketPPRRepositoryAction extends BitBucketPPRAction {
         break;
       }
     }
-
+    
     LOGGER.log(Level.INFO,
         () -> "Received commit hook notification for branch: " + this.branchName);
     LOGGER.log(Level.INFO, () -> "Received commit hook type: " + this.type);

@@ -21,35 +21,65 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  ******************************************************************************/
-package io.jenkins.plugins.bitbucketpushandpullrequest.model;
+package io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud;
 
 import java.io.Serializable;
 
-public class BitBucketPPRDestination implements Serializable {
-  private BitBucketPPRBranch branch;
-  private BitBucketPPRCommit commit;
-  private BitBucketPPRRepository repository;
-  public BitBucketPPRBranch getBranch() {
-    return branch;
+import com.google.gson.annotations.SerializedName;
+
+
+public class BitBucketPPROwner implements Serializable {
+  private String username;
+  private String type;
+  
+  @SerializedName("display_name")
+  private String displayName;
+  private String uuid;
+  BitBucketPPRLinks links;
+
+  public String getUsername() {
+    return username;
   }
-  public void setBranch(BitBucketPPRBranch branch) {
-    this.branch = branch;
+
+  public void setUsername(String username) {
+    this.username = username;
   }
-  public BitBucketPPRCommit getCommit() {
-    return commit;
+
+  public String getType() {
+    return type;
   }
-  public void setCommit(BitBucketPPRCommit commit) {
-    this.commit = commit;
+
+  public void setType(String type) {
+    this.type = type;
   }
-  public BitBucketPPRRepository getRepository() {
-    return repository;
+
+  public String getDisplayName() {
+    return displayName;
   }
-  public void setRepository(BitBucketPPRRepository repository) {
-    this.repository = repository;
+
+  public void setDisplayName(String displayName) {
+    this.displayName = displayName;
   }
+
+  public String getUuid() {
+    return uuid;
+  }
+
+  public void setUuid(String uuid) {
+    this.uuid = uuid;
+  }
+
+  public BitBucketPPRLinks getLinks() {
+    return this.links;
+  }
+
+  public void setLinks(BitBucketPPRLinks links) {
+    this.links = links;
+  }
+
   @Override
   public String toString() {
-    return "BitBucketPPRDestination [branch=" + branch + ", commit=" + commit + ", repository=" + repository
-        + "]";
+    return "BitBucketPPROwner [username=" + username + ", type=" + type + ", displayName=" + displayName
+        + ", uuid=" + uuid + ", BitBucketPPRLinks=" + links + "]";
   }
 }

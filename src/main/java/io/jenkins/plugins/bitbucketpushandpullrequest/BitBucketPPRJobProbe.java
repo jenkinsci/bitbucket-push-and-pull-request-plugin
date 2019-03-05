@@ -43,7 +43,7 @@ import hudson.scm.SCM;
 import hudson.security.ACL;
 import hudson.triggers.Trigger;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
-import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPREvent;
+import io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud.BitBucketPPREvent;
 import jenkins.model.Jenkins;
 import jenkins.model.ParameterizedJobMixIn;
 import jenkins.triggers.SCMTriggerItem;
@@ -68,7 +68,8 @@ public class BitBucketPPRJobProbe {
 
     try {
       URIish remote = new URIish(bitbucketAction.getScmUrl());
-
+      LOGGER.log(Level.FINE, "Considering remote {0}", remote);
+      
       for (Job<?, ?> job : Jenkins.get().getAllItems(Job.class)) {
         LOGGER.log(Level.FINE, "Considering candidate job {0}", job.getName());
 
@@ -79,8 +80,9 @@ public class BitBucketPPRJobProbe {
         }
       }
 
-    } catch (URISyntaxException e) {
+    } catch (Exception e) {
       LOGGER.log(Level.WARNING, "Invalid repository URL {0}", bitbucketAction.getScmUrl());
+      LOGGER.warning(e.getMessage());
     } finally {
       SecurityContextHolder.setContext(old);
     }
@@ -121,7 +123,6 @@ public class BitBucketPPRJobProbe {
           return (BitBucketPPRTrigger) trigger;
         }
       }
-
     }
 
     return null;
@@ -152,7 +153,9 @@ public class BitBucketPPRJobProbe {
     try {
       URI hgUri = new URI(((MercurialSCM) scm).getSource());
       String remote = url.toString();
+      LOGGER.log(Level.INFO, "Trying to match {0} ", hgUri.toString() + "<-->" + url.toString());      
       if (looselyMatches(hgUri, remote)) {
+        LOGGER.info("Machted scm");
         return true;
       }
     } catch (URISyntaxException ex) {
@@ -165,8 +168,9 @@ public class BitBucketPPRJobProbe {
   private boolean matchGitScm(SCM scm, URIish url) {
     for (RemoteConfig remoteConfig : ((GitSCM) scm).getRepositories()) {
       for (URIish urIish : remoteConfig.getURIs()) {
-        LOGGER.log(Level.FINE, "Trying to match {0} ", urIish.toString() + "<-->" + url.toString());
-        if (GitStatus.looselyMatches(parseBitBucketUrIish(urIish), url)) {
+        LOGGER.log(Level.INFO, "Trying to match {0} ", urIish.toString() + "<-->" + url.toString());
+        if (GitStatus.looselyMatches(urIish, url)) {
+          LOGGER.info("Machted scm");
           return true;
         }
       }
@@ -176,6 +180,7 @@ public class BitBucketPPRJobProbe {
   }
 
   // needed cause the ssh and https URI differs in Bitbucket Server.
+  // deprecated
   private URIish parseBitBucketUrIish(URIish urIish) {
     if (urIish.getPath().startsWith("/scm")) {
       urIish = urIish.setPath(urIish.getPath().substring(4));

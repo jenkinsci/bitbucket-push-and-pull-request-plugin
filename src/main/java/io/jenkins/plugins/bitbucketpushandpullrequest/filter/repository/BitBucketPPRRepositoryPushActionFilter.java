@@ -24,17 +24,20 @@ package io.jenkins.plugins.bitbucketpushandpullrequest.filter.repository;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.logging.Logger;
 
-import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 import hudson.Extension;
+import io.jenkins.plugins.bitbucketpushandpullrequest.BitBucketPPRTrigger;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.cause.BitBucketPPRTriggerCause;
 import io.jenkins.plugins.bitbucketpushandpullrequest.cause.repository.BitBucketPPRRepositoryCause;
 
 
 public class BitBucketPPRRepositoryPushActionFilter extends BitBucketPPRRepositoryActionFilter {
+  private static final Logger LOGGER = Logger.getLogger(BitBucketPPRTrigger.class.getName());
+
   public boolean triggerAlsoIfTagPush;
   public String allowedBranches;
 
@@ -47,9 +50,12 @@ public class BitBucketPPRRepositoryPushActionFilter extends BitBucketPPRReposito
 
   @Override
   public boolean shouldTriggerBuild(BitBucketPPRAction bitbucketAction) {
-    if (bitbucketAction.getType().equals("branch") || this.triggerAlsoIfTagPush) {
+    if (bitbucketAction.getType().equalsIgnoreCase("BRANCH")
+        || bitbucketAction.getType().equalsIgnoreCase("UPDATE") || this.triggerAlsoIfTagPush) {
 
+      LOGGER.info("Should trigger build?");
       if (this.allowedBranches.length() > 0) {
+        LOGGER.info("Allowed branches are set.");
         String[] buffer = this.allowedBranches.split(",");
 
         String[] branches = new String[buffer.length];
@@ -57,11 +63,12 @@ public class BitBucketPPRRepositoryPushActionFilter extends BitBucketPPRReposito
           branches[i] = buffer[i].trim();
 
         for (String branch : branches) {
-          if (bitbucketAction.getBranchName().equals(branch)) {
+          if (bitbucketAction.getBranchName().equalsIgnoreCase(branch)) {
             return true;
           }
         }
       } else {
+        LOGGER.info("allowed branches are not set.");
         return true;
       }
     }

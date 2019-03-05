@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  ******************************************************************************/
-package io.jenkins.plugins.bitbucketpushandpullrequest.model;
+package io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud;
 
 import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConsts.*;
 
@@ -45,7 +45,8 @@ public class BitBucketPPREvent {
       throws OperationNotSupportedException {
     if (REPOSITORY_EVENT.equals(eventActionPair[0])) {
       if (!(REPOSITORY_PUSH.equals(eventActionPair[1])
-          || REPOSITORY_POST.equals(eventActionPair[1]))) {
+          || REPOSITORY_POST.equals(eventActionPair[1]) 
+          || REPOSITORY_SERVER_PUSH.equals(eventActionPair[1]))) {
         throw new OperationNotSupportedException();
       }
     } else if (PULL_REQUEST_EVENT.equals(eventActionPair[0])) {

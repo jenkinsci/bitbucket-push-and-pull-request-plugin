@@ -29,7 +29,7 @@ import io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.BitBuck
 import io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.BitBucketPPRPullRequestTriggerMatcher;
 import io.jenkins.plugins.bitbucketpushandpullrequest.filter.repository.BitBucketPPRRepositoryTriggerFilter;
 import io.jenkins.plugins.bitbucketpushandpullrequest.filter.repository.BitBucketPPRRepositoryTriggerMatcher;
-import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPREvent;
+import io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud.BitBucketPPREvent;
 import io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConsts;
 
 

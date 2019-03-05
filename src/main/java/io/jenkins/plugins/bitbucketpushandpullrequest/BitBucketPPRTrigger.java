@@ -55,8 +55,8 @@ import io.jenkins.plugins.bitbucketpushandpullrequest.filter.BitBucketPPRTrigger
 import io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.BitBucketPPRPullRequestTriggerFilter;
 import io.jenkins.plugins.bitbucketpushandpullrequest.filter.repository.BitBucketPPRRepositoryPushActionFilter;
 import io.jenkins.plugins.bitbucketpushandpullrequest.filter.repository.BitBucketPPRRepositoryTriggerFilter;
-import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPREvent;
-import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRProject;
+import io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud.BitBucketPPREvent;
+import io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud.BitBucketPPRProject;
 import jenkins.model.Jenkins;
 import jenkins.model.ParameterizedJobMixIn;
 import jenkins.triggers.SCMTriggerItem;
@@ -65,6 +65,7 @@ import jenkins.triggers.SCMTriggerItem;
 public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
   private static final Logger LOGGER = Logger.getLogger(BitBucketPPRTrigger.class.getName());
   private List<BitBucketPPRTriggerFilter> triggers;
+  private String repositoryName;
 
 
   @DataBoundConstructor
@@ -95,14 +96,14 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
     BitBucketPPRFilterMatcher filterMatcher = new BitBucketPPRFilterMatcher();
     final List<BitBucketPPRTriggerFilter> matchingFilters =
         filterMatcher.getMatchingFilters(bitbucketEvent, triggers);
-
+ 
     if (matchingFilters != null && !matchingFilters.isEmpty()) {
       BitBucketPPRPollingRunnable bitbucketPollingRunnable =
           new BitBucketPPRPollingRunnable(job, getLogFile(), new BitBucketPPRPollResultListener() {
 
             @Override
             public void onPollSuccess(PollingResult pollingResult) {
-              LOGGER.log(Level.FINEST, "Called onPollSuccess");
+              LOGGER.log(Level.INFO, "Called onPollSuccess");
               for (BitBucketPPRTriggerFilter filter : matchingFilters) {
                 BitBucketPPRTriggerCause cause;
                 try {
@@ -115,19 +116,21 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
                   }
 
                 } catch (IOException e) {
-                  LOGGER.log(Level.SEVERE, e.getMessage());
+                  LOGGER.log(Level.INFO, e.getMessage());
                 }
               }
             }
 
             @Override
             public void onPollError(Throwable throwable) {
-              LOGGER.log(Level.FINEST, "Called onPollError");
+              LOGGER.log(Level.INFO, "Called onPollError");
             }
           });
+      
       getDescriptor().queue.execute(bitbucketPollingRunnable);
+    
     } else {
-      LOGGER.log(Level.FINEST, "No matching filters");
+      LOGGER.log(Level.INFO, "No matching filters");
     }
   }
 
@@ -136,8 +139,8 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
     boolean shouldScheduleJob = filter.shouldScheduleJob(bitbucketAction);
     boolean hasChanges = pollingResult.hasChanges();
     boolean isPullRequestFilter = filter instanceof BitBucketPPRPullRequestTriggerFilter;
-    LOGGER.log(Level.FINEST,
-        "Should schedule job : {0} and polling result has changes {1} and is instance of {2}",
+    LOGGER.log(Level.INFO,
+        "Should schedule job : {0} and (polling result has changes {1} or is pull request {2})",
         new Object[] {shouldScheduleJob, hasChanges, isPullRequestFilter});
 
     return shouldScheduleJob && (hasChanges || isPullRequestFilter);
@@ -157,7 +160,7 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
         String name = " #" + job.getNextBuildNumber();
         LOGGER.info(() -> "SCM changes detected in " + job.getName() + ". Triggering " + name);
       } catch (NullPointerException e) {
-        LOGGER.severe(e.getMessage());
+        LOGGER.info(e.getMessage());
       }
     } else {
       LOGGER
