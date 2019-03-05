@@ -1,6 +1,8 @@
 package io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud;
 
-public class BitBucketPPRSelf {
+import java.io.Serializable;
+
+public class BitBucketPPRSelf implements Serializable {
   private String href;
 
   public String getHref() {

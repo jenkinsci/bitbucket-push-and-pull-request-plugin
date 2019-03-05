@@ -80,14 +80,9 @@ public class BitBucketPPRHookReceiver implements UnprotectedRootAction {
 
     if (!inputStream.isEmpty() && request.getRequestURI().contains("/" + HOOK_URL + "/")) {
       inputStream = decodeInputStream(inputStream, request.getContentType());
-
       LOGGER.log(Level.FINE, "Received commit hook notification : {0}", inputStream);
 
-      Gson gson = new Gson();
-
-      BitBucketPPRPayload payload = null;
       BitBucketPPREvent bitbucketEvent = null;
-
 
       if (request.getHeader("x-event-key") != null) {
         LOGGER.log(Level.INFO, "Received x-event-key payload from bb server");
@@ -97,14 +92,17 @@ public class BitBucketPPRHookReceiver implements UnprotectedRootAction {
         bitbucketEvent = new BitBucketPPREvent("repo:post");
       }
 
-      try {payload = gson.fromJson(inputStream,
-          BitBucketPayloadFactory.getInstance(bitbucketEvent).getClass());
-      } catch(Exception e) {
+      Gson gson = new Gson();
+
+      try {
+        BitBucketPPRPayload payload = gson.fromJson(inputStream,
+            BitBucketPayloadFactory.getInstance(bitbucketEvent).getClass());
+        BitBucketPPRPayloadProcessor bitbucketPayloadProcessor =
+            BitBucketPPRPayloadProcessorFactory.createProcessor(bitbucketEvent);
+        bitbucketPayloadProcessor.processPayload(payload);
+      } catch (Exception e) {
         LOGGER.warning(e.getMessage());
       }
-      BitBucketPPRPayloadProcessor bitbucketPayloadProcessor =
-          BitBucketPPRPayloadProcessorFactory.createProcessor(bitbucketEvent);
-      bitbucketPayloadProcessor.processPayload(payload);
     } else {
       LOGGER.log(Level.WARNING,
           () -> "The Jenkins job cannot be triggered. You might no have configured "
@@ -118,7 +116,7 @@ public class BitBucketPPRHookReceiver implements UnprotectedRootAction {
       try {
         input = URLDecoder.decode(input, "UTF-8");
       } catch (UnsupportedEncodingException e) {
-        e.printStackTrace();
+        LOGGER.warning(e.getMessage());
       }
     }
 

@@ -21,39 +21,32 @@
 package io.jenkins.plugins.bitbucketpushandpullrequest.model.server;
 
 import java.io.Serializable;
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.google.gson.annotations.SerializedName;
 
-import io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud.BitBucketPPRSelf;
-
 
 public class BitBucketPPRServerLinks implements Serializable {
-  
-  BitBucketPPRServerClone[] clone;
-  
+  @SerializedName("clone")
+  private List<BitBucketPPRServerClone> cloneProperty = new ArrayList<>();
+
   @SerializedName("self")
-  private BitBucketPPRSelf[] selfProperty;
+  private List<BitBucketPPRServerSelf> selfProperty = new ArrayList<>();
 
-  public BitBucketPPRServerClone[] getClone() {
-    return clone;
+  public List<BitBucketPPRServerClone> getCloneProperty() {
+    return new ArrayList<>(cloneProperty);
   }
 
-  public void setClone(BitBucketPPRServerClone[] clone) {
-    this.clone = clone;
+  public void setCloneProperty(List<BitBucketPPRServerClone> cloneProperty) {
+    this.cloneProperty = cloneProperty;
   }
 
-  public BitBucketPPRSelf[] getSelf() {
-    return selfProperty;
+  public List<BitBucketPPRServerSelf> getSelfProperty() {
+    return new ArrayList<>(selfProperty);
   }
 
-  public void setSelf(BitBucketPPRSelf[] self) {
-    this.selfProperty = self;
-  }
-
-  @Override
-  public String toString() {
-    return "BitBucketPPRServerLinks [clone=" + Arrays.toString(clone) + ", selfProperty="
-        + Arrays.toString(selfProperty) + "]";
+  public void setSelfProperty(List<BitBucketPPRServerSelf> selfProperty) {
+    this.selfProperty = selfProperty;
   }
 }

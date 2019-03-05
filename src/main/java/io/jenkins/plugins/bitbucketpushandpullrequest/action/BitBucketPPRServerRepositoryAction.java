@@ -1,5 +1,6 @@
 package io.jenkins.plugins.bitbucketpushandpullrequest.action;
 
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -16,8 +17,8 @@ public class BitBucketPPRServerRepositoryAction extends BitBucketPPRAction {
 
     this.scm = payload.getServerRepository().getScmId();
 
-    BitBucketPPRServerClone[] clones =
-        payload.getServerRepository().getLinks().getClone();
+    List<BitBucketPPRServerClone> clones =
+        payload.getServerRepository().getLinks().getCloneProperty();
 
     for (BitBucketPPRServerClone clone : clones) {
       if (clone.getName().equalsIgnoreCase("http")) {
