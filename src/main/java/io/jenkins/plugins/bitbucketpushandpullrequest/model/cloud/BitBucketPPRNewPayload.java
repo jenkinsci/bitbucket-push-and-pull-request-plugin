@@ -73,4 +73,9 @@ public class BitBucketPPRNewPayload implements BitBucketPPRPayload {
   public void setApproval(BitBucketPPRApproval approval) {
     this.approval = approval;
   }
+
+  @Override
+  public String toString() {
+    return new com.google.gson.Gson().toJson(this);
+  }
 }

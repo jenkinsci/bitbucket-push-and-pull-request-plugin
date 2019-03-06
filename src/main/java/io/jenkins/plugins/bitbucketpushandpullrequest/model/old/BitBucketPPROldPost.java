@@ -102,7 +102,6 @@ public class BitBucketPPROldPost implements BitBucketPPRPayload, Serializable {
 
   @Override
   public String toString() {
-    return "BitBucketPPROldPost [canonUrl=" + canonUrl + ", commits=" + commits + ", repository=" + repository
-        + ", user=" + user + "]";
+    return new com.google.gson.Gson().toJson(this);
   }
 }

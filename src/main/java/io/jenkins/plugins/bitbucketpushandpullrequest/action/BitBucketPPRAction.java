@@ -46,6 +46,8 @@ import java.util.logging.Logger;
 
 import javax.annotation.Nonnull;
 
+import com.google.gson.Gson;
+
 import hudson.EnvVars;
 import hudson.model.EnvironmentContributingAction;
 import hudson.model.InvisibleAction;
@@ -63,8 +65,7 @@ public class BitBucketPPRAction extends InvisibleAction implements EnvironmentCo
   protected String branchName;
   protected String type;
   protected String repositoryName;
-
-
+  
   public BitBucketPPRAction(@Nonnull BitBucketPPRPayload payload) {
     this.payload = payload;
 
@@ -105,10 +106,10 @@ public class BitBucketPPRAction extends InvisibleAction implements EnvironmentCo
   public String getRepositoryName() {
     return repositoryName;
   }
-
+  
   @Override
   public void buildEnvironment(@Nonnull Run<?, ?> run, @Nonnull EnvVars env) {
     env.put("BITBUCKET_PAYLOAD", payload.toString());
-    LOGGER.log(Level.FINEST, "Injecting BITBUCKET_PAYLOAD: {0}", payload);
+    LOGGER.log(Level.FINEST, "Injecting BITBUCKET_PAYLOAD: {0}", payload.toString());
   }
 }

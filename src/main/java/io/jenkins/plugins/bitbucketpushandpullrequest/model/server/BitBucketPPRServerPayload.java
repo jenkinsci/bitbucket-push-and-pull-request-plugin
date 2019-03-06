@@ -31,7 +31,6 @@ public class BitBucketPPRServerPayload implements BitBucketPPRPayload {
 
   @Override
   public String toString() {
-    return "BitBucketPPRServerPayload [actor=" + actor + ", repository=" + repository + ", changes="
-        + changes + "]";
+    return new com.google.gson.Gson().toJson(this);
   }
 }

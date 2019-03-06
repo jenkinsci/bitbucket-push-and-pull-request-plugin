@@ -52,4 +52,8 @@ public class BitBucketPPRRepositoryAction extends BitBucketPPRAction {
         () -> "Received commit hook notification for branch: " + this.branchName);
     LOGGER.log(Level.INFO, () -> "Received commit hook type: " + this.type);
   }
+  
+  public String getRepositoryUrl() {
+    return payload.getRepository().getLinks().getHtml().getHref();
+  }
 }

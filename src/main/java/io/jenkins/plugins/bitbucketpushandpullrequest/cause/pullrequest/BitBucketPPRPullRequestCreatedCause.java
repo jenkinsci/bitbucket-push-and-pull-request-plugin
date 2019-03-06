@@ -26,6 +26,7 @@ import java.io.File;
 import java.io.IOException;
 
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
+import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRPullRequestAction;
 
 
 public class BitBucketPPRPullRequestCreatedCause extends BitBucketPPRPullRequestCause {
@@ -33,7 +34,7 @@ public class BitBucketPPRPullRequestCreatedCause extends BitBucketPPRPullRequest
       throws IOException {
     super(pollingLog, bitbucketAction);
   }
-
+  
   @Override
   public String getShortDescription() {
     return "Started by Bitbucket new pull request created";

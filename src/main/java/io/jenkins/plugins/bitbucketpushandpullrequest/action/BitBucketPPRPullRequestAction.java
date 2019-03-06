@@ -52,14 +52,5 @@ public class BitBucketPPRPullRequestAction extends BitBucketPPRAction {
     return payload.getPullRequest().getLinks().getHtml().getHref();
   }
 
-  @Override
-  public void buildEnvVars(AbstractBuild<?, ?> abstractBuild, EnvVars envVars) {
-    super.buildEnvVars(abstractBuild, envVars);
-
-    envVars.put("BITBUCKET_BRANCH", getSourceBranch());
-    LOGGER.log(Level.FINEST, "Injecting BITBUCKET_BRANCH: {0}", getSourceBranch());
-
-    envVars.put("PULL_REQUEST_LINK", getPullRequestUrl());
-    LOGGER.log(Level.FINEST, "Injecting PULL_REQUEST_LINK: {0}", getPullRequestUrl());
-  }
+  
 }

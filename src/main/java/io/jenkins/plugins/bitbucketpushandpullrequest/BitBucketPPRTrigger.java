@@ -96,7 +96,7 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
     BitBucketPPRFilterMatcher filterMatcher = new BitBucketPPRFilterMatcher();
     final List<BitBucketPPRTriggerFilter> matchingFilters =
         filterMatcher.getMatchingFilters(bitbucketEvent, triggers);
- 
+
     if (matchingFilters != null && !matchingFilters.isEmpty()) {
       BitBucketPPRPollingRunnable bitbucketPollingRunnable =
           new BitBucketPPRPollingRunnable(job, getLogFile(), new BitBucketPPRPollResultListener() {
@@ -126,9 +126,9 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
               LOGGER.log(Level.INFO, "Called onPollError");
             }
           });
-      
+
       getDescriptor().queue.execute(bitbucketPollingRunnable);
-    
+
     } else {
       LOGGER.log(Level.INFO, "No matching filters");
     }
