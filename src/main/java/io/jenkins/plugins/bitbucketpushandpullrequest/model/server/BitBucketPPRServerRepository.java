@@ -98,4 +98,12 @@ public class BitBucketPPRServerRepository implements Serializable {
   public void setLinks(BitBucketPPRServerLinks links) {
     this.links = links;
   }
+
+  @Override
+  public String toString() {
+    return "BitBucketPPRServerRepository [slug=" + slug + ", id=" + id + ", name=" + name
+        + ", scmId=" + scmId + ", state=" + state + ", statusMessage=" + statusMessage
+        + ", forkable=" + forkable + ", project=" + project + ", links=" + links + ", isPublic="
+        + isPublic + "]";
+  }
 }
