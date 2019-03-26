@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import org.acegisecurity.context.SecurityContext;
 import org.acegisecurity.context.SecurityContextHolder;
@@ -66,22 +67,33 @@ public class BitBucketPPRJobProbe {
     Jenkins.get().getACL();
     SecurityContext old = ACL.impersonate(ACL.SYSTEM);
 
+    List<URIish> remotes = new ArrayList<>();
+
     try {
-      URIish remote = new URIish(bitbucketAction.getScmUrl());
-      LOGGER.log(Level.FINE, "Considering remote {0}", remote);
+      remotes = (List<URIish>) (bitbucketAction.getScmUrls()).stream().map(a -> {
+        try {
+          return new URIish(a);
+        } catch (URISyntaxException e) {
+          e.printStackTrace();
+        }
+        return null;
+      }).collect(Collectors.toList());
       
+      
+      LOGGER.log(Level.FINE, "Considering remote {0}", remotes.toString());
+
       for (Job<?, ?> job : Jenkins.get().getAllItems(Job.class)) {
         LOGGER.log(Level.FINE, "Considering candidate job {0}", job.getName());
 
         BitBucketPPRTrigger bitbucketTrigger = getBitBucketTrigger(job);
         if (bitbucketTrigger != null) {
-          List<SCM> scmTriggered = getTriggeredScm(job, bitbucketTrigger, remote);
+          List<SCM> scmTriggered = getTriggeredScm(job, bitbucketTrigger, remotes);
           LOGGER.log(Level.FINE, "Considering to poke {0}", job.getFullDisplayName());
         }
       }
 
     } catch (Exception e) {
-      LOGGER.log(Level.WARNING, "Invalid repository URL {0}", bitbucketAction.getScmUrl());
+      LOGGER.log(Level.WARNING, "Invalid repository URL {0}", bitbucketAction.getScmUrls());
       LOGGER.warning(e.getMessage());
     } finally {
       SecurityContextHolder.setContext(old);
@@ -89,19 +101,28 @@ public class BitBucketPPRJobProbe {
   }
 
   private List<SCM> getTriggeredScm(Job<?, ?> job, BitBucketPPRTrigger bitbucketTrigger,
-      URIish remote) {
+      List<URIish> remotes) {
     List<SCM> scmTriggered = new ArrayList<>();
 
     try {
       SCMTriggerItem item = SCMTriggerItem.SCMTriggerItems.asSCMTriggerItem(job);
       for (SCM scmTrigger : item.getSCMs()) {
-        if (match(scmTrigger, remote) && !hasBeenTriggered(scmTriggered, scmTrigger)) {
+
+        boolean isRemoteSet = false;
+        for (URIish remote : remotes) {
+          if (match(scmTrigger, remote)) {
+            isRemoteSet = true;
+            break;
+          }
+        }
+
+        if (isRemoteSet && !hasBeenTriggered(scmTriggered, scmTrigger)) {
           scmTriggered.add(scmTrigger);
 
           bitbucketTrigger.onPost(bitbucketEvent, bitbucketAction);
         } else {
           LOGGER.log(Level.FINE, "{0} SCM doesn't match remote repo {1}",
-              new Object[] {job.getName(), remote});
+              new Object[] {job.getName(), remotes});
         }
       }
     } catch (NullPointerException e) {
@@ -149,11 +170,11 @@ public class BitBucketPPRJobProbe {
     return false;
   }
 
-  private boolean matchMercurialScm(SCM scm, URIish url) {
+  private boolean matchMercurialScm(SCM scm, URIish remote) {
     try {
       URI hgUri = new URI(((MercurialSCM) scm).getSource());
-      String remote = url.toString();
-      LOGGER.log(Level.INFO, "Trying to match {0} ", hgUri.toString() + "<-->" + url.toString());      
+
+      LOGGER.log(Level.INFO, "Trying to match {0} ", hgUri.toString() + "<-->" + remote.toString());
       if (looselyMatches(hgUri, remote)) {
         LOGGER.info("Machted scm");
         return true;
@@ -165,11 +186,11 @@ public class BitBucketPPRJobProbe {
     return false;
   }
 
-  private boolean matchGitScm(SCM scm, URIish url) {
+  private boolean matchGitScm(SCM scm, URIish remote) {
     for (RemoteConfig remoteConfig : ((GitSCM) scm).getRepositories()) {
       for (URIish urIish : remoteConfig.getURIs()) {
-        LOGGER.log(Level.INFO, "Trying to match {0} ", urIish.toString() + "<-->" + url.toString());
-        if (GitStatus.looselyMatches(urIish, url)) {
+        LOGGER.log(Level.INFO, "Trying to match {0} ", urIish.toString() + "<-->" + remote.toString());
+        if (GitStatus.looselyMatches(urIish, remote)) {
           LOGGER.info("Machted scm");
           return true;
         }
@@ -188,10 +209,10 @@ public class BitBucketPPRJobProbe {
     return urIish;
   }
 
-  private boolean looselyMatches(URI notifyUri, String repository) {
+  private boolean looselyMatches(URI notifyUri, URIish repository) {
     boolean result = false;
     try {
-      URI repositoryUri = new URI(repository);
+      URI repositoryUri = new URI(repository.toString());
       result = Objects.equal(notifyUri.getHost(), repositoryUri.getHost())
           && Objects.equal(notifyUri.getPath(), repositoryUri.getPath())
           && Objects.equal(notifyUri.getQuery(), repositoryUri.getQuery());

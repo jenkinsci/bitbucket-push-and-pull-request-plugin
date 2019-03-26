@@ -4,10 +4,6 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.annotation.Nonnull;
-
-import hudson.EnvVars;
-import hudson.model.Run;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.server.BitBucketPPRServerChange;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.server.BitBucketPPRServerClone;
@@ -25,8 +21,8 @@ public class BitBucketPPRServerRepositoryAction extends BitBucketPPRAction {
         payload.getServerRepository().getLinks().getCloneProperty();
 
     for (BitBucketPPRServerClone clone : clones) {
-      if (clone.getName().equalsIgnoreCase("http")) {
-        this.scmUrl = clone.getHref();
+      if (clone.getName().equalsIgnoreCase("http") || clone.getName().equalsIgnoreCase("ssh")) {
+        this.scmUrls.add(clone.getHref());
       }
     }
 
@@ -42,5 +38,4 @@ public class BitBucketPPRServerRepositoryAction extends BitBucketPPRAction {
         () -> "Received commit hook notification from server for branch: " + this.branchName);
     LOGGER.log(Level.INFO, () -> "Received commit hook type from server: " + this.type);
   }
- 
 }
