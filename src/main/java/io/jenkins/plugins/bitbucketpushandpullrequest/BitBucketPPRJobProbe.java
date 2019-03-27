@@ -67,7 +67,7 @@ public class BitBucketPPRJobProbe {
     Jenkins.get().getACL();
     SecurityContext old = ACL.impersonate(ACL.SYSTEM);
 
-    List<URIish> remotes = new ArrayList<>();
+    List<URIish> remotes = null;
 
     try {
       remotes = (List<URIish>) (bitbucketAction.getScmUrls()).stream().map(a -> {
@@ -79,19 +79,21 @@ public class BitBucketPPRJobProbe {
         return null;
       }).collect(Collectors.toList());
       
-      
-      LOGGER.log(Level.FINE, "Considering remote {0}", remotes.toString());
+      if (remotes != null) {
+        LOGGER.log(Level.FINE, "Considering remote {0}", remotes.toString());
 
-      for (Job<?, ?> job : Jenkins.get().getAllItems(Job.class)) {
-        LOGGER.log(Level.FINE, "Considering candidate job {0}", job.getName());
+        for (Job<?, ?> job : Jenkins.get().getAllItems(Job.class)) {
+          LOGGER.log(Level.FINE, "Considering candidate job {0}", job.getName());
 
-        BitBucketPPRTrigger bitbucketTrigger = getBitBucketTrigger(job);
-        if (bitbucketTrigger != null) {
-          List<SCM> scmTriggered = getTriggeredScm(job, bitbucketTrigger, remotes);
-          LOGGER.log(Level.FINE, "Considering to poke {0}", job.getFullDisplayName());
-        }
+          BitBucketPPRTrigger bitbucketTrigger = getBitBucketTrigger(job);
+          if (bitbucketTrigger != null) {
+            List<SCM> scmTriggered = getTriggeredScm(job, bitbucketTrigger, remotes);
+            LOGGER.log(Level.FINE, "Considering to poke {0}", job.getFullDisplayName());
+          } 
+        } 
+      } else {
+        LOGGER.log(Level.FINE, "Remotes are not present");
       }
-
     } catch (Exception e) {
       LOGGER.log(Level.WARNING, "Invalid repository URL {0}", bitbucketAction.getScmUrls());
       LOGGER.warning(e.getMessage());
@@ -189,7 +191,8 @@ public class BitBucketPPRJobProbe {
   private boolean matchGitScm(SCM scm, URIish remote) {
     for (RemoteConfig remoteConfig : ((GitSCM) scm).getRepositories()) {
       for (URIish urIish : remoteConfig.getURIs()) {
-        LOGGER.log(Level.INFO, "Trying to match {0} ", urIish.toString() + "<-->" + remote.toString());
+        LOGGER.log(Level.INFO, "Trying to match {0} ",
+            urIish.toString() + "<-->" + remote.toString());
         if (GitStatus.looselyMatches(urIish, remote)) {
           LOGGER.info("Machted scm");
           return true;
