@@ -41,6 +41,8 @@
 
 package io.jenkins.plugins.bitbucketpushandpullrequest.action;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -61,20 +63,19 @@ public class BitBucketPPRAction extends InvisibleAction implements EnvironmentCo
   protected final @Nonnull BitBucketPPRPayload payload;
   protected String scm;
   protected String user;
-  protected String scmUrl;
+  protected List<String> scmUrls = new ArrayList<>(2);
   protected String branchName;
   protected String type;
   protected String repositoryName;
-  
+
   public BitBucketPPRAction(@Nonnull BitBucketPPRPayload payload) {
     this.payload = payload;
 
     if (payload.getRepository() != null) {
-      this.user = payload.getActor().getUsername();
-      this.repositoryName = payload.getRepository().getName();
-      this.scm =
-          payload.getRepository().getScm() != null ? payload.getRepository().getScm() : "git";
-      this.scmUrl = payload.getRepository().getLinks().getHtml().getHref();
+      user = payload.getActor().getUsername();
+      repositoryName = payload.getRepository().getName();
+      scm = payload.getRepository().getScm() != null ? payload.getRepository().getScm() : "git";
+      scmUrls.add(payload.getRepository().getLinks().getHtml().getHref());
     }
   }
 
@@ -91,10 +92,6 @@ public class BitBucketPPRAction extends InvisibleAction implements EnvironmentCo
     return user;
   }
 
-  public String getScmUrl() {
-    return scmUrl;
-  }
-
   public String getBranchName() {
     return branchName;
   }
@@ -105,6 +102,10 @@ public class BitBucketPPRAction extends InvisibleAction implements EnvironmentCo
 
   public String getRepositoryName() {
     return repositoryName;
+  }
+
+  public List<String> getScmUrls() {
+    return scmUrls;
   }
   
   @Override

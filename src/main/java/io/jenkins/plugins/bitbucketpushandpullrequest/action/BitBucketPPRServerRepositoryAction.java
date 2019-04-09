@@ -25,8 +25,8 @@ public class BitBucketPPRServerRepositoryAction extends BitBucketPPRAction {
         payload.getServerRepository().getLinks().getCloneProperty();
 
     for (BitBucketPPRServerClone clone : clones) {
-      if (clone.getName().equalsIgnoreCase("http")) {
-        this.scmUrl = clone.getHref();
+      if (clone.getName().equalsIgnoreCase("http") || clone.getName().equalsIgnoreCase("ssh")) {
+        this.scmUrls.add(clone.getHref());
       }
     }
 

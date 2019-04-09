@@ -36,7 +36,7 @@ public class BitBucketPPROldPostAction extends BitBucketPPRAction {
     BitBucketPPROldRepository repo = payload.getOldRepository();
 
     this.user = payload.getUser();
-    this.scmUrl = payload.getCanonUrl() + repo.getAbsoluteUrl();
+    this.scmUrls.add(payload.getCanonUrl() + repo.getAbsoluteUrl());
     this.scm = repo.getScm();
   }
 
