@@ -48,6 +48,8 @@ import java.util.logging.Logger;
 
 import javax.annotation.Nonnull;
 
+import com.google.gson.Gson;
+
 import hudson.EnvVars;
 import hudson.model.EnvironmentContributingAction;
 import hudson.model.InvisibleAction;
