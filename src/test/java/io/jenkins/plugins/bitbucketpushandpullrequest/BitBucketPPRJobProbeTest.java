@@ -1,6 +1,7 @@
 package io.jenkins.plugins.bitbucketpushandpullrequest;
 
 import static org.junit.Assert.assertEquals;
+
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -44,9 +45,6 @@ public class BitBucketPPRJobProbeTest {
 
   BitBucketPPRJobProbe jobProbe;
 
-  // @Rule
-  // public JenkinsRule jenkins = new JenkinsRule();
-
   @BeforeClass
   public static void beforeClass() {
     System.out.println("Starting test class" + BitBucketPPRJobProbeTest.class.getName());
@@ -61,16 +59,16 @@ public class BitBucketPPRJobProbeTest {
   @Test
   public void testTriggerMatchingJobs() {
     PowerMockito.mockStatic(Jenkins.class);
-    
-    
+
+
     PowerMockito.verifyStatic(Jenkins.class);
 
-    
+
     jobProbe.triggerMatchingJobs(null, null);
-    Jenkins.get();    
-    
+    Jenkins.get();
+
   }
-  
+
   @Test
   public void testGetRemotesAsList() throws Exception {
     BitBucketPPRAction bitbucketAction = mock(BitBucketPPRAction.class);
