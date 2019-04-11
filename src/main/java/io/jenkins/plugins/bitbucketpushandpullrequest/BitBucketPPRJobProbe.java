@@ -94,7 +94,7 @@ public class BitBucketPPRJobProbe {
     }).collect(Collectors.toList());
   }
 
-  private void triggerScm(Job<?, ?> job, List<URIish> remotes) {
+  void triggerScm(Job<?, ?> job, List<URIish> remotes) {
     LOGGER.log(Level.FINE, "Considering to poke {0}", job.getFullDisplayName());
     Optional<BitBucketPPRTrigger> bitbucketTrigger = getBitBucketTrigger(job);
     List<SCM> scmTriggered = new ArrayList<>();

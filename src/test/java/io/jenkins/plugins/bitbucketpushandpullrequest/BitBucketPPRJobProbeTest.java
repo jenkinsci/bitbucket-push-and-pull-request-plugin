@@ -1,8 +1,8 @@
 package io.jenkins.plugins.bitbucketpushandpullrequest;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -10,37 +10,42 @@ import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import org.eclipse.jgit.transport.URIish;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.jvnet.hudson.test.JenkinsRule;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.Mockito;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonIOException;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.stream.JsonReader;
 
+import hudson.model.Job;
+import hudson.security.ACL;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
-import io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud.BitBucketPPREvent;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud.BitBucketPPRNewPayload;
+import jenkins.model.Jenkins;
+import jenkins.model.ParameterizedJobMixIn.ParameterizedJob;
 
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(PowerMockRunner.class)
+@PrepareForTest({Jenkins.class, ACL.class, Logger.class})
 public class BitBucketPPRJobProbeTest {
   Gson gson = new Gson();
 
   BitBucketPPRJobProbe jobProbe;
 
-//  @Rule
-//  public JenkinsRule jenkins = new JenkinsRule();
+  // @Rule
+  // public JenkinsRule jenkins = new JenkinsRule();
 
   @BeforeClass
   public static void beforeClass() {
@@ -48,35 +53,29 @@ public class BitBucketPPRJobProbeTest {
   }
 
   @Before
-  public void before() {
+  public void setUp() {
     System.out.println("Starting a test");
     jobProbe = new BitBucketPPRJobProbe();
   }
 
-//  @Test
-//  public void testTriggerMatchingJobs() {
-//
-//    BitBucketPPREvent bitbucketEvent = mock(BitBucketPPREvent.class);
-//    BitBucketPPRAction bitbucketAction = new BitBucketPPRAction(getPayload());
-//    BitBucketPPRAction bitbucketActionSpy = spy(bitbucketAction);
-//
-//    when(bitbucketActionSpy.getScm()).thenReturn("git");
-//
-//
-//    List<String> remotes = new ArrayList<>();
-//    remotes.add("https://cdelmonte-zg@bitbucket.org/theveryjenkinsadventure/test-one.git");
-//    remotes.add("git@bitbucket.org:theveryjenkinsadventure/test-one.git");
-//
-//    when(bitbucketActionSpy.getScmUrls()).thenReturn(remotes);
-//    jobProbe.triggerMatchingJobs(bitbucketEvent, bitbucketAction);
-//
-//    assertEquals(true, true);
-//  }
-
-
   @Test
-  public void testgetRemotesAsList() throws Exception {
+  public void testTriggerMatchingJobs() {
+    PowerMockito.mockStatic(Jenkins.class);
+    
+    
+    PowerMockito.verifyStatic(Jenkins.class);
+
+    
+    jobProbe.triggerMatchingJobs(null, null);
+    Jenkins.get();    
+    
+  }
+  
+  @Test
+  public void testGetRemotesAsList() throws Exception {
     BitBucketPPRAction bitbucketAction = mock(BitBucketPPRAction.class);
+
+    // PowerMockito.whenNew(BitBucketPPRAction.class).withNoArguments().thenReturn(bitbucketAction);
 
     List<String> remotes = new ArrayList<>();
     remotes.add("https://cdelmonte-zg@bitbucket.org/theveryjenkinsadventure/test-one.git");
