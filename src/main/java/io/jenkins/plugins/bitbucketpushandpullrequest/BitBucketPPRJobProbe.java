@@ -1,7 +1,7 @@
 /*******************************************************************************
  * The MIT License
  * 
- * Copyright (C) 2018, CloudBees, Inc.
+ * Copyright (C) 2019, CloudBees, Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -26,7 +26,6 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -43,7 +42,6 @@ import hudson.plugins.mercurial.MercurialSCM;
 import hudson.scm.SCM;
 import hudson.security.ACL;
 import hudson.security.ACLContext;
-import hudson.triggers.Trigger;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud.BitBucketPPREvent;
 import jenkins.model.Jenkins;
@@ -94,7 +92,7 @@ public class BitBucketPPRJobProbe {
     }).collect(Collectors.toList());
   }
 
-  private void triggerScm(Job<?, ?> job, List<URIish> remotes) {
+  void triggerScm(Job<?, ?> job, List<URIish> remotes) {
     LOGGER.log(Level.FINE, "Considering to poke {0}", job.getFullDisplayName());
     Optional<BitBucketPPRTrigger> bitbucketTrigger = getBitBucketTrigger(job);
     List<SCM> scmTriggered = new ArrayList<>();

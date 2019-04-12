@@ -1,8 +1,30 @@
+/*******************************************************************************
+ * The MIT License
+ * 
+ * Copyright (C) 2019, CloudBees, Inc.
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
+ * associated documentation files (the "Software"), to deal in the Software without restriction,
+ * including without limitation the rights to use, copy, modify, merge, publish, distribute,
+ * sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all copies or
+ * substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT
+ * NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+ * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ ******************************************************************************/
+
+
 package io.jenkins.plugins.bitbucketpushandpullrequest;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -10,16 +32,13 @@ import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
 import java.util.stream.Collectors;
 
 import org.eclipse.jgit.transport.URIish;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.jvnet.hudson.test.JenkinsRule;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import com.google.gson.Gson;
@@ -29,7 +48,6 @@ import com.google.gson.stream.JsonReader;
 
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
-import io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud.BitBucketPPREvent;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud.BitBucketPPRNewPayload;
 
 
@@ -39,43 +57,19 @@ public class BitBucketPPRJobProbeTest {
 
   BitBucketPPRJobProbe jobProbe;
 
-//  @Rule
-//  public JenkinsRule jenkins = new JenkinsRule();
-
   @BeforeClass
   public static void beforeClass() {
     System.out.println("Starting test class" + BitBucketPPRJobProbeTest.class.getName());
   }
 
   @Before
-  public void before() {
+  public void setUp() {
     System.out.println("Starting a test");
     jobProbe = new BitBucketPPRJobProbe();
   }
 
-//  @Test
-//  public void testTriggerMatchingJobs() {
-//
-//    BitBucketPPREvent bitbucketEvent = mock(BitBucketPPREvent.class);
-//    BitBucketPPRAction bitbucketAction = new BitBucketPPRAction(getPayload());
-//    BitBucketPPRAction bitbucketActionSpy = spy(bitbucketAction);
-//
-//    when(bitbucketActionSpy.getScm()).thenReturn("git");
-//
-//
-//    List<String> remotes = new ArrayList<>();
-//    remotes.add("https://cdelmonte-zg@bitbucket.org/theveryjenkinsadventure/test-one.git");
-//    remotes.add("git@bitbucket.org:theveryjenkinsadventure/test-one.git");
-//
-//    when(bitbucketActionSpy.getScmUrls()).thenReturn(remotes);
-//    jobProbe.triggerMatchingJobs(bitbucketEvent, bitbucketAction);
-//
-//    assertEquals(true, true);
-//  }
-
-
   @Test
-  public void testgetRemotesAsList() throws Exception {
+  public void testGetRemotesAsList() throws Exception {
     BitBucketPPRAction bitbucketAction = mock(BitBucketPPRAction.class);
 
     List<String> remotes = new ArrayList<>();
@@ -118,5 +112,4 @@ public class BitBucketPPRJobProbeTest {
 
     return payload;
   }
-
 }
