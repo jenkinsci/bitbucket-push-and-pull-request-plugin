@@ -32,7 +32,6 @@ import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import org.eclipse.jgit.transport.URIish;
@@ -40,24 +39,19 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonIOException;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.stream.JsonReader;
 
-import hudson.security.ACL;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud.BitBucketPPRNewPayload;
-import jenkins.model.Jenkins;
 
 
-@RunWith(PowerMockRunner.class)
-@PrepareForTest({Jenkins.class, ACL.class, Logger.class})
+@RunWith(MockitoJUnitRunner.class)
 public class BitBucketPPRJobProbeTest {
   Gson gson = new Gson();
 
@@ -75,18 +69,8 @@ public class BitBucketPPRJobProbeTest {
   }
 
   @Test
-  public void testTriggerMatchingJobs() {
-    PowerMockito.mockStatic(Jenkins.class);
-    PowerMockito.verifyStatic(Jenkins.class);
-    jobProbe.triggerMatchingJobs(null, null);
-    Jenkins.get();
-  }
-
-  @Test
   public void testGetRemotesAsList() throws Exception {
     BitBucketPPRAction bitbucketAction = mock(BitBucketPPRAction.class);
-
-    // PowerMockito.whenNew(BitBucketPPRAction.class).withNoArguments().thenReturn(bitbucketAction);
 
     List<String> remotes = new ArrayList<>();
     remotes.add("https://cdelmonte-zg@bitbucket.org/theveryjenkinsadventure/test-one.git");
