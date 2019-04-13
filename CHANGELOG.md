@@ -1,7 +1,7 @@
 # Change Log
 
 ## 1.5.0 (2019-04-11)
-[Full Changelog](https://github.com/skywinder/ActionSheetPicker-3.0/compare/2.2.0...2.3.0)
+[Full Changelog](https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/compare/master@%7B20days%7D...master)
 
 **Implemented enhancements:**
 
