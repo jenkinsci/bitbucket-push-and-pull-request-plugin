@@ -24,11 +24,11 @@ package io.jenkins.plugins.bitbucketpushandpullrequest.filter.repository;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.logging.Logger;
-
 import org.kohsuke.stapler.DataBoundConstructor;
-
 import hudson.Extension;
+import hudson.plugins.git.BranchSpec;
 import io.jenkins.plugins.bitbucketpushandpullrequest.BitBucketPPRTrigger;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.cause.BitBucketPPRTriggerCause;
@@ -52,23 +52,24 @@ public class BitBucketPPRRepositoryPushActionFilter extends BitBucketPPRReposito
   public boolean shouldTriggerBuild(BitBucketPPRAction bitbucketAction) {
     if (bitbucketAction.getType().equalsIgnoreCase("BRANCH")
         || bitbucketAction.getType().equalsIgnoreCase("UPDATE") || this.triggerAlsoIfTagPush) {
+      return matches(new BranchSpec(bitbucketAction.getBranchName()), this.allowedBranches);
+    }
+    return false;
+  }
 
-      LOGGER.info("Should trigger build?");
-      if (this.allowedBranches.length() > 0) {
-        LOGGER.info("Allowed branches are set.");
-        String[] buffer = this.allowedBranches.split(",");
+  protected boolean matches(BranchSpec branchSpec, String allowedBranches) {
+    LOGGER.info("Should trigger build?");
+    if (this.allowedBranches.isEmpty()) {
+      LOGGER.info("allowed branches are not set.");
+      return true;
+    }
 
-        String[] branches = new String[buffer.length];
-        for (int i = 0; i < buffer.length; i++)
-          branches[i] = buffer[i].trim();
+    LOGGER.info("Allowed branches are set.");
+    String[] branches = this.allowedBranches.split(",");
+    Arrays.stream(branches).map(String::trim).toArray(unused -> branches);
 
-        for (String branch : branches) {
-          if (bitbucketAction.getBranchName().equalsIgnoreCase(branch)) {
-            return true;
-          }
-        }
-      } else {
-        LOGGER.info("allowed branches are not set.");
+    for (String branchPattern : branches) {
+      if (branchSpec.matches(branchPattern)) {
         return true;
       }
     }
