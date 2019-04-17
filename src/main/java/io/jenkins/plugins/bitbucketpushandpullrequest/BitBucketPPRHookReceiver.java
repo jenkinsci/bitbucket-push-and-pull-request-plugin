@@ -85,7 +85,7 @@ public class BitBucketPPRHookReceiver implements UnprotectedRootAction {
       LOGGER.warning("The Jenkins job cannot be triggered. The input stream is empty.");
     } else if (request.getRequestURI().contains("/" + HOOK_URL + "/")) {
       LOGGER.log(Level.FINE, "Received commit hook notification : {0}", inputStream);
-      
+
       inputStream = decodeInputStream(inputStream, request.getContentType());
       BitBucketPPREvent bitbucketEvent = null;
       if (request.getHeader("x-event-key") != null) {
@@ -104,15 +104,17 @@ public class BitBucketPPRHookReceiver implements UnprotectedRootAction {
         }
       }
 
-      Gson gson = new Gson();
-      try {
-        BitBucketPPRPayload payload = gson.fromJson(inputStream,
-            BitBucketPayloadFactory.getInstance(bitbucketEvent).getClass());
-        BitBucketPPRPayloadProcessor bitbucketPayloadProcessor =
-            BitBucketPPRPayloadProcessorFactory.createProcessor(bitbucketEvent);
-        bitbucketPayloadProcessor.processPayload(payload);
-      } catch (Exception e) {
-        LOGGER.warning(e.getMessage());
+      if (bitbucketEvent != null) {
+        Gson gson = new Gson();
+        try {
+          BitBucketPPRPayload payload = gson.fromJson(inputStream,
+              BitBucketPayloadFactory.getInstance(bitbucketEvent).getClass());
+          BitBucketPPRPayloadProcessor bitbucketPayloadProcessor =
+              BitBucketPPRPayloadProcessorFactory.createProcessor(bitbucketEvent);
+          bitbucketPayloadProcessor.processPayload(payload);
+        } catch (Exception e) {
+          LOGGER.warning(e.getMessage());
+        }
       }
 
       LOGGER.log(Level.INFO, "Sending response.");
@@ -128,7 +130,6 @@ public class BitBucketPPRHookReceiver implements UnprotectedRootAction {
       } catch (Exception e) {
         LOGGER.warning(e.getMessage());
       }
-
     } else {
       LOGGER.log(Level.WARNING,
           () -> "The Jenkins job cannot be triggered. You might no have configured "
@@ -152,5 +153,4 @@ public class BitBucketPPRHookReceiver implements UnprotectedRootAction {
 
     return input;
   }
-
 }
