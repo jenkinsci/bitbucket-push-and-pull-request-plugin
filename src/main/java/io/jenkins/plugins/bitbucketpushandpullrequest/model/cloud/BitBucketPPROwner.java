@@ -29,21 +29,13 @@ import com.google.gson.annotations.SerializedName;
 
 
 public class BitBucketPPROwner implements Serializable {
-  private String username;
   private String type;
   
   @SerializedName("display_name")
   private String displayName;
   private String uuid;
   BitBucketPPRLinks links;
-
-  public String getUsername() {
-    return username;
-  }
-
-  public void setUsername(String username) {
-    this.username = username;
-  }
+  private String nickname;
 
   public String getType() {
     return type;
@@ -77,9 +69,17 @@ public class BitBucketPPROwner implements Serializable {
     this.links = links;
   }
 
+  public String getNickname() {
+    return nickname;
+  }
+
+  public void setNickname(String nickname) {
+    this.nickname = nickname;
+  }
+
   @Override
   public String toString() {
-    return "BitBucketPPROwner [username=" + username + ", type=" + type + ", displayName=" + displayName
-        + ", uuid=" + uuid + ", BitBucketPPRLinks=" + links + "]";
+    return "BitBucketPPROwner [type=" + type + ", displayName=" + displayName + ", uuid=" + uuid
+        + ", links=" + links + ", nickname=" + nickname + "]";
   }
 }
