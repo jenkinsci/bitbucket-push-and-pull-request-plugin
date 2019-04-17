@@ -26,15 +26,18 @@ import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRCo
 import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConsts.USER_AGENT;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.naming.OperationNotSupportedException;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
 import org.kohsuke.stapler.StaplerRequest;
+import org.kohsuke.stapler.StaplerResponse;
 
 import com.google.gson.Gson;
 
@@ -75,25 +78,33 @@ public class BitBucketPPRHookReceiver implements UnprotectedRootAction {
     return HOOK_URL;
   }
 
-  public void doIndex(StaplerRequest request) throws IOException, OperationNotSupportedException {
+  public void doIndex(StaplerRequest request, StaplerResponse response) throws IOException {
     String inputStream = IOUtils.toString(request.getInputStream());
 
-    if (!inputStream.isEmpty() && request.getRequestURI().contains("/" + HOOK_URL + "/")) {
-      inputStream = decodeInputStream(inputStream, request.getContentType());
+    if (inputStream.isEmpty()) {
+      LOGGER.warning("The Jenkins job cannot be triggered. The input stream is empty.");
+    } else if (request.getRequestURI().contains("/" + HOOK_URL + "/")) {
       LOGGER.log(Level.FINE, "Received commit hook notification : {0}", inputStream);
-
+      
+      inputStream = decodeInputStream(inputStream, request.getContentType());
       BitBucketPPREvent bitbucketEvent = null;
-
       if (request.getHeader("x-event-key") != null) {
-        LOGGER.log(Level.INFO, "Received x-event-key payload from bb server");
-        bitbucketEvent = new BitBucketPPREvent(request.getHeader("x-event-key"));
+        LOGGER.log(Level.INFO, "Received x-event-key payload from bitbucket");
+        try {
+          bitbucketEvent = new BitBucketPPREvent(request.getHeader("x-event-key"));
+        } catch (OperationNotSupportedException e) {
+          LOGGER.warning(e.getMessage());
+        }
       } else {
         LOGGER.log(Level.INFO, "Received old POST payload. (Deprecated, it will be removed.)");
-        bitbucketEvent = new BitBucketPPREvent("repo:post");
+        try {
+          bitbucketEvent = new BitBucketPPREvent("repo:post");
+        } catch (OperationNotSupportedException e) {
+          LOGGER.warning(e.getMessage());
+        }
       }
 
       Gson gson = new Gson();
-
       try {
         BitBucketPPRPayload payload = gson.fromJson(inputStream,
             BitBucketPayloadFactory.getInstance(bitbucketEvent).getClass());
@@ -103,6 +114,21 @@ public class BitBucketPPRHookReceiver implements UnprotectedRootAction {
       } catch (Exception e) {
         LOGGER.warning(e.getMessage());
       }
+
+      LOGGER.log(Level.INFO, "Sending response.");
+      try {
+        response.setContentType("text/html");
+        response.setCharacterEncoding("UTF-8");
+        response.setStatus(HttpServletResponse.SC_OK);
+        PrintWriter out = response.getWriter();
+        out.write("ok");
+        out.flush();
+        out.close();
+        LOGGER.log(Level.INFO, "Response sent.");
+      } catch (Exception e) {
+        LOGGER.warning(e.getMessage());
+      }
+
     } else {
       LOGGER.log(Level.WARNING,
           () -> "The Jenkins job cannot be triggered. You might no have configured "
