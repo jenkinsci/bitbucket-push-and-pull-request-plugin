@@ -54,7 +54,8 @@ public class BitBucketPPREvent {
     } else if (PULL_REQUEST_EVENT.equalsIgnoreCase(eventActionPair[0])) {
       if (!(PULL_REQUEST_APPROVED.equalsIgnoreCase(eventActionPair[1])
           || PULL_REQUEST_CREATED.equalsIgnoreCase(eventActionPair[1])
-          || PULL_REQUEST_UPDATED.equalsIgnoreCase(eventActionPair[1]))) {
+          || PULL_REQUEST_UPDATED.equalsIgnoreCase(eventActionPair[1])
+          || PULL_REQUEST_MERGED.equalsIgnoreCase(eventActionPair[1]))) {
         error = true;
       }
     } else if (DIAGNOSTICS.equalsIgnoreCase(eventActionPair[0])) {
