@@ -72,7 +72,7 @@ public class BitBucketPPRAction extends InvisibleAction implements EnvironmentCo
     this.payload = payload;
 
     if (payload.getRepository() != null) {
-      user = payload.getActor().getUsername();
+      user = payload.getActor().getNickname();
       repositoryName = payload.getRepository().getName();
       scm = payload.getRepository().getScm() != null ? payload.getRepository().getScm() : "git";
       scmUrls.add(payload.getRepository().getLinks().getHtml().getHref());

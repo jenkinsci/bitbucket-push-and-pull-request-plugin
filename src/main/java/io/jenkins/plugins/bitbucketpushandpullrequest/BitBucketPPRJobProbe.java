@@ -21,6 +21,7 @@
 
 package io.jenkins.plugins.bitbucketpushandpullrequest;
 
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -113,7 +114,11 @@ public class BitBucketPPRJobProbe {
             scmTriggered.add(scmTrigger);
             LOGGER.log(Level.FINE, "Triggering trigger {0} for job {1}",
                 new Object[] {trigger.getClass().getName(), job.getFullDisplayName()});
-            trigger.onPost(bitbucketEvent, bitbucketAction);
+            try {
+              trigger.onPost(bitbucketEvent, bitbucketAction);
+            } catch (Exception e) {
+              LOGGER.log(Level.WARNING, "Error: {0}", e.getMessage());
+            }
           } else {
             LOGGER.log(Level.FINE, "{0} SCM doesn't match remote repo {1}",
                 new Object[] {job.getName(), remotes});

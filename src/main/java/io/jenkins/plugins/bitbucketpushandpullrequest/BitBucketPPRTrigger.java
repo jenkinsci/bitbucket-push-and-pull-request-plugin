@@ -90,9 +90,11 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
 
   /**
    * Called when a POST is made.
+   * 
+   * @throws IOException
    */
   public void onPost(final BitBucketPPREvent bitbucketEvent,
-      final BitBucketPPRAction bitbucketAction) {
+      final BitBucketPPRAction bitbucketAction) throws Exception {
     BitBucketPPRFilterMatcher filterMatcher = new BitBucketPPRFilterMatcher();
     final List<BitBucketPPRTriggerFilter> matchingFilters =
         filterMatcher.getMatchingFilters(bitbucketEvent, triggers);
@@ -115,7 +117,7 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
                     return;
                   }
 
-                } catch (IOException e) {
+                } catch (Exception e) {
                   LOGGER.log(Level.INFO, e.getMessage());
                 }
               }
@@ -175,35 +177,21 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
 
   /**
    * Returns the file that records the last/current polling activity.
+   * @throws Exception 
    */
-  public File getLogFile() {
-    File file = null;
-
-    try {
-      file = new File(job.getRootDir(), "bitbucket-polling.log");
-    } catch (NullPointerException e) {
-      LOGGER.severe(e.getMessage());
+  public File getLogFile() throws Exception {
+    
+    if (job == null) {
+      throw new Exception("No job started");
     }
-
+    
+    File file = new File(job.getRootDir(), "bitbucket-polling.log");
+    if (file.createNewFile()) {
+      LOGGER.log(Level.FINE, "Created new file {0} for logging in the directory {1}.",
+          new Object[] {"bitbucket-polling.log",job.getRootDir()});
+    }
+    
     return file;
-  }
-
-  /**
-   * Check if "bitbucket-polling.log" already exists to initialise it
-   */
-  public boolean isLogFileInitialized() {
-    try {
-      if (job != null) {
-        File file = new File(job.getRootDir(), "bitbucket-polling.log");
-        return file.exists();
-      } else {
-        throw new Exception("Job is null");
-      }
-    } catch (Exception e) {
-      LOGGER.severe(e.getMessage());
-    }
-
-    return false;
   }
 
   @Override
@@ -231,14 +219,14 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
       return "BitBucketPollLog";
     }
 
-    public String getLog() throws IOException {
+    public String getLog() throws Exception {
       return Util.loadFile(getLogFile(), StandardCharsets.UTF_8);
     }
 
     /**
      * Writes the annotated log to the given output.
      */
-    public void writeLogTo(XMLOutput out) throws IOException {
+    public void writeLogTo(XMLOutput out) throws Exception {
       new AnnotatedLargeText<BitBucketWebHookPollingAction>(getLogFile(), Charset.defaultCharset(),
           true, this).writeHtmlTo(0, out.asWriter());
     }
@@ -266,7 +254,6 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
       // you may want to filter this list of descriptors here, if you are being very fancy
       return Jenkins.get().getDescriptorList(BitBucketPPRTriggerFilter.class);
     }
-
   }
 
   public List<BitBucketPPRTriggerFilter> getTriggers() {

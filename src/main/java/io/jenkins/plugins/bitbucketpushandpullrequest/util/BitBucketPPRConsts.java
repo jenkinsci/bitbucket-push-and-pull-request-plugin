@@ -31,13 +31,17 @@ public final class BitBucketPPRConsts {
   public static final String REPOSITORY_PUSH = "push";
   public static final String REPOSITORY_POST = "post";
   
+  public static final String DIAGNOSTICS = "diagnostics";
+  public static final String PING = "ping";
+  
   public static final String REPOSITORY_SERVER_PUSH = "refs_changed";
 
   public static final String PULL_REQUEST_EVENT = "pullrequest";
   public static final String PULL_REQUEST_CREATED = "created";
   public static final String PULL_REQUEST_APPROVED = "approved";
   public static final String PULL_REQUEST_UPDATED = "updated";
-
+  public static final String PULL_REQUEST_MERGED = "fulfilled";
+  
   public static final String PULL_REQUEST_REVIEWER = "REVIEWER";
   public static final String PULL_REQUEST_PARTICIPANT = "PARTICIPANT";
 

@@ -73,8 +73,8 @@ public class BitBucketPPRJobProbeTest {
     BitBucketPPRAction bitbucketAction = mock(BitBucketPPRAction.class);
 
     List<String> remotes = new ArrayList<>();
-    remotes.add("https://cdelmonte-zg@bitbucket.org/theveryjenkinsadventure/test-one.git");
-    remotes.add("git@bitbucket.org:theveryjenkinsadventure/test-one.git");
+    remotes.add("https://some-user@bitbucket.org/theveryjenkins/test.git");
+    remotes.add("git@bitbucket.org:theveryjenkins/test.git");
     when(bitbucketAction.getScmUrls()).thenReturn(remotes);
 
     List<URIish> returnedList = remotes.stream().map(a -> {

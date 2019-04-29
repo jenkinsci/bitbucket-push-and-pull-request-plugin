@@ -29,7 +29,6 @@ import com.google.gson.annotations.SerializedName;
 
 
 public class BitBucketPPRActor implements Serializable {
-  String username;
 
   @SerializedName("display_name")
   String displayName;
@@ -40,14 +39,6 @@ public class BitBucketPPRActor implements Serializable {
   BitBucketPPRLinks links;
   String nickname;
   String uuid;
-
-  public String getUsername() {
-    return username;
-  }
-
-  public void setUsername(String username) {
-    this.username = username;
-  }
 
   public String getDisplayName() {
     return displayName;
@@ -99,7 +90,7 @@ public class BitBucketPPRActor implements Serializable {
 
   @Override
   public String toString() {
-    return "BitBucketPPRActor [username=" + username + ", displayName=" + displayName + ", accountId="
+    return "BitBucketPPRActor [displayName=" + displayName + ", accountId="
         + accountId + ", type=" + type + ", links=" + links + ", nickname=" + nickname + ", uuid="
         + uuid + "]";
   }
