@@ -45,6 +45,10 @@ public class BitBucketPPRPullRequestTriggerMatcher implements BitBucketPPREventT
         && triggerFilter.getActionFilter() instanceof BitBucketPPRPullRequestCreatedActionFilter) {
       return true;
     }
+    if (PULL_REQUEST_MERGED.equals(bitbucketEvent.getAction())
+        && triggerFilter.getActionFilter() instanceof BitBucketPPRPullRequestMergedActionFilter) {
+      return true;
+    }
     return false;
   }
 }

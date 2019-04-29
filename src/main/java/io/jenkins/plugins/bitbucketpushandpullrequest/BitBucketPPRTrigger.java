@@ -266,7 +266,6 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
       // you may want to filter this list of descriptors here, if you are being very fancy
       return Jenkins.get().getDescriptorList(BitBucketPPRTriggerFilter.class);
     }
-
   }
 
   public List<BitBucketPPRTriggerFilter> getTriggers() {
