@@ -116,7 +116,7 @@ public class BitBucketPPRJobProbe {
                 new Object[] {trigger.getClass().getName(), job.getFullDisplayName()});
             try {
               trigger.onPost(bitbucketEvent, bitbucketAction);
-            } catch (IOException e) {
+            } catch (Exception e) {
               LOGGER.log(Level.WARNING, "Error: {0}", e.getMessage());
             }
           } else {

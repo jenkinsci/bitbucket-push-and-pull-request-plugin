@@ -90,10 +90,11 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
 
   /**
    * Called when a POST is made.
-   * @throws IOException 
+   * 
+   * @throws IOException
    */
   public void onPost(final BitBucketPPREvent bitbucketEvent,
-      final BitBucketPPRAction bitbucketAction) throws IOException {
+      final BitBucketPPRAction bitbucketAction) throws Exception {
     BitBucketPPRFilterMatcher filterMatcher = new BitBucketPPRFilterMatcher();
     final List<BitBucketPPRTriggerFilter> matchingFilters =
         filterMatcher.getMatchingFilters(bitbucketEvent, triggers);
@@ -116,7 +117,7 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
                     return;
                   }
 
-                } catch (IOException e) {
+                } catch (Exception e) {
                   LOGGER.log(Level.INFO, e.getMessage());
                 }
               }
@@ -176,12 +177,19 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
 
   /**
    * Returns the file that records the last/current polling activity.
-   * 
-   * @throws IOException
+   * @throws Exception 
    */
-  public File getLogFile() throws IOException {
+  public File getLogFile() throws Exception {
+    
+    if (job == null) {
+      throw new Exception("No job started");
+    }
+    
     File file = new File(job.getRootDir(), "bitbucket-polling.log");
-    file.createNewFile();
+    if (file.createNewFile()) {
+      LOGGER.log(Level.FINE, "Created new file {0} for logging in the directory {1}.",
+          new Object[] {"bitbucket-polling.log",job.getRootDir()});
+    }
     
     return file;
   }
@@ -211,14 +219,14 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
       return "BitBucketPollLog";
     }
 
-    public String getLog() throws IOException {
+    public String getLog() throws Exception {
       return Util.loadFile(getLogFile(), StandardCharsets.UTF_8);
     }
 
     /**
      * Writes the annotated log to the given output.
      */
-    public void writeLogTo(XMLOutput out) throws IOException {
+    public void writeLogTo(XMLOutput out) throws Exception {
       new AnnotatedLargeText<BitBucketWebHookPollingAction>(getLogFile(), Charset.defaultCharset(),
           true, this).writeHtmlTo(0, out.asWriter());
     }
