@@ -90,9 +90,10 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
 
   /**
    * Called when a POST is made.
+   * @throws IOException 
    */
   public void onPost(final BitBucketPPREvent bitbucketEvent,
-      final BitBucketPPRAction bitbucketAction) {
+      final BitBucketPPRAction bitbucketAction) throws IOException {
     BitBucketPPRFilterMatcher filterMatcher = new BitBucketPPRFilterMatcher();
     final List<BitBucketPPRTriggerFilter> matchingFilters =
         filterMatcher.getMatchingFilters(bitbucketEvent, triggers);
@@ -175,35 +176,14 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
 
   /**
    * Returns the file that records the last/current polling activity.
+   * 
+   * @throws IOException
    */
-  public File getLogFile() {
-    File file = null;
-
-    try {
-      file = new File(job.getRootDir(), "bitbucket-polling.log");
-    } catch (NullPointerException e) {
-      LOGGER.severe(e.getMessage());
-    }
-
+  public File getLogFile() throws IOException {
+    File file = new File(job.getRootDir(), "bitbucket-polling.log");
+    file.createNewFile();
+    
     return file;
-  }
-
-  /**
-   * Check if "bitbucket-polling.log" already exists to initialise it
-   */
-  public boolean isLogFileInitialized() {
-    try {
-      if (job != null) {
-        File file = new File(job.getRootDir(), "bitbucket-polling.log");
-        return file.exists();
-      } else {
-        throw new Exception("Job is null");
-      }
-    } catch (Exception e) {
-      LOGGER.severe(e.getMessage());
-    }
-
-    return false;
   }
 
   @Override
