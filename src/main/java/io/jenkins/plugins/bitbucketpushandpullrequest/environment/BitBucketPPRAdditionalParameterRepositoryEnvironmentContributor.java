@@ -33,13 +33,26 @@ public class BitBucketPPRAdditionalParameterRepositoryEnvironmentContributor
       return;
     }
     
-    String urlBranch = cause.getRepositoryPayLoad().getRepositoryUrl();
-    putEnvVar(envVars, "REPOSITORY_LINK", urlBranch);
-    LOGGER.log(Level.FINEST, "Injecting REPOSOTORY_LINK: {0}", urlBranch);
+    @Deprecated
+    String urlBranchDeprecated = cause.getRepositoryPayLoad().getRepositoryUrl();
+    putEnvVar(envVars, "REPOSITORY_LINK", urlBranchDeprecated);
+    LOGGER.log(Level.FINEST, "Injecting REPOSOTORY_LINK: {0}", urlBranchDeprecated);
 
     String payloadInString = gson.toJson(cause.getRepositoryPayLoad());
     putEnvVar(envVars, "BITBUCKET_PAYLOAD", payloadInString);
     LOGGER.log(Level.FINEST, "Injecting BITBUCKET_PAYLOAD: {0}", payloadInString);
+    
+    String sourceBranch = cause.getRepositoryPayLoad().getRepositoryName();
+    putEnvVar(envVars, "BITBUCKET_SOURCE_BRANCH", sourceBranch);
+    LOGGER.log(Level.FINEST, "Injecting BITBUCKET_SOURCE_BRANCH: {0}", sourceBranch);
+
+    String urlBranch = cause.getRepositoryPayLoad().getRepositoryUrl();
+    putEnvVar(envVars, "BITBUCKET_REPOSITORY_URL", urlBranch);
+    LOGGER.log(Level.FINEST, "Injecting BITBUCKET_REPOSITORY_URL: {0}", urlBranch);
+    
+    String repositoryUuid = cause.getRepositoryPayLoad().getRepositoryUuid();
+    putEnvVar(envVars, "BITBUCKET_REPOSITORY_UUID", urlBranch);
+    LOGGER.log(Level.FINEST, "Injecting BITBUCKET_PUSH_REPOSITORY_UUID: {0}", repositoryUuid);
   }
 
   private static void putEnvVar(EnvVars envs, String name, String value) {

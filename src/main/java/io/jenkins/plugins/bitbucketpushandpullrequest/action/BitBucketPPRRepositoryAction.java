@@ -44,6 +44,7 @@ public class BitBucketPPRRepositoryAction extends BitBucketPPRAction {
       if (change.getNewChange() != null) {
         this.branchName = change.getNewChange().getName();
         this.type = change.getNewChange().getType();
+        this.repositoryUuid = payload.getRepository().getUuid();
         break;
       }
     }

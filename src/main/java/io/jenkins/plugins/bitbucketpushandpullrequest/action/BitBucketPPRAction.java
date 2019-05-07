@@ -67,6 +67,8 @@ public class BitBucketPPRAction extends InvisibleAction implements EnvironmentCo
   protected String branchName;
   protected String type;
   protected String repositoryName;
+  protected String pullRequestId;
+  protected String repositoryUuid;
 
   public BitBucketPPRAction(@Nonnull BitBucketPPRPayload payload) {
     this.payload = payload;
@@ -108,6 +110,14 @@ public class BitBucketPPRAction extends InvisibleAction implements EnvironmentCo
     return scmUrls;
   }
   
+  public String getPullRequestId() {
+    return pullRequestId;
+  }
+
+  public String getRepositoryUuid() {
+    return repositoryUuid;
+  }
+
   @Override
   public void buildEnvironment(@Nonnull Run<?, ?> run, @Nonnull EnvVars env) {
     env.put("BITBUCKET_PAYLOAD", payload.toString());

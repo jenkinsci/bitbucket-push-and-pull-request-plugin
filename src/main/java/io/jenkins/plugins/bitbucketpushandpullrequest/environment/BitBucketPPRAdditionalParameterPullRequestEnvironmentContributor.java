@@ -55,17 +55,21 @@ public class BitBucketPPRAdditionalParameterPullRequestEnvironmentContributor
       return;
     }
 
-    String sourceBranch = cause.getPullRequestPayLoad().getSourceBranch();
-    putEnvVar(envVars, "BITBUCKET_SOURCE_BRANCH", sourceBranch);
-    LOGGER.log(Level.FINEST, "Injecting BITBUCKET_SOURCE_BRANCH: {0}", sourceBranch);
+    String pullRequestSourceBranch = cause.getPullRequestPayLoad().getSourceBranch();
+    putEnvVar(envVars, "BITBUCKET_SOURCE_BRANCH", pullRequestSourceBranch);
+    LOGGER.log(Level.FINEST, "Injecting BITBUCKET_SOURCE_BRANCH: {0}", pullRequestSourceBranch);
 
-    String targetBranch = cause.getPullRequestPayLoad().getTargetBranch();
-    putEnvVar(envVars, "BITBUCKET_TARGET_BRANCH", targetBranch);
-    LOGGER.log(Level.FINEST, "Injecting BITBUCKET_TARGET_BRANCH: {0}", targetBranch);
+    String pullRequestTargetBranch = cause.getPullRequestPayLoad().getTargetBranch();
+    putEnvVar(envVars, "BITBUCKET_TARGET_BRANCH", pullRequestTargetBranch);
+    LOGGER.log(Level.FINEST, "Injecting BITBUCKET_TARGET_BRANCH: {0}", pullRequestTargetBranch);
 
-    String urlBranch = cause.getPullRequestPayLoad().getPullRequestUrl();
-    putEnvVar(envVars, "PULL_REQUEST_LINK", urlBranch);
-    LOGGER.log(Level.FINEST, "Injecting PULL_REQUEST_LINK: {0}", urlBranch);
+    String pullRequestUrlBranch = cause.getPullRequestPayLoad().getPullRequestUrl();
+    putEnvVar(envVars, "BITBUCKET_PULL_REQUEST_LINK", pullRequestUrlBranch);
+    LOGGER.log(Level.FINEST, "Injecting BITBUCKET_PULL_REQUEST_LINK: {0}", pullRequestUrlBranch);
+    
+    String pullRequestId = cause.getPullRequestPayLoad().getPullRequestUrl();
+    putEnvVar(envVars, "BITBUCKET_PULL_REQUEST_ID", pullRequestId);
+    LOGGER.log(Level.FINEST, "Injecting BITBUCKET_PULL_REQUEST_ID: {0}", pullRequestId);
 
     String payloadInString = gson.toJson(cause.getPullRequestPayLoad());
     putEnvVar(envVars, "BITBUCKET_PAYLOAD", payloadInString);
