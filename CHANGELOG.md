@@ -1,6 +1,23 @@
 # Change Log
 
 
+## 1.6.1 (2019-05-08)
+[Full Changelog](https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/compare/bitbucket-push-and-pull-request-1.6.0...bitbucket-push-and-pull-request-1.6.1)
+
+**Implemented enhancements:**
+
+- added more enviroment variables and improved the documentation abotu them
+
+**Closed issues:**
+
+- Improvements#24 Add environment variable for pull request id
+- Issue#19 Webhook not triggering
+- Improvements#11 BITBUCKET_SOURCE_BRANCH is not injected for SCM poll
+
+**Merged pull requests:**
+
+- [develop] Enhance environment variables #25 
+
 ## 1.6.0 (2019-04-29)
 [Full Changelog](https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/compare/bitbucket-push-and-pull-request-1.5.0...bitbucket-push-and-pull-request-1.6.0)
 
