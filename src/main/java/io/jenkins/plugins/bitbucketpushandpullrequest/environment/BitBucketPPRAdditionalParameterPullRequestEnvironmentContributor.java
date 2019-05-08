@@ -48,10 +48,13 @@ public class BitBucketPPRAdditionalParameterPullRequestEnvironmentContributor
   @Override
   public void buildEnvironmentFor(@Nonnull Run run, EnvVars envVars, TaskListener taskListener)
       throws IOException, InterruptedException {
-
+    
+    LOGGER.log(Level.INFO, "Injecting env vars because of pull request cause.");
+    
     BitBucketPPRPullRequestCause cause =
         (BitBucketPPRPullRequestCause) run.getCause(BitBucketPPRPullRequestCause.class);
     if (cause == null) {
+      LOGGER.log(Level.WARNING, "Problem injecting env variables: Cause = null");
       return;
     }
 
@@ -67,7 +70,7 @@ public class BitBucketPPRAdditionalParameterPullRequestEnvironmentContributor
     putEnvVar(envVars, "BITBUCKET_PULL_REQUEST_LINK", pullRequestUrlBranch);
     LOGGER.log(Level.FINEST, "Injecting BITBUCKET_PULL_REQUEST_LINK: {0}", pullRequestUrlBranch);
     
-    String pullRequestId = cause.getPullRequestPayLoad().getPullRequestUrl();
+    String pullRequestId = cause.getPullRequestPayLoad().getPullRequestId();
     putEnvVar(envVars, "BITBUCKET_PULL_REQUEST_ID", pullRequestId);
     LOGGER.log(Level.FINEST, "Injecting BITBUCKET_PULL_REQUEST_ID: {0}", pullRequestId);
 

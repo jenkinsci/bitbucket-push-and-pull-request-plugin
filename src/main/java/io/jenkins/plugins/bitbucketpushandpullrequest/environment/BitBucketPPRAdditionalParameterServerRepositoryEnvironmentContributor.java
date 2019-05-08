@@ -9,11 +9,14 @@ import javax.annotation.Nonnull;
 import com.google.gson.Gson;
 
 import hudson.EnvVars;
+import hudson.Extension;
 import hudson.model.EnvironmentContributor;
 import hudson.model.Run;
 import hudson.model.TaskListener;
 import io.jenkins.plugins.bitbucketpushandpullrequest.cause.repository.BitBucketPPRServerRepositoryCause;
 
+
+@Extension
 public class BitBucketPPRAdditionalParameterServerRepositoryEnvironmentContributor  extends EnvironmentContributor {
   private static final Logger LOGGER = Logger
       .getLogger(BitBucketPPRAdditionalParameterServerRepositoryEnvironmentContributor.class.getName());
@@ -23,10 +26,13 @@ public class BitBucketPPRAdditionalParameterServerRepositoryEnvironmentContribut
   @Override
   public void buildEnvironmentFor(@Nonnull Run run, EnvVars envVars, TaskListener taskListener)
       throws IOException, InterruptedException {
-
+    
+    LOGGER.log(Level.INFO, "Injecting env vars because of server push cause.");
+    
     BitBucketPPRServerRepositoryCause cause =
         (BitBucketPPRServerRepositoryCause) run.getCause(BitBucketPPRServerRepositoryCause.class);
     if (cause == null) {
+      LOGGER.log(Level.WARNING, "Problem injecting env variables: Cause = null");
       return;
     }
 

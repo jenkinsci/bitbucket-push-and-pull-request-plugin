@@ -30,6 +30,7 @@ import java.nio.charset.StandardCharsets;
 
 import javax.naming.OperationNotSupportedException;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
@@ -64,6 +65,7 @@ public class BitBucketPPRPullRequestPayloadProcessorTest {
   private BitBucketPPRPullRequestPayloadProcessor pullRequestPayloadProcessor;
 
   @Test
+  @Ignore
   public void testProcessPullRequestApprovalWebhookHg() {
     String user = "test_user";
     String url = "https://bitbucket.org/test_user/test_repo";
