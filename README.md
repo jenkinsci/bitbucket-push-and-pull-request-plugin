@@ -21,6 +21,8 @@ Bitbucket Push And Pull Request Plugin will not work if the old Bitbucket plugin
 **For infos about the plugin's configuration please visit the webpage** <https://plugins.jenkins.io/bitbucket-push-and-pull-request>
 
 
+# Environment variables
+
 ### Environment variables for Bitbucket Cloud pull requests
 
 | NAME                        | VALUE                  |
@@ -30,6 +32,7 @@ Bitbucket Push And Pull Request Plugin will not work if the old Bitbucket plugin
 | BITBUCKET_PULL_REQUEST_LINK | link                   |
 | BITBUCKET_PULL_REQUEST_ID   | id                     |
 | BITBUCKET_PAYLOAD           | payload as json string | 
+
 
 
 ### Environment variables for Bitbucket Cloud  pushs
