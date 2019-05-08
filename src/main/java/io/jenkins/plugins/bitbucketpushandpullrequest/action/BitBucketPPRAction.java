@@ -57,7 +57,7 @@ import hudson.model.Run;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
 
 
-public class BitBucketPPRAction extends InvisibleAction implements EnvironmentContributingAction {
+public class BitBucketPPRAction extends InvisibleAction {
   private static final Logger LOGGER = Logger.getLogger(BitBucketPPRAction.class.getName());
 
   protected final @Nonnull BitBucketPPRPayload payload;
@@ -67,6 +67,8 @@ public class BitBucketPPRAction extends InvisibleAction implements EnvironmentCo
   protected String branchName;
   protected String type;
   protected String repositoryName;
+  protected String pullRequestId;
+  protected String repositoryUuid;
 
   public BitBucketPPRAction(@Nonnull BitBucketPPRPayload payload) {
     this.payload = payload;
@@ -108,9 +110,11 @@ public class BitBucketPPRAction extends InvisibleAction implements EnvironmentCo
     return scmUrls;
   }
   
-  @Override
-  public void buildEnvironment(@Nonnull Run<?, ?> run, @Nonnull EnvVars env) {
-    env.put("BITBUCKET_PAYLOAD", payload.toString());
-    LOGGER.log(Level.FINEST, "Injecting BITBUCKET_PAYLOAD: {0}", payload.toString());
+  public String getPullRequestId() {
+    return pullRequestId;
+  }
+
+  public String getRepositoryUuid() {
+    return repositoryUuid;
   }
 }

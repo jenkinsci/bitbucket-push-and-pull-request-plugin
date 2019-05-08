@@ -22,13 +22,8 @@
 
 package io.jenkins.plugins.bitbucketpushandpullrequest.action;
 
-import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import javax.annotation.Nonnull;
-
-import hudson.EnvVars;
-import hudson.model.AbstractBuild;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
 
 
@@ -38,6 +33,7 @@ public class BitBucketPPRPullRequestAction extends BitBucketPPRAction {
 
   public BitBucketPPRPullRequestAction(@Nonnull BitBucketPPRPayload payload) {
     super(payload);
+    this.pullRequestId = payload.getPullRequest().getId();
   }
 
   public String getSourceBranch() {
@@ -50,7 +46,5 @@ public class BitBucketPPRPullRequestAction extends BitBucketPPRAction {
 
   public String getPullRequestUrl() {
     return payload.getPullRequest().getLinks().getHtml().getHref();
-  }
-
-  
+  }  
 }
