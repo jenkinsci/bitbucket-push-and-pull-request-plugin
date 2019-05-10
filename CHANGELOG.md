@@ -1,5 +1,16 @@
 # Change Log
 
+## 1.6.2 (2019-05-10)
+[Full Changelog](https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/compare/bitbucket-push-and-pull-request-1.6.1...bitbucket-push-and-pull-request-1.6.2)
+
+**Closed issues:**
+
+- Issue #27 Builds not triggering with 1.6.1 and Bitbucket Server 7.0.1 bug
+
+**Merged pull requests:**
+
+- [Bug] #27 Builds not triggering with 1.6.1 and Bitbucket Server 7.0.1 #28
+
 
 ## 1.6.1 (2019-05-08)
 [Full Changelog](https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/compare/bitbucket-push-and-pull-request-1.6.0...bitbucket-push-and-pull-request-1.6.1)
