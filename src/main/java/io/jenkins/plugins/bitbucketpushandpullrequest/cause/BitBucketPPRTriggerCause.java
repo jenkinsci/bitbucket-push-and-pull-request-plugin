@@ -28,7 +28,6 @@ import java.io.IOException;
 import hudson.triggers.SCMTrigger;
 import hudson.triggers.SCMTrigger.SCMTriggerCause;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
-import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRPullRequestAction;
 
 
 public class BitBucketPPRTriggerCause extends SCMTrigger.SCMTriggerCause {
