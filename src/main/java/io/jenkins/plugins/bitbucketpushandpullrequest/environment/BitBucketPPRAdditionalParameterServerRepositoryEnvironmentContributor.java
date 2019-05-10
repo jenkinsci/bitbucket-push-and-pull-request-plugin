@@ -17,32 +17,33 @@ import io.jenkins.plugins.bitbucketpushandpullrequest.cause.repository.BitBucket
 
 
 @Extension
-public class BitBucketPPRAdditionalParameterServerRepositoryEnvironmentContributor  extends EnvironmentContributor {
-  private static final Logger LOGGER = Logger
-      .getLogger(BitBucketPPRAdditionalParameterServerRepositoryEnvironmentContributor.class.getName());
+public class BitBucketPPRAdditionalParameterServerRepositoryEnvironmentContributor
+    extends EnvironmentContributor {
+  private static final Logger LOGGER = Logger.getLogger(
+      BitBucketPPRAdditionalParameterServerRepositoryEnvironmentContributor.class.getName());
 
   Gson gson = new Gson();
 
   @Override
   public void buildEnvironmentFor(@Nonnull Run run, EnvVars envVars, TaskListener taskListener)
       throws IOException, InterruptedException {
-    
+
     LOGGER.log(Level.INFO, "Injecting env vars because of server push cause.");
-    
-    BitBucketPPRServerRepositoryCause cause =
-        (BitBucketPPRServerRepositoryCause) run.getCause(BitBucketPPRServerRepositoryCause.class);
-    if (cause == null) {
-      LOGGER.log(Level.WARNING, "Problem injecting env variables: Cause = null");
-      return;
+
+    try {
+      BitBucketPPRServerRepositoryCause cause =
+          (BitBucketPPRServerRepositoryCause) run.getCause(BitBucketPPRServerRepositoryCause.class);
+      if (cause == null) {
+        LOGGER.log(Level.WARNING, "Problem injecting env variables: Cause = null");
+        return;
+      }
+
+      String urlBranch = cause.getServerRepositoryPayLoad().getRepositoryName();
+      putEnvVar(envVars, "REPOSITORY_NAME", urlBranch);
+      LOGGER.log(Level.FINEST, "Injecting SERVER_REPOSITORY_NAME: {0}", urlBranch);
+    } catch (ClassCastException e) {
+      LOGGER.log(Level.WARNING, "Problem injecting env variables: wrong EnvironmentContributor");
     }
-
-    String urlBranch = cause.getServerRepositoryPayLoad().getRepositoryName();
-    putEnvVar(envVars, "REPOSITORY_NAME", urlBranch);
-    LOGGER.log(Level.FINEST, "Injecting SERVER_REPOSITORY_NAME: {0}", urlBranch);
-
-    String payloadInString = gson.toJson(cause.getServerRepositoryPayLoad());
-    putEnvVar(envVars, "BITBUCKET_PAYLOAD", payloadInString);
-    LOGGER.log(Level.FINEST, "Injecting BITBUCKET_PAYLOAD: {0}", payloadInString);
   }
 
   private static void putEnvVar(EnvVars envs, String name, String value) {

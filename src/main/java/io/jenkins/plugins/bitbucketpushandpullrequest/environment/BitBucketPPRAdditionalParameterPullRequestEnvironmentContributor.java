@@ -73,10 +73,6 @@ public class BitBucketPPRAdditionalParameterPullRequestEnvironmentContributor
     String pullRequestId = cause.getPullRequestPayLoad().getPullRequestId();
     putEnvVar(envVars, "BITBUCKET_PULL_REQUEST_ID", pullRequestId);
     LOGGER.log(Level.FINEST, "Injecting BITBUCKET_PULL_REQUEST_ID: {0}", pullRequestId);
-
-    String payloadInString = gson.toJson(cause.getPullRequestPayLoad());
-    putEnvVar(envVars, "BITBUCKET_PAYLOAD", payloadInString);
-    LOGGER.log(Level.FINEST, "Injecting BITBUCKET_PAYLOAD: {0}", payloadInString);
   }
 
   private static void putEnvVar(EnvVars envs, String name, String value) {
