@@ -51,9 +51,9 @@ public class BitBucketPPRRepositoryTriggerFilter extends BitBucketPPRTriggerFilt
   }
 
   @Override
-  public BitBucketPPRTriggerCause getCause(File pollingLog, BitBucketPPRAction repositoryAction)
+  public BitBucketPPRTriggerCause getCause(File pollingLog, BitBucketPPRAction action)
       throws IOException {
-    return actionFilter.getCause(pollingLog, repositoryAction);
+    return actionFilter.getCause(pollingLog, action);
   }
 
   @Override

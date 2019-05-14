@@ -40,8 +40,9 @@ public class BitBucketPPRRepositoryTriggerMatcher implements BitBucketPPREventTr
       BitBucketPPRTriggerFilter triggerFilter) {
     LOGGER.log(Level.INFO, () -> "" + bitbucketEvent.toString());
 
-    return (triggerFilter.getActionFilter() instanceof BitBucketPPRRepositoryPushActionFilter
-        && (BitBucketPPRConsts.REPOSITORY_PUSH.equals(bitbucketEvent.getAction())
-            || BitBucketPPRConsts.REPOSITORY_SERVER_PUSH.equals(bitbucketEvent.getAction())));
+    return ((triggerFilter.getActionFilter() instanceof BitBucketPPRRepositoryPushActionFilter
+        && BitBucketPPRConsts.REPOSITORY_PUSH.equals(bitbucketEvent.getAction()))
+        || (triggerFilter.getActionFilter() instanceof BitBucketPPRServerRepositoryPushActionFilter
+            && BitBucketPPRConsts.REPOSITORY_SERVER_PUSH.equals(bitbucketEvent.getAction())));
   }
 }
