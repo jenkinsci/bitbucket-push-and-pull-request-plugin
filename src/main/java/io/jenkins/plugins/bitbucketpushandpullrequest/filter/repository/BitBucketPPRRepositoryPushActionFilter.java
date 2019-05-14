@@ -26,17 +26,18 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.logging.Logger;
+
 import org.kohsuke.stapler.DataBoundConstructor;
+
 import hudson.Extension;
 import hudson.plugins.git.BranchSpec;
-import io.jenkins.plugins.bitbucketpushandpullrequest.BitBucketPPRTrigger;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.cause.BitBucketPPRTriggerCause;
 import io.jenkins.plugins.bitbucketpushandpullrequest.cause.repository.BitBucketPPRRepositoryCause;
 
 
 public class BitBucketPPRRepositoryPushActionFilter extends BitBucketPPRRepositoryActionFilter {
-  private static final Logger LOGGER = Logger.getLogger(BitBucketPPRTrigger.class.getName());
+  private static final Logger LOGGER = Logger.getLogger(BitBucketPPRRepositoryPushActionFilter.class.getName());
 
   public boolean triggerAlsoIfTagPush;
   public String allowedBranches;
@@ -88,7 +89,7 @@ public class BitBucketPPRRepositoryPushActionFilter extends BitBucketPPRReposito
 
     @Override
     public String getDisplayName() {
-      return "Push";
+      return "Bitbucket Cloud Push";
     }
   }
 }

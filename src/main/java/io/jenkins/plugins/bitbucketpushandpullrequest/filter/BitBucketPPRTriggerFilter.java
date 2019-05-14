@@ -35,7 +35,7 @@ public abstract class BitBucketPPRTriggerFilter
   public abstract boolean shouldScheduleJob(BitBucketPPRAction bitbucketAction);
 
   public abstract BitBucketPPRTriggerCause getCause(File pollingLog,
-      BitBucketPPRAction pullRequestAction) throws IOException;
+      BitBucketPPRAction action) throws IOException;
 
   public abstract AbstractDescribableImpl<?> getActionFilter();
 }

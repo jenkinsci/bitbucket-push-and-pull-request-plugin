@@ -59,7 +59,7 @@ public class BitBucketPPRFilterMatcher {
         && triggerFilter instanceof BitBucketPPRRepositoryTriggerFilter) {
       return new BitBucketPPRRepositoryTriggerMatcher().matchesAction(event, triggerFilter);
     }
-
+    
     return false;
   }
 }

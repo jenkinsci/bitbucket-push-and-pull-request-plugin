@@ -56,9 +56,9 @@ public class BitBucketPPRPullRequestTriggerFilter extends BitBucketPPRTriggerFil
   }
 
   @Override
-  public BitBucketPPRTriggerCause getCause(File pollingLog, BitBucketPPRAction pullRequestAction)
+  public BitBucketPPRTriggerCause getCause(File pollingLog, BitBucketPPRAction action)
       throws IOException {
-    return actionFilter.getCause(pollingLog, pullRequestAction);
+    return actionFilter.getCause(pollingLog, action);
   }
 
   @Extension
@@ -66,7 +66,7 @@ public class BitBucketPPRPullRequestTriggerFilter extends BitBucketPPRTriggerFil
     
     @Override
     public String getDisplayName() {
-      return "Pull Request";
+      return "Bitbucket Cloud Pull Request";
     }
 
     public List<BitBucketPPRPullRequestActionDescriptor> getActionDescriptors() {
