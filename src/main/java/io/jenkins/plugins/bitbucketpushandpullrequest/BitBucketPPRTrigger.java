@@ -111,7 +111,6 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
                 try {
                   cause = filter.getCause(getLogFile(), bitbucketAction);
 
-
                   if (shouldScheduleJob(filter, pollingResult, bitbucketAction)) {
                     scheduleJob(cause, bitbucketAction);
                     return;
