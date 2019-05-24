@@ -50,6 +50,7 @@ Bitbucket Push And Pull Request Plugin will not work if the old Bitbucket plugin
 - Approve Pull Request on successful build, cf. #29
 - Trigger via Pipeline DSL
 - Multi-branch pipelines support
+- Pull requests for Bitbucket Server
 
 
 # Dsl Job snippets
