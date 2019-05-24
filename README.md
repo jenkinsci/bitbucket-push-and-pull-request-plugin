@@ -46,8 +46,11 @@ Bitbucket Push And Pull Request Plugin will not work if the old Bitbucket plugin
 
 
 # Roadmap
-- introduce pullrequests for Bitbucket server 5.14+ and later
-- improve DSL pipelines scripting
+- Build Status propagation, cf. #23
+- Approve Pull Request on successful build, cf. #29
+- Trigger via Pipeline DSL
+- Multi-branch pipelines support
+- Pull requests for Bitbucket Server
 
 
 # Dsl Job snippets
