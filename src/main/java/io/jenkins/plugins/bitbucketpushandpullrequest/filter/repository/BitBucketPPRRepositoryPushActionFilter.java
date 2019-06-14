@@ -51,30 +51,35 @@ public class BitBucketPPRRepositoryPushActionFilter extends BitBucketPPRReposito
 
   @Override
   public boolean shouldTriggerBuild(BitBucketPPRAction bitbucketAction) {
-    if (bitbucketAction.getType().equalsIgnoreCase("BRANCH")
-        || bitbucketAction.getType().equalsIgnoreCase("UPDATE") || this.triggerAlsoIfTagPush) {
-      return matches(new BranchSpec(bitbucketAction.getBranchName()), this.allowedBranches);
-    }
-    return false;
-  }
-
-  protected boolean matches(BranchSpec branchSpec, String allowedBranches) {
     LOGGER.info("Should trigger build?");
-    if (this.allowedBranches.isEmpty()) {
-      LOGGER.info("allowed branches are not set.");
+    
+    if (! bitbucketAction.getType().equalsIgnoreCase("BRANCH")
+        && ! bitbucketAction.getType().equalsIgnoreCase("UPDATE") 
+        && ! this.triggerAlsoIfTagPush) {
+      LOGGER.info("Neither bitbucketActionType is BRANCH, nor UPDATE, nor trigger on tag push is set.");
+      
+      return false;
+    }
+    
+    return matches(bitbucketAction.getBranchName(), this.allowedBranches);
+  }
+  
+  protected boolean matches(String branchName, String allowedBranches) {
+    if (allowedBranches.isEmpty()) {
+      LOGGER.info("Allowed branches are not set. Do trigger.");
       return true;
     }
+    
+    LOGGER.info("The branchName in action is: " + branchName);
 
-    LOGGER.info("Allowed branches are set.");
-    String[] branches = this.allowedBranches.split(",");
-    Arrays.stream(branches).map(String::trim).toArray(unused -> branches);
-
-    for (String branchPattern : branches) {
-      if (branchSpec.matches(branchPattern)) {
-        return true;
+    String[] branchSpecs = allowedBranches.split(",");
+    for (String branchSpec: branchSpecs) {
+      LOGGER.info("Matching branch: " + branchName + " with branchSpec: " + branchSpec);
+      if (new BranchSpec(branchSpec.trim()).matches(branchName)) {
+          return true;
       }
     }
-
+    
     return false;
   }
 
