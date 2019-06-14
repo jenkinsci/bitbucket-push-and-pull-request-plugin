@@ -2,27 +2,12 @@ package io.jenkins.plugins.bitbucketpushandpullrequest.filter.repository;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
-import hudson.plugins.git.BranchSpec;
 
 @RunWith(MockitoJUnitRunner.class)
 public class BitBucketPPRRepositoryPushActionFilterTest {
-
-  BranchSpec branchSpecMock;
-  
-  @Before
-  public void setUp() {
-    branchSpecMock = mock(BranchSpec.class);
-  }
-
   
   @Test
   public void testMatches() {
@@ -30,18 +15,17 @@ public class BitBucketPPRRepositoryPushActionFilterTest {
     BitBucketPPRRepositoryPushActionFilter classUnderTest =
         new BitBucketPPRRepositoryPushActionFilter(false, allowedBranches);
 
-    when(branchSpecMock.matches(anyString())).thenReturn(true);
-    assertTrue(classUnderTest.matches(branchSpecMock, allowedBranches));
+    assertTrue(classUnderTest.matches("develop", allowedBranches));
+    assertTrue(classUnderTest.matches("feature/new-stuff", allowedBranches));
   }
   
   @Test
   public void testMatches_not() {
-    String allowedBranches = "develop,feature/*";
+    String allowedBranches = "develop";
     BitBucketPPRRepositoryPushActionFilter classUnderTest =
         new BitBucketPPRRepositoryPushActionFilter(false, allowedBranches);
 
-    when(branchSpecMock.matches(anyString())).thenReturn(false);
-    assertFalse(classUnderTest.matches(branchSpecMock, allowedBranches));
+    assertFalse(classUnderTest.matches("master", allowedBranches));
   }
   
   @Test
@@ -51,7 +35,8 @@ public class BitBucketPPRRepositoryPushActionFilterTest {
     BitBucketPPRRepositoryPushActionFilter classUnderTest =
         new BitBucketPPRRepositoryPushActionFilter(false, allowedBranches);
 
-    assertTrue(classUnderTest.matches(branchSpecMock, allowedBranches));
-    verify(branchSpecMock, never()).matches(anyString());
+    assertTrue(classUnderTest.matches("master", allowedBranches));
+    assertTrue(classUnderTest.matches("develop", allowedBranches));
+    assertTrue(classUnderTest.matches("feature/new-stuff", allowedBranches));
   }
 }
