@@ -65,9 +65,7 @@ import jenkins.triggers.SCMTriggerItem;
 public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
   private static final Logger LOGGER = Logger.getLogger(BitBucketPPRTrigger.class.getName());
   private List<BitBucketPPRTriggerFilter> triggers;
-  private String repositoryName;
-
-
+  
   @DataBoundConstructor
   public BitBucketPPRTrigger(List<BitBucketPPRTriggerFilter> triggers) {
     this.triggers = triggers;
@@ -154,9 +152,10 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
         return job;
       }
     };
+    LOGGER.info("Check if job should be triggered due to changes in SCM");
 
-    pJob.scheduleBuild2(5, new CauseAction(cause), bitbucketAction);
-    if (pJob.scheduleBuild(cause)) {
+
+    if (pJob.scheduleBuild2(5, new CauseAction(cause), bitbucketAction) != null) {
       try {
         String name = " #" + job.getNextBuildNumber();
         LOGGER.info(() -> "SCM changes detected in " + job.getName() + ". Triggering " + name);
@@ -176,20 +175,21 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
 
   /**
    * Returns the file that records the last/current polling activity.
-   * @throws Exception 
+   * 
+   * @throws Exception
    */
   public File getLogFile() throws Exception {
-    
+
     if (job == null) {
       throw new Exception("No job started");
     }
-    
+
     File file = new File(job.getRootDir(), "bitbucket-polling.log");
     if (file.createNewFile()) {
       LOGGER.log(Level.FINE, "Created new file {0} for logging in the directory {1}.",
-          new Object[] {"bitbucket-polling.log",job.getRootDir()});
+          new Object[] {"bitbucket-polling.log", job.getRootDir()});
     }
-    
+
     return file;
   }
 
@@ -206,14 +206,18 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
       return job;
     }
 
+    @Override
     public String getIconFileName() {
       return "clipboard.png";
     }
 
+    @Override
     public String getDisplayName() {
       return "BitBucket Hook Log";
     }
 
+
+    @Override
     public String getUrlName() {
       return "BitBucketPollLog";
     }
