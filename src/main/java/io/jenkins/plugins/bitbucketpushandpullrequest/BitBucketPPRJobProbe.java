@@ -105,6 +105,7 @@ public class BitBucketPPRJobProbe {
         .ifPresent(trigger -> item.ifPresent(i -> i.getSCMs().stream().forEach(scmTrigger ->
         {
 
+          //todo add check isPipelineMultibranch
           if(!isPrSourceBranchSameAsJobsBranch(job, bitbucketAction)){
             LOGGER.log(Level.FINE,"Skipping for job:"+job.getDisplayName());
             return;
