@@ -1,7 +1,7 @@
 /*******************************************************************************
  * The MIT License
  * 
- * Copyright (C) 2018, CloudBees, Inc.
+ * Copyright (C) 2019, CloudBees, Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -24,7 +24,6 @@ package io.jenkins.plugins.bitbucketpushandpullrequest.filter.repository;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.logging.Logger;
 
 import org.kohsuke.stapler.DataBoundConstructor;
@@ -39,8 +38,8 @@ import io.jenkins.plugins.bitbucketpushandpullrequest.cause.repository.BitBucket
 public class BitBucketPPRRepositoryPushActionFilter extends BitBucketPPRRepositoryActionFilter {
   private static final Logger LOGGER = Logger.getLogger(BitBucketPPRRepositoryPushActionFilter.class.getName());
 
-  public boolean triggerAlsoIfTagPush;
-  public String allowedBranches;
+  public final boolean triggerAlsoIfTagPush;
+  public final String allowedBranches;
 
   @DataBoundConstructor
   public BitBucketPPRRepositoryPushActionFilter(boolean triggerAlsoIfTagPush,
@@ -70,11 +69,12 @@ public class BitBucketPPRRepositoryPushActionFilter extends BitBucketPPRReposito
       return true;
     }
     
-    LOGGER.info("The branchName in action is: " + branchName);
+    LOGGER.info(() -> "Following allowed branches patterns are set: " + allowedBranches);
+    LOGGER.info(() -> "The branchName in action is: " + branchName);
 
     String[] branchSpecs = allowedBranches.split(",");
     for (String branchSpec: branchSpecs) {
-      LOGGER.info("Matching branch: " + branchName + " with branchSpec: " + branchSpec);
+      LOGGER.info(() -> "Matching branch: " + branchName + " with branchSpec: " + branchSpec);
       if (new BranchSpec(branchSpec.trim()).matches(branchName)) {
           return true;
       }
