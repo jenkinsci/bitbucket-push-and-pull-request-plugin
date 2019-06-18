@@ -65,7 +65,7 @@ import jenkins.triggers.SCMTriggerItem;
 public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
   private static final Logger LOGGER = Logger.getLogger(BitBucketPPRTrigger.class.getName());
   private List<BitBucketPPRTriggerFilter> triggers;
-  
+
   @DataBoundConstructor
   public BitBucketPPRTrigger(List<BitBucketPPRTriggerFilter> triggers) {
     this.triggers = triggers;
@@ -93,6 +93,8 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
    */
   public void onPost(final BitBucketPPREvent bitbucketEvent,
       final BitBucketPPRAction bitbucketAction) throws Exception {
+    LOGGER.log(Level.INFO, "Called onPost");
+    
     BitBucketPPRFilterMatcher filterMatcher = new BitBucketPPRFilterMatcher();
     final List<BitBucketPPRTriggerFilter> matchingFilters =
         filterMatcher.getMatchingFilters(bitbucketEvent, triggers);
@@ -109,13 +111,16 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
                 try {
                   cause = filter.getCause(getLogFile(), bitbucketAction);
 
+                  LOGGER.log(Level.INFO, () -> "On Poll Success, get cause: " + cause.toString());
+
                   if (shouldScheduleJob(filter, pollingResult, bitbucketAction)) {
                     scheduleJob(cause, bitbucketAction);
                     return;
                   }
 
                 } catch (Exception e) {
-                  LOGGER.log(Level.INFO, e.getMessage());
+                  LOGGER.log(Level.INFO,
+                      "Something went wrong in the on Poll Success " + e.getMessage());
                 }
               }
             }
