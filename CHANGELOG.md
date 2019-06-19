@@ -1,5 +1,17 @@
 # Change Log
 
+## 1.6.4 (2019-06-19)
+[Full Changelog](https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/compare/bitbucket-push-and-pull-request-1.6.3...bitbucket-push-and-pull-request-1.6.4)
+
+**Closed issues:**
+- Issue #38 BITBUCKET_SOURCE_BRANCH has wrong value for repo:push events
+_ Issue #36 Branch expression matching before triggering the build
+
+**Merged pull requests:**
+- #47 Develop
+- #46 Improving tests for allowed branches
+- #45 Develop
+
 ## 1.6.3 (2019-06-14)
 [Full Changelog](https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/compare/bitbucket-push-and-pull-request-1.6.2...bitbucket-push-and-pull-request-1.6.3)
 
