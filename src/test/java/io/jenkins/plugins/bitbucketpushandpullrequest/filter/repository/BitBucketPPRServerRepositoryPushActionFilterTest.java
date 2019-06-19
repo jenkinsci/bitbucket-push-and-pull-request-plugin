@@ -25,7 +25,6 @@ public class BitBucketPPRServerRepositoryPushActionFilterTest {
     assertTrue(c.matches("master"));
     assertFalse(c.matches("dev"));
 
-
     c.setAllowedBranches("origin/*/dev");
 
     assertFalse(c.matches("origintestdev"));
