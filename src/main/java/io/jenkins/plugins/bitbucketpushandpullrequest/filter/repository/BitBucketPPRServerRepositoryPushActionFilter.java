@@ -2,7 +2,6 @@ package io.jenkins.plugins.bitbucketpushandpullrequest.filter.repository;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.logging.Logger;
 
 import org.kohsuke.stapler.DataBoundConstructor;
@@ -14,42 +13,54 @@ import io.jenkins.plugins.bitbucketpushandpullrequest.cause.BitBucketPPRTriggerC
 import io.jenkins.plugins.bitbucketpushandpullrequest.cause.repository.BitBucketPPRServerRepositoryCause;
 
 
-public class BitBucketPPRServerRepositoryPushActionFilter extends BitBucketPPRRepositoryActionFilter {
+public class BitBucketPPRServerRepositoryPushActionFilter
+    extends BitBucketPPRRepositoryActionFilter {
   private static final Logger LOGGER =
       Logger.getLogger(BitBucketPPRServerRepositoryPushActionFilter.class.getName());
 
-  public boolean triggerAlsoIfTagPush;
-  public String allowedBranches;
+  public final boolean triggerAlsoIfTagPush;
+  public final String allowedBranches;
 
-@DataBoundConstructor
-public BitBucketPPRServerRepositoryPushActionFilter(boolean triggerAlsoIfTagPush,
-    String allowedBranches) {
-  this.triggerAlsoIfTagPush = triggerAlsoIfTagPush;
-  this.allowedBranches = allowedBranches;
-}
+  @DataBoundConstructor
+  public BitBucketPPRServerRepositoryPushActionFilter(boolean triggerAlsoIfTagPush,
+      String allowedBranches) {
+    this.triggerAlsoIfTagPush = triggerAlsoIfTagPush;
+    this.allowedBranches = allowedBranches;
+  }
 
   @Override
   public boolean shouldTriggerBuild(BitBucketPPRAction bitbucketAction) {
-    if (bitbucketAction.getType().equalsIgnoreCase("BRANCH")
-        || bitbucketAction.getType().equalsIgnoreCase("UPDATE") || this.triggerAlsoIfTagPush) {
-      return matches(new BranchSpec(bitbucketAction.getBranchName()), this.allowedBranches);
+    LOGGER
+        .info(() -> "Should trigger build for bitbucket action" + bitbucketAction.toString() + "?");
+
+    if (!bitbucketAction.getType().equalsIgnoreCase("BRANCH")
+        && !bitbucketAction.getType().equalsIgnoreCase("named_branch")
+        && !bitbucketAction.getType().equalsIgnoreCase("UPDATE") && !this.triggerAlsoIfTagPush) {
+      LOGGER.info(
+          () -> "Neither bitbucketActionType is BRANCH, nor UPDATE, nor trigger on tag push is set for bitbucket type: "
+              + bitbucketAction.getType() + ".");
+
+      return false;
     }
-    return false;
+
+    return matches(bitbucketAction.getBranchName(), this.allowedBranches);
   }
 
-  protected boolean matches(BranchSpec branchSpec, String allowedBranches) {
+  protected boolean matches(String branchName, String allowedBranches) {
     LOGGER.info("Should trigger build?");
     if (this.allowedBranches.isEmpty()) {
       LOGGER.info("allowed branches are not set.");
       return true;
     }
 
-    LOGGER.info("Allowed branches are set.");
-    String[] branches = this.allowedBranches.split(",");
-    Arrays.stream(branches).map(String::trim).toArray(unused -> branches);
+    LOGGER.info(() -> "Following allowed branches patterns are set: " + allowedBranches);
+    LOGGER.info(() -> "The branchName in action is: " + branchName);
 
-    for (String branchPattern : branches) {
-      if (branchSpec.matches(branchPattern)) {
+
+    String[] branchSpecs = allowedBranches.split(",");
+    for (String branchSpec : branchSpecs) {
+      LOGGER.info(() -> "Matching branch: " + branchName + " with branchSpec: " + branchSpec);
+      if (new BranchSpec(branchSpec.trim()).matches(branchName)) {
         return true;
       }
     }

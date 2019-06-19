@@ -1,7 +1,7 @@
 /*******************************************************************************
  * The MIT License
  * 
- * Copyright (C) 2018, CloudBees, Inc.
+ * Copyright (C) 2019, CloudBees, Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -24,7 +24,6 @@ package io.jenkins.plugins.bitbucketpushandpullrequest.filter.repository;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.logging.Logger;
 
 import org.kohsuke.stapler.DataBoundConstructor;
@@ -37,10 +36,11 @@ import io.jenkins.plugins.bitbucketpushandpullrequest.cause.repository.BitBucket
 
 
 public class BitBucketPPRRepositoryPushActionFilter extends BitBucketPPRRepositoryActionFilter {
-  private static final Logger LOGGER = Logger.getLogger(BitBucketPPRRepositoryPushActionFilter.class.getName());
+  private static final Logger LOGGER =
+      Logger.getLogger(BitBucketPPRRepositoryPushActionFilter.class.getName());
 
-  public boolean triggerAlsoIfTagPush;
-  public String allowedBranches;
+  public final boolean triggerAlsoIfTagPush;
+  public final String allowedBranches;
 
   @DataBoundConstructor
   public BitBucketPPRRepositoryPushActionFilter(boolean triggerAlsoIfTagPush,
@@ -51,35 +51,42 @@ public class BitBucketPPRRepositoryPushActionFilter extends BitBucketPPRReposito
 
   @Override
   public boolean shouldTriggerBuild(BitBucketPPRAction bitbucketAction) {
-    LOGGER.info("Should trigger build?");
-    
-    if (! bitbucketAction.getType().equalsIgnoreCase("BRANCH")
-        && ! bitbucketAction.getType().equalsIgnoreCase("UPDATE") 
-        && ! this.triggerAlsoIfTagPush) {
-      LOGGER.info("Neither bitbucketActionType is BRANCH, nor UPDATE, nor trigger on tag push is set.");
-      
+    LOGGER.info(
+        () -> "Should trigger build for the bitbucket action: " + bitbucketAction.toString() + "?");
+
+
+    // TODO: create an extra class for the mercurial actions
+
+    if (!bitbucketAction.getType().equalsIgnoreCase("BRANCH")
+        && !bitbucketAction.getType().equalsIgnoreCase("named_branch")
+        && !bitbucketAction.getType().equalsIgnoreCase("UPDATE") && !this.triggerAlsoIfTagPush) {
+      LOGGER.info(
+          "Neither bitbucketAction type is BRANCH, nor UPDATE, nor trigger on tag push is set: "
+              + bitbucketAction.getType());
+
       return false;
     }
-    
+
     return matches(bitbucketAction.getBranchName(), this.allowedBranches);
   }
-  
+
   protected boolean matches(String branchName, String allowedBranches) {
     if (allowedBranches.isEmpty()) {
       LOGGER.info("Allowed branches are not set. Do trigger.");
       return true;
     }
-    
-    LOGGER.info("The branchName in action is: " + branchName);
+
+    LOGGER.info(() -> "Following allowed branches patterns are set: " + allowedBranches);
+    LOGGER.info(() -> "The branchName in action is: " + branchName);
 
     String[] branchSpecs = allowedBranches.split(",");
-    for (String branchSpec: branchSpecs) {
-      LOGGER.info("Matching branch: " + branchName + " with branchSpec: " + branchSpec);
+    for (String branchSpec : branchSpecs) {
+      LOGGER.info(() -> "Matching branch: " + branchName + " with branchSpec: " + branchSpec);
       if (new BranchSpec(branchSpec.trim()).matches(branchName)) {
-          return true;
+        return true;
       }
     }
-    
+
     return false;
   }
 

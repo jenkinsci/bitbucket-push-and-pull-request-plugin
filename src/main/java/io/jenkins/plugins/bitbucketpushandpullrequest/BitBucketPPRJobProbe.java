@@ -21,7 +21,6 @@
 
 package io.jenkins.plugins.bitbucketpushandpullrequest;
 
-import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -31,6 +30,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang.StringUtils;
 import org.eclipse.jgit.transport.RemoteConfig;
 import org.eclipse.jgit.transport.URIish;
 
@@ -164,19 +164,24 @@ public class BitBucketPPRJobProbe {
   }
 
   private boolean matchMercurialScm(SCM scm, URIish remote) {
+    boolean result = false;
+
     try {
       URI hgUri = new URI(((MercurialSCM) scm).getSource());
 
       LOGGER.log(Level.INFO, "Trying to match {0} ", hgUri.toString() + "<-->" + remote.toString());
-      if (looselyMatches(hgUri, remote)) {
-        LOGGER.info("Machted scm");
-        return true;
+      result = hgLooselyMatches(hgUri, remote.toString());
+
+      if (result) {
+        LOGGER.info("Matched scm ");
+      } else {
+        LOGGER.info(() -> "Didn't match scm " + hgUri.toString());
       }
     } catch (URISyntaxException ex) {
       LOGGER.log(Level.SEVERE, "Could not parse jobSource uri: {0} ", ex);
     }
 
-    return false;
+    return result;
   }
 
   private boolean matchGitScm(SCM scm, URIish remote) {
@@ -185,13 +190,35 @@ public class BitBucketPPRJobProbe {
         LOGGER.log(Level.INFO, "Trying to match {0} ",
             urIish.toString() + "<-->" + remote.toString());
         if (GitStatus.looselyMatches(urIish, remote)) {
-          LOGGER.info("Machted scm");
+          LOGGER.info("Matched scm");
           return true;
         }
       }
     }
 
     return false;
+  }
+
+  private boolean hgLooselyMatches(URI notifyUri, String repository) {
+    boolean result = false;
+    try {
+      if (!hgIsUnexpandedEnvVar(repository)) {
+        URI repositoryUri = new URI(repository);
+        LOGGER.log(Level.INFO, "Mercurial loose match between {0} ",
+            notifyUri.toString() + "<- and ->" + repositoryUri.toString());
+        result = Objects.equal(notifyUri.getHost(), repositoryUri.getHost())
+            && Objects.equal(StringUtils.stripEnd(notifyUri.getPath(), "/"),
+                StringUtils.stripEnd(repositoryUri.getPath(), "/"))
+            && Objects.equal(notifyUri.getQuery(), repositoryUri.getQuery());
+      }
+    } catch (URISyntaxException ex) {
+      LOGGER.log(Level.SEVERE, "could not parse repository uri " + repository, ex);
+    }
+    return result;
+  }
+
+  private boolean hgIsUnexpandedEnvVar(String str) {
+    return str.startsWith("$");
   }
 
   // needed cause the ssh and https URI differs in Bitbucket Server.
@@ -203,18 +230,7 @@ public class BitBucketPPRJobProbe {
     return urIish;
   }
 
-  private boolean looselyMatches(URI notifyUri, URIish repository) {
-    boolean result = false;
-    try {
-      URI repositoryUri = new URI(repository.toString());
-      result = Objects.equal(notifyUri.getHost(), repositoryUri.getHost())
-          && Objects.equal(notifyUri.getPath(), repositoryUri.getPath())
-          && Objects.equal(notifyUri.getQuery(), repositoryUri.getQuery());
-    } catch (URISyntaxException ex) {
-      LOGGER.log(Level.SEVERE, "Could not parse repository uri: {0}, {1}",
-          new Object[] {repository, ex});
-    }
-
-    return result;
+  boolean testMatchMercurialScm(SCM scm, URIish remote) {
+    return matchMercurialScm(scm, remote);
   }
 }

@@ -40,6 +40,21 @@ public class BitBucketPPRRepositoryTriggerMatcher implements BitBucketPPREventTr
       BitBucketPPRTriggerFilter triggerFilter) {
     LOGGER.log(Level.INFO, () -> "" + bitbucketEvent.toString());
 
+
+    LOGGER.log(Level.INFO,
+        "1. (Is the trigger filter instance of BitBucketPPRRepositoryPushActionFilter? <<{0}>> "
+            + "AND does it equal BitBucketPPRConsts.REPOSITORY_PUSH {1} to bitbucketEvent.getAction() {2}? <<{3}>>) OR "
+            + "2. (Is the trigger filter instance of BitBucketPPRServerRepositoryPushActionFilter? <<{4}>>"
+            + "AND does it equal BitBucketPPRConsts.REPOSITORY_SERVER_PUSH {5} to bitbucketEvent.getAction() {6}? <<{7}>> ",
+        new Object[] {
+            triggerFilter.getActionFilter() instanceof BitBucketPPRRepositoryPushActionFilter,
+            BitBucketPPRConsts.REPOSITORY_PUSH, 
+            bitbucketEvent.getAction(),
+            BitBucketPPRConsts.REPOSITORY_PUSH.equals(bitbucketEvent.getAction()),
+            triggerFilter.getActionFilter() instanceof BitBucketPPRServerRepositoryPushActionFilter,
+            BitBucketPPRConsts.REPOSITORY_SERVER_PUSH, bitbucketEvent.getAction(),
+            BitBucketPPRConsts.REPOSITORY_SERVER_PUSH.equals(bitbucketEvent.getAction())});
+
     return ((triggerFilter.getActionFilter() instanceof BitBucketPPRRepositoryPushActionFilter
         && BitBucketPPRConsts.REPOSITORY_PUSH.equals(bitbucketEvent.getAction()))
         || (triggerFilter.getActionFilter() instanceof BitBucketPPRServerRepositoryPushActionFilter

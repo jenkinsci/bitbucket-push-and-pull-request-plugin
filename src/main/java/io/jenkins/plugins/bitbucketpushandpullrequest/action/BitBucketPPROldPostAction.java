@@ -22,16 +22,22 @@
 
 package io.jenkins.plugins.bitbucketpushandpullrequest.action;
 
+import java.util.logging.Logger;
+
 import javax.annotation.Nonnull;
 
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.old.BitBucketPPROldRepository;
 
 
+@Deprecated
 public class BitBucketPPROldPostAction extends BitBucketPPRAction {
+  private static final Logger logger = Logger.getLogger(BitBucketPPROldPostAction.class.getName());
 
   public BitBucketPPROldPostAction(@Nonnull BitBucketPPRPayload payload) {
     super(payload);
+
+    logger.info("BitBucketPPROldPostAction is deprecated. Why are you here?");
 
     BitBucketPPROldRepository repo = payload.getOldRepository();
 
@@ -39,5 +45,4 @@ public class BitBucketPPROldPostAction extends BitBucketPPRAction {
     this.scmUrls.add(payload.getCanonUrl() + repo.getAbsoluteUrl());
     this.scm = repo.getScm();
   }
-
 }

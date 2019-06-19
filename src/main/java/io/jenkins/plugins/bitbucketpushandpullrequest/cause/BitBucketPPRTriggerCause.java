@@ -26,7 +26,6 @@ import java.io.File;
 import java.io.IOException;
 
 import hudson.triggers.SCMTrigger;
-import hudson.triggers.SCMTrigger.SCMTriggerCause;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
 
 
@@ -44,12 +43,32 @@ public class BitBucketPPRTriggerCause extends SCMTrigger.SCMTriggerCause {
   }
 
   @Override
-  public boolean equals(Object o) {
-    return o instanceof SCMTriggerCause;
+  public int hashCode() {
+    final int prime = 31;
+    int result = super.hashCode();
+    result = prime * result + ((bitbucketAction == null) ? 0 : bitbucketAction.hashCode());
+    return result;
   }
 
   @Override
-  public int hashCode() {
-    return 3;
+  public boolean equals(Object obj) {
+    if (this == obj)
+      return true;
+    if (!super.equals(obj))
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
+    BitBucketPPRTriggerCause other = (BitBucketPPRTriggerCause) obj;
+    if (bitbucketAction == null) {
+      if (other.bitbucketAction != null)
+        return false;
+    } else if (!bitbucketAction.equals(other.bitbucketAction))
+      return false;
+    return true;
+  }
+
+  @Override
+  public String toString() {
+    return "BitBucketPPRTriggerCause [bitbucketAction=" + bitbucketAction + "]";
   }
 }

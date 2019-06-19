@@ -23,6 +23,7 @@
 package io.jenkins.plugins.bitbucketpushandpullrequest;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -39,6 +40,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import com.google.gson.Gson;
@@ -46,6 +48,7 @@ import com.google.gson.JsonIOException;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.stream.JsonReader;
 
+import hudson.plugins.mercurial.MercurialSCM;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud.BitBucketPPRNewPayload;
@@ -88,6 +91,17 @@ public class BitBucketPPRJobProbeTest {
     assertEquals(returnedList, jobProbe.getRemotesAsList(bitbucketAction));
   }
 
+  @Test
+  public void testMatchMercurialScm_not() {
+    MercurialSCM scm = mock(MercurialSCM.class);
+    Mockito.when(scm.getSource())
+        .thenReturn("https://bitbucket.org/theveryjenkinsadventure/test-mercurial-in-cloud/src/default");
+      
+    URIish remote = mock(org.eclipse.jgit.transport.URIish.class);
+    Mockito.when(remote.toString()).thenReturn("https://bitbucket.org/theveryjenkinsadventure/test-mercurial-in-cloud");
+
+    assertFalse(jobProbe.testMatchMercurialScm(scm, remote));
+  }
 
   private BitBucketPPRPayload getPayload() {
     JsonReader reader = null;

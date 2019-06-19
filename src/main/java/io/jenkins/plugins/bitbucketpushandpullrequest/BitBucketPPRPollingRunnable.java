@@ -53,6 +53,8 @@ public class BitBucketPPRPollingRunnable implements Runnable {
   }
 
   public void run() {
+    LOGGER.log(Level.INFO, "Run method called.");
+    
     try {
       StreamTaskListener streamListener = new StreamTaskListener(logFile);
       try {
@@ -79,6 +81,8 @@ public class BitBucketPPRPollingRunnable implements Runnable {
         e.printStackTrace(streamListener.error("Failed to record SCM polling"));
         LOGGER.log(Level.SEVERE, "Failed to record SCM polling", e);
         bitbucketPollResultListener.onPollError(e);
+      } catch (Exception e) {
+        LOGGER.log(Level.SEVERE, "Failed ", e);
       } finally {
         streamListener.close();
       }
@@ -86,6 +90,8 @@ public class BitBucketPPRPollingRunnable implements Runnable {
     } catch (IOException e) {
       LOGGER.log(Level.SEVERE, "Failed to record SCM polling", e);
       bitbucketPollResultListener.onPollError(e);
+    } catch (Exception e) {
+      LOGGER.log(Level.SEVERE, "Failed ", e);
     }
   }
 }
