@@ -94,7 +94,7 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
   public void onPost(final BitBucketPPREvent bitbucketEvent,
       final BitBucketPPRAction bitbucketAction) throws Exception {
     LOGGER.log(Level.INFO, "Called onPost");
-    
+
     BitBucketPPRFilterMatcher filterMatcher = new BitBucketPPRFilterMatcher();
     final List<BitBucketPPRTriggerFilter> matchingFilters =
         filterMatcher.getMatchingFilters(bitbucketEvent, triggers);
@@ -105,7 +105,8 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
 
             @Override
             public void onPollSuccess(PollingResult pollingResult) {
-              LOGGER.log(Level.INFO, "Called onPollSuccess");
+              LOGGER.log(Level.INFO, "Called onPollSuccess with polling result {}.",
+                  pollingResult.toString());
               for (BitBucketPPRTriggerFilter filter : matchingFilters) {
                 BitBucketPPRTriggerCause cause;
                 try {
@@ -117,7 +118,6 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
                     scheduleJob(cause, bitbucketAction);
                     return;
                   }
-
                 } catch (Exception e) {
                   LOGGER.log(Level.INFO,
                       "Something went wrong in the on Poll Success " + e.getMessage());
@@ -130,8 +130,14 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
               LOGGER.log(Level.INFO, "Called onPollError");
             }
           });
+      LOGGER.log(Level.INFO, "matchingFilters is not null AND matchingFilters is not empty {0} ",
+          new String[] {matchingFilters.toString()});
 
-      getDescriptor().queue.execute(bitbucketPollingRunnable);
+      try {
+        getDescriptor().queue.execute(bitbucketPollingRunnable);
+      } catch (Exception e) {
+        LOGGER.log(Level.INFO, "No matching filters");
+      }
 
     } else {
       LOGGER.log(Level.INFO, "No matching filters");

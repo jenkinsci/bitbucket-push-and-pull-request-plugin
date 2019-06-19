@@ -102,4 +102,12 @@ public class BitBucketPPRAction extends InvisibleAction implements EnvironmentCo
     env.put("BITBUCKET_PAYLOAD", payload.toString());
     LOGGER.log(Level.FINEST, "Injecting BITBUCKET_PAYLOAD: {0}", payload);
   }
+
+  @Override
+  public String toString() {
+    return "BitBucketPPRAction [payload=" + payload + ", scm=" + scm + ", user=" + user
+        + ", scmUrls=" + scmUrls + ", branchName=" + branchName + ", type=" + type
+        + ", repositoryName=" + repositoryName + ", pullRequestId=" + pullRequestId
+        + ", repositoryUuid=" + repositoryUuid + "]";
+  }
 }
