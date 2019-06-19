@@ -6,6 +6,7 @@ import java.util.logging.Logger;
 
 import org.kohsuke.stapler.DataBoundConstructor;
 
+import hudson.EnvVars;
 import hudson.Extension;
 import hudson.plugins.git.BranchSpec;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
@@ -15,11 +16,11 @@ import io.jenkins.plugins.bitbucketpushandpullrequest.cause.repository.BitBucket
 
 public class BitBucketPPRServerRepositoryPushActionFilter
     extends BitBucketPPRRepositoryActionFilter {
-  private static final Logger LOGGER =
+  private static final Logger logger =
       Logger.getLogger(BitBucketPPRServerRepositoryPushActionFilter.class.getName());
 
-  public final boolean triggerAlsoIfTagPush;
-  public final String allowedBranches;
+  public boolean triggerAlsoIfTagPush;
+  private String allowedBranches;
 
   @DataBoundConstructor
   public BitBucketPPRServerRepositoryPushActionFilter(boolean triggerAlsoIfTagPush,
@@ -30,37 +31,54 @@ public class BitBucketPPRServerRepositoryPushActionFilter
 
   @Override
   public boolean shouldTriggerBuild(BitBucketPPRAction bitbucketAction) {
-    LOGGER
+    logger
         .info(() -> "Should trigger build for bitbucket action" + bitbucketAction.toString() + "?");
 
     if (!bitbucketAction.getType().equalsIgnoreCase("BRANCH")
         && !bitbucketAction.getType().equalsIgnoreCase("named_branch")
         && !bitbucketAction.getType().equalsIgnoreCase("UPDATE") && !this.triggerAlsoIfTagPush) {
-      LOGGER.info(
+      logger.info(
           () -> "Neither bitbucketActionType is BRANCH, nor UPDATE, nor trigger on tag push is set for bitbucket type: "
               + bitbucketAction.getType() + ".");
 
       return false;
     }
 
-    return matches(bitbucketAction.getBranchName(), this.allowedBranches);
+    return matches(bitbucketAction.getBranchName());
   }
 
-  protected boolean matches(String branchName, String allowedBranches) {
-    LOGGER.info("Should trigger build?");
-    if (this.allowedBranches.isEmpty()) {
-      LOGGER.info("allowed branches are not set.");
-      return true;
-    }
-
-    LOGGER.info(() -> "Following allowed branches patterns are set: " + allowedBranches);
-    LOGGER.info(() -> "The branchName in action is: " + branchName);
-
+  protected boolean matches(String branchName) {
+    logger.info(() -> "Following allowed branches patterns are set: " + allowedBranches);
+    logger.info(() -> "The branchName in action is: " + branchName);
 
     String[] branchSpecs = allowedBranches.split(",");
     for (String branchSpec : branchSpecs) {
-      LOGGER.info(() -> "Matching branch: " + branchName + " with branchSpec: " + branchSpec);
-      if (new BranchSpec(branchSpec.trim()).matches(branchName)) {
+      BranchSpec pattern = new BranchSpec(branchSpec.trim());
+
+      logger.info(() -> "Matching branch: " + branchName + " with branchSpec pattern: "
+          + pattern.getName());
+
+      if (pattern.matches(branchName)) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  public boolean matches(String branchName, EnvVars env) {
+    logger.info(() -> "Following allowed branches patterns are set: " + allowedBranches);
+    logger.info(() -> "The branchName in action is: " + branchName);
+
+    String[] branchSpecs = allowedBranches.split(",");
+
+    for (String branchSpec : branchSpecs) {
+      BranchSpec pattern = new BranchSpec(branchSpec.trim());
+
+      logger.info(() -> "Matching branch: " + branchName + " with branchSpec pattern: "
+          + pattern.getName());
+
+      if (pattern.matches(branchName, env)) {
         return true;
       }
     }
@@ -72,6 +90,14 @@ public class BitBucketPPRServerRepositoryPushActionFilter
   public BitBucketPPRTriggerCause getCause(File pollingLog, BitBucketPPRAction bitbucketAction)
       throws IOException {
     return new BitBucketPPRServerRepositoryCause(pollingLog, bitbucketAction);
+  }
+
+  public String getAllowedBranches() {
+    return allowedBranches;
+  }
+
+  public void setAllowedBranches(String allowedBranches) {
+    this.allowedBranches = allowedBranches;
   }
 
   @Extension

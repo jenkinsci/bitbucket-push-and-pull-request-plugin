@@ -185,7 +185,15 @@ public class BitBucketPPRJobProbe {
   }
 
   private boolean matchGitScm(SCM scm, URIish remote) {
-    for (RemoteConfig remoteConfig : ((GitSCM) scm).getRepositories()) {
+    
+    GitSCM gitSCM = (GitSCM) scm;
+    
+    gitSCM.getBranches().stream().forEach(b -> LOGGER.info(() -> "GIT BRANCHES" + b.toString()));
+    
+    LOGGER.info(() -> "GIT BRANCH VARIABLE " + GitSCM.GIT_BRANCH);
+    LOGGER.info(() -> "GIT LOCAL BRANCH VARIABLE " + GitSCM.GIT_LOCAL_BRANCH);
+    
+    for (RemoteConfig remoteConfig : gitSCM.getRepositories()) {
       for (URIish urIish : remoteConfig.getURIs()) {
         LOGGER.log(Level.INFO, "Trying to match {0} ",
             urIish.toString() + "<-->" + remote.toString());
