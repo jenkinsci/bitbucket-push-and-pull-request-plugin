@@ -28,6 +28,7 @@ import java.util.logging.Logger;
 
 import org.kohsuke.stapler.DataBoundConstructor;
 
+import hudson.EnvVars;
 import hudson.Extension;
 import hudson.plugins.git.BranchSpec;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
@@ -39,8 +40,8 @@ public class BitBucketPPRRepositoryPushActionFilter extends BitBucketPPRReposito
   private static final Logger LOGGER =
       Logger.getLogger(BitBucketPPRRepositoryPushActionFilter.class.getName());
 
-  public final boolean triggerAlsoIfTagPush;
-  public final String allowedBranches;
+  public boolean triggerAlsoIfTagPush;
+  private String allowedBranches;
 
   @DataBoundConstructor
   public BitBucketPPRRepositoryPushActionFilter(boolean triggerAlsoIfTagPush,
@@ -49,13 +50,11 @@ public class BitBucketPPRRepositoryPushActionFilter extends BitBucketPPRReposito
     this.allowedBranches = allowedBranches;
   }
 
+
   @Override
   public boolean shouldTriggerBuild(BitBucketPPRAction bitbucketAction) {
     LOGGER.info(
         () -> "Should trigger build for the bitbucket action: " + bitbucketAction.toString() + "?");
-
-
-    // TODO: create an extra class for the mercurial actions
 
     if (!bitbucketAction.getType().equalsIgnoreCase("BRANCH")
         && !bitbucketAction.getType().equalsIgnoreCase("named_branch")
@@ -67,22 +66,21 @@ public class BitBucketPPRRepositoryPushActionFilter extends BitBucketPPRReposito
       return false;
     }
 
-    return matches(bitbucketAction.getBranchName(), this.allowedBranches);
+    return matches(bitbucketAction.getBranchName());
   }
 
-  protected boolean matches(String branchName, String allowedBranches) {
-    if (allowedBranches.isEmpty()) {
-      LOGGER.info("Allowed branches are not set. Do trigger.");
-      return true;
-    }
-
+  protected boolean matches(String branchName) {
     LOGGER.info(() -> "Following allowed branches patterns are set: " + allowedBranches);
     LOGGER.info(() -> "The branchName in action is: " + branchName);
 
     String[] branchSpecs = allowedBranches.split(",");
     for (String branchSpec : branchSpecs) {
-      LOGGER.info(() -> "Matching branch: " + branchName + " with branchSpec: " + branchSpec);
-      if (new BranchSpec(branchSpec.trim()).matches(branchName)) {
+      BranchSpec pattern = new BranchSpec(branchSpec.trim());
+
+      LOGGER.info(() -> "Matching branch: " + branchName + " with branchSpec pattern: "
+          + pattern.getName());
+
+      if (pattern.matches(branchName)) {
         return true;
       }
     }
@@ -90,10 +88,39 @@ public class BitBucketPPRRepositoryPushActionFilter extends BitBucketPPRReposito
     return false;
   }
 
+  public boolean matches(String branchName, EnvVars env) {
+    LOGGER.info(() -> "Following allowed branches patterns are set: " + allowedBranches);
+    LOGGER.info(() -> "The branchName in action is: " + branchName);
+    
+    String[] branchSpecs = allowedBranches.split(",");
+    
+    for (String branchSpec : branchSpecs) {
+      BranchSpec pattern = new BranchSpec(branchSpec.trim());
+
+      LOGGER.info(() -> "Matching branch: " + branchName + " with branchSpec pattern: "
+          + pattern.getName());
+
+      if (pattern.matches(branchName, env)) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+
   @Override
   public BitBucketPPRTriggerCause getCause(File pollingLog, BitBucketPPRAction bitbucketAction)
       throws IOException {
     return new BitBucketPPRRepositoryCause(pollingLog, bitbucketAction);
+  }
+
+  public String getAllowedBranches() {
+    return allowedBranches;
+  }
+
+  public void setAllowedBranches(String allowedBranches) {
+    this.allowedBranches = allowedBranches;
   }
 
   @Extension
