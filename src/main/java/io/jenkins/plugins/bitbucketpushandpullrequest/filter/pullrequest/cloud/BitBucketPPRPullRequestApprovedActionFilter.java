@@ -20,10 +20,14 @@
  ******************************************************************************/
 
 
-package io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest;
+package io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.cloud;
+
+import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConsts.PULL_REQUEST_REVIEWER;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
+import java.util.logging.Logger;
 
 import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.DataBoundConstructor;
@@ -31,24 +35,37 @@ import org.kohsuke.stapler.DataBoundConstructor;
 import hudson.Extension;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.cause.BitBucketPPRTriggerCause;
-import io.jenkins.plugins.bitbucketpushandpullrequest.cause.pullrequest.BitBucketPPRPullRequestUpdatedCause;
+import io.jenkins.plugins.bitbucketpushandpullrequest.cause.pullrequest.cloud.BitBucketPPRPullRequestApprovedCause;
+import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
+import io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud.BitBucketPPRParticipant;
 
 
-public class BitBucketPPRPullRequestUpdatedActionFilter
+public class BitBucketPPRPullRequestApprovedActionFilter
     extends BitBucketPPRPullRequestActionFilter {
+  private static final Logger LOGGER =
+      Logger.getLogger(BitBucketPPRPullRequestApprovedActionFilter.class.getName());
+
+  private boolean triggerOnlyIfAllReviewersApproved;
 
   @DataBoundConstructor
-  public BitBucketPPRPullRequestUpdatedActionFilter() {}
+  public BitBucketPPRPullRequestApprovedActionFilter(boolean triggerOnlyIfAllReviewersApproved) {
+    this.triggerOnlyIfAllReviewersApproved = triggerOnlyIfAllReviewersApproved;
+  }
 
   @Override
   public boolean shouldTriggerBuild(BitBucketPPRAction bitbucketAction) {
+    if (triggerOnlyIfAllReviewersApproved && !allReviewersHaveApproved(bitbucketAction)) {
+      LOGGER.info("Not triggered because not all reviewers have approved the pull request");
+      return false;
+    }
+
     return true;
   }
 
   @Override
   public BitBucketPPRTriggerCause getCause(File pollingLog, BitBucketPPRAction pullRequestAction)
       throws IOException {
-    return new BitBucketPPRPullRequestUpdatedCause(pollingLog, pullRequestAction);
+    return new BitBucketPPRPullRequestApprovedCause(pollingLog, pullRequestAction);
   }
 
   @Extension
@@ -56,7 +73,32 @@ public class BitBucketPPRPullRequestUpdatedActionFilter
 
     @Override
     public String getDisplayName() {
-      return "Updated";
+      return "Approved";
     }
+  }
+
+  public boolean getTriggerOnlyIfAllReviewersApproved() {
+    return triggerOnlyIfAllReviewersApproved;
+  }
+
+  private boolean allReviewersHaveApproved(BitBucketPPRAction pullRequestAction) {
+    BitBucketPPRPayload payload = pullRequestAction.getPayload();
+    List<BitBucketPPRParticipant> participants = payload.getPullRequest().getParticipants();
+
+    boolean allApproved = true;
+
+    for (BitBucketPPRParticipant participant : participants) {
+      if (isReviewer(participant) && !participant.getApproved()) {
+        allApproved = false;
+      }
+    }
+
+    return allApproved;
+  }
+
+  private boolean isReviewer(BitBucketPPRParticipant pullRequestParticipant) {
+    String role = pullRequestParticipant.getRole();
+
+    return PULL_REQUEST_REVIEWER.equals(role);
   }
 }

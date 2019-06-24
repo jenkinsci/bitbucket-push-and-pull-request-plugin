@@ -1,7 +1,7 @@
 /*******************************************************************************
  * The MIT License
  * 
- * Copyright (C) 2018, CloudBees, Inc.
+ * Copyright (C) 2018-2019, CloudBees, Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -20,45 +20,52 @@
  ******************************************************************************/
 
 
-package io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest;
+package io.jenkins.plugins.bitbucketpushandpullrequest.model.server;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.Serializable;
 
-import org.jenkinsci.Symbol;
-import org.kohsuke.stapler.DataBoundConstructor;
+public class BitBucketPPRServerRepositoryRef implements Serializable {
 
-import hudson.Extension;
-import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
-import io.jenkins.plugins.bitbucketpushandpullrequest.cause.BitBucketPPRTriggerCause;
-import io.jenkins.plugins.bitbucketpushandpullrequest.cause.pullrequest.BitBucketPPRPullRequestCreatedCause;
+  private String id;
+  private String displayId;
+  private String latestCommit;
+  private BitBucketPPRServerRepository repository;
 
+  public String getId() {
+    return id;
+  }
 
-public class BitBucketPPRPullRequestCreatedActionFilter
-    extends BitBucketPPRPullRequestActionFilter {
+  public void setId(String id) {
+    this.id = id;
+  }
 
-  @DataBoundConstructor
-  public BitBucketPPRPullRequestCreatedActionFilter() {
-    // This method is empty
+  public String getDisplayId() {
+    return displayId;
+  }
+
+  public void setDisplayId(String displayId) {
+    this.displayId = displayId;
+  }
+
+  public String getLatestCommit() {
+    return latestCommit;
+  }
+
+  public void setLatestCommit(String latestCommit) {
+    this.latestCommit = latestCommit;
+  }
+
+  public BitBucketPPRServerRepository getRepository() {
+    return repository;
+  }
+
+  public void setRepository(BitBucketPPRServerRepository repository) {
+    this.repository = repository;
   }
 
   @Override
-  public boolean shouldTriggerBuild(BitBucketPPRAction bitbucketAction) {
-    return true;
-  }
-
-  @Override
-  public BitBucketPPRTriggerCause getCause(File pollingLog, BitBucketPPRAction pullRequestAction)
-      throws IOException {
-    return new BitBucketPPRPullRequestCreatedCause(pollingLog, pullRequestAction);
-  }
-
-  @Extension
-  public static class ActionFilterDescriptorImpl extends BitBucketPPRPullRequestActionDescriptor {
-
-    @Override
-    public String getDisplayName() {
-      return "Created";
-    }
+  public String toString() {
+    return "BitBucketPPRServerRepositoryRef [id=" + id + ", displayId=" + displayId
+        + ", latestCommit=" + latestCommit + ", repository=" + repository + "]";
   }
 }

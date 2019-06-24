@@ -41,6 +41,14 @@ public final class BitBucketPPRConsts {
   public static final String PULL_REQUEST_APPROVED = "approved";
   public static final String PULL_REQUEST_UPDATED = "updated";
   public static final String PULL_REQUEST_MERGED = "fulfilled";
+ 
+  
+  public static final String PULL_REQUEST_SERVER_EVENT = "pr";
+  public static final String PULL_REQUEST_SERVER_CREATED = "opened";
+  public static final String PULL_REQUEST_SERVER_APPROVED = "approved";
+  public static final String PULL_REQUEST_SERVER_UPDATED = "modified";
+  public static final String PULL_REQUEST_SERVER_MERGED = "merged";
+  
   
   public static final String PULL_REQUEST_REVIEWER = "REVIEWER";
   public static final String PULL_REQUEST_PARTICIPANT = "PARTICIPANT";

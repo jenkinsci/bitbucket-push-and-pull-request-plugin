@@ -21,29 +21,32 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  ******************************************************************************/
-package io.jenkins.plugins.bitbucketpushandpullrequest.processor;
 
-import javax.annotation.Nonnull;
 
-import io.jenkins.plugins.bitbucketpushandpullrequest.BitBucketPPRJobProbe;
+package io.jenkins.plugins.bitbucketpushandpullrequest.cause.pullrequest.cloud;
+
+import java.io.File;
+import java.io.IOException;
+
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
-import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRRepositoryAction;
-import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPREvent;
-import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
+import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRPullRequestAction;
+import io.jenkins.plugins.bitbucketpushandpullrequest.cause.BitBucketPPRTriggerCause;
 
 
-public class BitBucketPPRRepositoryPayloadProcessor extends BitBucketPPRPayloadProcessor {
-  public BitBucketPPRRepositoryPayloadProcessor(BitBucketPPRJobProbe jobProbe, BitBucketPPREvent bitbucketEvent) {
-    super(jobProbe, bitbucketEvent);
+public class BitBucketPPRPullRequestCause extends BitBucketPPRTriggerCause {
+
+  public BitBucketPPRPullRequestCause(File pollingLog, BitBucketPPRAction bitbucketAction) throws IOException {
+    super(pollingLog, bitbucketAction);
+  }
+
+  public BitBucketPPRPullRequestAction getPullRequestPayLoad() {
+    return (BitBucketPPRPullRequestAction) super.getAction();
   }
 
   @Override
-  public void processPayload(BitBucketPPRPayload payload) {
-    BitBucketPPRAction action = buildActionForJobs(payload);
-    jobProbe.triggerMatchingJobs(bitbucketEvent, action);
+  public String getShortDescription() {
+    String pusher = bitbucketAction.getUser() != null ? bitbucketAction.getUser() : "";
+    return "Started by Bitbucket pull request event by " + pusher;
   }
 
-  private BitBucketPPRAction buildActionForJobs(@Nonnull BitBucketPPRPayload payload) {
-    return new BitBucketPPRRepositoryAction(payload);
-  }
 }

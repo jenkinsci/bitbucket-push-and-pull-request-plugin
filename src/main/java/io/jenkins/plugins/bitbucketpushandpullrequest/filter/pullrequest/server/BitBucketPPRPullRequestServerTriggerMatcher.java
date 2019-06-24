@@ -1,7 +1,7 @@
 /*******************************************************************************
  * The MIT License
  * 
- * Copyright (C) 2018, CloudBees, Inc.
+ * Copyright (C) 2019, CloudBees, Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -20,33 +20,34 @@
  ******************************************************************************/
 
 
-package io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest;
+package io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.server;
 
 import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConsts.*;
 
 import io.jenkins.plugins.bitbucketpushandpullrequest.filter.BitBucketPPREventTriggerMatcher;
 import io.jenkins.plugins.bitbucketpushandpullrequest.filter.BitBucketPPRTriggerFilter;
-import io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud.BitBucketPPREvent;
+import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPREvent;
 
 
-public class BitBucketPPRPullRequestTriggerMatcher implements BitBucketPPREventTriggerMatcher {
+public class BitBucketPPRPullRequestServerTriggerMatcher
+    implements BitBucketPPREventTriggerMatcher {
   @Override
   public boolean matchesAction(BitBucketPPREvent bitbucketEvent,
       BitBucketPPRTriggerFilter triggerFilter) {
-    if (PULL_REQUEST_APPROVED.equals(bitbucketEvent.getAction())
-        && triggerFilter.getActionFilter() instanceof BitBucketPPRPullRequestApprovedActionFilter) {
+    if (PULL_REQUEST_SERVER_APPROVED.equals(bitbucketEvent.getAction()) && triggerFilter
+        .getActionFilter() instanceof BitBucketPPRPullRequestServerApprovedActionFilter) {
       return true;
     }
-    if (PULL_REQUEST_UPDATED.equals(bitbucketEvent.getAction())
-        && triggerFilter.getActionFilter() instanceof BitBucketPPRPullRequestUpdatedActionFilter) {
+    if (PULL_REQUEST_SERVER_UPDATED.equals(bitbucketEvent.getAction()) && triggerFilter
+        .getActionFilter() instanceof BitBucketPPRPullRequestServerUpdatedActionFilter) {
       return true;
     }
-    if (PULL_REQUEST_CREATED.equals(bitbucketEvent.getAction())
-        && triggerFilter.getActionFilter() instanceof BitBucketPPRPullRequestCreatedActionFilter) {
+    if (PULL_REQUEST_SERVER_CREATED.equals(bitbucketEvent.getAction()) && triggerFilter
+        .getActionFilter() instanceof BitBucketPPRPullRequestServerCreatedActionFilter) {
       return true;
     }
-    if (PULL_REQUEST_MERGED.equals(bitbucketEvent.getAction())
-        && triggerFilter.getActionFilter() instanceof BitBucketPPRPullRequestMergedActionFilter) {
+    if (PULL_REQUEST_SERVER_MERGED.equals(bitbucketEvent.getAction()) && triggerFilter
+        .getActionFilter() instanceof BitBucketPPRPullRequesServerMergedActionFilter) {
       return true;
     }
     return false;

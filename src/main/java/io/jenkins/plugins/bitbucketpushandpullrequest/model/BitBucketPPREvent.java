@@ -18,7 +18,7 @@
  * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  ******************************************************************************/
-package io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud;
+package io.jenkins.plugins.bitbucketpushandpullrequest.model;
 
 import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConsts.*;
 
@@ -33,11 +33,14 @@ public class BitBucketPPREvent {
   public BitBucketPPREvent(String eventAction) throws OperationNotSupportedException {
     String[] eventActionPair = eventAction.split(":");
 
-    // diagnostics ping
-
     checkOperationSupportedException(eventActionPair);
     this.event = eventActionPair[0];
-    this.action = eventActionPair[1];
+
+    if (eventActionPair.length == 3 && eventActionPair[1].equalsIgnoreCase("reviewer")) {
+      this.action = eventActionPair[2];
+    } else {
+      this.action = eventActionPair[1];
+    }
   }
 
   private void checkOperationSupportedException(String[] eventActionPair)
@@ -51,11 +54,16 @@ public class BitBucketPPREvent {
           || REPOSITORY_SERVER_PUSH.equalsIgnoreCase(eventActionPair[1]))) {
         error = true;
       }
-    } else if (PULL_REQUEST_EVENT.equalsIgnoreCase(eventActionPair[0])) {
+    } else if (PULL_REQUEST_EVENT.equalsIgnoreCase(eventActionPair[0])
+        || PULL_REQUEST_SERVER_EVENT.equalsIgnoreCase(eventActionPair[0])) {
       if (!(PULL_REQUEST_APPROVED.equalsIgnoreCase(eventActionPair[1])
           || PULL_REQUEST_CREATED.equalsIgnoreCase(eventActionPair[1])
           || PULL_REQUEST_UPDATED.equalsIgnoreCase(eventActionPair[1])
-          || PULL_REQUEST_MERGED.equalsIgnoreCase(eventActionPair[1]))) {
+          || PULL_REQUEST_MERGED.equalsIgnoreCase(eventActionPair[1])
+          || PULL_REQUEST_SERVER_CREATED.equalsIgnoreCase(eventActionPair[1])
+          || PULL_REQUEST_SERVER_UPDATED.equalsIgnoreCase(eventActionPair[1])
+          || PULL_REQUEST_SERVER_APPROVED.equalsIgnoreCase(eventActionPair[2])
+          || PULL_REQUEST_SERVER_MERGED.equalsIgnoreCase(eventActionPair[1]))) {
         error = true;
       }
     } else if (DIAGNOSTICS.equalsIgnoreCase(eventActionPair[0])) {

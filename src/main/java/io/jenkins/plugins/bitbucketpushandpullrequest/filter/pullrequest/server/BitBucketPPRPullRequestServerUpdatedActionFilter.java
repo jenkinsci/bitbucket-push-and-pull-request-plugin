@@ -1,7 +1,7 @@
 /*******************************************************************************
  * The MIT License
  * 
- * Copyright (C) 2018, CloudBees, Inc.
+ * Copyright (C) 2019, CloudBees, Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -20,23 +20,42 @@
  ******************************************************************************/
 
 
-package io.jenkins.plugins.bitbucketpushandpullrequest.cause.pullrequest;
+package io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.server;
 
 import java.io.File;
 import java.io.IOException;
 
+import org.kohsuke.stapler.DataBoundConstructor;
+
+import hudson.Extension;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
-import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRPullRequestAction;
+import io.jenkins.plugins.bitbucketpushandpullrequest.cause.BitBucketPPRTriggerCause;
+import io.jenkins.plugins.bitbucketpushandpullrequest.cause.pullrequest.server.BitBucketPPRPullRequestServerUpdatedCause;
 
 
-public class BitBucketPPRPullRequestUpdatedCause extends BitBucketPPRPullRequestCause {
-  public BitBucketPPRPullRequestUpdatedCause(File pollingLog, BitBucketPPRAction bitbucketAction)
-      throws IOException {
-    super(pollingLog, bitbucketAction);
-  }
-  
+public class BitBucketPPRPullRequestServerUpdatedActionFilter
+    extends BitBucketPPRPullRequestServerActionFilter {
+
+  @DataBoundConstructor
+  public BitBucketPPRPullRequestServerUpdatedActionFilter() {}
+
   @Override
-  public String getShortDescription() {
-    return "Started by Bitbucket pull request updated";
+  public boolean shouldTriggerBuild(BitBucketPPRAction bitbucketAction) {
+    return true;
+  }
+
+  @Override
+  public BitBucketPPRTriggerCause getCause(File pollingLog, BitBucketPPRAction pullRequestAction)
+      throws IOException {
+    return new BitBucketPPRPullRequestServerUpdatedCause(pollingLog, pullRequestAction);
+  }
+
+  @Extension
+  public static class ActionFilterDescriptorImpl extends BitBucketPPRPullRequestServerActionDescriptor {
+
+    @Override
+    public String getDisplayName() {
+      return "Updated";
+    }
   }
 }

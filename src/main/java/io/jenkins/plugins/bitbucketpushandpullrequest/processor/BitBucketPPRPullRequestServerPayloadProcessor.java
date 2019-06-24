@@ -1,7 +1,7 @@
 /*******************************************************************************
  * The MIT License
  * 
- * Copyright (C) 2018, CloudBees, Inc.
+ * Copyright (C) 2019, CloudBees, Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,20 +21,30 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  ******************************************************************************/
+
+
 package io.jenkins.plugins.bitbucketpushandpullrequest.processor;
+
+import java.util.logging.Logger;
 
 import javax.annotation.Nonnull;
 
 import io.jenkins.plugins.bitbucketpushandpullrequest.BitBucketPPRJobProbe;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
-import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRRepositoryAction;
+import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRPullRequestServerAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPREvent;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
 
 
-public class BitBucketPPRRepositoryPayloadProcessor extends BitBucketPPRPayloadProcessor {
-  public BitBucketPPRRepositoryPayloadProcessor(BitBucketPPRJobProbe jobProbe, BitBucketPPREvent bitbucketEvent) {
+public class BitBucketPPRPullRequestServerPayloadProcessor extends BitBucketPPRPayloadProcessor {
+  
+  private static final Logger logger = Logger.getLogger(BitBucketPPRPullRequestServerPayloadProcessor.class.getName());
+  
+  public BitBucketPPRPullRequestServerPayloadProcessor(BitBucketPPRJobProbe jobProbe,
+      BitBucketPPREvent bitbucketEvent) {
     super(jobProbe, bitbucketEvent);
+    logger.fine(() -> "Processing " + bitbucketEvent.toString());
+    
   }
 
   @Override
@@ -44,6 +54,6 @@ public class BitBucketPPRRepositoryPayloadProcessor extends BitBucketPPRPayloadP
   }
 
   private BitBucketPPRAction buildActionForJobs(@Nonnull BitBucketPPRPayload payload) {
-    return new BitBucketPPRRepositoryAction(payload);
+    return new BitBucketPPRPullRequestServerAction(payload);
   }
 }

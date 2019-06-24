@@ -20,30 +20,24 @@
  ******************************************************************************/
 
 
-package io.jenkins.plugins.bitbucketpushandpullrequest.cause;
+package io.jenkins.plugins.bitbucketpushandpullrequest.cause.pullrequest.server;
 
 import java.io.File;
 import java.io.IOException;
 
-import hudson.triggers.SCMTrigger;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
+import io.jenkins.plugins.bitbucketpushandpullrequest.cause.pullrequest.cloud.BitBucketPPRPullRequestCause;
 
 
-public class BitBucketPPRTriggerCause extends SCMTrigger.SCMTriggerCause {
-  protected BitBucketPPRAction bitbucketAction;
-
-  public BitBucketPPRTriggerCause(File pollingLog, BitBucketPPRAction bitbucketAction)
+public class BitBucketPPRPullRequestServerCreatedCause extends BitBucketPPRPullRequestServerCause {
+  public BitBucketPPRPullRequestServerCreatedCause(File pollingLog, BitBucketPPRAction bitbucketAction)
       throws IOException {
-    super(pollingLog);
-    this.bitbucketAction = bitbucketAction;
+    super(pollingLog, bitbucketAction);
   }
-
-  public BitBucketPPRAction getAction() {
-    return this.bitbucketAction;
-  }
-
+  
   @Override
-  public String toString() {
-    return "BitBucketPPRTriggerCause [bitbucketAction=" + bitbucketAction + "]";
+  public String getShortDescription() {
+    String pusher = bitbucketAction.getUser() != null ? bitbucketAction.getUser() : "";
+    return "Started by user " + pusher + ": Bitbucket PPR: new pull request created";
   }
 }

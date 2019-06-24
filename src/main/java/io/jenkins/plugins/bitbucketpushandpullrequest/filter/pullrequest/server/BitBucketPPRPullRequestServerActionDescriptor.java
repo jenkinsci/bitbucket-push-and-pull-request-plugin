@@ -20,30 +20,13 @@
  ******************************************************************************/
 
 
-package io.jenkins.plugins.bitbucketpushandpullrequest.cause;
-
-import java.io.File;
-import java.io.IOException;
-
-import hudson.triggers.SCMTrigger;
-import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
+package io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.server;
 
 
-public class BitBucketPPRTriggerCause extends SCMTrigger.SCMTriggerCause {
-  protected BitBucketPPRAction bitbucketAction;
+import hudson.model.Descriptor;
 
-  public BitBucketPPRTriggerCause(File pollingLog, BitBucketPPRAction bitbucketAction)
-      throws IOException {
-    super(pollingLog);
-    this.bitbucketAction = bitbucketAction;
-  }
 
-  public BitBucketPPRAction getAction() {
-    return this.bitbucketAction;
-  }
+public abstract class BitBucketPPRPullRequestServerActionDescriptor
+    extends Descriptor<BitBucketPPRPullRequestServerActionFilter> {
 
-  @Override
-  public String toString() {
-    return "BitBucketPPRTriggerCause [bitbucketAction=" + bitbucketAction + "]";
-  }
 }

@@ -21,24 +21,33 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  ******************************************************************************/
-package io.jenkins.plugins.bitbucketpushandpullrequest.model;
-
-import java.io.Serializable;
 
 
-public class BitBucketPPRHtml implements Serializable {
-  private String href;
+package io.jenkins.plugins.bitbucketpushandpullrequest.cause.pullrequest.server;
 
-  public String getHref() {
-    return href;
+import java.io.File;
+import java.io.IOException;
+
+import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
+import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRPullRequestAction;
+import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRPullRequestServerAction;
+import io.jenkins.plugins.bitbucketpushandpullrequest.cause.BitBucketPPRTriggerCause;
+
+
+public class BitBucketPPRPullRequestServerCause extends BitBucketPPRTriggerCause {
+
+  public BitBucketPPRPullRequestServerCause(File pollingLog, BitBucketPPRAction bitbucketAction) throws IOException {
+    super(pollingLog, bitbucketAction);
   }
 
-  public void setHref(String href) {
-    this.href = href;
+  public BitBucketPPRPullRequestServerAction getPullRequestPayLoad() {
+    return (BitBucketPPRPullRequestServerAction) super.getAction();
   }
 
   @Override
-  public String toString() {
-    return "BitBucketPPRHtml [href=" + href + "]";
+  public String getShortDescription() {
+    String pusher = bitbucketAction.getUser() != null ? bitbucketAction.getUser() : "";
+    return "Started by Bitbucket pull request event by " + pusher;
   }
+
 }

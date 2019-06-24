@@ -1,7 +1,7 @@
 /*******************************************************************************
  * The MIT License
  * 
- * Copyright (C) 2018, CloudBees, Inc.
+ * Copyright (C) 2019, CloudBees, Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -20,7 +20,7 @@
  ******************************************************************************/
 
 
-package io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest;
+package io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.server;
 
 import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConsts.PULL_REQUEST_REVIEWER;
 
@@ -29,26 +29,24 @@ import java.io.IOException;
 import java.util.List;
 import java.util.logging.Logger;
 
-import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 import hudson.Extension;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.cause.BitBucketPPRTriggerCause;
-import io.jenkins.plugins.bitbucketpushandpullrequest.cause.pullrequest.BitBucketPPRPullRequestApprovedCause;
+import io.jenkins.plugins.bitbucketpushandpullrequest.cause.pullrequest.server.BitBucketPPRPullRequestServerApprovedCause;
+import io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.cloud.BitBucketPPRPullRequestApprovedActionFilter;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud.BitBucketPPRParticipant;
 
-
-public class BitBucketPPRPullRequestApprovedActionFilter
-    extends BitBucketPPRPullRequestActionFilter {
+public class BitBucketPPRPullRequestServerApprovedActionFilter extends BitBucketPPRPullRequestServerActionFilter {
   private static final Logger LOGGER =
       Logger.getLogger(BitBucketPPRPullRequestApprovedActionFilter.class.getName());
 
   private boolean triggerOnlyIfAllReviewersApproved;
 
   @DataBoundConstructor
-  public BitBucketPPRPullRequestApprovedActionFilter(boolean triggerOnlyIfAllReviewersApproved) {
+  public BitBucketPPRPullRequestServerApprovedActionFilter(boolean triggerOnlyIfAllReviewersApproved) {
     this.triggerOnlyIfAllReviewersApproved = triggerOnlyIfAllReviewersApproved;
   }
 
@@ -60,16 +58,16 @@ public class BitBucketPPRPullRequestApprovedActionFilter
     }
 
     return true;
-  }
+  } 
 
   @Override
   public BitBucketPPRTriggerCause getCause(File pollingLog, BitBucketPPRAction pullRequestAction)
       throws IOException {
-    return new BitBucketPPRPullRequestApprovedCause(pollingLog, pullRequestAction);
+    return new BitBucketPPRPullRequestServerApprovedCause(pollingLog, pullRequestAction);
   }
 
   @Extension
-  public static class ActionFilterDescriptorImpl extends BitBucketPPRPullRequestActionDescriptor {
+  public static class ActionFilterDescriptorImpl extends BitBucketPPRPullRequestServerActionDescriptor {
 
     @Override
     public String getDisplayName() {
