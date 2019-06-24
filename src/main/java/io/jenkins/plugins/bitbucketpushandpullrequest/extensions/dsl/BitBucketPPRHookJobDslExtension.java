@@ -42,6 +42,7 @@ import javaposse.jobdsl.plugin.DslExtensionMethod;
 
 @Extension(optional = true)
 public class BitBucketPPRHookJobDslExtension extends ContextExtensionPoint {
+  List<BitBucketPPRTriggerFilter> triggers = new ArrayList<>();
 
   @Deprecated
   @DslExtensionMethod(context = TriggerContext.class)
@@ -52,48 +53,40 @@ public class BitBucketPPRHookJobDslExtension extends ContextExtensionPoint {
   @DslExtensionMethod(context = TriggerContext.class)
   public Object bitbucketRepositoryPushAction(boolean triggerAlsoIfTagPush,
       String allowedBranches) {
-    List<BitBucketPPRTriggerFilter> triggers;
     BitBucketPPRRepositoryPushActionFilter repositoryPushActionFilter =
         new BitBucketPPRRepositoryPushActionFilter(triggerAlsoIfTagPush, allowedBranches);
     BitBucketPPRRepositoryTriggerFilter repositoryTriggerFilter =
         new BitBucketPPRRepositoryTriggerFilter(repositoryPushActionFilter);
-    triggers = new ArrayList<>();
     triggers.add(repositoryTriggerFilter);
     return new BitBucketPPRTrigger(triggers);
   }
 
   @DslExtensionMethod(context = TriggerContext.class)
   public Object bitbucketPullRequestApprovedAction(boolean onlyIfReviewersApproved) {
-    List<BitBucketPPRTriggerFilter> triggers;
     BitBucketPPRPullRequestApprovedActionFilter pullRequestApprovedActionFilter =
         new BitBucketPPRPullRequestApprovedActionFilter(onlyIfReviewersApproved);
     BitBucketPPRPullRequestTriggerFilter pullRequestTriggerFilter =
         new BitBucketPPRPullRequestTriggerFilter(pullRequestApprovedActionFilter);
-    triggers = new ArrayList<>();
     triggers.add(pullRequestTriggerFilter);
     return new BitBucketPPRTrigger(triggers);
   }
 
   @DslExtensionMethod(context = TriggerContext.class)
   public Object bitbucketPullRequestCreatedAction() {
-    List<BitBucketPPRTriggerFilter> triggers;
     BitBucketPPRPullRequestCreatedActionFilter pullRequestCreatedActionFilter =
         new BitBucketPPRPullRequestCreatedActionFilter();
     BitBucketPPRPullRequestTriggerFilter pullRequestTriggerFilter =
         new BitBucketPPRPullRequestTriggerFilter(pullRequestCreatedActionFilter);
-    triggers = new ArrayList<>();
     triggers.add(pullRequestTriggerFilter);
     return new BitBucketPPRTrigger(triggers);
   }
 
   @DslExtensionMethod(context = TriggerContext.class)
   public Object bitbucketPullRequestUpdatedAction() {
-    List<BitBucketPPRTriggerFilter> triggers;
     BitBucketPPRPullRequestUpdatedActionFilter pullRequestUpdatedActionFilter =
         new BitBucketPPRPullRequestUpdatedActionFilter();
     BitBucketPPRPullRequestTriggerFilter pullRequestTriggerFilter =
         new BitBucketPPRPullRequestTriggerFilter(pullRequestUpdatedActionFilter);
-    triggers = new ArrayList<>();
     triggers.add(pullRequestTriggerFilter);
     return new BitBucketPPRTrigger(triggers);
   }
