@@ -28,13 +28,19 @@ import java.util.List;
 import hudson.Extension;
 import io.jenkins.plugins.bitbucketpushandpullrequest.BitBucketPPRTrigger;
 import io.jenkins.plugins.bitbucketpushandpullrequest.filter.BitBucketPPRTriggerFilter;
-import io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.BitBucketPPRPullRequestApprovedActionFilter;
-import io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.BitBucketPPRPullRequestCreatedActionFilter;
-import io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.BitBucketPPRPullRequestTriggerFilter;
-import io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.BitBucketPPRPullRequestUpdatedActionFilter;
+import io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.cloud.BitBucketPPRPullRequestApprovedActionFilter;
+import io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.cloud.BitBucketPPRPullRequestCreatedActionFilter;
+import io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.cloud.BitBucketPPRPullRequestMergedActionFilter;
+import io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.cloud.BitBucketPPRPullRequestTriggerFilter;
+import io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.cloud.BitBucketPPRPullRequestUpdatedActionFilter;
+import io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.server.BitBucketPPRPullRequestServerApprovedActionFilter;
+import io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.server.BitBucketPPRPullRequestServerCreatedActionFilter;
+import io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.server.BitBucketPPRPullRequestServerMergedActionFilter;
+import io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.server.BitBucketPPRPullRequestServerTriggerFilter;
+import io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.server.BitBucketPPRPullRequestServerUpdatedActionFilter;
 import io.jenkins.plugins.bitbucketpushandpullrequest.filter.repository.BitBucketPPRRepositoryPushActionFilter;
 import io.jenkins.plugins.bitbucketpushandpullrequest.filter.repository.BitBucketPPRRepositoryTriggerFilter;
-import javaposse.jobdsl.dsl.helpers.step.StepContext;
+import io.jenkins.plugins.bitbucketpushandpullrequest.filter.repository.BitBucketPPRServerRepositoryPushActionFilter;
 import javaposse.jobdsl.dsl.helpers.triggers.TriggerContext;
 import javaposse.jobdsl.plugin.ContextExtensionPoint;
 import javaposse.jobdsl.plugin.DslExtensionMethod;
@@ -43,11 +49,11 @@ import javaposse.jobdsl.plugin.DslExtensionMethod;
 @Extension(optional = true)
 public class BitBucketPPRHookJobDslExtension extends ContextExtensionPoint {
 
-  @Deprecated
-  @DslExtensionMethod(context = TriggerContext.class)
-  public Object bitbucketPush() {
-    return bitbucketRepositoryPushAction(false, null);
-  }
+  // @Deprecated
+  // @DslExtensionMethod(context = TriggerContext.class)
+  // public Object bitbucketPush() {
+  // return bitbucketRepositoryPushAction(false, null);
+  // }
 
   @DslExtensionMethod(context = TriggerContext.class)
   public Object bitbucketRepositoryPushAction(boolean triggerAlsoIfTagPush,
@@ -95,6 +101,79 @@ public class BitBucketPPRHookJobDslExtension extends ContextExtensionPoint {
         new BitBucketPPRPullRequestTriggerFilter(pullRequestUpdatedActionFilter);
     triggers = new ArrayList<>();
     triggers.add(pullRequestTriggerFilter);
+    return new BitBucketPPRTrigger(triggers);
+  }
+
+  @DslExtensionMethod(context = TriggerContext.class)
+  public Object bitbucketPullRequestMergedAction() {
+    List<BitBucketPPRTriggerFilter> triggers;
+    BitBucketPPRPullRequestMergedActionFilter pullRequestMegedActionFilter =
+        new BitBucketPPRPullRequestMergedActionFilter();
+    BitBucketPPRPullRequestTriggerFilter pullRequestTriggerFilter =
+        new BitBucketPPRPullRequestTriggerFilter(pullRequestMegedActionFilter);
+    triggers = new ArrayList<>();
+    triggers.add(pullRequestTriggerFilter);
+    return new BitBucketPPRTrigger(triggers);
+  }
+
+  @DslExtensionMethod(context = TriggerContext.class)
+  public Object bitbucketRepositoryServerPushAction(boolean triggerAlsoIfTagPush,
+      String allowedBranches) {
+    List<BitBucketPPRTriggerFilter> triggers;
+    BitBucketPPRServerRepositoryPushActionFilter repositoryServerPushActionFilter =
+        new BitBucketPPRServerRepositoryPushActionFilter(triggerAlsoIfTagPush, allowedBranches);
+    BitBucketPPRRepositoryTriggerFilter repositoryServerTriggerFilter =
+        new BitBucketPPRRepositoryTriggerFilter(repositoryServerPushActionFilter);
+    triggers = new ArrayList<>();
+    triggers.add(repositoryServerTriggerFilter);
+    return new BitBucketPPRTrigger(triggers);
+  }
+
+  @DslExtensionMethod(context = TriggerContext.class)
+  public Object bitbucketPullRequestServerApprovedAction(boolean onlyIfReviewersApproved) {
+    List<BitBucketPPRTriggerFilter> triggers;
+    BitBucketPPRPullRequestServerApprovedActionFilter pullRequestServerApprovedActionFilter =
+        new BitBucketPPRPullRequestServerApprovedActionFilter(onlyIfReviewersApproved);
+    BitBucketPPRPullRequestServerTriggerFilter pullRequestServerTriggerFilter =
+        new BitBucketPPRPullRequestServerTriggerFilter(pullRequestServerApprovedActionFilter);
+    triggers = new ArrayList<>();
+    triggers.add(pullRequestServerTriggerFilter);
+    return new BitBucketPPRTrigger(triggers);
+  }
+
+  @DslExtensionMethod(context = TriggerContext.class)
+  public Object bitbucketPullRequestServerCreatedAction() {
+    List<BitBucketPPRTriggerFilter> triggers;
+    BitBucketPPRPullRequestServerCreatedActionFilter pullRequestServerCreatedActionFilter =
+        new BitBucketPPRPullRequestServerCreatedActionFilter();
+    BitBucketPPRPullRequestServerTriggerFilter pullRequestServerTriggerFilter =
+        new BitBucketPPRPullRequestServerTriggerFilter(pullRequestServerCreatedActionFilter);
+    triggers = new ArrayList<>();
+    triggers.add(pullRequestServerTriggerFilter);
+    return new BitBucketPPRTrigger(triggers);
+  }
+
+  @DslExtensionMethod(context = TriggerContext.class)
+  public Object bitbucketPullRequestServerUpdatedAction() {
+    List<BitBucketPPRTriggerFilter> triggers;
+    BitBucketPPRPullRequestServerUpdatedActionFilter pullRequestUpdatedServerActionFilter =
+        new BitBucketPPRPullRequestServerUpdatedActionFilter();
+    BitBucketPPRPullRequestServerTriggerFilter pullRequestServerTriggerFilter =
+        new BitBucketPPRPullRequestServerTriggerFilter(pullRequestUpdatedServerActionFilter);
+    triggers = new ArrayList<>();
+    triggers.add(pullRequestServerTriggerFilter);
+    return new BitBucketPPRTrigger(triggers);
+  }
+
+  @DslExtensionMethod(context = TriggerContext.class)
+  public Object bitbucketPullRequestServerMergedAction() {
+    List<BitBucketPPRTriggerFilter> triggers;
+    BitBucketPPRPullRequestServerMergedActionFilter pullRequestServerMegedActionFilter =
+        new BitBucketPPRPullRequestServerMergedActionFilter();
+    BitBucketPPRPullRequestServerTriggerFilter pullRequestServerTriggerFilter =
+        new BitBucketPPRPullRequestServerTriggerFilter(pullRequestServerMegedActionFilter);
+    triggers = new ArrayList<>();
+    triggers.add(pullRequestServerTriggerFilter);
     return new BitBucketPPRTrigger(triggers);
   }
 }

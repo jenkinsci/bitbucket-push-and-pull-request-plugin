@@ -1,7 +1,7 @@
 /*******************************************************************************
  * The MIT License
  * 
- * Copyright (C) 2018, CloudBees, Inc.
+ * Copyright (C) 2018-2019, CloudBees, Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -20,23 +20,52 @@
  ******************************************************************************/
 
 
-package io.jenkins.plugins.bitbucketpushandpullrequest.cause.pullrequest;
+package io.jenkins.plugins.bitbucketpushandpullrequest.model.server;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.Serializable;
 
-import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
-import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRPullRequestAction;
+public class BitBucketPPRServerRepositoryRef implements Serializable {
 
+  private String id;
+  private String displayId;
+  private String latestCommit;
+  private BitBucketPPRServerRepository repository;
 
-public class BitBucketPPRPullRequestCreatedCause extends BitBucketPPRPullRequestCause {
-  public BitBucketPPRPullRequestCreatedCause(File pollingLog, BitBucketPPRAction bitbucketAction)
-      throws IOException {
-    super(pollingLog, bitbucketAction);
+  public String getId() {
+    return id;
   }
-  
+
+  public void setId(String id) {
+    this.id = id;
+  }
+
+  public String getDisplayId() {
+    return displayId;
+  }
+
+  public void setDisplayId(String displayId) {
+    this.displayId = displayId;
+  }
+
+  public String getLatestCommit() {
+    return latestCommit;
+  }
+
+  public void setLatestCommit(String latestCommit) {
+    this.latestCommit = latestCommit;
+  }
+
+  public BitBucketPPRServerRepository getRepository() {
+    return repository;
+  }
+
+  public void setRepository(BitBucketPPRServerRepository repository) {
+    this.repository = repository;
+  }
+
   @Override
-  public String getShortDescription() {
-    return "Started by Bitbucket new pull request created";
+  public String toString() {
+    return "BitBucketPPRServerRepositoryRef [id=" + id + ", displayId=" + displayId
+        + ", latestCommit=" + latestCommit + ", repository=" + repository + "]";
   }
 }

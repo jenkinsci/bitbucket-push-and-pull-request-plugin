@@ -23,30 +23,24 @@
  ******************************************************************************/
 
 
-package io.jenkins.plugins.bitbucketpushandpullrequest.cause.pullrequest;
+package io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud;
 
-import java.io.File;
-import java.io.IOException;
-
-import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
-import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRPullRequestAction;
-import io.jenkins.plugins.bitbucketpushandpullrequest.cause.BitBucketPPRTriggerCause;
+import java.io.Serializable;
 
 
-public class BitBucketPPRPullRequestCause extends BitBucketPPRTriggerCause {
+public class BitBucketPPRHtml implements Serializable {
+  private String href;
 
-  public BitBucketPPRPullRequestCause(File pollingLog, BitBucketPPRAction bitbucketAction) throws IOException {
-    super(pollingLog, bitbucketAction);
+  public String getHref() {
+    return href;
   }
 
-  public BitBucketPPRPullRequestAction getPullRequestPayLoad() {
-    return (BitBucketPPRPullRequestAction) super.getAction();
+  public void setHref(String href) {
+    this.href = href;
   }
 
   @Override
-  public String getShortDescription() {
-    String pusher = bitbucketAction.getUser() != null ? bitbucketAction.getUser() : "";
-    return "Started by Bitbucket pull request event by " + pusher;
+  public String toString() {
+    return "BitBucketPPRHtml [href=" + href + "]";
   }
-
 }

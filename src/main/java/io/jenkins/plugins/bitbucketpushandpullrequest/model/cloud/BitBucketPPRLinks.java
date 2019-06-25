@@ -27,8 +27,6 @@ import java.io.Serializable;
 
 import com.google.gson.annotations.SerializedName;
 
-import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRHtml;
-
 public class BitBucketPPRLinks implements Serializable {
   BitBucketPPRHtml html;
   

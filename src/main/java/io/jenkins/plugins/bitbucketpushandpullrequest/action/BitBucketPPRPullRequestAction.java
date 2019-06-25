@@ -28,7 +28,7 @@ import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
 
 
 public class BitBucketPPRPullRequestAction extends BitBucketPPRAction {
-  private static final Logger LOGGER =
+  private static final Logger logger =
       Logger.getLogger(BitBucketPPRPullRequestAction.class.getName());
 
   public BitBucketPPRPullRequestAction(@Nonnull BitBucketPPRPayload payload) {

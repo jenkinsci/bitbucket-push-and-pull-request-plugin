@@ -20,30 +20,13 @@
  ******************************************************************************/
 
 
-package io.jenkins.plugins.bitbucketpushandpullrequest.cause.repository;
-
-import java.io.File;
-import java.io.IOException;
-
-import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
-import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRPullRequestAction;
-import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRRepositoryAction;
-import io.jenkins.plugins.bitbucketpushandpullrequest.cause.BitBucketPPRTriggerCause;
+package io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.cloud;
 
 
-public class BitBucketPPRRepositoryCause extends BitBucketPPRTriggerCause {
-  public BitBucketPPRRepositoryCause(File pollingLog, BitBucketPPRAction bitbucketAction)
-      throws IOException {
-    super(pollingLog, bitbucketAction);
-  }
-  
-  public BitBucketPPRRepositoryAction getRepositoryPayLoad() {
-    return (BitBucketPPRRepositoryAction) super.getAction();
-  }
-  
-  @Override
-  public String getShortDescription() {
-    String pusher = bitbucketAction.getUser() != null ? bitbucketAction.getUser() : "";
-    return "Started by Bitbucket PPR: repository event by " + pusher;
-  }
+import hudson.model.Descriptor;
+
+
+public abstract class BitBucketPPRPullRequestActionDescriptor
+    extends Descriptor<BitBucketPPRPullRequestActionFilter> {
+
 }

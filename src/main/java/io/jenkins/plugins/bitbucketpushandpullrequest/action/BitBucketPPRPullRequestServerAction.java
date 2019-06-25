@@ -1,7 +1,7 @@
 /*******************************************************************************
  * The MIT License
  * 
- * Copyright (C) 2018, CloudBees, Inc.
+ * Copyright (C) 2019, CloudBees, Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,46 +26,49 @@
 package io.jenkins.plugins.bitbucketpushandpullrequest.action;
 
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import javax.annotation.Nonnull;
-
-import hudson.EnvVars;
-import hudson.model.Run;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
-import io.jenkins.plugins.bitbucketpushandpullrequest.model.server.BitBucketPPRServerChange;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.server.BitBucketPPRServerClone;
 
 
-public class BitBucketPPRServerRepositoryAction extends BitBucketPPRAction {
-  private static final Logger LOGGER = Logger.getLogger(BitBucketPPRAction.class.getName());
+public class BitBucketPPRPullRequestServerAction extends BitBucketPPRAction {
+  private static final Logger logger =
+      Logger.getLogger(BitBucketPPRPullRequestServerAction.class.getName());
 
-  public BitBucketPPRServerRepositoryAction(BitBucketPPRPayload payload) {
+  public BitBucketPPRPullRequestServerAction(@Nonnull BitBucketPPRPayload payload) {
     super(payload);
-
-    this.scm = payload.getServerRepository().getScmId();
+    this.pullRequestId = Long.toString(payload.getServerPullRequest().getId());
+    
+    
+    this.scm = payload.getServerPullRequest().getFromRef().getRepository().getScmId();
 
     List<BitBucketPPRServerClone> clones =
-        payload.getServerRepository().getLinks().getCloneProperty();
+        payload.getServerPullRequest().getToRef().getRepository().getLinks().getCloneProperty();
 
     for (BitBucketPPRServerClone clone : clones) {
       if (clone.getName().equalsIgnoreCase("http") || clone.getName().equalsIgnoreCase("ssh")) {
         this.scmUrls.add(clone.getHref());
       }
-    }
-
-    for (BitBucketPPRServerChange change : payload.getServerChanges()) {
-      if (change.getRefId() != null) {
-        this.branchName = change.getRef().getDisplayId();
-        this.type = change.getType();
-        break;
-      }
-    }
-
-    LOGGER.log(Level.INFO,
-        () -> "Received commit hook notification from server for branch: " + this.branchName);
-    LOGGER.log(Level.INFO, () -> "Received commit hook type from server: " + this.type);
+    }    
+    
+    logger.fine("BitBucketPPRPullRequestServerAction was called.");
   }
- 
+
+  public String getSourceBranch() {
+    return payload.getServerPullRequest().getFromRef().getDisplayId();
+  }
+
+  public String getTargetBranch() {
+    return payload.getServerPullRequest().getToRef().getDisplayId();
+  }
+
+  public String getPullRequestUrl() {
+    return payload.getServerPullRequest().getLinks().getSelfProperty().get(0).getHref();
+  }
+  
+  @Override
+  public String getScm() {
+    return payload.getServerPullRequest().getFromRef().getRepository().getScmId();
+  }
 }

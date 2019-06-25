@@ -1,7 +1,7 @@
 /*******************************************************************************
  * The MIT License
  * 
- * Copyright (C) 2018, CloudBees, Inc.
+ * Copyright (C) 2019, CloudBees, Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -20,55 +20,41 @@
  ******************************************************************************/
 
 
-package io.jenkins.plugins.bitbucketpushandpullrequest.cause;
+package io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.cloud;
 
 import java.io.File;
 import java.io.IOException;
 
-import hudson.triggers.SCMTrigger;
+import org.kohsuke.stapler.DataBoundConstructor;
+
+import hudson.Extension;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
+import io.jenkins.plugins.bitbucketpushandpullrequest.cause.BitBucketPPRTriggerCause;
+import io.jenkins.plugins.bitbucketpushandpullrequest.cause.pullrequest.cloud.BitBucketPPRPullRequestUpdatedCause;
 
 
-public class BitBucketPPRTriggerCause extends SCMTrigger.SCMTriggerCause {
-  protected BitBucketPPRAction bitbucketAction;
+public class BitBucketPPRPullRequestMergedActionFilter extends BitBucketPPRPullRequestActionFilter {
 
-  public BitBucketPPRTriggerCause(File pollingLog, BitBucketPPRAction bitbucketAction)
-      throws IOException {
-    super(pollingLog);
-    this.bitbucketAction = bitbucketAction;
-  }
-
-  public BitBucketPPRAction getAction() {
-    return this.bitbucketAction;
-  }
-  
-  @Override
-  public int hashCode() {
-    final int prime = 31;
-    int result = super.hashCode();
-    result = prime * result + ((bitbucketAction == null) ? 0 : bitbucketAction.hashCode());
-    return result;
-  }
+  @DataBoundConstructor
+  public BitBucketPPRPullRequestMergedActionFilter() {}
 
   @Override
-  public boolean equals(Object obj) {
-    if (this == obj)
-      return true;
-    if (!super.equals(obj))
-      return false;
-    if (getClass() != obj.getClass())
-      return false;
-    BitBucketPPRTriggerCause other = (BitBucketPPRTriggerCause) obj;
-    if (bitbucketAction == null) {
-      if (other.bitbucketAction != null)
-        return false;
-    } else if (!bitbucketAction.equals(other.bitbucketAction))
-      return false;
+  public boolean shouldTriggerBuild(BitBucketPPRAction bitbucketAction) {
     return true;
   }
 
   @Override
-  public String toString() {
-    return "BitBucketPPRTriggerCause [bitbucketAction=" + bitbucketAction + "]";
+  public BitBucketPPRTriggerCause getCause(File pollingLog, BitBucketPPRAction pullRequestAction)
+      throws IOException {
+    return new BitBucketPPRPullRequestUpdatedCause(pollingLog, pullRequestAction);
+  }
+
+  @Extension
+  public static class ActionFilterDescriptorImpl extends BitBucketPPRPullRequestActionDescriptor {
+
+    @Override
+    public String getDisplayName() {
+      return "Merged";
+    }
   }
 }

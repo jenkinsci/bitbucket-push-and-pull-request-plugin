@@ -37,7 +37,7 @@ import io.jenkins.plugins.bitbucketpushandpullrequest.cause.repository.BitBucket
 
 
 public class BitBucketPPRRepositoryPushActionFilter extends BitBucketPPRRepositoryActionFilter {
-  private static final Logger LOGGER =
+  private static final Logger logger =
       Logger.getLogger(BitBucketPPRRepositoryPushActionFilter.class.getName());
 
   public boolean triggerAlsoIfTagPush;
@@ -53,13 +53,13 @@ public class BitBucketPPRRepositoryPushActionFilter extends BitBucketPPRReposito
 
   @Override
   public boolean shouldTriggerBuild(BitBucketPPRAction bitbucketAction) {
-    LOGGER.info(
+    logger.info(
         () -> "Should trigger build for the bitbucket action: " + bitbucketAction.toString() + "?");
 
     if (!bitbucketAction.getType().equalsIgnoreCase("BRANCH")
         && !bitbucketAction.getType().equalsIgnoreCase("named_branch")
         && !bitbucketAction.getType().equalsIgnoreCase("UPDATE") && !this.triggerAlsoIfTagPush) {
-      LOGGER.info(
+      logger.info(
           "Neither bitbucketAction type is BRANCH, nor UPDATE, nor trigger on tag push is set: "
               + bitbucketAction.getType());
 
@@ -70,14 +70,14 @@ public class BitBucketPPRRepositoryPushActionFilter extends BitBucketPPRReposito
   }
 
   protected boolean matches(String branchName) {
-    LOGGER.info(() -> "Following allowed branches patterns are set: " + allowedBranches);
-    LOGGER.info(() -> "The branchName in action is: " + branchName);
+    logger.info(() -> "Following allowed branches patterns are set: " + allowedBranches);
+    logger.info(() -> "The branchName in action is: " + branchName);
 
     String[] branchSpecs = allowedBranches.split(",");
     for (String branchSpec : branchSpecs) {
       BranchSpec pattern = new BranchSpec(branchSpec.trim());
 
-      LOGGER.info(() -> "Matching branch: " + branchName + " with branchSpec pattern: "
+      logger.info(() -> "Matching branch: " + branchName + " with branchSpec pattern: "
           + pattern.getName());
 
       if (pattern.matches(branchName)) {
@@ -89,15 +89,15 @@ public class BitBucketPPRRepositoryPushActionFilter extends BitBucketPPRReposito
   }
 
   public boolean matches(String branchName, EnvVars env) {
-    LOGGER.info(() -> "Following allowed branches patterns are set: " + allowedBranches);
-    LOGGER.info(() -> "The branchName in action is: " + branchName);
+    logger.info(() -> "Following allowed branches patterns are set: " + allowedBranches);
+    logger.info(() -> "The branchName in action is: " + branchName);
     
     String[] branchSpecs = allowedBranches.split(",");
     
     for (String branchSpec : branchSpecs) {
       BranchSpec pattern = new BranchSpec(branchSpec.trim());
 
-      LOGGER.info(() -> "Matching branch: " + branchName + " with branchSpec pattern: "
+      logger.info(() -> "Matching branch: " + branchName + " with branchSpec pattern: "
           + pattern.getName());
 
       if (pattern.matches(branchName, env)) {

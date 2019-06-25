@@ -20,55 +20,24 @@
  ******************************************************************************/
 
 
-package io.jenkins.plugins.bitbucketpushandpullrequest.cause;
+package io.jenkins.plugins.bitbucketpushandpullrequest.cause.pullrequest.cloud;
 
 import java.io.File;
 import java.io.IOException;
 
-import hudson.triggers.SCMTrigger;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
+import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRPullRequestAction;
 
 
-public class BitBucketPPRTriggerCause extends SCMTrigger.SCMTriggerCause {
-  protected BitBucketPPRAction bitbucketAction;
-
-  public BitBucketPPRTriggerCause(File pollingLog, BitBucketPPRAction bitbucketAction)
+public class BitBucketPPRPullRequestUpdatedCause extends BitBucketPPRPullRequestCause {
+  public BitBucketPPRPullRequestUpdatedCause(File pollingLog, BitBucketPPRAction bitbucketAction)
       throws IOException {
-    super(pollingLog);
-    this.bitbucketAction = bitbucketAction;
-  }
-
-  public BitBucketPPRAction getAction() {
-    return this.bitbucketAction;
+    super(pollingLog, bitbucketAction);
   }
   
   @Override
-  public int hashCode() {
-    final int prime = 31;
-    int result = super.hashCode();
-    result = prime * result + ((bitbucketAction == null) ? 0 : bitbucketAction.hashCode());
-    return result;
-  }
-
-  @Override
-  public boolean equals(Object obj) {
-    if (this == obj)
-      return true;
-    if (!super.equals(obj))
-      return false;
-    if (getClass() != obj.getClass())
-      return false;
-    BitBucketPPRTriggerCause other = (BitBucketPPRTriggerCause) obj;
-    if (bitbucketAction == null) {
-      if (other.bitbucketAction != null)
-        return false;
-    } else if (!bitbucketAction.equals(other.bitbucketAction))
-      return false;
-    return true;
-  }
-
-  @Override
-  public String toString() {
-    return "BitBucketPPRTriggerCause [bitbucketAction=" + bitbucketAction + "]";
+  public String getShortDescription() {
+    String pusher = bitbucketAction.getUser() != null ? bitbucketAction.getUser() : "";
+    return "Started by user " + pusher + ": Bitbucket PPR: pull request updated";
   }
 }
