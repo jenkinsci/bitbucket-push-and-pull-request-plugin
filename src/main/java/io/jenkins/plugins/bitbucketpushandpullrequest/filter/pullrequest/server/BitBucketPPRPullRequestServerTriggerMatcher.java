@@ -44,6 +44,6 @@ public class BitBucketPPRPullRequestServerTriggerMatcher
             && triggerFilter
                 .getActionFilter() instanceof BitBucketPPRPullRequestServerCreatedActionFilter)
         || (PULL_REQUEST_SERVER_MERGED.equalsIgnoreCase(bitbucketEvent.getAction()) && triggerFilter
-            .getActionFilter() instanceof BitBucketPPRPullRequesServerMergedActionFilter);
+            .getActionFilter() instanceof BitBucketPPRPullRequestServerMergedActionFilter);
   }
 }

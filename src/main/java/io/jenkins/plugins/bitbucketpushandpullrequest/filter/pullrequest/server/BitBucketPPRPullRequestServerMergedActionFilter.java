@@ -33,10 +33,10 @@ import io.jenkins.plugins.bitbucketpushandpullrequest.cause.BitBucketPPRTriggerC
 import io.jenkins.plugins.bitbucketpushandpullrequest.cause.pullrequest.server.BitBucketPPRPullRequestServerUpdatedCause;
 
 
-public class BitBucketPPRPullRequesServerMergedActionFilter
+public class BitBucketPPRPullRequestServerMergedActionFilter
     extends BitBucketPPRPullRequestServerActionFilter {
   @DataBoundConstructor
-  public BitBucketPPRPullRequesServerMergedActionFilter() {}
+  public BitBucketPPRPullRequestServerMergedActionFilter() {}
 
   @Override
   public boolean shouldTriggerBuild(BitBucketPPRAction bitbucketAction) {

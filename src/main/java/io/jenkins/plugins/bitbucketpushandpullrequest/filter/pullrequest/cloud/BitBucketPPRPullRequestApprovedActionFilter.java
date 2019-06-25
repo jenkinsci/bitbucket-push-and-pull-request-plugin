@@ -29,7 +29,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.logging.Logger;
 
-import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 import hudson.Extension;
