@@ -1,6 +1,6 @@
 # Change Log
 
-## 1.6.4 (2019-06-25)
+## 2.0.0 (2019-06-25)
 [Full Changelog](https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/compare/bitbucket-push-and-pull-request-1.6.4...bitbucket-push-and-pull-request-2.0.0)
 
 **Implemented enhancements:**
