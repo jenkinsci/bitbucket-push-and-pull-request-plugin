@@ -10,6 +10,7 @@ import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
 public class BitBucketPPRServerPayload implements BitBucketPPRPayload {
   private BitBucketPPRServerActor actor;
   private BitBucketPPRServerPullRequest pullRequest;
+  private BitBucketPPRServerRepository repository;
   private List<BitBucketPPRServerChange> changes = new ArrayList<>();
 
   @SuppressFBWarnings
@@ -22,6 +23,12 @@ public class BitBucketPPRServerPayload implements BitBucketPPRPayload {
   @Override
   public BitBucketPPRServerPullRequest getServerPullRequest() {
     return pullRequest;
+  }
+
+  @SuppressFBWarnings
+  @Override
+  public BitBucketPPRServerRepository getServerRepository() {
+    return repository;
   }
 
   @Override
