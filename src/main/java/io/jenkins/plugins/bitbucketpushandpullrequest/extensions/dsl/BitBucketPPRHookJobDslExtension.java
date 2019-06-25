@@ -34,11 +34,12 @@ import io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.BitBuck
 import io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.BitBucketPPRPullRequestUpdatedActionFilter;
 import io.jenkins.plugins.bitbucketpushandpullrequest.filter.repository.BitBucketPPRRepositoryPushActionFilter;
 import io.jenkins.plugins.bitbucketpushandpullrequest.filter.repository.BitBucketPPRRepositoryTriggerFilter;
-import javaposse.jobdsl.dsl.helpers.step.StepContext;
 import javaposse.jobdsl.dsl.helpers.triggers.TriggerContext;
 import javaposse.jobdsl.plugin.ContextExtensionPoint;
 import javaposse.jobdsl.plugin.DslExtensionMethod;
 
+import hudson.model.Item;
+import javaposse.jobdsl.plugin.DslEnvironment;
 
 @Extension(optional = true)
 public class BitBucketPPRHookJobDslExtension extends ContextExtensionPoint {
@@ -90,4 +91,10 @@ public class BitBucketPPRHookJobDslExtension extends ContextExtensionPoint {
     triggers.add(pullRequestTriggerFilter);
     return new BitBucketPPRTrigger(triggers);
   }
+  /*
+  @Override
+  public void notifyItemCreated(Item item,
+                                DslEnvironment dslEnvironment) {
+	  triggers.clear();
+  }*/
 }
