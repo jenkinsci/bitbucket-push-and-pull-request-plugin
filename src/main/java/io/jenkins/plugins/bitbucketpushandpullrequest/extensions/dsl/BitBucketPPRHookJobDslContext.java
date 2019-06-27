@@ -1,7 +1,7 @@
 /*******************************************************************************
  * The MIT License
  * 
- * Copyright (C) 2018, CloudBees, Inc.
+ * Copyright (C) 2019, CloudBees, Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -25,7 +25,6 @@ package io.jenkins.plugins.bitbucketpushandpullrequest.extensions.dsl;
 import java.util.ArrayList;
 import java.util.List;
 
-import hudson.Extension;
 import io.jenkins.plugins.bitbucketpushandpullrequest.BitBucketPPRTrigger;
 import io.jenkins.plugins.bitbucketpushandpullrequest.filter.BitBucketPPRTriggerFilter;
 import io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.BitBucketPPRPullRequestApprovedActionFilter;
@@ -34,76 +33,42 @@ import io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.BitBuck
 import io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.BitBucketPPRPullRequestUpdatedActionFilter;
 import io.jenkins.plugins.bitbucketpushandpullrequest.filter.repository.BitBucketPPRRepositoryPushActionFilter;
 import io.jenkins.plugins.bitbucketpushandpullrequest.filter.repository.BitBucketPPRRepositoryTriggerFilter;
-import javaposse.jobdsl.dsl.helpers.triggers.TriggerContext;
-import javaposse.jobdsl.plugin.ContextExtensionPoint;
-import javaposse.jobdsl.plugin.DslExtensionMethod;
 
-import javaposse.jobdsl.plugin.DslEnvironment;
-import io.jenkins.plugins.bitbucketpushandpullrequest.extensions.dsl.BitBucketPPRHookJobDslContext;
+import javaposse.jobdsl.dsl.Context;
 
-@Extension(optional = true)
-public class BitBucketPPRHookJobDslExtension extends ContextExtensionPoint {
+public class BitBucketPPRHookJobDslContext implements Context {
+  List<BitBucketPPRTriggerFilter> triggers = new ArrayList<>();
 
-  @DslExtensionMethod(context = TriggerContext.class)
-  public Object bitbucketTriggers(Runnable closure) {
-    BitBucketPPRHookJobDslContext context = new BitBucketPPRHookJobDslContext();
-    executeInContext(closure, context);
-
-    return new BitBucketPPRTrigger(context.triggers);
-  }
-
-  @Deprecated
-  @DslExtensionMethod(context = TriggerContext.class)
-  public Object bitbucketPush() {
-    return bitbucketRepositoryPushAction(false, null);
-  }
-
-  @Deprecated
-  @DslExtensionMethod(context = TriggerContext.class)
-  public Object bitbucketRepositoryPushAction(boolean triggerAlsoIfTagPush,
+  public void repositoryPushAction(boolean triggerAlsoIfTagPush,
       String allowedBranches) {
-    List<BitBucketPPRTriggerFilter> triggers = new ArrayList<>();
     BitBucketPPRRepositoryPushActionFilter repositoryPushActionFilter =
-        new BitBucketPPRRepositoryPushActionFilter(triggerAlsoIfTagPush, allowedBranches);
+      new BitBucketPPRRepositoryPushActionFilter(triggerAlsoIfTagPush, allowedBranches);
     BitBucketPPRRepositoryTriggerFilter repositoryTriggerFilter =
-        new BitBucketPPRRepositoryTriggerFilter(repositoryPushActionFilter);
+      new BitBucketPPRRepositoryTriggerFilter(repositoryPushActionFilter);
     triggers.add(repositoryTriggerFilter);
-    return new BitBucketPPRTrigger(triggers);
   }
 
-  @Deprecated
-  @DslExtensionMethod(context = TriggerContext.class)
-  public Object bitbucketPullRequestApprovedAction(boolean onlyIfReviewersApproved) {
-    List<BitBucketPPRTriggerFilter> triggers = new ArrayList<>();
+  public void pullRequestApprovedAction(boolean onlyIfReviewersApproved) {
     BitBucketPPRPullRequestApprovedActionFilter pullRequestApprovedActionFilter =
-        new BitBucketPPRPullRequestApprovedActionFilter(onlyIfReviewersApproved);
+      new BitBucketPPRPullRequestApprovedActionFilter(onlyIfReviewersApproved);
     BitBucketPPRPullRequestTriggerFilter pullRequestTriggerFilter =
-        new BitBucketPPRPullRequestTriggerFilter(pullRequestApprovedActionFilter);
+      new BitBucketPPRPullRequestTriggerFilter(pullRequestApprovedActionFilter);
     triggers.add(pullRequestTriggerFilter);
-    return new BitBucketPPRTrigger(triggers);
   }
 
-  @Deprecated
-  @DslExtensionMethod(context = TriggerContext.class)
-  public Object bitbucketPullRequestCreatedAction() {
-    List<BitBucketPPRTriggerFilter> triggers = new ArrayList<>();
+  public void pullRequestCreatedAction() {
     BitBucketPPRPullRequestCreatedActionFilter pullRequestCreatedActionFilter =
-        new BitBucketPPRPullRequestCreatedActionFilter();
+      new BitBucketPPRPullRequestCreatedActionFilter();
     BitBucketPPRPullRequestTriggerFilter pullRequestTriggerFilter =
-        new BitBucketPPRPullRequestTriggerFilter(pullRequestCreatedActionFilter);
+      new BitBucketPPRPullRequestTriggerFilter(pullRequestCreatedActionFilter);
     triggers.add(pullRequestTriggerFilter);
-    return new BitBucketPPRTrigger(triggers);
   }
 
-  @Deprecated
-  @DslExtensionMethod(context = TriggerContext.class)
-  public Object bitbucketPullRequestUpdatedAction() {
-    List<BitBucketPPRTriggerFilter> triggers = new ArrayList<>();
+  public void pullRequestUpdatedAction() {
     BitBucketPPRPullRequestUpdatedActionFilter pullRequestUpdatedActionFilter =
-        new BitBucketPPRPullRequestUpdatedActionFilter();
+      new BitBucketPPRPullRequestUpdatedActionFilter();
     BitBucketPPRPullRequestTriggerFilter pullRequestTriggerFilter =
-        new BitBucketPPRPullRequestTriggerFilter(pullRequestUpdatedActionFilter);
+      new BitBucketPPRPullRequestTriggerFilter(pullRequestUpdatedActionFilter);
     triggers.add(pullRequestTriggerFilter);
-    return new BitBucketPPRTrigger(triggers);
   }
 }

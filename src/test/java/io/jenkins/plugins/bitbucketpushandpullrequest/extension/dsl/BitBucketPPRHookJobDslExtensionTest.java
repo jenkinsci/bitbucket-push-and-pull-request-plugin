@@ -75,7 +75,7 @@ public class BitBucketPPRHookJobDslExtensionTest {
   @Test
   public void testDslTriggerPushAction() throws Exception {
     /* Create seed job which will process DSL */
-    createSeedJob("freeStyleJob('test-job') { triggers { bitbucketRepositoryPushAction(false, '') } }");
+    createSeedJob("freeStyleJob('test-job') { triggers { bitbucketTriggers { repositoryPushAction(false, '') } } }");
     /* Fetch the newly created job and check its trigger configuration */
     FreeStyleProject createdJob = (FreeStyleProject) j.getInstance().getItem("test-job");
     /* Go through all triggers to validate DSL */
@@ -96,7 +96,7 @@ public class BitBucketPPRHookJobDslExtensionTest {
   @Test
   public void testDslTriggerPRApproved() throws Exception {
     /* Create seed job which will process DSL */
-    createSeedJob("freeStyleJob('test-job') { triggers { bitbucketPullRequestApprovedAction(false) } }");
+    createSeedJob("freeStyleJob('test-job') { triggers { bitbucketTriggers { pullRequestApprovedAction(false) } } }");
     /* Fetch the newly created job and check its trigger configuration */
     FreeStyleProject createdJob = (FreeStyleProject) j.getInstance().getItem("test-job");
     /* Go through all triggers to validate DSL */
@@ -117,7 +117,7 @@ public class BitBucketPPRHookJobDslExtensionTest {
   @Test
   public void testDslTriggerPRCreated() throws Exception {
     /* Create seed job which will process DSL */
-    createSeedJob("freeStyleJob('test-job') { triggers { bitbucketPullRequestCreatedAction() } }");
+    createSeedJob("freeStyleJob('test-job') { triggers { bitbucketTriggers { pullRequestCreatedAction() } } }");
     /* Fetch the newly created job and check its trigger configuration */
     FreeStyleProject createdJob = (FreeStyleProject) j.getInstance().getItem("test-job");
     /* Go through all triggers to validate DSL */
@@ -138,7 +138,7 @@ public class BitBucketPPRHookJobDslExtensionTest {
   @Test
   public void testDslTriggerPRUpdated() throws Exception {
     /* Create seed job which will process DSL */
-    createSeedJob("freeStyleJob('test-job') { triggers { bitbucketPullRequestUpdatedAction() } }");
+    createSeedJob("freeStyleJob('test-job') { triggers { bitbucketTriggers { pullRequestUpdatedAction() } } }");
     /* Fetch the newly created job and check its trigger configuration */
     FreeStyleProject createdJob = (FreeStyleProject) j.getInstance().getItem("test-job");
     /* Go through all triggers to validate DSL */
@@ -159,7 +159,7 @@ public class BitBucketPPRHookJobDslExtensionTest {
   @Test
   public void testDslTriggerAllPRActions() throws Exception {
     /* Create seed job which will process DSL */
-    createSeedJob("freeStyleJob('test-job') { triggers { bitbucketPullRequestCreatedAction()\nbitbucketPullRequestUpdatedAction()\nbitbucketPullRequestApprovedAction(false) } }");
+    createSeedJob("freeStyleJob('test-job') { triggers { bitbucketTriggers { pullRequestCreatedAction()\npullRequestUpdatedAction()\npullRequestApprovedAction(false) } } }");
     /* Fetch the newly created job and check its trigger configuration */
     FreeStyleProject createdJob = (FreeStyleProject) j.getInstance().getItem("test-job");
     /* Go through all triggers to validate DSL */
@@ -190,7 +190,7 @@ public class BitBucketPPRHookJobDslExtensionTest {
   @Test
   public void testDslMultipleJobsInSeed() throws Exception {
     /* Create seed job which will process DSL */
-    createSeedJob("freeStyleJob('test-job1') { triggers { bitbucketPullRequestCreatedAction() } };freeStyleJob('test-job2') { triggers { bitbucketRepositoryPushAction(false, '') } }");
+    createSeedJob("freeStyleJob('test-job1') { triggers { bitbucketTriggers { pullRequestCreatedAction() } } };freeStyleJob('test-job2') { triggers { bitbucketTriggers { repositoryPushAction(false, '') } } }");
     /* Fetch the newly created job and check its trigger configuration */
     FreeStyleProject createdJob = (FreeStyleProject) j.getInstance().getItem("test-job1");
     /* Go through all triggers to validate DSL */
