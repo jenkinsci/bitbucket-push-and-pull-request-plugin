@@ -20,22 +20,24 @@
  ******************************************************************************/
 
 
-package io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest;
+package io.jenkins.plugins.bitbucketpushandpullrequest.cause.pullrequest.server;
 
 import java.io.File;
 import java.io.IOException;
 
-import hudson.model.AbstractDescribableImpl;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
-import io.jenkins.plugins.bitbucketpushandpullrequest.cause.BitBucketPPRTriggerCause;
+import io.jenkins.plugins.bitbucketpushandpullrequest.cause.pullrequest.cloud.BitBucketPPRPullRequestCause;
 
 
-public abstract class BitBucketPPRPullRequestActionFilter
-    extends AbstractDescribableImpl<BitBucketPPRPullRequestActionFilter> {
+public class BitBucketPPRPullRequestServerApprovedCause extends BitBucketPPRPullRequestServerCause {
+  public BitBucketPPRPullRequestServerApprovedCause(File pollingLog, BitBucketPPRAction bitbucketAction)
+      throws IOException {
+    super(pollingLog, bitbucketAction);
+  }
 
-  public abstract boolean shouldTriggerBuild(BitBucketPPRAction bitbucketAction);
-
-  public abstract BitBucketPPRTriggerCause getCause(File pollingLog,
-      BitBucketPPRAction pullRequestAction) throws IOException;
+  @Override
+  public String getShortDescription() {
+    String pusher = bitbucketAction.getUser() != null ? bitbucketAction.getUser() : "";
+    return "Started by user " + pusher + ": Bitbucket PPR: pull request approved";
+  }
 }
-

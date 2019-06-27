@@ -1,7 +1,7 @@
 /*******************************************************************************
  * The MIT License
  * 
- * Copyright (C) 2018, CloudBees, Inc.
+ * Copyright (C) 2019, CloudBees, Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -20,25 +20,24 @@
  ******************************************************************************/
 
 
-package io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest;
+package io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.server;
 
 import java.io.File;
 import java.io.IOException;
 
-import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 import hudson.Extension;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.cause.BitBucketPPRTriggerCause;
-import io.jenkins.plugins.bitbucketpushandpullrequest.cause.pullrequest.BitBucketPPRPullRequestUpdatedCause;
+import io.jenkins.plugins.bitbucketpushandpullrequest.cause.pullrequest.server.BitBucketPPRPullRequestServerUpdatedCause;
 
 
-public class BitBucketPPRPullRequestUpdatedActionFilter
-    extends BitBucketPPRPullRequestActionFilter {
+public class BitBucketPPRPullRequestServerUpdatedActionFilter
+    extends BitBucketPPRPullRequestServerActionFilter {
 
   @DataBoundConstructor
-  public BitBucketPPRPullRequestUpdatedActionFilter() {}
+  public BitBucketPPRPullRequestServerUpdatedActionFilter() {}
 
   @Override
   public boolean shouldTriggerBuild(BitBucketPPRAction bitbucketAction) {
@@ -48,11 +47,11 @@ public class BitBucketPPRPullRequestUpdatedActionFilter
   @Override
   public BitBucketPPRTriggerCause getCause(File pollingLog, BitBucketPPRAction pullRequestAction)
       throws IOException {
-    return new BitBucketPPRPullRequestUpdatedCause(pollingLog, pullRequestAction);
+    return new BitBucketPPRPullRequestServerUpdatedCause(pollingLog, pullRequestAction);
   }
 
   @Extension
-  public static class ActionFilterDescriptorImpl extends BitBucketPPRPullRequestActionDescriptor {
+  public static class ActionFilterDescriptorImpl extends BitBucketPPRPullRequestServerActionDescriptor {
 
     @Override
     public String getDisplayName() {

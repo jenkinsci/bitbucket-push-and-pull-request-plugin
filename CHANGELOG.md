@@ -1,7 +1,25 @@
 # Change Log
 
+## 2.0.0 (2019-06-25)
+[Full Changelog](https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/compare/bitbucket-push-and-pull-request-1.6.4...bitbucket-push-and-pull-request-2.0.0)
+
+**Implemented enhancements:**
+- Added pull request support for Bitbucket Server
+- Added pull request support for Mercurial on Bitbucket Cloud
+
+**Closed issues:**
+- Issue #44 Branch expression matching before triggering the build: expecting fix for Bitbucket Server bug
+- Issue #37 Jenkins build triggered from push event with Mercurial instead of git enhancement
+
+**Merged pull requests:**
+- #49 Add warnings
+- #48 [Enhancement] Add pull request support for Bitbucket Server and Mercurial on Bitbucket Cloud
+
 ## 1.6.4 (2019-06-19)
 [Full Changelog](https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/compare/bitbucket-push-and-pull-request-1.6.3...bitbucket-push-and-pull-request-1.6.4)
+
+**Implemented enhancements:**
+- Added push support for Mercurial on Bitbucket Cloud
 
 **Closed issues:**
 - Issue #38 BITBUCKET_SOURCE_BRANCH has wrong value for repo:push events
@@ -43,7 +61,7 @@ _ Issue #36 Branch expression matching before triggering the build
 
 **Implemented enhancements:**
 
-- added more enviroment variables and improved the documentation abotu them
+- added more enviroment variables and improved the documentation about them
 
 **Closed issues:**
 

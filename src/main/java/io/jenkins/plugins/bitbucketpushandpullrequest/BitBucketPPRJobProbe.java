@@ -44,7 +44,7 @@ import hudson.scm.SCM;
 import hudson.security.ACL;
 import hudson.security.ACLContext;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
-import io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud.BitBucketPPREvent;
+import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPREvent;
 import jenkins.model.Jenkins;
 import jenkins.model.ParameterizedJobMixIn;
 import jenkins.model.ParameterizedJobMixIn.ParameterizedJob;

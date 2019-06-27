@@ -25,11 +25,13 @@ package io.jenkins.plugins.bitbucketpushandpullrequest.filter;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.BitBucketPPRPullRequestTriggerFilter;
-import io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.BitBucketPPRPullRequestTriggerMatcher;
+import io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.cloud.BitBucketPPRPullRequestTriggerFilter;
+import io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.cloud.BitBucketPPRPullRequestTriggerMatcher;
+import io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.server.BitBucketPPRPullRequestServerTriggerFilter;
+import io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.server.BitBucketPPRPullRequestServerTriggerMatcher;
 import io.jenkins.plugins.bitbucketpushandpullrequest.filter.repository.BitBucketPPRRepositoryTriggerFilter;
 import io.jenkins.plugins.bitbucketpushandpullrequest.filter.repository.BitBucketPPRRepositoryTriggerMatcher;
-import io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud.BitBucketPPREvent;
+import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPREvent;
 import io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConsts;
 
 
@@ -52,14 +54,17 @@ public class BitBucketPPRFilterMatcher {
 
   private boolean matchesEventAndAction(BitBucketPPREvent event,
       BitBucketPPRTriggerFilter triggerFilter) {
-    if (BitBucketPPRConsts.PULL_REQUEST_EVENT.equals(event.getEvent())
+    if (BitBucketPPRConsts.PULL_REQUEST_EVENT.equalsIgnoreCase(event.getEvent())
         && triggerFilter instanceof BitBucketPPRPullRequestTriggerFilter) {
       return new BitBucketPPRPullRequestTriggerMatcher().matchesAction(event, triggerFilter);
-    } else if (BitBucketPPRConsts.REPOSITORY_EVENT.equals(event.getEvent())
+    } else if (BitBucketPPRConsts.PULL_REQUEST_SERVER_EVENT.equalsIgnoreCase(event.getEvent())
+        && triggerFilter instanceof BitBucketPPRPullRequestServerTriggerFilter) {
+      return new BitBucketPPRPullRequestServerTriggerMatcher().matchesAction(event, triggerFilter);
+    } else if (BitBucketPPRConsts.REPOSITORY_EVENT.equalsIgnoreCase(event.getEvent())
         && triggerFilter instanceof BitBucketPPRRepositoryTriggerFilter) {
       return new BitBucketPPRRepositoryTriggerMatcher().matchesAction(event, triggerFilter);
     }
-    
+
     return false;
   }
 }
