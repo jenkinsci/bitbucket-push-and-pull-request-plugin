@@ -27,21 +27,21 @@ import java.util.logging.Logger;
 
 import io.jenkins.plugins.bitbucketpushandpullrequest.filter.BitBucketPPREventTriggerMatcher;
 import io.jenkins.plugins.bitbucketpushandpullrequest.filter.BitBucketPPRTriggerFilter;
-import io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud.BitBucketPPREvent;
+import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPREvent;
 import io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConsts;
 
 
 public class BitBucketPPRRepositoryTriggerMatcher implements BitBucketPPREventTriggerMatcher {
-  private static final Logger LOGGER =
+  private static final Logger logger =
       Logger.getLogger(BitBucketPPRRepositoryTriggerMatcher.class.getName());
 
   @Override
   public boolean matchesAction(BitBucketPPREvent bitbucketEvent,
       BitBucketPPRTriggerFilter triggerFilter) {
-    LOGGER.log(Level.INFO, () -> "" + bitbucketEvent.toString());
+    logger.log(Level.INFO, () -> "" + bitbucketEvent.toString());
 
 
-    LOGGER.log(Level.INFO,
+    logger.log(Level.INFO,
         "1. (Is the trigger filter instance of BitBucketPPRRepositoryPushActionFilter? <<{0}>> "
             + "AND does it equal BitBucketPPRConsts.REPOSITORY_PUSH {1} to bitbucketEvent.getAction() {2}? <<{3}>>) OR "
             + "2. (Is the trigger filter instance of BitBucketPPRServerRepositoryPushActionFilter? <<{4}>>"

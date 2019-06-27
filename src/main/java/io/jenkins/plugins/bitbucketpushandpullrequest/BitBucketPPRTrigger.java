@@ -52,10 +52,11 @@ import io.jenkins.plugins.bitbucketpushandpullrequest.cause.BitBucketPPRTriggerC
 import io.jenkins.plugins.bitbucketpushandpullrequest.filter.BitBucketPPRFilterMatcher;
 import io.jenkins.plugins.bitbucketpushandpullrequest.filter.BitBucketPPRTriggerFilter;
 import io.jenkins.plugins.bitbucketpushandpullrequest.filter.BitBucketPPRTriggerFilterDescriptor;
-import io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.BitBucketPPRPullRequestTriggerFilter;
+import io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.cloud.BitBucketPPRPullRequestTriggerFilter;
+import io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.server.BitBucketPPRPullRequestServerTriggerFilter;
 import io.jenkins.plugins.bitbucketpushandpullrequest.filter.repository.BitBucketPPRRepositoryPushActionFilter;
 import io.jenkins.plugins.bitbucketpushandpullrequest.filter.repository.BitBucketPPRRepositoryTriggerFilter;
-import io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud.BitBucketPPREvent;
+import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPREvent;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud.BitBucketPPRProject;
 import jenkins.model.Jenkins;
 import jenkins.model.ParameterizedJobMixIn;
@@ -105,8 +106,10 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
 
             @Override
             public void onPollSuccess(PollingResult pollingResult) {
-              LOGGER.log(Level.INFO, "Called onPollSuccess with polling result {}.",
-                  pollingResult.toString());
+
+              // TODO: do we need a .toString()?
+              LOGGER.log(Level.INFO, "Called onPollSuccess with polling result {0}.",
+                  new Object[] {pollingResult});
               for (BitBucketPPRTriggerFilter filter : matchingFilters) {
                 BitBucketPPRTriggerCause cause;
                 try {
@@ -148,7 +151,8 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
       BitBucketPPRAction bitbucketAction) {
     boolean shouldScheduleJob = filter.shouldScheduleJob(bitbucketAction);
     boolean hasChanges = pollingResult.hasChanges();
-    boolean isPullRequestFilter = filter instanceof BitBucketPPRPullRequestTriggerFilter;
+    boolean isPullRequestFilter = filter instanceof BitBucketPPRPullRequestTriggerFilter
+        || filter instanceof BitBucketPPRPullRequestServerTriggerFilter;
     LOGGER.log(Level.INFO,
         "Should schedule job : {0} and (polling result has changes {1} or is pull request {2})",
         new Object[] {shouldScheduleJob, hasChanges, isPullRequestFilter});

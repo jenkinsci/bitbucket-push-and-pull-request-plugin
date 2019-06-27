@@ -32,6 +32,7 @@ import io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud.BitBucketPPRRe
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.old.BitBucketPPROldRepository;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.server.BitBucketPPRServerActor;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.server.BitBucketPPRServerChange;
+import io.jenkins.plugins.bitbucketpushandpullrequest.model.server.BitBucketPPRServerPullRequest;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.server.BitBucketPPRServerRepository;
 
 
@@ -73,6 +74,10 @@ public interface BitBucketPPRPayload extends Serializable {
   }
 
   default BitBucketPPRServerRepository getServerRepository() {
+    return null;
+  }
+  
+  default BitBucketPPRServerPullRequest getServerPullRequest() {
     return null;
   }
 

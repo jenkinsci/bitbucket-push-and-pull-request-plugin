@@ -21,6 +21,6 @@ public class BitBucketPPRServerRepositoryCause extends BitBucketPPRTriggerCause 
   @Override
   public String getShortDescription() {
     String pusher = bitbucketAction.getUser() != null ? bitbucketAction.getUser() : "";
-    return "Started by Bitbucket repository event by " + pusher;
+    return "Started by Bitbucket PPR: server repository event by " + pusher;
   }
 }

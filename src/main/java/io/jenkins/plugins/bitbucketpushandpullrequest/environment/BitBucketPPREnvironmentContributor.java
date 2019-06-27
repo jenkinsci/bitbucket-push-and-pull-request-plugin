@@ -15,7 +15,8 @@ import hudson.model.Cause;
 import hudson.model.EnvironmentContributor;
 import hudson.model.Run;
 import hudson.model.TaskListener;
-import io.jenkins.plugins.bitbucketpushandpullrequest.cause.pullrequest.BitBucketPPRPullRequestCause;
+import io.jenkins.plugins.bitbucketpushandpullrequest.cause.pullrequest.cloud.BitBucketPPRPullRequestCause;
+import io.jenkins.plugins.bitbucketpushandpullrequest.cause.pullrequest.server.BitBucketPPRPullRequestServerCause;
 import io.jenkins.plugins.bitbucketpushandpullrequest.cause.repository.BitBucketPPRRepositoryCause;
 import io.jenkins.plugins.bitbucketpushandpullrequest.cause.repository.BitBucketPPRServerRepositoryCause;
 
@@ -39,6 +40,8 @@ public class BitBucketPPREnvironmentContributor extends EnvironmentContributor {
     for (Cause cause : causes) {
       if (cause instanceof BitBucketPPRPullRequestCause) {
         setEnvVarsForCloudPullRequest(envVars, (BitBucketPPRPullRequestCause) cause);
+      }  else if (cause instanceof BitBucketPPRPullRequestServerCause) {
+        setEnvVarsForServerPullRequest(envVars, (BitBucketPPRPullRequestServerCause) cause);
       } else if (cause instanceof BitBucketPPRRepositoryCause) {
         try {
           setEnvVarsForCloudRepository(envVars, (BitBucketPPRRepositoryCause) cause);
@@ -76,6 +79,24 @@ public class BitBucketPPREnvironmentContributor extends EnvironmentContributor {
   }
 
   private void setEnvVarsForCloudPullRequest(EnvVars envVars, BitBucketPPRPullRequestCause cause) {
+    String pullRequestSourceBranch = cause.getPullRequestPayLoad().getSourceBranch();
+    putEnvVar(envVars, "BITBUCKET_SOURCE_BRANCH", pullRequestSourceBranch);
+    LOGGER.log(Level.FINEST, "Injecting BITBUCKET_SOURCE_BRANCH: {0}", pullRequestSourceBranch);
+
+    String pullRequestTargetBranch = cause.getPullRequestPayLoad().getTargetBranch();
+    putEnvVar(envVars, "BITBUCKET_TARGET_BRANCH", pullRequestTargetBranch);
+    LOGGER.log(Level.FINEST, "Injecting BITBUCKET_TARGET_BRANCH: {0}", pullRequestTargetBranch);
+
+    String pullRequestUrlBranch = cause.getPullRequestPayLoad().getPullRequestUrl();
+    putEnvVar(envVars, "BITBUCKET_PULL_REQUEST_LINK", pullRequestUrlBranch);
+    LOGGER.log(Level.FINEST, "Injecting BITBUCKET_PULL_REQUEST_LINK: {0}", pullRequestUrlBranch);
+
+    String pullRequestId = cause.getPullRequestPayLoad().getPullRequestId();
+    putEnvVar(envVars, "BITBUCKET_PULL_REQUEST_ID", pullRequestId);
+    LOGGER.log(Level.FINEST, "Injecting BITBUCKET_PULL_REQUEST_ID: {0}", pullRequestId);
+  }
+  
+  private void setEnvVarsForServerPullRequest(EnvVars envVars, BitBucketPPRPullRequestServerCause cause) {
     String pullRequestSourceBranch = cause.getPullRequestPayLoad().getSourceBranch();
     putEnvVar(envVars, "BITBUCKET_SOURCE_BRANCH", pullRequestSourceBranch);
     LOGGER.log(Level.FINEST, "Injecting BITBUCKET_SOURCE_BRANCH: {0}", pullRequestSourceBranch);

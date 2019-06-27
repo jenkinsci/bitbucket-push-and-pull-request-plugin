@@ -20,13 +20,45 @@
  ******************************************************************************/
 
 
-package io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest;
+package io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.cloud;
+
+import java.io.File;
+import java.io.IOException;
+
+import org.jenkinsci.Symbol;
+import org.kohsuke.stapler.DataBoundConstructor;
+
+import hudson.Extension;
+import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
+import io.jenkins.plugins.bitbucketpushandpullrequest.cause.BitBucketPPRTriggerCause;
+import io.jenkins.plugins.bitbucketpushandpullrequest.cause.pullrequest.cloud.BitBucketPPRPullRequestCreatedCause;
 
 
-import hudson.model.Descriptor;
+public class BitBucketPPRPullRequestCreatedActionFilter
+    extends BitBucketPPRPullRequestActionFilter {
 
+  @DataBoundConstructor
+  public BitBucketPPRPullRequestCreatedActionFilter() {
+    // This method is empty
+  }
 
-public abstract class BitBucketPPRPullRequestActionDescriptor
-    extends Descriptor<BitBucketPPRPullRequestActionFilter> {
+  @Override
+  public boolean shouldTriggerBuild(BitBucketPPRAction bitbucketAction) {
+    return true;
+  }
 
+  @Override
+  public BitBucketPPRTriggerCause getCause(File pollingLog, BitBucketPPRAction pullRequestAction)
+      throws IOException {
+    return new BitBucketPPRPullRequestCreatedCause(pollingLog, pullRequestAction);
+  }
+
+  @Extension
+  public static class ActionFilterDescriptorImpl extends BitBucketPPRPullRequestActionDescriptor {
+
+    @Override
+    public String getDisplayName() {
+      return "Created";
+    }
+  }
 }

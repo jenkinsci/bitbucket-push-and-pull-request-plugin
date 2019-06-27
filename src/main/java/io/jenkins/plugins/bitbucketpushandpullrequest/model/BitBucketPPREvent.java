@@ -18,7 +18,7 @@
  * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  ******************************************************************************/
-package io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud;
+package io.jenkins.plugins.bitbucketpushandpullrequest.model;
 
 import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConsts.*;
 
@@ -32,34 +32,44 @@ public class BitBucketPPREvent {
 
   public BitBucketPPREvent(String eventAction) throws OperationNotSupportedException {
     String[] eventActionPair = eventAction.split(":");
-
-    // diagnostics ping
-
-    checkOperationSupportedException(eventActionPair);
-    this.event = eventActionPair[0];
-    this.action = eventActionPair[1];
+    
+    event = eventActionPair[0];
+    
+    if (eventActionPair.length == 3 && eventActionPair[1].equalsIgnoreCase("reviewer")) {
+      action = eventActionPair[2];
+    } else {
+      action = eventActionPair[1];
+    }
+    
+    checkOperationSupportedException(event, action);
+    
   }
 
-  private void checkOperationSupportedException(String[] eventActionPair)
+  private void checkOperationSupportedException(String event, String action)
       throws OperationNotSupportedException {
 
-    boolean error = false;;
+    boolean error = false;
 
-    if (REPOSITORY_EVENT.equalsIgnoreCase(eventActionPair[0])) {
-      if (!(REPOSITORY_PUSH.equalsIgnoreCase(eventActionPair[1])
-          || REPOSITORY_POST.equalsIgnoreCase(eventActionPair[1])
-          || REPOSITORY_SERVER_PUSH.equalsIgnoreCase(eventActionPair[1]))) {
+    if (REPOSITORY_EVENT.equalsIgnoreCase(event)) {
+      if (!(REPOSITORY_PUSH.equalsIgnoreCase(action)
+          || REPOSITORY_POST.equalsIgnoreCase(action)
+          || REPOSITORY_SERVER_PUSH.equalsIgnoreCase(action))) {
         error = true;
       }
-    } else if (PULL_REQUEST_EVENT.equalsIgnoreCase(eventActionPair[0])) {
-      if (!(PULL_REQUEST_APPROVED.equalsIgnoreCase(eventActionPair[1])
-          || PULL_REQUEST_CREATED.equalsIgnoreCase(eventActionPair[1])
-          || PULL_REQUEST_UPDATED.equalsIgnoreCase(eventActionPair[1])
-          || PULL_REQUEST_MERGED.equalsIgnoreCase(eventActionPair[1]))) {
+    } else if (PULL_REQUEST_EVENT.equalsIgnoreCase(event)
+        || PULL_REQUEST_SERVER_EVENT.equalsIgnoreCase(event)) {
+      if (!(PULL_REQUEST_APPROVED.equalsIgnoreCase(action)
+          || PULL_REQUEST_CREATED.equalsIgnoreCase(action)
+          || PULL_REQUEST_UPDATED.equalsIgnoreCase(action)
+          || PULL_REQUEST_MERGED.equalsIgnoreCase(action)
+          || PULL_REQUEST_SERVER_CREATED.equalsIgnoreCase(action)
+          || PULL_REQUEST_SERVER_UPDATED.equalsIgnoreCase(action)
+          || PULL_REQUEST_SERVER_APPROVED.equalsIgnoreCase(action)
+          || PULL_REQUEST_SERVER_MERGED.equalsIgnoreCase(action))) {
         error = true;
       }
-    } else if (DIAGNOSTICS.equalsIgnoreCase(eventActionPair[0])) {
-      if (!PING.equalsIgnoreCase(eventActionPair[1])) {
+    } else if (DIAGNOSTICS.equalsIgnoreCase(event)) {
+      if (!PING.equalsIgnoreCase(action)) {
         error = true;
       }
     } else {
@@ -67,8 +77,8 @@ public class BitBucketPPREvent {
     }
 
     if (error) {
-      throw new OperationNotSupportedException("The eventAction " + eventActionPair[0] + "  "
-          + eventActionPair[1] + " is not supported.");
+      throw new OperationNotSupportedException("The eventAction " + event + "  "
+          + action + " is not supported.");
     }
   }
 

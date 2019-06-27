@@ -30,8 +30,6 @@ import javax.naming.OperationNotSupportedException;
 
 import org.junit.Test;
 
-import io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud.BitBucketPPREvent;
-
 
 public class BitBucketPPREventTest {
 

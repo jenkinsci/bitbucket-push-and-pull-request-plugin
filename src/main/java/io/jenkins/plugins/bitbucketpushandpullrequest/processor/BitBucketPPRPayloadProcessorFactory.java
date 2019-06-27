@@ -28,7 +28,7 @@ import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRCo
 import javax.naming.OperationNotSupportedException;
 
 import io.jenkins.plugins.bitbucketpushandpullrequest.BitBucketPPRJobProbe;
-import io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud.BitBucketPPREvent;
+import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPREvent;
 
 
 public final class BitBucketPPRPayloadProcessorFactory {
@@ -59,6 +59,8 @@ public final class BitBucketPPRPayloadProcessorFactory {
       }
     } else if (PULL_REQUEST_EVENT.equals(bitbucketEvent.getEvent())) {
       processor = new BitBucketPPRPullRequestPayloadProcessor(probe, bitbucketEvent);
+    } else if (PULL_REQUEST_SERVER_EVENT.equals(bitbucketEvent.getEvent())) {
+      processor = new BitBucketPPRPullRequestServerPayloadProcessor(probe, bitbucketEvent);
     }
 
     if (processor == null) {
