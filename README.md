@@ -56,9 +56,12 @@ Bitbucket Push And Pull Request Plugin will not work if the old Bitbucket plugin
 
 # Dsl Job snippets
 ```
+// pullRequestCreatedAction()
 job('example-pull-request-created') {
   	triggers{
-  		bitbucketPullRequestCreatedAction()
+		bitbucketTriggers {
+			pullRequestCreatedAction()
+		}
   	}
   	scm {
 		git {
@@ -72,9 +75,12 @@ job('example-pull-request-created') {
     }
 }
 
+// pullRequestUpdatedAction()
 job('example-pull-request-updated') {
   	triggers{
-  		bitbucketPullRequestUpdatedAction()
+		bitbucketTriggers {
+			pullRequestUpdatedAction()
+		}
   	}
   	scm {
 		git {
@@ -88,10 +94,12 @@ job('example-pull-request-updated') {
     }
 }
 
-// bitbucketPullRequestApprovedAction(boolean onlyIfReviewersApproved)
+// pullRequestApprovedAction(boolean onlyIfReviewersApproved)
 job('example-pull-request-approved') {
   	triggers{
-  		bitbucketPullRequestApprovedAction(false)
+		bitbucketTriggers {
+			pullRequestApprovedAction(false)
+		}
   	}
   	scm {
 		git {
@@ -105,10 +113,12 @@ job('example-pull-request-approved') {
     }
 }
 
-// bitbucketRepositoryPushAction(boolean triggerAlsoIfTagPush, String allowedBranches)
+// repositoryPushAction(boolean triggerAlsoIfTagPush, String allowedBranches)
 job('example-push') {
   	triggers{
-  		bitbucketRepositoryPushAction(false, "")
+		bitbucketTriggers {
+			repositoryPushAction(false, "")
+		}
   	}
   	scm {
 		git {
@@ -119,6 +129,26 @@ job('example-push') {
 	}
     steps {
         shell('echo START push')
+    }
+}
+
+// combination of triggers is also possible
+job('example-pull-request-created-updated') {
+  	triggers{
+		bitbucketTriggers {
+			pullRequestCreatedAction()
+			pullRequestUpdatedAction()
+		}
+  	}
+  	scm {
+		git {
+		    remote {
+		        url("https://git.company.domain/scm/~username/telegram.git")
+		    }
+		}
+	}
+    steps {
+        shell('echo START pull request created')
     }
 }
 ```
