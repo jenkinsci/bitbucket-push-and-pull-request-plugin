@@ -114,6 +114,7 @@ public class BitBucketPPRHookJobDslExtension extends ContextExtensionPoint {
     return new BitBucketPPRTrigger(triggers);
   }
 
+  @Deprecated
   @DslExtensionMethod(context = TriggerContext.class)
   public Object bitbucketPullRequestMergedAction() {
     List<BitBucketPPRTriggerFilter> triggers;
@@ -126,6 +127,7 @@ public class BitBucketPPRHookJobDslExtension extends ContextExtensionPoint {
     return new BitBucketPPRTrigger(triggers);
   }
 
+  @Deprecated
   @DslExtensionMethod(context = TriggerContext.class)
   public Object bitbucketRepositoryServerPushAction(boolean triggerAlsoIfTagPush,
       String allowedBranches) {
@@ -139,6 +141,7 @@ public class BitBucketPPRHookJobDslExtension extends ContextExtensionPoint {
     return new BitBucketPPRTrigger(triggers);
   }
 
+  @Deprecated
   @DslExtensionMethod(context = TriggerContext.class)
   public Object bitbucketPullRequestServerApprovedAction(boolean onlyIfReviewersApproved) {
     List<BitBucketPPRTriggerFilter> triggers;
@@ -151,6 +154,7 @@ public class BitBucketPPRHookJobDslExtension extends ContextExtensionPoint {
     return new BitBucketPPRTrigger(triggers);
   }
 
+  @Deprecated
   @DslExtensionMethod(context = TriggerContext.class)
   public Object bitbucketPullRequestServerCreatedAction() {
     List<BitBucketPPRTriggerFilter> triggers;
@@ -163,6 +167,7 @@ public class BitBucketPPRHookJobDslExtension extends ContextExtensionPoint {
     return new BitBucketPPRTrigger(triggers);
   }
 
+  @Deprecated
   @DslExtensionMethod(context = TriggerContext.class)
   public Object bitbucketPullRequestServerUpdatedAction() {
     List<BitBucketPPRTriggerFilter> triggers;
@@ -175,6 +180,7 @@ public class BitBucketPPRHookJobDslExtension extends ContextExtensionPoint {
     return new BitBucketPPRTrigger(triggers);
   }
 
+  @Deprecated
   @DslExtensionMethod(context = TriggerContext.class)
   public Object bitbucketPullRequestServerMergedAction() {
     List<BitBucketPPRTriggerFilter> triggers;
