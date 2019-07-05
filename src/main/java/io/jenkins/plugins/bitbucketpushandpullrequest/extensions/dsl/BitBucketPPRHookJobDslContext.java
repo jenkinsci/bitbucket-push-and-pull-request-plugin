@@ -29,10 +29,17 @@ import io.jenkins.plugins.bitbucketpushandpullrequest.BitBucketPPRTrigger;
 import io.jenkins.plugins.bitbucketpushandpullrequest.filter.BitBucketPPRTriggerFilter;
 import io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.cloud.BitBucketPPRPullRequestApprovedActionFilter;
 import io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.cloud.BitBucketPPRPullRequestCreatedActionFilter;
+import io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.cloud.BitBucketPPRPullRequestMergedActionFilter;
 import io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.cloud.BitBucketPPRPullRequestTriggerFilter;
 import io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.cloud.BitBucketPPRPullRequestUpdatedActionFilter;
+import io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.server.BitBucketPPRPullRequestServerApprovedActionFilter;
+import io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.server.BitBucketPPRPullRequestServerCreatedActionFilter;
+import io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.server.BitBucketPPRPullRequestServerMergedActionFilter;
+import io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.server.BitBucketPPRPullRequestServerTriggerFilter;
+import io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.server.BitBucketPPRPullRequestServerUpdatedActionFilter;
 import io.jenkins.plugins.bitbucketpushandpullrequest.filter.repository.BitBucketPPRRepositoryPushActionFilter;
 import io.jenkins.plugins.bitbucketpushandpullrequest.filter.repository.BitBucketPPRRepositoryTriggerFilter;
+import io.jenkins.plugins.bitbucketpushandpullrequest.filter.repository.BitBucketPPRServerRepositoryPushActionFilter;
 
 import javaposse.jobdsl.dsl.Context;
 
@@ -70,5 +77,54 @@ public class BitBucketPPRHookJobDslContext implements Context {
     BitBucketPPRPullRequestTriggerFilter pullRequestTriggerFilter =
       new BitBucketPPRPullRequestTriggerFilter(pullRequestUpdatedActionFilter);
     triggers.add(pullRequestTriggerFilter);
+  }
+  
+  public void pullRequestMergedAction() {
+    BitBucketPPRPullRequestMergedActionFilter pullRequestMegedActionFilter =
+        new BitBucketPPRPullRequestMergedActionFilter();
+    BitBucketPPRPullRequestTriggerFilter pullRequestTriggerFilter =
+        new BitBucketPPRPullRequestTriggerFilter(pullRequestMegedActionFilter);
+    triggers.add(pullRequestTriggerFilter);
+  }
+
+  public void repositoryServerPushAction(boolean triggerAlsoIfTagPush,
+      String allowedBranches) {
+    BitBucketPPRServerRepositoryPushActionFilter repositoryServerPushActionFilter =
+        new BitBucketPPRServerRepositoryPushActionFilter(triggerAlsoIfTagPush, allowedBranches);
+    BitBucketPPRRepositoryTriggerFilter repositoryServerTriggerFilter =
+        new BitBucketPPRRepositoryTriggerFilter(repositoryServerPushActionFilter);
+    triggers.add(repositoryServerTriggerFilter);
+  }
+
+  public void pullRequestServerApprovedAction(boolean onlyIfReviewersApproved) {
+    BitBucketPPRPullRequestServerApprovedActionFilter pullRequestServerApprovedActionFilter =
+        new BitBucketPPRPullRequestServerApprovedActionFilter(onlyIfReviewersApproved);
+    BitBucketPPRPullRequestServerTriggerFilter pullRequestServerTriggerFilter =
+        new BitBucketPPRPullRequestServerTriggerFilter(pullRequestServerApprovedActionFilter);
+    triggers.add(pullRequestServerTriggerFilter);
+  }
+
+  public void pullRequestServerCreatedAction() {
+    BitBucketPPRPullRequestServerCreatedActionFilter pullRequestServerCreatedActionFilter =
+        new BitBucketPPRPullRequestServerCreatedActionFilter();
+    BitBucketPPRPullRequestServerTriggerFilter pullRequestServerTriggerFilter =
+        new BitBucketPPRPullRequestServerTriggerFilter(pullRequestServerCreatedActionFilter);
+    triggers.add(pullRequestServerTriggerFilter);
+  }
+
+  public void pullRequestServerUpdatedAction() {
+    BitBucketPPRPullRequestServerUpdatedActionFilter pullRequestUpdatedServerActionFilter =
+        new BitBucketPPRPullRequestServerUpdatedActionFilter();
+    BitBucketPPRPullRequestServerTriggerFilter pullRequestServerTriggerFilter =
+        new BitBucketPPRPullRequestServerTriggerFilter(pullRequestUpdatedServerActionFilter);
+    triggers.add(pullRequestServerTriggerFilter);
+  }
+
+  public void pullRequestServerMergedAction() {
+    BitBucketPPRPullRequestServerMergedActionFilter pullRequestServerMegedActionFilter =
+        new BitBucketPPRPullRequestServerMergedActionFilter();
+    BitBucketPPRPullRequestServerTriggerFilter pullRequestServerTriggerFilter =
+        new BitBucketPPRPullRequestServerTriggerFilter(pullRequestServerMegedActionFilter);
+    triggers.add(pullRequestServerTriggerFilter);
   }
 }

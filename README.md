@@ -113,6 +113,25 @@ job('example-pull-request-approved') {
     }
 }
 
+// pullRequestMergedAction()
+job('example-pull-request-merged') {
+  	triggers{
+		bitbucketTriggers {
+			pullRequestMergedAction()
+		}
+  	}
+  	scm {
+		git {
+		    remote {
+		        url("https://git.company.domain/scm/~username/telegram.git")
+		    }
+		}
+	}
+    steps {
+        shell('echo START pull request approved')
+    }
+}
+
 // repositoryPushAction(boolean triggerAlsoIfTagPush, String allowedBranches)
 job('example-push') {
   	triggers{
