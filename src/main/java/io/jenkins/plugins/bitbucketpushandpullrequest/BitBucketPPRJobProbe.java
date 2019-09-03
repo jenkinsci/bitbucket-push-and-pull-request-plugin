@@ -1,17 +1,17 @@
 /*******************************************************************************
  * The MIT License
- * 
+ *
  * Copyright (C) 2019, CloudBees, Inc.
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
  * including without limitation the rights to use, copy, modify, merge, publish, distribute,
  * sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in all copies or
  * substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT
  * NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
@@ -50,6 +50,7 @@ import jenkins.model.ParameterizedJobMixIn;
 import jenkins.model.ParameterizedJobMixIn.ParameterizedJob;
 import jenkins.triggers.SCMTriggerItem;
 
+import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 
 public class BitBucketPPRJobProbe {
   private static final Logger LOGGER = Logger.getLogger(BitBucketPPRJobProbe.class.getName());
@@ -57,7 +58,7 @@ public class BitBucketPPRJobProbe {
   private BitBucketPPRAction bitbucketAction;
 
   public void triggerMatchingJobs(BitBucketPPREvent bitbucketEvent,
-      BitBucketPPRAction bitbucketAction) {
+                                  BitBucketPPRAction bitbucketAction) {
     this.bitbucketEvent = bitbucketEvent;
     this.bitbucketAction = bitbucketAction;
 
@@ -74,7 +75,8 @@ public class BitBucketPPRJobProbe {
 
       Jenkins.get().getAllItems(Job.class).stream().forEach(job -> {
         LOGGER.log(Level.FINE, "Considering candidate job {0}", job.getName());
-        triggerScm(job, remotes);
+
+        triggerScm(job, remotes, bitbucketAction);
       });
     } catch (Exception e) {
       LOGGER.log(Level.WARNING, "Invalid repository URLs {0}\n{1}",
@@ -93,7 +95,7 @@ public class BitBucketPPRJobProbe {
     }).collect(Collectors.toList());
   }
 
-  void triggerScm(Job<?, ?> job, List<URIish> remotes) {
+  void triggerScm(Job<?, ?> job, List<URIish> remotes, BitBucketPPRAction bitbucketAction) {
     LOGGER.log(Level.FINE, "Considering to poke {0}", job.getFullDisplayName());
     Optional<BitBucketPPRTrigger> bitbucketTrigger = getBitBucketTrigger(job);
     List<SCM> scmTriggered = new ArrayList<>();
@@ -101,7 +103,16 @@ public class BitBucketPPRJobProbe {
         Optional.ofNullable(SCMTriggerItem.SCMTriggerItems.asSCMTriggerItem(job));
 
     bitbucketTrigger
-        .ifPresent(trigger -> item.ifPresent(i -> i.getSCMs().stream().forEach(scmTrigger -> {
+        .ifPresent(trigger -> item.ifPresent(i -> i.getSCMs().stream().forEach(scmTrigger ->
+        {
+          LOGGER.log(Level.FINE, "Job is of type: " + job.getClass().getTypeName());
+          if(isMultiBranchPipeline(job) && !isPrSourceBranchSameAsJobsBranch(job, bitbucketAction)){
+            LOGGER.log(Level.FINE,"Skipping for job:"+job.getDisplayName());
+            return;
+          }
+
+          LOGGER.log(Level.FINE,"Scheduling for job:"+job.getDisplayName());
+
           boolean isRemoteSet = false;
           for (URIish remote : remotes) {
             if (match(scmTrigger, remote)) {
@@ -115,7 +126,7 @@ public class BitBucketPPRJobProbe {
             LOGGER.log(Level.FINE, "Triggering trigger {0} for job {1}",
                 new Object[] {trigger.getClass().getName(), job.getFullDisplayName()});
             try {
-              trigger.onPost(bitbucketEvent, bitbucketAction);
+              trigger.onPost(bitbucketEvent, this.bitbucketAction);
             } catch (Exception e) {
               LOGGER.log(Level.WARNING, "Error: {0}", e.getMessage());
             }
@@ -124,6 +135,24 @@ public class BitBucketPPRJobProbe {
                 new Object[] {job.getName(), remotes});
           }
         })));
+  }
+
+  private boolean isMultiBranchPipeline(Job<?, ?> job) {
+    return job instanceof WorkflowJob;
+  }
+  
+  private boolean isPrSourceBranchSameAsJobsBranch(Job<?, ?> job, BitBucketPPRAction bitbucketAction) {
+    final String displayName = job.getDisplayName();
+    final String sourceBranchName = bitbucketAction
+        .getPayload()
+        .getPullRequest()
+        .getSource()
+        .getBranch()
+        .getName();
+    LOGGER.log(Level.FINE,"Job Name : " +displayName);
+    LOGGER.log(Level.FINE,"sourceBranchName : " +sourceBranchName);
+
+    return displayName.equals(sourceBranchName);
   }
 
   private Optional<BitBucketPPRTrigger> getBitBucketTrigger(Job<?, ?> job) {
