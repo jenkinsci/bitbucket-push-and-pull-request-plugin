@@ -50,6 +50,7 @@ import jenkins.model.ParameterizedJobMixIn;
 import jenkins.model.ParameterizedJobMixIn.ParameterizedJob;
 import jenkins.triggers.SCMTriggerItem;
 
+import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 
 public class BitBucketPPRJobProbe {
   private static final Logger LOGGER = Logger.getLogger(BitBucketPPRJobProbe.class.getName());
@@ -104,9 +105,8 @@ public class BitBucketPPRJobProbe {
     bitbucketTrigger
         .ifPresent(trigger -> item.ifPresent(i -> i.getSCMs().stream().forEach(scmTrigger ->
         {
-
-          //todo add check isPipelineMultibranch
-          if(!isPrSourceBranchSameAsJobsBranch(job, bitbucketAction)){
+          LOGGER.log(Level.FINE, "Job is of type: " + job.getClass().getTypeName());
+          if(isMultiBranchPipeline(job) && !isPrSourceBranchSameAsJobsBranch(job, bitbucketAction)){
             LOGGER.log(Level.FINE,"Skipping for job:"+job.getDisplayName());
             return;
           }
@@ -137,6 +137,10 @@ public class BitBucketPPRJobProbe {
         })));
   }
 
+  private boolean isMultiBranchPipeline(Job<?, ?> job) {
+    return job instanceof WorkflowJob;
+  }
+  
   private boolean isPrSourceBranchSameAsJobsBranch(Job<?, ?> job, BitBucketPPRAction bitbucketAction) {
     final String displayName = job.getDisplayName();
     final String sourceBranchName = bitbucketAction
