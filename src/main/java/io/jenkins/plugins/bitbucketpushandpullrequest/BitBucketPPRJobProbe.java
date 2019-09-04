@@ -50,7 +50,7 @@ import jenkins.model.ParameterizedJobMixIn;
 import jenkins.model.ParameterizedJobMixIn.ParameterizedJob;
 import jenkins.triggers.SCMTriggerItem;
 
-import org.jenkinsci.plugins.workflow.job.WorkflowJob;
+import jenkins.branch.MultiBranchProject;
 
 public class BitBucketPPRJobProbe {
   private static final Logger LOGGER = Logger.getLogger(BitBucketPPRJobProbe.class.getName());
@@ -138,7 +138,7 @@ public class BitBucketPPRJobProbe {
   }
 
   private boolean isMultiBranchPipeline(Job<?, ?> job) {
-    return job instanceof WorkflowJob;
+    return job.getParent() instanceof MultiBranchProject;
   }
   
   private boolean isPrSourceBranchSameAsJobsBranch(Job<?, ?> job, BitBucketPPRAction bitbucketAction) {
