@@ -35,63 +35,49 @@ import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-
 public class BitBucketPPRPollingRunnable implements Runnable {
-  Job<?, ?> job;
-  File logFile;
+	Job<?, ?> job;
+	File logFile;
 
-  private static final Logger LOGGER =
-      Logger.getLogger(BitBucketPPRPollingRunnable.class.getName());
+	private static final Logger LOGGER = Logger.getLogger(BitBucketPPRPollingRunnable.class.getName());
 
-  BitBucketPPRPollResultListener bitbucketPollResultListener;
+	BitBucketPPRPollResultListener bitbucketPollResultListener;
 
-  public BitBucketPPRPollingRunnable(Job<?, ?> job, File logFile,
-      BitBucketPPRPollResultListener bitbucketPollResultListener) {
-    this.job = job;
-    this.bitbucketPollResultListener = bitbucketPollResultListener;
-    this.logFile = logFile;
-  }
+	public BitBucketPPRPollingRunnable(Job<?, ?> job, File logFile,
+			BitBucketPPRPollResultListener bitbucketPollResultListener) {
+		this.job = job;
+		this.bitbucketPollResultListener = bitbucketPollResultListener;
+		this.logFile = logFile;
+	}
 
-  public void run() {
-    LOGGER.log(Level.INFO, "Run method called.");
-    
-    try {
-      StreamTaskListener streamListener = new StreamTaskListener(logFile);
-      try {
-        PrintStream logger = streamListener.getLogger();
-        long start = System.currentTimeMillis();
-        logger.println("Started on " + DateFormat.getDateTimeInstance().format(new Date()));
+	public void run() {
+		LOGGER.log(Level.INFO, "Run method called.");
 
-        PollingResult pollingResult = null;
+		try (StreamTaskListener streamListener = new StreamTaskListener(logFile)) {
+			exec(streamListener);
+		} catch (IOException e) {
+			LOGGER.log(Level.SEVERE, "Failed {0}", e.getMessage());
+		}
+	}
 
-        try {
-          pollingResult = SCMTriggerItem.SCMTriggerItems.asSCMTriggerItem(job).poll(streamListener);
-          logger
-              .println("Done. Took " + Util.getTimeSpanString(System.currentTimeMillis() - start));
-          bitbucketPollResultListener.onPollSuccess(pollingResult);
-        } catch (NullPointerException e) {
-          LOGGER.log(Level.SEVERE, "Failed to record SCM polling", e);
-        }
+	private void exec(StreamTaskListener streamListener) {
+		try {
+			PrintStream logger = streamListener.getLogger();
+			long start = System.currentTimeMillis();
+			logger.println("Started on " + DateFormat.getDateTimeInstance().format(new Date()));
 
-      } catch (Error e) {
-        e.printStackTrace(streamListener.error("Failed to record SCM polling"));
-        LOGGER.log(Level.SEVERE, "Failed to record SCM polling", e);
-        bitbucketPollResultListener.onPollError(e);
-      } catch (RuntimeException e) {
-        e.printStackTrace(streamListener.error("Failed to record SCM polling"));
-        LOGGER.log(Level.SEVERE, "Failed to record SCM polling", e);
-        bitbucketPollResultListener.onPollError(e);
-      } catch (Exception e) {
-        LOGGER.log(Level.SEVERE, "Failed ", e);
-      } finally {
-        streamListener.close();
-      }
+			PollingResult pollingResult = SCMTriggerItem.SCMTriggerItems.asSCMTriggerItem(job).poll(streamListener);
+			logger.println("Done. Took " + Util.getTimeSpanString(System.currentTimeMillis() - start));
+			bitbucketPollResultListener.onPollSuccess(pollingResult);
 
-    } catch (IOException e) {
-      LOGGER.log(Level.SEVERE, "Failed to record SCM polling", e);
-      bitbucketPollResultListener.onPollError(e);
-    } catch (Exception e) {
-      LOGGER.log(Level.SEVERE, "Failed ", e);
-    }
-  }
+		} catch (NullPointerException e) {
+			LOGGER.log(Level.SEVERE, "NullPointerException: Failed to record SCM polling {0}", e.getMessage());
+		} catch (RuntimeException e) {
+			e.printStackTrace(streamListener.error("Failed to record SCM polling"));
+			LOGGER.log(Level.SEVERE, "RuntimeException: Failed to record SCM polling {0}", e.getMessage());
+			bitbucketPollResultListener.onPollError(e);
+		} catch (Exception e) {
+			LOGGER.log(Level.SEVERE, "Failed ", e);
+		}
+	}
 }

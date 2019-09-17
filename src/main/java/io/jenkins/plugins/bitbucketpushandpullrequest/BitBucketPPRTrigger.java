@@ -100,15 +100,14 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
 				triggers);
 
 		if (matchingFilters != null && !matchingFilters.isEmpty()) {
+			LOGGER.log(Level.INFO, "matchingFilters is not null AND is not empty {0} ", matchingFilters);
+
 			BitBucketPPRPollingRunnable bitbucketPollingRunnable = new BitBucketPPRPollingRunnable(job, getLogFile(),
 					new BitBucketPPRPollResultListener() {
-
 						@Override
 						public void onPollSuccess(PollingResult pollingResult) {
 
-							// TODO: do we need a .toString()?
-							LOGGER.log(Level.INFO, "Called onPollSuccess with polling result {0}.",
-									new Object[] { pollingResult });
+							LOGGER.log(Level.INFO, "Called onPollSuccess with polling result {0}", pollingResult);
 							for (BitBucketPPRTriggerFilter filter : matchingFilters) {
 								BitBucketPPRTriggerCause cause;
 								try {
@@ -129,16 +128,14 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
 
 						@Override
 						public void onPollError(Throwable throwable) {
-							LOGGER.log(Level.INFO, "Called onPollError");
+							LOGGER.log(Level.INFO, "Called onPollError: " + throwable.getMessage());
 						}
 					});
-			LOGGER.log(Level.INFO, "matchingFilters is not null AND matchingFilters is not empty {0} ",
-					new String[] { matchingFilters.toString() });
 
 			try {
 				getDescriptor().queue.execute(bitbucketPollingRunnable);
 			} catch (Exception e) {
-				LOGGER.log(Level.INFO, "No matching filters");
+				LOGGER.log(Level.INFO, "No matching filters {0}", e.getMessage());
 			}
 
 		} else {
