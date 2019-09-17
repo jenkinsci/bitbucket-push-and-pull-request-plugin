@@ -19,32 +19,30 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  ******************************************************************************/
 
-
 package io.jenkins.plugins.bitbucketpushandpullrequest.action;
 
 import java.util.logging.Logger;
 import javax.annotation.Nonnull;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
 
-
 public class BitBucketPPRPullRequestAction extends BitBucketPPRAction {
-  private static final Logger logger =
-      Logger.getLogger(BitBucketPPRPullRequestAction.class.getName());
+	private static final Logger logger = Logger.getLogger(BitBucketPPRPullRequestAction.class.getName());
 
-  public BitBucketPPRPullRequestAction(@Nonnull BitBucketPPRPayload payload) {
-    super(payload);
-    this.pullRequestId = payload.getPullRequest().getId();
-  }
+	public BitBucketPPRPullRequestAction(@Nonnull BitBucketPPRPayload payload) {
+		super(payload);
+		this.pullRequestId = payload.getPullRequest().getId();
+		this.branchName = getSourceBranch();
+	}
 
-  public String getSourceBranch() {
-    return payload.getPullRequest().getSource().getBranch().getName();
-  }
+	public String getSourceBranch() {
+		return payload.getPullRequest().getSource().getBranch().getName();
+	}
 
-  public String getTargetBranch() {
-    return payload.getPullRequest().getDestination().getBranch().getName();
-  }
+	public String getTargetBranch() {
+		return payload.getPullRequest().getDestination().getBranch().getName();
+	}
 
-  public String getPullRequestUrl() {
-    return payload.getPullRequest().getLinks().getHtml().getHref();
-  }  
+	public String getPullRequestUrl() {
+		return payload.getPullRequest().getLinks().getHtml().getHref();
+	}
 }

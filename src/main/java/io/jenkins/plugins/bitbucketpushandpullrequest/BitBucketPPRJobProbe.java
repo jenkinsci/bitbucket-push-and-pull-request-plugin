@@ -50,224 +50,218 @@ import jenkins.model.ParameterizedJobMixIn;
 import jenkins.model.ParameterizedJobMixIn.ParameterizedJob;
 import jenkins.triggers.SCMTriggerItem;
 
-import org.jenkinsci.plugins.workflow.job.WorkflowJob;
+import jenkins.branch.MultiBranchProject;
 
 public class BitBucketPPRJobProbe {
-  private static final Logger LOGGER = Logger.getLogger(BitBucketPPRJobProbe.class.getName());
-  private BitBucketPPREvent bitbucketEvent;
-  private BitBucketPPRAction bitbucketAction;
+	private static final Logger LOGGER = Logger.getLogger(BitBucketPPRJobProbe.class.getName());
+	private BitBucketPPREvent bitbucketEvent;
+	private BitBucketPPRAction bitbucketAction;
 
-  public void triggerMatchingJobs(BitBucketPPREvent bitbucketEvent,
-                                  BitBucketPPRAction bitbucketAction) {
-    this.bitbucketEvent = bitbucketEvent;
-    this.bitbucketAction = bitbucketAction;
+	public void triggerMatchingJobs(BitBucketPPREvent bitbucketEvent, BitBucketPPRAction bitbucketAction) {
+		this.bitbucketEvent = bitbucketEvent;
+		this.bitbucketAction = bitbucketAction;
 
-    if (!("git".equals(bitbucketAction.getScm()) || "hg".equals(bitbucketAction.getScm()))) {
-      throw new UnsupportedOperationException("Unsupported SCM type " + bitbucketAction.getScm());
-    }
+		if (!("git".equals(bitbucketAction.getScm()) || "hg".equals(bitbucketAction.getScm()))) {
+			throw new UnsupportedOperationException("Unsupported SCM type " + bitbucketAction.getScm());
+		}
 
-    // TODO: do we need it?
-    Jenkins.get().getACL();
+		// TODO: do we need it?
+		Jenkins.get().getACL();
 
-    try (ACLContext old = ACL.as(ACL.SYSTEM) ) {
-      List<URIish> remotes = getRemotesAsList(bitbucketAction);
-      LOGGER.log(Level.FINE, "Considering remote {0}", remotes);
+		try (ACLContext old = ACL.as(ACL.SYSTEM)) {
+			List<URIish> remotes = getRemotesAsList(bitbucketAction);
+			LOGGER.log(Level.FINE, "Considering remote {0}", remotes);
 
-      Jenkins.get().getAllItems(Job.class).stream().forEach(job -> {
-        LOGGER.log(Level.FINE, "Considering candidate job {0}", job.getName());
+			Jenkins.get().getAllItems(Job.class).stream().forEach(job -> {
+				LOGGER.log(Level.FINE, "Considering candidate job {0}", job.getName());
 
-        triggerScm(job, remotes, bitbucketAction);
-      });
-    } catch (Exception e) {
-      LOGGER.log(Level.WARNING, "Invalid repository URLs {0}\n{1}",
-          new Object[] {bitbucketAction.getScmUrls(), e.getMessage()});
-    }
-  }
+				triggerScm(job, remotes, bitbucketAction);
+			});
+		} catch (Exception e) {
+			LOGGER.log(Level.WARNING, "Invalid repository URLs {0}\n{1}",
+					new Object[] { bitbucketAction.getScmUrls(), e.getMessage() });
+		}
+	}
 
-  List<URIish> getRemotesAsList(BitBucketPPRAction bitbucketAction) {
-    return (List<URIish>) (bitbucketAction.getScmUrls()).stream().map(a -> {
-      try {
-        return new URIish(a);
-      } catch (URISyntaxException e) {
-        LOGGER.log(Level.WARNING, "Invalid URI {0}", e.getMessage());
-        return null;
-      }
-    }).collect(Collectors.toList());
-  }
+	List<URIish> getRemotesAsList(BitBucketPPRAction bitbucketAction) {
+		return (List<URIish>) (bitbucketAction.getScmUrls()).stream().map(a -> {
+			try {
+				return new URIish(a);
+			} catch (URISyntaxException e) {
+				LOGGER.log(Level.WARNING, "Invalid URI {0}", e.getMessage());
+				return null;
+			}
+		}).collect(Collectors.toList());
+	}
 
-  void triggerScm(Job<?, ?> job, List<URIish> remotes, BitBucketPPRAction bitbucketAction) {
-    LOGGER.log(Level.FINE, "Considering to poke {0}", job.getFullDisplayName());
-    Optional<BitBucketPPRTrigger> bitbucketTrigger = getBitBucketTrigger(job);
-    List<SCM> scmTriggered = new ArrayList<>();
-    Optional<SCMTriggerItem> item =
-        Optional.ofNullable(SCMTriggerItem.SCMTriggerItems.asSCMTriggerItem(job));
+	void triggerScm(Job<?, ?> job, List<URIish> remotes, BitBucketPPRAction bitbucketAction) {
+		LOGGER.log(Level.FINE, "Considering to poke {0}", job.getFullDisplayName());
+		Optional<BitBucketPPRTrigger> bitbucketTrigger = getBitBucketTrigger(job);
+		List<SCM> scmTriggered = new ArrayList<>();
+		Optional<SCMTriggerItem> item = Optional.ofNullable(SCMTriggerItem.SCMTriggerItems.asSCMTriggerItem(job));
 
-    bitbucketTrigger
-        .ifPresent(trigger -> item.ifPresent(i -> i.getSCMs().stream().forEach(scmTrigger ->
-        {
-          LOGGER.log(Level.FINE, "Job is of type: " + job.getClass().getTypeName());
-          if(isMultiBranchPipeline(job) && !isPrSourceBranchSameAsJobsBranch(job, bitbucketAction)){
-            LOGGER.log(Level.FINE,"Skipping for job:"+job.getDisplayName());
-            return;
-          }
+		bitbucketTrigger.ifPresent(trigger -> item.ifPresent(i -> i.getSCMs().stream().forEach(scmTrigger -> {
+			if (isMultiBranchPipeline(job) && !isPrSourceBranchSameAsJobsBranch(job, bitbucketAction)) {
+				LOGGER.log(Level.FINE, "Skipping for job:" + job.getDisplayName());
+				return;
+			}
 
-          LOGGER.log(Level.FINE,"Scheduling for job:"+job.getDisplayName());
+			LOGGER.log(Level.FINE, "Scheduling for job:" + job.getDisplayName());
 
-          boolean isRemoteSet = false;
-          for (URIish remote : remotes) {
-            if (match(scmTrigger, remote)) {
-              isRemoteSet = true;
-              break;
-            }
-          }
+			boolean isRemoteSet = false;
+			for (URIish remote : remotes) {
+				if (match(scmTrigger, remote)) {
+					isRemoteSet = true;
+					break;
+				}
+			}
 
-          if (isRemoteSet && !hasBeenTriggered(scmTriggered, scmTrigger)) {
-            scmTriggered.add(scmTrigger);
-            LOGGER.log(Level.FINE, "Triggering trigger {0} for job {1}",
-                new Object[] {trigger.getClass().getName(), job.getFullDisplayName()});
-            try {
-              trigger.onPost(bitbucketEvent, this.bitbucketAction);
-            } catch (Exception e) {
-              LOGGER.log(Level.WARNING, "Error: {0}", e.getMessage());
-            }
-          } else {
-            LOGGER.log(Level.FINE, "{0} SCM doesn't match remote repo {1}",
-                new Object[] {job.getName(), remotes});
-          }
-        })));
-  }
+			if (isRemoteSet && !hasBeenTriggered(scmTriggered, scmTrigger)) {
+				scmTriggered.add(scmTrigger);
+				LOGGER.log(Level.FINE, "Triggering trigger {0} for job {1}",
+						new Object[] { trigger.getClass().getName(), job.getFullDisplayName() });
+				try {
+					trigger.onPost(bitbucketEvent, this.bitbucketAction);
+				} catch (Exception e) {
+					LOGGER.log(Level.WARNING, "Error: {0}", e.getMessage());
+				}
+			} else {
+				LOGGER.log(Level.FINE, "{0} SCM doesn't match remote repo {1}",
+						new Object[] { job.getName(), remotes });
+			}
+		})));
+	}
 
-  private boolean isMultiBranchPipeline(Job<?, ?> job) {
-    return job instanceof WorkflowJob;
-  }
-  
-  private boolean isPrSourceBranchSameAsJobsBranch(Job<?, ?> job, BitBucketPPRAction bitbucketAction) {
-    final String displayName = job.getDisplayName();
-    final String sourceBranchName = bitbucketAction
-        .getPayload()
-        .getPullRequest()
-        .getSource()
-        .getBranch()
-        .getName();
-    LOGGER.log(Level.FINE,"Job Name : " +displayName);
-    LOGGER.log(Level.FINE,"sourceBranchName : " +sourceBranchName);
+	private boolean isMultiBranchPipeline(Job<?, ?> job) {
+		LOGGER.log(Level.FINE, "Job is of type: " + job.getParent().getClass().getTypeName());
 
-    return displayName.equals(sourceBranchName);
-  }
+		return job.getParent() instanceof MultiBranchProject;
+	}
 
-  private Optional<BitBucketPPRTrigger> getBitBucketTrigger(Job<?, ?> job) {
-    if (job instanceof ParameterizedJobMixIn.ParameterizedJob) {
-      ParameterizedJobMixIn.ParameterizedJob<?, ?> pJob =
-          (ParameterizedJobMixIn.ParameterizedJob<?, ?>) job;
+	private boolean isPrSourceBranchSameAsJobsBranch(Job<?, ?> job, BitBucketPPRAction bitbucketAction) {
+		if (job.getDisplayName() != null) {
+			final String displayName = job.getDisplayName();
+			final String sourceBranchName = bitbucketAction.getBranchName();
+			LOGGER.log(Level.FINE, "Job Name : {0}", displayName);
+			LOGGER.log(Level.FINE, "sourceBranchName {0} ", sourceBranchName);
 
-      return getBitBucketTrigger(pJob);
-    }
+			return displayName.equals(sourceBranchName);
+		} else {
+			return false;
+		}
+	}
 
-    return Optional.empty();
-  }
+	private Optional<BitBucketPPRTrigger> getBitBucketTrigger(Job<?, ?> job) {
+		if (job instanceof ParameterizedJobMixIn.ParameterizedJob) {
+			ParameterizedJobMixIn.ParameterizedJob<?, ?> pJob = (ParameterizedJobMixIn.ParameterizedJob<?, ?>) job;
 
-  private Optional<BitBucketPPRTrigger> getBitBucketTrigger(ParameterizedJob<?, ?> job) {
-    return job.getTriggers().values().stream().filter(e -> e instanceof BitBucketPPRTrigger)
-        .findFirst().map(p -> (BitBucketPPRTrigger) p);
-  }
+			return getBitBucketTrigger(pJob);
+		}
 
-  private boolean hasBeenTriggered(List<SCM> scmTriggered, SCM scmTrigger) {
-    for (SCM scm : scmTriggered) {
-      if (scm.equals(scmTrigger)) {
-        LOGGER.log(Level.FINEST, "Has been triggered {0}", scmTrigger.getType());
-        return true;
-      }
-    }
+		return Optional.empty();
+	}
 
-    return false;
-  }
+	private Optional<BitBucketPPRTrigger> getBitBucketTrigger(ParameterizedJob<?, ?> job) {
+		return job.getTriggers().values().stream().filter(e -> e instanceof BitBucketPPRTrigger).findFirst()
+				.map(p -> (BitBucketPPRTrigger) p);
+	}
 
-  private boolean match(SCM scm, URIish url) {
-    if (scm instanceof GitSCM) {
-      return matchGitScm(scm, url);
-    } else if (scm instanceof MercurialSCM) {
-      return matchMercurialScm(scm, url);
-    }
+	private boolean hasBeenTriggered(List<SCM> scmTriggered, SCM scmTrigger) {
+		for (SCM scm : scmTriggered) {
+			if (scm.equals(scmTrigger)) {
+				LOGGER.log(Level.FINEST, "Has been triggered {0}", scmTrigger.getType());
+				return true;
+			}
+		}
 
-    return false;
-  }
+		return false;
+	}
 
-  private boolean matchMercurialScm(SCM scm, URIish remote) {
-    boolean result = false;
+	private boolean match(SCM scm, URIish url) {
+		if (scm instanceof GitSCM) {
+			return matchGitScm(scm, url);
+		} else if (scm instanceof MercurialSCM) {
+			return matchMercurialScm(scm, url);
+		}
 
-    try {
-      URI hgUri = new URI(((MercurialSCM) scm).getSource());
+		return false;
+	}
 
-      LOGGER.log(Level.INFO, "Trying to match {0} ", hgUri.toString() + "<-->" + remote.toString());
-      result = hgLooselyMatches(hgUri, remote.toString());
+	private boolean matchMercurialScm(SCM scm, URIish remote) {
+		boolean result = false;
 
-      if (result) {
-        LOGGER.info("Matched scm ");
-      } else {
-        LOGGER.info(() -> "Didn't match scm " + hgUri.toString());
-      }
-    } catch (URISyntaxException ex) {
-      LOGGER.log(Level.SEVERE, "Could not parse jobSource uri: {0} ", ex);
-    }
+		try {
+			URI hgUri = new URI(((MercurialSCM) scm).getSource());
 
-    return result;
-  }
+			LOGGER.log(Level.INFO, "Trying to match {0} ", hgUri.toString() + "<-->" + remote.toString());
+			result = hgLooselyMatches(hgUri, remote.toString());
 
-  private boolean matchGitScm(SCM scm, URIish remote) {
-    
-    GitSCM gitSCM = (GitSCM) scm;
-    
-    gitSCM.getBranches().stream().forEach(b -> LOGGER.info(() -> "GIT BRANCHES" + b.toString()));
-    
-    LOGGER.info(() -> "GIT BRANCH VARIABLE " + GitSCM.GIT_BRANCH);
-    LOGGER.info(() -> "GIT LOCAL BRANCH VARIABLE " + GitSCM.GIT_LOCAL_BRANCH);
-    
-    for (RemoteConfig remoteConfig : gitSCM.getRepositories()) {
-      for (URIish urIish : remoteConfig.getURIs()) {
-        LOGGER.log(Level.INFO, "Trying to match {0} ",
-            urIish.toString() + "<-->" + remote.toString());
-        if (GitStatus.looselyMatches(urIish, remote)) {
-          LOGGER.info("Matched scm");
-          return true;
-        }
-      }
-    }
+			if (result) {
+				LOGGER.info("Matched scm ");
+			} else {
+				LOGGER.info(() -> "Didn't match scm " + hgUri.toString());
+			}
+		} catch (URISyntaxException ex) {
+			LOGGER.log(Level.SEVERE, "Could not parse jobSource uri: {0} ", ex);
+		}
 
-    return false;
-  }
+		return result;
+	}
 
-  private boolean hgLooselyMatches(URI notifyUri, String repository) {
-    boolean result = false;
-    try {
-      if (!hgIsUnexpandedEnvVar(repository)) {
-        URI repositoryUri = new URI(repository);
-        LOGGER.log(Level.INFO, "Mercurial loose match between {0} ",
-            notifyUri.toString() + "<- and ->" + repositoryUri.toString());
-        result = Objects.equal(notifyUri.getHost(), repositoryUri.getHost())
-            && Objects.equal(StringUtils.stripEnd(notifyUri.getPath(), "/"),
-                StringUtils.stripEnd(repositoryUri.getPath(), "/"))
-            && Objects.equal(notifyUri.getQuery(), repositoryUri.getQuery());
-      }
-    } catch (URISyntaxException ex) {
-      LOGGER.log(Level.SEVERE, "could not parse repository uri " + repository, ex);
-    }
-    return result;
-  }
+	private boolean matchGitScm(SCM scm, URIish remote) {
 
-  private boolean hgIsUnexpandedEnvVar(String str) {
-    return str.startsWith("$");
-  }
+		GitSCM gitSCM = (GitSCM) scm;
 
-  // needed cause the ssh and https URI differs in Bitbucket Server.
-  @Deprecated
-  private URIish parseBitBucketUrIish(URIish urIish) {
-    if (urIish.getPath().startsWith("/scm")) {
-      urIish = urIish.setPath(urIish.getPath().substring(4));
-    }
-    return urIish;
-  }
+		gitSCM.getBranches().stream().forEach(b -> LOGGER.info(() -> "GIT BRANCHES" + b.toString()));
 
-  boolean testMatchMercurialScm(SCM scm, URIish remote) {
-    return matchMercurialScm(scm, remote);
-  }
+		LOGGER.info(() -> "GIT BRANCH VARIABLE " + GitSCM.GIT_BRANCH);
+		LOGGER.info(() -> "GIT LOCAL BRANCH VARIABLE " + GitSCM.GIT_LOCAL_BRANCH);
+
+		for (RemoteConfig remoteConfig : gitSCM.getRepositories()) {
+			for (URIish urIish : remoteConfig.getURIs()) {
+				LOGGER.log(Level.INFO, "Trying to match {0} ", urIish.toString() + "<-->" + remote.toString());
+				if (GitStatus.looselyMatches(urIish, remote)) {
+					LOGGER.info("Matched scm");
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
+
+	private boolean hgLooselyMatches(URI notifyUri, String repository) {
+		boolean result = false;
+		try {
+			if (!hgIsUnexpandedEnvVar(repository)) {
+				URI repositoryUri = new URI(repository);
+				LOGGER.log(Level.INFO, "Mercurial loose match between {0} ",
+						notifyUri.toString() + "<- and ->" + repositoryUri.toString());
+				result = Objects.equal(notifyUri.getHost(), repositoryUri.getHost())
+						&& Objects.equal(StringUtils.stripEnd(notifyUri.getPath(), "/"),
+								StringUtils.stripEnd(repositoryUri.getPath(), "/"))
+						&& Objects.equal(notifyUri.getQuery(), repositoryUri.getQuery());
+			}
+		} catch (URISyntaxException ex) {
+			LOGGER.log(Level.SEVERE, "could not parse repository uri " + repository, ex);
+		}
+		return result;
+	}
+
+	private boolean hgIsUnexpandedEnvVar(String str) {
+		return str.startsWith("$");
+	}
+
+	// needed cause the ssh and https URI differs in Bitbucket Server.
+	@Deprecated
+	private URIish parseBitBucketUrIish(URIish urIish) {
+		if (urIish.getPath().startsWith("/scm")) {
+			urIish = urIish.setPath(urIish.getPath().substring(4));
+		}
+		return urIish;
+	}
+
+	boolean testMatchMercurialScm(SCM scm, URIish remote) {
+		return matchMercurialScm(scm, remote);
+	}
 }

@@ -22,7 +22,6 @@
  * SOFTWARE.
  ******************************************************************************/
 
-
 package io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.cloud;
 
 import java.io.File;
@@ -39,42 +38,44 @@ import io.jenkins.plugins.bitbucketpushandpullrequest.filter.BitBucketPPRTrigger
 import io.jenkins.plugins.bitbucketpushandpullrequest.filter.BitBucketPPRTriggerFilterDescriptor;
 import jenkins.model.Jenkins;
 
-
 public class BitBucketPPRPullRequestTriggerFilter extends BitBucketPPRTriggerFilter {
-  public BitBucketPPRPullRequestActionFilter actionFilter;
+	public BitBucketPPRPullRequestActionFilter actionFilter;
 
-  @DataBoundConstructor
-  public BitBucketPPRPullRequestTriggerFilter(BitBucketPPRPullRequestActionFilter actionFilter) {
-    this.actionFilter = actionFilter;
-  }
+	@DataBoundConstructor
+	public BitBucketPPRPullRequestTriggerFilter(BitBucketPPRPullRequestActionFilter actionFilter) {
+		this.actionFilter = actionFilter;
+	}
 
+	@Override
+	public boolean shouldScheduleJob(BitBucketPPRAction bitbucketAction) {
+		return actionFilter.shouldTriggerBuild(bitbucketAction);
+	}
 
-  @Override
-  public boolean shouldScheduleJob(BitBucketPPRAction bitbucketAction) {
-    return actionFilter.shouldTriggerBuild(bitbucketAction);
-  }
+	@Override
+	public BitBucketPPRTriggerCause getCause(File pollingLog, BitBucketPPRAction action) throws IOException {
+		return actionFilter.getCause(pollingLog, action);
+	}
 
-  @Override
-  public BitBucketPPRTriggerCause getCause(File pollingLog, BitBucketPPRAction action)
-      throws IOException {
-    return actionFilter.getCause(pollingLog, action);
-  }
+	@Extension
+	public static class FilterDescriptorImpl extends BitBucketPPRTriggerFilterDescriptor {
 
-  @Extension
-  public static class FilterDescriptorImpl extends BitBucketPPRTriggerFilterDescriptor {
-    
-    @Override
-    public String getDisplayName() {
-      return "Bitbucket Cloud Pull Request";
-    }
+		@Override
+		public String getDisplayName() {
+			return "Bitbucket Cloud Pull Request";
+		}
 
-    public List<BitBucketPPRPullRequestActionDescriptor> getActionDescriptors() {
-      // you may want to filter this list of descriptors here, if you are being very fancy
-      return Jenkins.get().getDescriptorList(BitBucketPPRPullRequestActionFilter.class);
-    }
-  }
+		public List<BitBucketPPRPullRequestActionDescriptor> getActionDescriptors() {
+			// you may want to filter this list of descriptors here, if you are being very fancy
+			return Jenkins.get().getDescriptorList(BitBucketPPRPullRequestActionFilter.class);
+		}
+	}
 
-  public AbstractDescribableImpl<?> getActionFilter() {
-    return actionFilter;
-  }
+	public AbstractDescribableImpl<?> getActionFilter() {
+		return actionFilter;
+	}
+
+	@Override
+	public String toString() {
+		return "BitBucketPPRPullRequestTriggerFilter [actionFilter=" + actionFilter + "]";
+	}
 }

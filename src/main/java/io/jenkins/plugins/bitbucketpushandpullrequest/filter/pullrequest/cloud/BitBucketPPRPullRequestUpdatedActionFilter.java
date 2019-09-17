@@ -19,13 +19,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  ******************************************************************************/
 
-
 package io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.cloud;
 
 import java.io.File;
 import java.io.IOException;
 
-import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 import hudson.Extension;
@@ -33,30 +31,34 @@ import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.cause.BitBucketPPRTriggerCause;
 import io.jenkins.plugins.bitbucketpushandpullrequest.cause.pullrequest.cloud.BitBucketPPRPullRequestUpdatedCause;
 
+public class BitBucketPPRPullRequestUpdatedActionFilter extends BitBucketPPRPullRequestActionFilter {
 
-public class BitBucketPPRPullRequestUpdatedActionFilter
-    extends BitBucketPPRPullRequestActionFilter {
+	@DataBoundConstructor
+	public BitBucketPPRPullRequestUpdatedActionFilter() {
+	}
 
-  @DataBoundConstructor
-  public BitBucketPPRPullRequestUpdatedActionFilter() {}
+	@Override
+	public boolean shouldTriggerBuild(BitBucketPPRAction bitbucketAction) {
+		return true;
+	}
 
-  @Override
-  public boolean shouldTriggerBuild(BitBucketPPRAction bitbucketAction) {
-    return true;
-  }
+	@Override
+	public BitBucketPPRTriggerCause getCause(File pollingLog, BitBucketPPRAction pullRequestAction) throws IOException {
+		return new BitBucketPPRPullRequestUpdatedCause(pollingLog, pullRequestAction);
+	}
 
-  @Override
-  public BitBucketPPRTriggerCause getCause(File pollingLog, BitBucketPPRAction pullRequestAction)
-      throws IOException {
-    return new BitBucketPPRPullRequestUpdatedCause(pollingLog, pullRequestAction);
-  }
+	@Extension
+	public static class ActionFilterDescriptorImpl extends BitBucketPPRPullRequestActionDescriptor {
 
-  @Extension
-  public static class ActionFilterDescriptorImpl extends BitBucketPPRPullRequestActionDescriptor {
+		@Override
+		public String getDisplayName() {
+			return "Updated";
+		}
+	}
 
-    @Override
-    public String getDisplayName() {
-      return "Updated";
-    }
-  }
+	@Override
+	public String toString() {
+		return "BitBucketPPRPullRequestUpdatedActionFilter [getDescriptor()=" + getDescriptor() + ", getClass()="
+				+ getClass() + ", hashCode()=" + hashCode() + ", toString()=" + super.toString() + "]";
+	}
 }
