@@ -38,4 +38,6 @@ public abstract class BitBucketPPRTriggerFilter
       BitBucketPPRAction action) throws IOException;
 
   public abstract AbstractDescribableImpl<?> getActionFilter();
+
+  public abstract boolean shouldTriggerAlsoIfNothingChanged();
 }
