@@ -67,11 +67,11 @@ public class BitBucketPPRHookJobDslExtension extends ContextExtensionPoint {
 
   @Deprecated
   @DslExtensionMethod(context = TriggerContext.class)
-  public Object bitbucketRepositoryPushAction(boolean triggerAlsoIfTagPush,
+  public Object bitbucketRepositoryPushAction(boolean triggerAlsoIfTagPush, boolean triggerAlsoIfNothingChanged,
       String allowedBranches) {
     List<BitBucketPPRTriggerFilter> triggers = new ArrayList<>();
     BitBucketPPRRepositoryPushActionFilter repositoryPushActionFilter =
-        new BitBucketPPRRepositoryPushActionFilter(triggerAlsoIfTagPush, allowedBranches);
+        new BitBucketPPRRepositoryPushActionFilter(triggerAlsoIfTagPush, triggerAlsoIfNothingChanged, allowedBranches);
     BitBucketPPRRepositoryTriggerFilter repositoryTriggerFilter =
         new BitBucketPPRRepositoryTriggerFilter(repositoryPushActionFilter);
     triggers.add(repositoryTriggerFilter);
@@ -129,11 +129,11 @@ public class BitBucketPPRHookJobDslExtension extends ContextExtensionPoint {
 
   @Deprecated
   @DslExtensionMethod(context = TriggerContext.class)
-  public Object bitbucketRepositoryServerPushAction(boolean triggerAlsoIfTagPush,
+  public Object bitbucketRepositoryServerPushAction(boolean triggerAlsoIfTagPush, boolean triggerAlsoIfNothingChanged,
       String allowedBranches) {
     List<BitBucketPPRTriggerFilter> triggers;
     BitBucketPPRServerRepositoryPushActionFilter repositoryServerPushActionFilter =
-        new BitBucketPPRServerRepositoryPushActionFilter(triggerAlsoIfTagPush, allowedBranches);
+        new BitBucketPPRServerRepositoryPushActionFilter(triggerAlsoIfTagPush, triggerAlsoIfNothingChanged, allowedBranches);
     BitBucketPPRRepositoryTriggerFilter repositoryServerTriggerFilter =
         new BitBucketPPRRepositoryTriggerFilter(repositoryServerPushActionFilter);
     triggers = new ArrayList<>();

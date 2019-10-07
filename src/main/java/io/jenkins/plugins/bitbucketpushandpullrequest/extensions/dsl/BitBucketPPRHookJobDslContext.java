@@ -46,10 +46,10 @@ import javaposse.jobdsl.dsl.Context;
 public class BitBucketPPRHookJobDslContext implements Context {
   List<BitBucketPPRTriggerFilter> triggers = new ArrayList<>();
 
-  public void repositoryPushAction(boolean triggerAlsoIfTagPush,
+  public void repositoryPushAction(boolean triggerAlsoIfTagPush, boolean triggerAlsoIfNothingChanged, 
       String allowedBranches) {
     BitBucketPPRRepositoryPushActionFilter repositoryPushActionFilter =
-      new BitBucketPPRRepositoryPushActionFilter(triggerAlsoIfTagPush, allowedBranches);
+      new BitBucketPPRRepositoryPushActionFilter(triggerAlsoIfTagPush, triggerAlsoIfNothingChanged, allowedBranches);
     BitBucketPPRRepositoryTriggerFilter repositoryTriggerFilter =
       new BitBucketPPRRepositoryTriggerFilter(repositoryPushActionFilter);
     triggers.add(repositoryTriggerFilter);
@@ -87,10 +87,10 @@ public class BitBucketPPRHookJobDslContext implements Context {
     triggers.add(pullRequestTriggerFilter);
   }
 
-  public void repositoryServerPushAction(boolean triggerAlsoIfTagPush,
+  public void repositoryServerPushAction(boolean triggerAlsoIfTagPush, boolean triggerAlsoIfNothingChanged, 
       String allowedBranches) {
     BitBucketPPRServerRepositoryPushActionFilter repositoryServerPushActionFilter =
-        new BitBucketPPRServerRepositoryPushActionFilter(triggerAlsoIfTagPush, allowedBranches);
+        new BitBucketPPRServerRepositoryPushActionFilter(triggerAlsoIfTagPush, triggerAlsoIfNothingChanged, allowedBranches);
     BitBucketPPRRepositoryTriggerFilter repositoryServerTriggerFilter =
         new BitBucketPPRRepositoryTriggerFilter(repositoryServerPushActionFilter);
     triggers.add(repositoryServerTriggerFilter);

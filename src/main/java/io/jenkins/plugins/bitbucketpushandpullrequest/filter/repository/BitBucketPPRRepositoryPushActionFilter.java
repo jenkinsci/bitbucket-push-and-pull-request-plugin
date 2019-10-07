@@ -41,12 +41,14 @@ public class BitBucketPPRRepositoryPushActionFilter extends BitBucketPPRReposito
       Logger.getLogger(BitBucketPPRRepositoryPushActionFilter.class.getName());
 
   public boolean triggerAlsoIfTagPush;
-  private String allowedBranches;
+  public boolean triggerAlsoIfNothingChanged;
+  public String allowedBranches;
 
   @DataBoundConstructor
   public BitBucketPPRRepositoryPushActionFilter(boolean triggerAlsoIfTagPush,
-      String allowedBranches) {
+      boolean triggerAlsoIfNothingChanged, String allowedBranches) {
     this.triggerAlsoIfTagPush = triggerAlsoIfTagPush;
+    this.triggerAlsoIfNothingChanged = triggerAlsoIfNothingChanged;
     this.allowedBranches = allowedBranches;
   }
 
@@ -121,6 +123,11 @@ public class BitBucketPPRRepositoryPushActionFilter extends BitBucketPPRReposito
 
   public void setAllowedBranches(String allowedBranches) {
     this.allowedBranches = allowedBranches;
+  }
+  
+  @Override
+  public boolean shouldTriggerAlsoIfNothingChanged() {
+    return triggerAlsoIfNothingChanged;
   }
 
   @Extension

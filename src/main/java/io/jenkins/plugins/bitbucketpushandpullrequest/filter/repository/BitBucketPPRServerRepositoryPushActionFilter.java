@@ -25,9 +25,7 @@ package io.jenkins.plugins.bitbucketpushandpullrequest.filter.repository;
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.Logger;
-
 import org.kohsuke.stapler.DataBoundConstructor;
-
 import hudson.EnvVars;
 import hudson.Extension;
 import hudson.plugins.git.BranchSpec;
@@ -42,12 +40,14 @@ public class BitBucketPPRServerRepositoryPushActionFilter
       Logger.getLogger(BitBucketPPRServerRepositoryPushActionFilter.class.getName());
 
   public boolean triggerAlsoIfTagPush;
-  private String allowedBranches;
+  public boolean triggerAlsoIfNothingChanged;
+  public String allowedBranches;
 
   @DataBoundConstructor
   public BitBucketPPRServerRepositoryPushActionFilter(boolean triggerAlsoIfTagPush,
-      String allowedBranches) {
+      boolean triggerAlsoIfNothingChanged, String allowedBranches) {
     this.triggerAlsoIfTagPush = triggerAlsoIfTagPush;
+    this.triggerAlsoIfNothingChanged = triggerAlsoIfNothingChanged;
     this.allowedBranches = allowedBranches;
   }
 
@@ -120,6 +120,11 @@ public class BitBucketPPRServerRepositoryPushActionFilter
 
   public void setAllowedBranches(String allowedBranches) {
     this.allowedBranches = allowedBranches;
+  }
+
+  @Override
+  public boolean shouldTriggerAlsoIfNothingChanged() {
+    return triggerAlsoIfNothingChanged;
   }
 
   @Extension

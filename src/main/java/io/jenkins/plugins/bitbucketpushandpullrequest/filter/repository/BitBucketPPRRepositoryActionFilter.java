@@ -24,7 +24,6 @@ package io.jenkins.plugins.bitbucketpushandpullrequest.filter.repository;
 
 import java.io.File;
 import java.io.IOException;
-
 import hudson.model.AbstractDescribableImpl;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.cause.BitBucketPPRTriggerCause;
@@ -38,4 +37,5 @@ public abstract class BitBucketPPRRepositoryActionFilter
   public abstract BitBucketPPRTriggerCause getCause(File pollingLog,
       BitBucketPPRAction bitbucketAction) throws IOException;
 
+  public abstract boolean shouldTriggerAlsoIfNothingChanged();
 }

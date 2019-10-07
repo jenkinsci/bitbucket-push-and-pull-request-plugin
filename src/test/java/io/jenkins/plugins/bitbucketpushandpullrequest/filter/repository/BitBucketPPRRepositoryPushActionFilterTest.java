@@ -18,7 +18,7 @@ public class BitBucketPPRRepositoryPushActionFilterTest {
   @Test
   public void testMatches() {
     BitBucketPPRRepositoryPushActionFilter c =
-        new BitBucketPPRRepositoryPushActionFilter(false, "master");
+        new BitBucketPPRRepositoryPushActionFilter(false, false, "master");
 
     assertTrue(c.matches("origin/master"));
     assertFalse(c.matches("origin/something/master"));
@@ -77,7 +77,7 @@ public class BitBucketPPRRepositoryPushActionFilterTest {
     EnvVars env = new EnvVars(envMap);
 
     BitBucketPPRRepositoryPushActionFilter c =
-        new BitBucketPPRRepositoryPushActionFilter(false, "${master}");
+        new BitBucketPPRRepositoryPushActionFilter(false, false, "${master}");
 
     assertTrue(c.matches("origin/master", env));
     assertFalse(c.matches("origin/something/master", env));
@@ -127,7 +127,7 @@ public class BitBucketPPRRepositoryPushActionFilterTest {
   @Test
   public void testUsesRefsHeads() {
     BitBucketPPRRepositoryPushActionFilter c =
-        new BitBucketPPRRepositoryPushActionFilter(false, "refs/heads/j*n*");
+        new BitBucketPPRRepositoryPushActionFilter(false, false, "refs/heads/j*n*");
 
     assertTrue(c.matches("refs/heads/jenkins"));
     assertTrue(c.matches("refs/heads/jane"));
@@ -140,7 +140,7 @@ public class BitBucketPPRRepositoryPushActionFilterTest {
   public void testUsesJavaPatternDirectlyIfPrefixedWithColon() {
 
     BitBucketPPRRepositoryPushActionFilter m =
-        new BitBucketPPRRepositoryPushActionFilter(false, ":^(?!(origin/prefix)).*");
+        new BitBucketPPRRepositoryPushActionFilter(false, false, ":^(?!(origin/prefix)).*");
 
     assertTrue(m.matches("origin"));
     assertTrue(m.matches("origin/master"));
@@ -153,7 +153,7 @@ public class BitBucketPPRRepositoryPushActionFilterTest {
   @Test
   public void testMatches_not_1() {
     BitBucketPPRRepositoryPushActionFilter c =
-        new BitBucketPPRRepositoryPushActionFilter(false, "*/master");
+        new BitBucketPPRRepositoryPushActionFilter(false, false, "*/master");
 
     assertFalse(c.matches("master"));
   }
@@ -161,7 +161,7 @@ public class BitBucketPPRRepositoryPushActionFilterTest {
   @Test
   public void testMatches_not_2() {
     BitBucketPPRRepositoryPushActionFilter c =
-        new BitBucketPPRRepositoryPushActionFilter(false, "develop, :^(?!master$).*");
+        new BitBucketPPRRepositoryPushActionFilter(false, false, "develop, :^(?!master$).*");
     assertFalse(c.matches("master"));
 
     c.setAllowedBranches(":^(?!develop$).*");
@@ -172,7 +172,7 @@ public class BitBucketPPRRepositoryPushActionFilterTest {
   public void testMatches_empty_branches() {
     String allowedBranches = "";
     BitBucketPPRRepositoryPushActionFilter c =
-        new BitBucketPPRRepositoryPushActionFilter(false, allowedBranches);
+        new BitBucketPPRRepositoryPushActionFilter(false, false, allowedBranches);
 
     assertTrue(c.matches("master"));
     assertTrue(c.matches("develop"));
@@ -183,7 +183,7 @@ public class BitBucketPPRRepositoryPushActionFilterTest {
   @Test
   public void testUsesJavaPatternWithRepetition() {
     BitBucketPPRRepositoryPushActionFilter m =
-        new BitBucketPPRRepositoryPushActionFilter(false, ":origin/release-\\d{8}");
+        new BitBucketPPRRepositoryPushActionFilter(false, false, ":origin/release-\\d{8}");
     assertTrue(m.matches("origin/release-20150101"));
     assertFalse(m.matches("origin/release-2015010"));
     assertFalse(m.matches("origin/release-201501011"));
@@ -193,7 +193,7 @@ public class BitBucketPPRRepositoryPushActionFilterTest {
   @Test
   public void testUsesJavaPatternToExcludeMultipleBranches() {
     BitBucketPPRRepositoryPushActionFilter m =
-        new BitBucketPPRRepositoryPushActionFilter(false, ":^(?!origin/master$|origin/develop$).*");
+        new BitBucketPPRRepositoryPushActionFilter(false, false, ":^(?!origin/master$|origin/develop$).*");
 
     assertTrue(m.matches("origin/branch1"));
     assertTrue(m.matches("origin/branch-2"));

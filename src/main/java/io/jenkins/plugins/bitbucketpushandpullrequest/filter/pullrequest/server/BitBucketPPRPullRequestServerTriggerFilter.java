@@ -73,4 +73,9 @@ public class BitBucketPPRPullRequestServerTriggerFilter extends BitBucketPPRTrig
   public AbstractDescribableImpl<?> getActionFilter() {
     return actionFilter;
   }
+
+  @Override
+  public boolean shouldTriggerAlsoIfNothingChanged() {
+    return true;
+  }
 }

@@ -25,10 +25,8 @@ package io.jenkins.plugins.bitbucketpushandpullrequest.filter.repository;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-
 import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.DataBoundConstructor;
-
 import hudson.Extension;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.cause.BitBucketPPRTriggerCause;
@@ -73,4 +71,8 @@ public class BitBucketPPRRepositoryTriggerFilter extends BitBucketPPRTriggerFilt
     }
   }
 
+  @Override
+  public boolean shouldTriggerAlsoIfNothingChanged() {
+    return actionFilter.shouldTriggerAlsoIfNothingChanged();
+  }
 }

@@ -44,7 +44,7 @@ public class BitBucketPPRPullRequestApprovedActionFilter
   private static final Logger LOGGER =
       Logger.getLogger(BitBucketPPRPullRequestApprovedActionFilter.class.getName());
 
-  private boolean triggerOnlyIfAllReviewersApproved;
+  public boolean triggerOnlyIfAllReviewersApproved;
 
   @DataBoundConstructor
   public BitBucketPPRPullRequestApprovedActionFilter(boolean triggerOnlyIfAllReviewersApproved) {
