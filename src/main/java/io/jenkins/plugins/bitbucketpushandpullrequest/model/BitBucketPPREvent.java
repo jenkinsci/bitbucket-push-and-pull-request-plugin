@@ -21,7 +21,6 @@
 package io.jenkins.plugins.bitbucketpushandpullrequest.model;
 
 import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConsts.*;
-
 import javax.naming.OperationNotSupportedException;
 
 
@@ -32,17 +31,17 @@ public class BitBucketPPREvent {
 
   public BitBucketPPREvent(String eventAction) throws OperationNotSupportedException {
     String[] eventActionPair = eventAction.split(":");
-    
+
     event = eventActionPair[0];
-    
+
     if (eventActionPair.length == 3 && eventActionPair[1].equalsIgnoreCase("reviewer")) {
       action = eventActionPair[2];
     } else {
       action = eventActionPair[1];
     }
-    
+
     checkOperationSupportedException(event, action);
-    
+
   }
 
   private void checkOperationSupportedException(String event, String action)
@@ -51,8 +50,7 @@ public class BitBucketPPREvent {
     boolean error = false;
 
     if (REPOSITORY_EVENT.equalsIgnoreCase(event)) {
-      if (!(REPOSITORY_PUSH.equalsIgnoreCase(action)
-          || REPOSITORY_POST.equalsIgnoreCase(action)
+      if (!(REPOSITORY_PUSH.equalsIgnoreCase(action) || REPOSITORY_POST.equalsIgnoreCase(action)
           || REPOSITORY_SERVER_PUSH.equalsIgnoreCase(action))) {
         error = true;
       }
@@ -77,8 +75,8 @@ public class BitBucketPPREvent {
     }
 
     if (error) {
-      throw new OperationNotSupportedException("The eventAction " + event + "  "
-          + action + " is not supported.");
+      throw new OperationNotSupportedException(
+          "The eventAction " + event + "  " + action + " is not supported.");
     }
   }
 

@@ -24,7 +24,6 @@ package io.jenkins.plugins.bitbucketpushandpullrequest.filter.repository;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import io.jenkins.plugins.bitbucketpushandpullrequest.filter.BitBucketPPREventTriggerMatcher;
 import io.jenkins.plugins.bitbucketpushandpullrequest.filter.BitBucketPPRTriggerFilter;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPREvent;
@@ -48,8 +47,7 @@ public class BitBucketPPRRepositoryTriggerMatcher implements BitBucketPPREventTr
             + "AND does it equal BitBucketPPRConsts.REPOSITORY_SERVER_PUSH {5} to bitbucketEvent.getAction() {6}? <<{7}>> ",
         new Object[] {
             triggerFilter.getActionFilter() instanceof BitBucketPPRRepositoryPushActionFilter,
-            BitBucketPPRConsts.REPOSITORY_PUSH, 
-            bitbucketEvent.getAction(),
+            BitBucketPPRConsts.REPOSITORY_PUSH, bitbucketEvent.getAction(),
             BitBucketPPRConsts.REPOSITORY_PUSH.equals(bitbucketEvent.getAction()),
             triggerFilter.getActionFilter() instanceof BitBucketPPRServerRepositoryPushActionFilter,
             BitBucketPPRConsts.REPOSITORY_SERVER_PUSH, bitbucketEvent.getAction(),

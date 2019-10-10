@@ -66,7 +66,7 @@ public class BitBucketPPRServerRepositoryPushActionFilter
       return false;
     }
 
-    return matches(bitbucketAction.getBranchName());
+    return matches(bitbucketAction.getTargetBranch());
   }
 
   protected boolean matches(String branchName) {

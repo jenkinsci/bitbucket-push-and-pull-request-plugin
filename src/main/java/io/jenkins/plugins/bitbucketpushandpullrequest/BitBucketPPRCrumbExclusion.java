@@ -22,14 +22,11 @@
 package io.jenkins.plugins.bitbucketpushandpullrequest;
 
 import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConsts.HOOK_URL;
-
 import java.io.IOException;
-
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import hudson.Extension;
 import hudson.security.csrf.CrumbExclusion;
 

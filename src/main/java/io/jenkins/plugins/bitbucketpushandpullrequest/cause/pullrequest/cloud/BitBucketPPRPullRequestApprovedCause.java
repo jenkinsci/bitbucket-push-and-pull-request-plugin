@@ -24,7 +24,6 @@ package io.jenkins.plugins.bitbucketpushandpullrequest.cause.pullrequest.cloud;
 
 import java.io.File;
 import java.io.IOException;
-
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
 
 

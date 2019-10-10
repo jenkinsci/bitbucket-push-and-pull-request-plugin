@@ -24,7 +24,6 @@ package io.jenkins.plugins.bitbucketpushandpullrequest.cause.repository;
 
 import java.io.File;
 import java.io.IOException;
-
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRPullRequestAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRRepositoryAction;
@@ -36,11 +35,11 @@ public class BitBucketPPRRepositoryCause extends BitBucketPPRTriggerCause {
       throws IOException {
     super(pollingLog, bitbucketAction);
   }
-  
+
   public BitBucketPPRRepositoryAction getRepositoryPayLoad() {
     return (BitBucketPPRRepositoryAction) super.getAction();
   }
-  
+
   @Override
   public String getShortDescription() {
     String pusher = bitbucketAction.getUser() != null ? bitbucketAction.getUser() : "";

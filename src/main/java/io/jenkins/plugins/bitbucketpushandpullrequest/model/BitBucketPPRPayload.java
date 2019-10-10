@@ -23,7 +23,6 @@ package io.jenkins.plugins.bitbucketpushandpullrequest.model;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud.BitBucketPPRActor;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud.BitBucketPPRApproval;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud.BitBucketPPRPullRequest;
@@ -76,7 +75,7 @@ public interface BitBucketPPRPayload extends Serializable {
   default BitBucketPPRServerRepository getServerRepository() {
     return null;
   }
-  
+
   default BitBucketPPRServerPullRequest getServerPullRequest() {
     return null;
   }

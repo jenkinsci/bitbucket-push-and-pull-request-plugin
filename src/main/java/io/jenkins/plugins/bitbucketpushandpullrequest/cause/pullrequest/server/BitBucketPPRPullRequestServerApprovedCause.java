@@ -24,14 +24,13 @@ package io.jenkins.plugins.bitbucketpushandpullrequest.cause.pullrequest.server;
 
 import java.io.File;
 import java.io.IOException;
-
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.cause.pullrequest.cloud.BitBucketPPRPullRequestCause;
 
 
 public class BitBucketPPRPullRequestServerApprovedCause extends BitBucketPPRPullRequestServerCause {
-  public BitBucketPPRPullRequestServerApprovedCause(File pollingLog, BitBucketPPRAction bitbucketAction)
-      throws IOException {
+  public BitBucketPPRPullRequestServerApprovedCause(File pollingLog,
+      BitBucketPPRAction bitbucketAction) throws IOException {
     super(pollingLog, bitbucketAction);
   }
 

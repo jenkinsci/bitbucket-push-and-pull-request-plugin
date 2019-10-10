@@ -24,7 +24,6 @@ package io.jenkins.plugins.bitbucketpushandpullrequest.extensions.dsl;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import io.jenkins.plugins.bitbucketpushandpullrequest.BitBucketPPRTrigger;
 import io.jenkins.plugins.bitbucketpushandpullrequest.filter.BitBucketPPRTriggerFilter;
 import io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.cloud.BitBucketPPRPullRequestApprovedActionFilter;
@@ -40,45 +39,45 @@ import io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.server.
 import io.jenkins.plugins.bitbucketpushandpullrequest.filter.repository.BitBucketPPRRepositoryPushActionFilter;
 import io.jenkins.plugins.bitbucketpushandpullrequest.filter.repository.BitBucketPPRRepositoryTriggerFilter;
 import io.jenkins.plugins.bitbucketpushandpullrequest.filter.repository.BitBucketPPRServerRepositoryPushActionFilter;
-
 import javaposse.jobdsl.dsl.Context;
 
 public class BitBucketPPRHookJobDslContext implements Context {
   List<BitBucketPPRTriggerFilter> triggers = new ArrayList<>();
 
-  public void repositoryPushAction(boolean triggerAlsoIfTagPush, boolean triggerAlsoIfNothingChanged, 
-      String allowedBranches) {
+  public void repositoryPushAction(boolean triggerAlsoIfTagPush,
+      boolean triggerAlsoIfNothingChanged, String allowedBranches) {
     BitBucketPPRRepositoryPushActionFilter repositoryPushActionFilter =
-      new BitBucketPPRRepositoryPushActionFilter(triggerAlsoIfTagPush, triggerAlsoIfNothingChanged, allowedBranches);
+        new BitBucketPPRRepositoryPushActionFilter(triggerAlsoIfTagPush,
+            triggerAlsoIfNothingChanged, allowedBranches);
     BitBucketPPRRepositoryTriggerFilter repositoryTriggerFilter =
-      new BitBucketPPRRepositoryTriggerFilter(repositoryPushActionFilter);
+        new BitBucketPPRRepositoryTriggerFilter(repositoryPushActionFilter);
     triggers.add(repositoryTriggerFilter);
   }
 
   public void pullRequestApprovedAction(boolean onlyIfReviewersApproved) {
     BitBucketPPRPullRequestApprovedActionFilter pullRequestApprovedActionFilter =
-      new BitBucketPPRPullRequestApprovedActionFilter(onlyIfReviewersApproved);
+        new BitBucketPPRPullRequestApprovedActionFilter(onlyIfReviewersApproved);
     BitBucketPPRPullRequestTriggerFilter pullRequestTriggerFilter =
-      new BitBucketPPRPullRequestTriggerFilter(pullRequestApprovedActionFilter);
+        new BitBucketPPRPullRequestTriggerFilter(pullRequestApprovedActionFilter);
     triggers.add(pullRequestTriggerFilter);
   }
 
   public void pullRequestCreatedAction() {
     BitBucketPPRPullRequestCreatedActionFilter pullRequestCreatedActionFilter =
-      new BitBucketPPRPullRequestCreatedActionFilter();
+        new BitBucketPPRPullRequestCreatedActionFilter();
     BitBucketPPRPullRequestTriggerFilter pullRequestTriggerFilter =
-      new BitBucketPPRPullRequestTriggerFilter(pullRequestCreatedActionFilter);
+        new BitBucketPPRPullRequestTriggerFilter(pullRequestCreatedActionFilter);
     triggers.add(pullRequestTriggerFilter);
   }
 
   public void pullRequestUpdatedAction() {
     BitBucketPPRPullRequestUpdatedActionFilter pullRequestUpdatedActionFilter =
-      new BitBucketPPRPullRequestUpdatedActionFilter();
+        new BitBucketPPRPullRequestUpdatedActionFilter();
     BitBucketPPRPullRequestTriggerFilter pullRequestTriggerFilter =
-      new BitBucketPPRPullRequestTriggerFilter(pullRequestUpdatedActionFilter);
+        new BitBucketPPRPullRequestTriggerFilter(pullRequestUpdatedActionFilter);
     triggers.add(pullRequestTriggerFilter);
   }
-  
+
   public void pullRequestMergedAction() {
     BitBucketPPRPullRequestMergedActionFilter pullRequestMegedActionFilter =
         new BitBucketPPRPullRequestMergedActionFilter();
@@ -87,10 +86,11 @@ public class BitBucketPPRHookJobDslContext implements Context {
     triggers.add(pullRequestTriggerFilter);
   }
 
-  public void repositoryServerPushAction(boolean triggerAlsoIfTagPush, boolean triggerAlsoIfNothingChanged, 
-      String allowedBranches) {
+  public void repositoryServerPushAction(boolean triggerAlsoIfTagPush,
+      boolean triggerAlsoIfNothingChanged, String allowedBranches) {
     BitBucketPPRServerRepositoryPushActionFilter repositoryServerPushActionFilter =
-        new BitBucketPPRServerRepositoryPushActionFilter(triggerAlsoIfTagPush, triggerAlsoIfNothingChanged, allowedBranches);
+        new BitBucketPPRServerRepositoryPushActionFilter(triggerAlsoIfTagPush,
+            triggerAlsoIfNothingChanged, allowedBranches);
     BitBucketPPRRepositoryTriggerFilter repositoryServerTriggerFilter =
         new BitBucketPPRRepositoryTriggerFilter(repositoryServerPushActionFilter);
     triggers.add(repositoryServerTriggerFilter);

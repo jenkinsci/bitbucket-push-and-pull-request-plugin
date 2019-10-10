@@ -24,23 +24,18 @@ package io.jenkins.plugins.bitbucketpushandpullrequest;
 
 import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConsts.HOOK_URL;
 import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConsts.USER_AGENT;
-
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import javax.naming.OperationNotSupportedException;
 import javax.servlet.http.HttpServletResponse;
-
 import org.apache.commons.io.IOUtils;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
-
 import com.google.gson.Gson;
-
 import hudson.Extension;
 import hudson.model.UnprotectedRootAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPREvent;
@@ -91,7 +86,8 @@ public class BitBucketPPRHookReceiver implements UnprotectedRootAction {
       if (request.getHeader("x-event-key") != null) {
         try {
           bitbucketEvent = new BitBucketPPREvent(request.getHeader("x-event-key"));
-          logger.log(Level.INFO, () -> "Received x-event-key " + request.getHeader("x-event-key") + " from Bitbucket");
+          logger.log(Level.INFO,
+              () -> "Received x-event-key " + request.getHeader("x-event-key") + " from Bitbucket");
         } catch (OperationNotSupportedException e) {
           logger.warning(e.getMessage());
         }
@@ -110,11 +106,12 @@ public class BitBucketPPRHookReceiver implements UnprotectedRootAction {
           BitBucketPPRPayload payload = gson.fromJson(inputStream,
               BitBucketPPRPayloadFactory.getInstance(bitbucketEvent).getClass());
           logger.fine(() -> "the payload is: " + payload.toString());
-          
+
           BitBucketPPRPayloadProcessor bitbucketPayloadProcessor =
               BitBucketPPRPayloadProcessorFactory.createProcessor(bitbucketEvent);
-          logger.fine(() -> "the selected payload processor is: " + bitbucketPayloadProcessor.toString());
-          
+          logger.fine(
+              () -> "the selected payload processor is: " + bitbucketPayloadProcessor.toString());
+
           bitbucketPayloadProcessor.processPayload(payload);
         } catch (Exception e) {
           logger.warning(e.getMessage());

@@ -21,7 +21,6 @@
 package io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud;
 
 import com.google.gson.annotations.SerializedName;
-
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
 
 

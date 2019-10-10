@@ -26,7 +26,6 @@ import hudson.model.Job;
 import hudson.scm.PollingResult;
 import hudson.util.StreamTaskListener;
 import jenkins.triggers.SCMTriggerItem;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -36,48 +35,52 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class BitBucketPPRPollingRunnable implements Runnable {
-	Job<?, ?> job;
-	File logFile;
+  Job<?, ?> job;
+  File logFile;
 
-	private static final Logger LOGGER = Logger.getLogger(BitBucketPPRPollingRunnable.class.getName());
+  private static final Logger LOGGER =
+      Logger.getLogger(BitBucketPPRPollingRunnable.class.getName());
 
-	BitBucketPPRPollResultListener bitbucketPollResultListener;
+  BitBucketPPRPollResultListener bitbucketPollResultListener;
 
-	public BitBucketPPRPollingRunnable(Job<?, ?> job, File logFile,
-			BitBucketPPRPollResultListener bitbucketPollResultListener) {
-		this.job = job;
-		this.bitbucketPollResultListener = bitbucketPollResultListener;
-		this.logFile = logFile;
-	}
+  public BitBucketPPRPollingRunnable(Job<?, ?> job, File logFile,
+      BitBucketPPRPollResultListener bitbucketPollResultListener) {
+    this.job = job;
+    this.bitbucketPollResultListener = bitbucketPollResultListener;
+    this.logFile = logFile;
+  }
 
-	public void run() {
-		LOGGER.log(Level.INFO, "Run method called.");
+  public void run() {
+    LOGGER.log(Level.INFO, "Run method called.");
 
-		try (StreamTaskListener streamListener = new StreamTaskListener(logFile)) {
-			exec(streamListener);
-		} catch (IOException e) {
-			LOGGER.log(Level.SEVERE, "Failed {0}", e.getMessage());
-		}
-	}
+    try (StreamTaskListener streamListener = new StreamTaskListener(logFile)) {
+      exec(streamListener);
+    } catch (IOException e) {
+      LOGGER.log(Level.SEVERE, "Failed {0}", e.getMessage());
+    }
+  }
 
-	private void exec(StreamTaskListener streamListener) {
-		try {
-			PrintStream logger = streamListener.getLogger();
-			long start = System.currentTimeMillis();
-			logger.println("Started on " + DateFormat.getDateTimeInstance().format(new Date()));
+  private void exec(StreamTaskListener streamListener) {
+    try {
+      PrintStream logger = streamListener.getLogger();
+      long start = System.currentTimeMillis();
+      logger.println("Started on " + DateFormat.getDateTimeInstance().format(new Date()));
 
-			PollingResult pollingResult = SCMTriggerItem.SCMTriggerItems.asSCMTriggerItem(job).poll(streamListener);
-			logger.println("Done. Took " + Util.getTimeSpanString(System.currentTimeMillis() - start));
-			bitbucketPollResultListener.onPollSuccess(pollingResult);
+      PollingResult pollingResult =
+          SCMTriggerItem.SCMTriggerItems.asSCMTriggerItem(job).poll(streamListener);
+      logger.println("Done. Took " + Util.getTimeSpanString(System.currentTimeMillis() - start));
+      bitbucketPollResultListener.onPollSuccess(pollingResult);
 
-		} catch (NullPointerException e) {
-			LOGGER.log(Level.SEVERE, "NullPointerException: Failed to record SCM polling {0}", e.getMessage());
-		} catch (RuntimeException e) {
-			e.printStackTrace(streamListener.error("Failed to record SCM polling"));
-			LOGGER.log(Level.SEVERE, "RuntimeException: Failed to record SCM polling {0}", e.getMessage());
-			bitbucketPollResultListener.onPollError(e);
-		} catch (Exception e) {
-			LOGGER.log(Level.SEVERE, "Failed ", e);
-		}
-	}
+    } catch (NullPointerException e) {
+      LOGGER.log(Level.SEVERE, "NullPointerException: Failed to record SCM polling {0}",
+          e.getMessage());
+    } catch (RuntimeException e) {
+      e.printStackTrace(streamListener.error("Failed to record SCM polling"));
+      LOGGER.log(Level.SEVERE, "RuntimeException: Failed to record SCM polling {0}",
+          e.getMessage());
+      bitbucketPollResultListener.onPollError(e);
+    } catch (Exception e) {
+      LOGGER.log(Level.SEVERE, "Failed ", e);
+    }
+  }
 }

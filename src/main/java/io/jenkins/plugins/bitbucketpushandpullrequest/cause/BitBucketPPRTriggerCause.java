@@ -24,7 +24,6 @@ package io.jenkins.plugins.bitbucketpushandpullrequest.cause;
 
 import java.io.File;
 import java.io.IOException;
-
 import hudson.triggers.SCMTrigger;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
 
@@ -41,7 +40,7 @@ public class BitBucketPPRTriggerCause extends SCMTrigger.SCMTriggerCause {
   public BitBucketPPRAction getAction() {
     return this.bitbucketAction;
   }
-  
+
   @Override
   public int hashCode() {
     final int prime = 31;

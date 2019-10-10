@@ -23,7 +23,6 @@
 package io.jenkins.plugins.bitbucketpushandpullrequest.model.server;
 
 import java.io.Serializable;
-
 import com.google.gson.annotations.SerializedName;
 
 public class BitBucketPPRServerRepository implements Serializable {
@@ -36,7 +35,7 @@ public class BitBucketPPRServerRepository implements Serializable {
   private boolean forkable;
   private BitBucketPPRServerProject project;
   private BitBucketPPRServerLinks links;
-  
+
 
   @SerializedName("public")
   private boolean isPublic;

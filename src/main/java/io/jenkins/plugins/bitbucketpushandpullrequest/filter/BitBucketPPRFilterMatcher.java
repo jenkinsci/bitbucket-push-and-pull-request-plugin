@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.cloud.BitBucketPPRPullRequestTriggerFilter;
 import io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.cloud.BitBucketPPRPullRequestTriggerMatcher;
 import io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.server.BitBucketPPRPullRequestServerTriggerFilter;
@@ -36,41 +35,42 @@ import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPREvent;
 import io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConsts;
 
 public class BitBucketPPRFilterMatcher {
-	private static final Logger LOGGER = Logger.getLogger(BitBucketPPRFilterMatcher.class.getName());
+  private static final Logger LOGGER = Logger.getLogger(BitBucketPPRFilterMatcher.class.getName());
 
-	public List<BitBucketPPRTriggerFilter> getMatchingFilters(BitBucketPPREvent event,
-			List<BitBucketPPRTriggerFilter> triggerFilterList) {
-		List<BitBucketPPRTriggerFilter> filteredList = new ArrayList<>();
+  public List<BitBucketPPRTriggerFilter> getMatchingFilters(BitBucketPPREvent event,
+      List<BitBucketPPRTriggerFilter> triggerFilterList) {
+    List<BitBucketPPRTriggerFilter> filteredList = new ArrayList<>();
 
-		if (triggerFilterList != null) {
-			for (BitBucketPPRTriggerFilter triggerFilter : triggerFilterList) {
-				if (matchesEventAndAction(event, triggerFilter)) {
-					filteredList.add(triggerFilter);
-					LOGGER.log(Level.INFO, "Event {0} matches trigger filter {1}",
-							new Object[] { event, triggerFilter });
-				} else {
-					LOGGER.log(Level.INFO, "Event {0} doesnt match trigger filter {1}",
-							new Object[] { event, triggerFilter });
-				}
+    if (triggerFilterList != null) {
+      for (BitBucketPPRTriggerFilter triggerFilter : triggerFilterList) {
+        if (matchesEventAndAction(event, triggerFilter)) {
+          filteredList.add(triggerFilter);
+          LOGGER.log(Level.INFO, "Event {0} matches trigger filter {1}",
+              new Object[] {event, triggerFilter});
+        } else {
+          LOGGER.log(Level.INFO, "Event {0} doesnt match trigger filter {1}",
+              new Object[] {event, triggerFilter});
+        }
 
-			}
-		}
+      }
+    }
 
-		return filteredList;
-	}
+    return filteredList;
+  }
 
-	private boolean matchesEventAndAction(BitBucketPPREvent event, BitBucketPPRTriggerFilter triggerFilter) {
-		if (BitBucketPPRConsts.PULL_REQUEST_EVENT.equalsIgnoreCase(event.getEvent())
-				&& triggerFilter instanceof BitBucketPPRPullRequestTriggerFilter) {
-			return new BitBucketPPRPullRequestTriggerMatcher().matchesAction(event, triggerFilter);
-		} else if (BitBucketPPRConsts.PULL_REQUEST_SERVER_EVENT.equalsIgnoreCase(event.getEvent())
-				&& triggerFilter instanceof BitBucketPPRPullRequestServerTriggerFilter) {
-			return new BitBucketPPRPullRequestServerTriggerMatcher().matchesAction(event, triggerFilter);
-		} else if (BitBucketPPRConsts.REPOSITORY_EVENT.equalsIgnoreCase(event.getEvent())
-				&& triggerFilter instanceof BitBucketPPRRepositoryTriggerFilter) {
-			return new BitBucketPPRRepositoryTriggerMatcher().matchesAction(event, triggerFilter);
-		}
+  private boolean matchesEventAndAction(BitBucketPPREvent event,
+      BitBucketPPRTriggerFilter triggerFilter) {
+    if (BitBucketPPRConsts.PULL_REQUEST_EVENT.equalsIgnoreCase(event.getEvent())
+        && triggerFilter instanceof BitBucketPPRPullRequestTriggerFilter) {
+      return new BitBucketPPRPullRequestTriggerMatcher().matchesAction(event, triggerFilter);
+    } else if (BitBucketPPRConsts.PULL_REQUEST_SERVER_EVENT.equalsIgnoreCase(event.getEvent())
+        && triggerFilter instanceof BitBucketPPRPullRequestServerTriggerFilter) {
+      return new BitBucketPPRPullRequestServerTriggerMatcher().matchesAction(event, triggerFilter);
+    } else if (BitBucketPPRConsts.REPOSITORY_EVENT.equalsIgnoreCase(event.getEvent())
+        && triggerFilter instanceof BitBucketPPRRepositoryTriggerFilter) {
+      return new BitBucketPPRRepositoryTriggerMatcher().matchesAction(event, triggerFilter);
+    }
 
-		return false;
-	}
+    return false;
+  }
 }
