@@ -1,7 +1,6 @@
 package io.jenkins.plugins.bitbucketpushandpullrequest.processor;
 
 import javax.annotation.Nonnull;
-
 import io.jenkins.plugins.bitbucketpushandpullrequest.BitBucketPPRJobProbe;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRServerRepositoryAction;

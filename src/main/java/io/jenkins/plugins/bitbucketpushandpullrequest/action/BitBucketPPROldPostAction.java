@@ -23,9 +23,7 @@
 package io.jenkins.plugins.bitbucketpushandpullrequest.action;
 
 import java.util.logging.Logger;
-
 import javax.annotation.Nonnull;
-
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.old.BitBucketPPROldRepository;
 

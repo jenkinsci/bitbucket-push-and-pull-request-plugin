@@ -26,9 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import javax.annotation.Nonnull;
-
 import hudson.EnvVars;
 import hudson.model.EnvironmentContributingAction;
 import hudson.model.InvisibleAction;
@@ -43,7 +41,8 @@ public class BitBucketPPRAction extends InvisibleAction implements EnvironmentCo
   protected String scm;
   protected String user;
   protected List<String> scmUrls = new ArrayList<>(2);
-  protected String branchName;
+  protected String sourceBranchName = null;
+  protected String targetBranchName = null;
   protected String type;
   protected String repositoryName;
   protected String pullRequestId;
@@ -73,8 +72,12 @@ public class BitBucketPPRAction extends InvisibleAction implements EnvironmentCo
     return user;
   }
 
-  public String getBranchName() {
-    return branchName;
+  public String getSourceBranch() {
+    return sourceBranchName;
+  }
+
+  public String getTargetBranch() {
+    return targetBranchName;
   }
 
   public String getType() {
@@ -96,7 +99,7 @@ public class BitBucketPPRAction extends InvisibleAction implements EnvironmentCo
   public String getRepositoryUuid() {
     return repositoryUuid;
   }
-  
+
   @Override
   public void buildEnvironment(@Nonnull Run<?, ?> run, @Nonnull EnvVars env) {
     env.put("BITBUCKET_PAYLOAD", payload.toString());
@@ -106,8 +109,8 @@ public class BitBucketPPRAction extends InvisibleAction implements EnvironmentCo
   @Override
   public String toString() {
     return "BitBucketPPRAction [payload=" + payload + ", scm=" + scm + ", user=" + user
-        + ", scmUrls=" + scmUrls + ", branchName=" + branchName + ", type=" + type
-        + ", repositoryName=" + repositoryName + ", pullRequestId=" + pullRequestId
-        + ", repositoryUuid=" + repositoryUuid + "]";
+        + ", scmUrls=" + scmUrls + ", sourceBranchName=" + sourceBranchName + ", targetBranchName="
+        + targetBranchName + ", type=" + type + ", repositoryName=" + repositoryName
+        + ", pullRequestId=" + pullRequestId + ", repositoryUuid=" + repositoryUuid + "]";
   }
 }

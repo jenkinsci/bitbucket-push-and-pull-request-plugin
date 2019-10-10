@@ -24,7 +24,6 @@ package io.jenkins.plugins.bitbucketpushandpullrequest.filter;
 
 import java.io.File;
 import java.io.IOException;
-
 import hudson.model.AbstractDescribableImpl;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.cause.BitBucketPPRTriggerCause;
@@ -34,8 +33,8 @@ public abstract class BitBucketPPRTriggerFilter
     extends AbstractDescribableImpl<BitBucketPPRTriggerFilter> {
   public abstract boolean shouldScheduleJob(BitBucketPPRAction bitbucketAction);
 
-  public abstract BitBucketPPRTriggerCause getCause(File pollingLog,
-      BitBucketPPRAction action) throws IOException;
+  public abstract BitBucketPPRTriggerCause getCause(File pollingLog, BitBucketPPRAction action)
+      throws IOException;
 
   public abstract AbstractDescribableImpl<?> getActionFilter();
 

@@ -4,11 +4,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import javax.annotation.Nonnull;
-
 import com.google.gson.Gson;
-
 import hudson.EnvVars;
 import hudson.Extension;
 import hudson.model.Cause;
@@ -40,7 +37,7 @@ public class BitBucketPPREnvironmentContributor extends EnvironmentContributor {
     for (Cause cause : causes) {
       if (cause instanceof BitBucketPPRPullRequestCause) {
         setEnvVarsForCloudPullRequest(envVars, (BitBucketPPRPullRequestCause) cause);
-      }  else if (cause instanceof BitBucketPPRPullRequestServerCause) {
+      } else if (cause instanceof BitBucketPPRPullRequestServerCause) {
         setEnvVarsForServerPullRequest(envVars, (BitBucketPPRPullRequestServerCause) cause);
       } else if (cause instanceof BitBucketPPRRepositoryCause) {
         try {
@@ -65,9 +62,9 @@ public class BitBucketPPREnvironmentContributor extends EnvironmentContributor {
     putEnvVar(envVars, "REPOSITORY_LINK", urlBranchDeprecated);
     LOGGER.log(Level.FINEST, "Injecting REPOSOTORY_LINK: {0}", urlBranchDeprecated);
 
-    String sourceBranch = cause.getRepositoryPayLoad().getBranchName();
-    putEnvVar(envVars, "BITBUCKET_SOURCE_BRANCH", sourceBranch);
-    LOGGER.log(Level.FINEST, "Injecting BITBUCKET_SOURCE_BRANCH: {0}", sourceBranch);
+    String targetBranch = cause.getRepositoryPayLoad().getTargetBranch();
+    putEnvVar(envVars, "BITBUCKET_SOURCE_BRANCH", targetBranch);
+    LOGGER.log(Level.FINEST, "Injecting BITBUCKET_SOURCE_BRANCH: {0}", targetBranch);
 
     String urlBranch = cause.getRepositoryPayLoad().getRepositoryUrl();
     putEnvVar(envVars, "BITBUCKET_REPOSITORY_URL", urlBranch);
@@ -95,8 +92,9 @@ public class BitBucketPPREnvironmentContributor extends EnvironmentContributor {
     putEnvVar(envVars, "BITBUCKET_PULL_REQUEST_ID", pullRequestId);
     LOGGER.log(Level.FINEST, "Injecting BITBUCKET_PULL_REQUEST_ID: {0}", pullRequestId);
   }
-  
-  private void setEnvVarsForServerPullRequest(EnvVars envVars, BitBucketPPRPullRequestServerCause cause) {
+
+  private void setEnvVarsForServerPullRequest(EnvVars envVars,
+      BitBucketPPRPullRequestServerCause cause) {
     String pullRequestSourceBranch = cause.getPullRequestPayLoad().getSourceBranch();
     putEnvVar(envVars, "BITBUCKET_SOURCE_BRANCH", pullRequestSourceBranch);
     LOGGER.log(Level.FINEST, "Injecting BITBUCKET_SOURCE_BRANCH: {0}", pullRequestSourceBranch);

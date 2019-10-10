@@ -1,7 +1,6 @@
 package io.jenkins.plugins.bitbucketpushandpullrequest.model.server;
 
 import java.io.Serializable;
-
 import com.google.gson.annotations.SerializedName;
 
 

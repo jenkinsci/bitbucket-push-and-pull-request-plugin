@@ -24,9 +24,7 @@ package io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.server
 
 import java.io.File;
 import java.io.IOException;
-
 import org.kohsuke.stapler.DataBoundConstructor;
-
 import hudson.Extension;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.cause.BitBucketPPRTriggerCause;
@@ -53,7 +51,8 @@ public class BitBucketPPRPullRequestServerCreatedActionFilter
   }
 
   @Extension
-  public static class ActionFilterDescriptorImpl extends BitBucketPPRPullRequestServerActionDescriptor {
+  public static class ActionFilterDescriptorImpl
+      extends BitBucketPPRPullRequestServerActionDescriptor {
 
     @Override
     public String getDisplayName() {

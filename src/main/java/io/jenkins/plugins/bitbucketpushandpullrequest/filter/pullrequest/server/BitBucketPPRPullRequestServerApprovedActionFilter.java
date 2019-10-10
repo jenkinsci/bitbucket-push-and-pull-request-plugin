@@ -23,14 +23,11 @@
 package io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.server;
 
 import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConsts.PULL_REQUEST_REVIEWER;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.logging.Logger;
-
 import org.kohsuke.stapler.DataBoundConstructor;
-
 import hudson.Extension;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.cause.BitBucketPPRTriggerCause;
@@ -39,14 +36,16 @@ import io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.cloud.B
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud.BitBucketPPRParticipant;
 
-public class BitBucketPPRPullRequestServerApprovedActionFilter extends BitBucketPPRPullRequestServerActionFilter {
+public class BitBucketPPRPullRequestServerApprovedActionFilter
+    extends BitBucketPPRPullRequestServerActionFilter {
   private static final Logger LOGGER =
       Logger.getLogger(BitBucketPPRPullRequestApprovedActionFilter.class.getName());
 
   public boolean triggerOnlyIfAllReviewersApproved;
 
   @DataBoundConstructor
-  public BitBucketPPRPullRequestServerApprovedActionFilter(boolean triggerOnlyIfAllReviewersApproved) {
+  public BitBucketPPRPullRequestServerApprovedActionFilter(
+      boolean triggerOnlyIfAllReviewersApproved) {
     this.triggerOnlyIfAllReviewersApproved = triggerOnlyIfAllReviewersApproved;
   }
 
@@ -58,7 +57,7 @@ public class BitBucketPPRPullRequestServerApprovedActionFilter extends BitBucket
     }
 
     return true;
-  } 
+  }
 
   @Override
   public BitBucketPPRTriggerCause getCause(File pollingLog, BitBucketPPRAction pullRequestAction)
@@ -67,7 +66,8 @@ public class BitBucketPPRPullRequestServerApprovedActionFilter extends BitBucket
   }
 
   @Extension
-  public static class ActionFilterDescriptorImpl extends BitBucketPPRPullRequestServerActionDescriptor {
+  public static class ActionFilterDescriptorImpl
+      extends BitBucketPPRPullRequestServerActionDescriptor {
 
     @Override
     public String getDisplayName() {

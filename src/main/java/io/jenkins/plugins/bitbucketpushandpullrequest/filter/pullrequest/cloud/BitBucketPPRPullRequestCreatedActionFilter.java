@@ -29,34 +29,36 @@ import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.cause.BitBucketPPRTriggerCause;
 import io.jenkins.plugins.bitbucketpushandpullrequest.cause.pullrequest.cloud.BitBucketPPRPullRequestCreatedCause;
 
-public class BitBucketPPRPullRequestCreatedActionFilter extends BitBucketPPRPullRequestActionFilter {
+public class BitBucketPPRPullRequestCreatedActionFilter
+    extends BitBucketPPRPullRequestActionFilter {
 
-	@DataBoundConstructor
-	public BitBucketPPRPullRequestCreatedActionFilter() {
-	}
+  @DataBoundConstructor
+  public BitBucketPPRPullRequestCreatedActionFilter() {}
 
-	@Override
-	public boolean shouldTriggerBuild(BitBucketPPRAction bitbucketAction) {
-		return true;
-	}
+  @Override
+  public boolean shouldTriggerBuild(BitBucketPPRAction bitbucketAction) {
+    return true;
+  }
 
-	@Override
-	public BitBucketPPRTriggerCause getCause(File pollingLog, BitBucketPPRAction pullRequestAction) throws IOException {
-		return new BitBucketPPRPullRequestCreatedCause(pollingLog, pullRequestAction);
-	}
+  @Override
+  public BitBucketPPRTriggerCause getCause(File pollingLog, BitBucketPPRAction pullRequestAction)
+      throws IOException {
+    return new BitBucketPPRPullRequestCreatedCause(pollingLog, pullRequestAction);
+  }
 
-	@Extension
-	public static class ActionFilterDescriptorImpl extends BitBucketPPRPullRequestActionDescriptor {
+  @Extension
+  public static class ActionFilterDescriptorImpl extends BitBucketPPRPullRequestActionDescriptor {
 
-		@Override
-		public String getDisplayName() {
-			return "Created";
-		}
-	}
+    @Override
+    public String getDisplayName() {
+      return "Created";
+    }
+  }
 
-	@Override
-	public String toString() {
-		return "BitBucketPPRPullRequestCreatedActionFilter [getDescriptor()=" + getDescriptor() + ", getClass()="
-				+ getClass() + ", hashCode()=" + hashCode() + ", toString()=" + super.toString() + "]";
-	}
+  @Override
+  public String toString() {
+    return "BitBucketPPRPullRequestCreatedActionFilter [getDescriptor()=" + getDescriptor()
+        + ", getClass()=" + getClass() + ", hashCode()=" + hashCode() + ", toString()="
+        + super.toString() + "]";
+  }
 }

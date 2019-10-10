@@ -25,9 +25,7 @@ package io.jenkins.plugins.bitbucketpushandpullrequest.filter.repository;
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.Logger;
-
 import org.kohsuke.stapler.DataBoundConstructor;
-
 import hudson.EnvVars;
 import hudson.Extension;
 import hudson.plugins.git.BranchSpec;
@@ -68,7 +66,7 @@ public class BitBucketPPRRepositoryPushActionFilter extends BitBucketPPRReposito
       return false;
     }
 
-    return matches(bitbucketAction.getBranchName());
+    return matches(bitbucketAction.getTargetBranch());
   }
 
   protected boolean matches(String branchName) {
@@ -93,9 +91,9 @@ public class BitBucketPPRRepositoryPushActionFilter extends BitBucketPPRReposito
   public boolean matches(String branchName, EnvVars env) {
     logger.info(() -> "Following allowed branches patterns are set: " + allowedBranches);
     logger.info(() -> "The branchName in action is: " + branchName);
-    
+
     String[] branchSpecs = allowedBranches.split(",");
-    
+
     for (String branchSpec : branchSpecs) {
       BranchSpec pattern = new BranchSpec(branchSpec.trim());
 
@@ -124,7 +122,7 @@ public class BitBucketPPRRepositoryPushActionFilter extends BitBucketPPRReposito
   public void setAllowedBranches(String allowedBranches) {
     this.allowedBranches = allowedBranches;
   }
-  
+
   @Override
   public boolean shouldTriggerAlsoIfNothingChanged() {
     return triggerAlsoIfNothingChanged;
