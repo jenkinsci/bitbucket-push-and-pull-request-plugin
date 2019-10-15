@@ -6,7 +6,7 @@
 **Implemented enhancements:**
 - Added checkbox to define if changes on the repos have to be confirmed through the git plugin before starting a job triggered by a push 
 - Added pull request support for Mercurial on Bitbucket Cloud
-- Addes upport for multiple triggers
+- Added support for multiple triggers
 
 **Merged pull requests:**
 - #60 change pull request 59 and reformatting by cdelmonte-zg
