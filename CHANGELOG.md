@@ -1,5 +1,20 @@
 # Change Log
 
+## 2.2.0 (2019-10-14)
+[Full Changelog](https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/compare/bitbucket-push-and-pull-request-2.0.0...bitbucket-push-and-pull-request-2.2.0)
+
+**Implemented enhancements:**
+- Added checkbox to define if changes on the repos have to be confirmed through the git plugin before starting a job triggered by a push 
+- Added pull request support for Mercurial on Bitbucket Cloud
+
+**Merged pull requests:**
+- #60 change pull request 59 and reformatting by cdelmonte-zg
+- #59 adding logic to trigger target branch on merge by raghav-a
+- #58 an option for repository hasChange() conditional behaviour by cdelmonte-zg
+- #55 workflows: implement isPipelineMultibranch check by macghriogair 
+- #51 Job DSL multiple triggers by rhotau
+- #50 Support for multiple triggers from dsl by rhotau
+
 ## 2.0.0 (2019-06-25)
 [Full Changelog](https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/compare/bitbucket-push-and-pull-request-1.6.4...bitbucket-push-and-pull-request-2.0.0)
 
