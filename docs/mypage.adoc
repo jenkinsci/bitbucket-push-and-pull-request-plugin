@@ -1,0 +1,469 @@
+ 
+
+....
+....
+
+[width="100%",cols="100%",]
+|====================================================
+a|
+....
+{jenkins-plugin-info:bitbucket-push-and-pull-request}
+....
+
+|====================================================
+
+[width="100%",cols="100%",]
+|=======================================================================
+a|
+{empty}1) This plugin requires a Jenkins v2.138.2 or later and supports
+
+* Bitbucket Cloud rest api v2.x+ and later
+* Bitbucket Server 5.14+ and later
+
+{empty}2) This plugin will not work if the previous Bitbucket plugin 
+(https://plugins.jenkins.io/bitbucket) is installed.
+
+{empty}3) *warning:* After updating the plugin from a version prior to
+the 2.x.x, the jobs with a pull request need to be reconfigured,
+reselecting once again, from the plugin conf. pane, the pull request
+event, that will trigger the build.
+
+|=======================================================================
+
+ +
+
+Plugin for Jenkins *v2.138.2 or later*, that triggers builds on
+Bitbucket's push and pull requests. It's based on the Sazo's fork
+(https://github.com/sazo/bitbucket-plugin) of the official Bitbucket
+Plugin (https://plugins.jenkins.io/bitbucket).
+
+The new features introduced by Bitbucket Push and Pull Request are:
+
+* improved support of pushs for Bitbucket Cloud (rest api v2.x+ with git
+and mercurial) and Bitbucket Server (5.14+ with git)
+* support of pull requests for Bitbucket Cloud (rest api v2.x+ with git
+and mercurial) and Bitbucket Server (5.14+ with git)
+* usage of Gson instead of net.sf.json.JSONObject (blacklisted starting
+from Jenkins 2.102+)
+* Introduction of Models and security improvements
+
+ +
+This plugin supports:
+
+* **push and pull requests* for Bitbucket cloud rest api v2.x+ and later
+and for* *for Bitbucket server 5.14+ and later +
+*
+
+Configuration
+-------------
+
+*Before you start...*
+
+*Bitbucket Push And Pull Request Plugin* ** will not work if the
+Bitbucket plugin  (https://plugins.jenkins.io/bitbucket) is still
+installed. So, please de-install the previous Bitbucket plugin if you
+want to use this new one. +
+
+*Configure the webhook*
+
+In case you are using *Bitbucket Cloud*, configure your Bitbucket
+repository adding a *webhook in the settings page.* In the URL field
+(see image, point A) add your JENKINS_URL followed by "/bitbucket-hook/"
+(for example
+"https://my-jenkins.on-my-planet-far-away.com/bitbucket-hook/")
+Credentials for the webhook endpoint are not required, the trailing
+slash is mandatory. For more infos please consult the resource
+https://confluence.atlassian.com/bitbucket/manage-webhooks-735643732.html.
+
+If you are using *Bitbucket Server*, follow these instructions:
+https://confluence.atlassian.com/bitbucketserver/managing-webhooks-in-bitbucket-server-938025878.html
+
+*Configure your Jenkins job*
+
+1.a. Configure the Bitbucket Repository under the Source Code Management
+with your credentials. For *git*:
+
+image:.//b7fc82d417c72eb80f3c22945214709bf5295d66.png[image,title="Jenkins > Bitbucket Push And Pull Request Plugin > Screenshot_push-and-pull-request-2.png",width=600]
+
+ +
+
+1.b. In case you are using *Mercurial* instead of git, configure it as
+follows:
+
+ +
+
+image:.//a83313a918370e7a399e2f7a02f0edb450ed048b.png[image,title="Jenkins > Bitbucket Push And Pull Request Plugin > Screenshot_2019-06-19 pipeline nofilter push mercurial cloud bitbucket Config [Jenkins].png",width=600]
+
+_Please note: the branch, related to the events which trigger the
+builds, must be specified in the field Revision. +
+_
+
+ +
+
+{empty}2. Now activate the plugin in your job selecting the "Build with
+Bitbucket Push and Pull Request Plugin" option in the Build Triggers
+pane.
+
+image:.//25de6f8dfbf5548d06d2ac4605f20501193b1b63.png[image,title="Jenkins > Bitbucket Push And Pull Request Plugin > Screenshot_2019-06-19 pipeline filter push cloud bitbucket Config [Jenkins](1).png",width=600]
+
+ +
+
+Environment variables
+---------------------
+
+Environment variables for Bitbucket Cloud and Server pull requests
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+[cols=",",options="header",]
+|=========================================
+|NAME |VALUE
+|BITBUCKET_SOURCE_BRANCH |source branch
+|BITBUCKET_TARGET_BRANCH |target branch
+|BITBUCKET_PULL_REQUEST_LINK |link
+|BITBUCKET_PULL_REQUEST_ID |id
+|BITBUCKET_PAYLOAD |payload as json string
+|=========================================
+
+Environment variables for Bitbucket Cloud pushs
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+[cols=",",options="header",]
+|==========================================================
+|NAME |VALUE
+|REPOSITORY_LINK |_branch (Deprecated. It will be removed)_
+|BITBUCKET_SOURCE_BRANCH |branch
+|BITBUCKET_REPOSITORY_URL |repository url
+|BITBUCKET_PAYLOAD |payload as json string
+|==========================================================
+
+Code snippets
+-------------
+
+ +
+
+[width="100%",cols="100%",]
+|=======================================================================
+a|
+....
+job('example-pull-request-created') {
+    triggers{
+        bitbucketPullRequestCreatedAction()
+    }
+    scm {
+        git {
+            remote {
+                url("https://git.company.domain/scm/~username/telegram.git")
+            }
+        }
+    }
+    steps {
+        shell('echo START pull request created')
+    }
+}
+
+job('example-pull-request-updated') {
+    triggers{
+        bitbucketPullRequestUpdatedAction()
+    }
+    scm {
+        git {
+            remote {
+                url("https://git.company.domain/scm/~username/telegram.git")
+            }
+        }
+    }
+    steps {
+        shell('echo START pull request updated')
+    }
+}
+
+// bitbucketPullRequestApprovedAction(boolean onlyIfReviewersApproved)
+job('example-pull-request-approved') {
+    triggers{
+        bitbucketPullRequestApprovedAction(false)
+    }
+    scm {
+        git {
+            remote {
+                url("https://git.company.domain/scm/~username/telegram.git")
+            }
+        }
+    }
+    steps {
+        shell('echo START pull request approved')
+    }
+}
+
+// bitbucketRepositoryPushAction(boolean triggerAlsoIfTagPush, String allowedBranches)
+job('example-push') {
+    triggers{
+        bitbucketRepositoryPushAction(false, "")
+    }
+    scm {
+        git {
+            remote {
+                url("https://git.company.domain/scm/~username/telegram.git")
+            }
+        }
+    }
+    steps {
+        shell('echo START push')
+    }
+}
+....
+
+|=======================================================================
+
+[width="100%",cols="100%",]
+|=======================================================================
+a|
+....
+properties([
+    pipelineTriggers([
+        [
+            $class: 'BitBucketPPRTrigger',
+            triggers : [
+                [
+                    $class: 'BitBucketPPRPullRequestTriggerFilter',
+                    actionFilter: [
+                        $class: 'BitBucketPPRPullRequestCreatedActionFilter'
+                    ]
+                ]
+            ]
+        ]
+    ])
+])
+node {
+    def sourceBranch = ""
+        def targetBranch = ""
+        try{
+            sourceBranch = "${BITBUCKET_SOURCE_BRANCH}";
+            targetBranch = "${BITBUCKET_TARGET_BRANCH}";
+        }catch(e){}
+
+        if(sourceBranch == ""){
+            sourceBranch = 'development'
+        }
+
+        if(targetBranch == ""){
+            targetBranch = 'master'
+        }
+
+        checkout changelog: true, poll: true, scm: [
+            $class: 'GitSCM',
+            branches: [
+                [name: '*/'+sourceBranch]
+            ],
+            doGenerateSubmoduleConfigurations: false,
+            extensions: [
+                 [
+                    $class: 'PreBuildMerge',
+                    options: [
+                        fastForwardMode: 'FF',
+                        mergeRemote: 'origin',
+                        mergeStrategy: 'recursive',
+                        mergeTarget: ''+targetBranch
+                    ]
+                ]
+            ],
+            submoduleCfg: [],
+            userRemoteConfigs: [
+                [
+                    url: 'https://[user]@bitbucket.org/[org]/[repo].git']
+                ]
+            ]
+
+
+        echo 'Some build steps'
+
+}
+....
+
+|=======================================================================
+
+ +
+
+Change Log
+----------
+
+2.2.0 (2019-10-14)
+~~~~~~~~~~~~~~~~~~
+
+https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/compare/bitbucket-push-and-pull-request-2.0.0...bitbucket-push-and-pull-request-2.2.0[Full
+Changelog]
+
+*Implemented enhancements:*
+
+* Added checkbox to define if changes on the repos have to be confirmed
+through the git plugin before starting a job triggered by a push
+* Added pull request support for Mercurial on Bitbucket Cloud
+
+*Merged pull requests:*
+
+* #60 change pull request #59 and reformatting by cdelmonte-zg
+* #59 adding logic to trigger target branch on merge by raghav-a
+* #58 an option for repository hasChange() conditional behaviour by
+cdelmonte-z
+* #55 workflows: implement isPipelineMultibranch check by macghriogair
+* #51 Job DSL multiple triggers by rhotau
+* #50 Support for multiple triggers from dsl by rhotau
+
+2.0.0 (2019-06-25)
+~~~~~~~~~~~~~~~~~~
+
+https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/compare/bitbucket-push-and-pull-request-1.6.4...bitbucket-push-and-pull-request-2.0.0[Full
+Changelog]
+
+*Implemented enhancements:*
+
+* Added pull request support for Bitbucket Server - Added pull request
+support for Mercurial on Bitbucket Cloud
+
+*Closed issues:*
+
+* Issue #44 Branch expression matching before triggering the build:
+expecting fix for Bitbucket Server bug
+* Issue #37 Jenkins build triggered from push event with Mercurial
+instead of git enhancement
+
+*Merged pull requests:* 
+
+* #49 Add warnings
+* #48 [Enhancement] Add pull request support for Bitbucket Server and
+Mercurial on Bitbucket Cloud
+
+1.6.4 (2019-06-19)
+~~~~~~~~~~~~~~~~~~
+
+https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/compare/bitbucket-push-and-pull-request-1.6.3...bitbucket-push-and-pull-request-1.6.4[Full
+Changelog]
+
+*Closed issues:*
+
+* Issue #38 BITBUCKET__SOURCE__BRANCH has wrong value for repo:push
+events 
+* Issue #36 Branch expression matching before triggering the build
+
+*Merged pull requests:*
+
+* [fix] #47 Develop
+* [fix] #46 Improving tests for allowed branches 
+* [fix] #45 Develop
+
+1.6.3 (2019-06-14)
+~~~~~~~~~~~~~~~~~~
+
+https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/compare/bitbucket-push-and-pull-request-1.6.2...bitbucket-push-and-pull-request-1.6.3[Full
+Changelog]
+
+*Closed issues:*
+
+* Issue #36 Branch expression matching before triggering the build
+* Issue #30 Version 1.6.2 throws exception after receiving PR payload
+bug
+* Issue #27 Builds not triggering with 1.6.1 and Bitbucket Server 7.0.1
+bug
+* Issue #26 Add environment variable for git repository url
+
+*Merged pull requests:*
+
+* [fix] #41 BranchSpec pattern matching directions (by macghriogair)
+* [enhancement] #34 Create CODE__OF__CONDUCT.md (by eiriarte-mendez)
+
+1.6.2 (2019-05-10)
+~~~~~~~~~~~~~~~~~~
+
+https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/compare/bitbucket-push-and-pull-request-1.6.1...bitbucket-push-and-pull-request-1.6.2[Full
+Changelog]
+
+*Closed issues:*
+
+* Issue #27 Builds not triggering with 1.6.1 and Bitbucket Server 7.0.1
+bug
+
+*Merged pull requests:*
+
+* [Bug] #27 Builds not triggering with 1.6.1 and Bitbucket Server 7.0.1
+#28
+
+1.6.1 (2019-05-08)
+~~~~~~~~~~~~~~~~~~
+
+https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/compare/bitbucket-push-and-pull-request-1.6.0...bitbucket-push-and-pull-request-1.6.1[Full
+Changelog]
+
+*Implemented enhancements:*
+
+* added more enviroment variables and improved the documentation abotu
+them
+
+*Closed issues:*
+
+* Improvements#24 Add environment variable for pull request id
+* Issue#19 Webhook not triggering
+* Improvements#11 BITBUCKET_SOURCE_BRANCH is not injected for SCM poll
+
+*Merged pull requests:*
+
+* [develop] Enhance environment variables #25
+
+1.6.0 (2019-04-29)
+~~~~~~~~~~~~~~~~~~
+
+https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/compare/bitbucket-push-and-pull-request-1.5.0...bitbucket-push-and-pull-request-1.6.0[Full
+Changelog]
+
+*Implemented enhancements:*
+
+* split methods of
+io.jenkins.plugins.bitbucketpushandpullrequest.BitBucketPPRJobProbe to
+allow unit tests
+
+*Closed issues:*
+
+* Improvements#20 Add trigger for pull request merged
+* Improvements#14 Pattern for allowed branches
+* Improvements#5 Improve support for BitBucket Server push
+
+*Merged pull requests:*
+
+* [develop] Remove deprecated username field from payload #17 by
+macghriogair
+* [develop] add support for pattern matching on branches #18 by
+macghriogair
+* [develop] Add support for merged pull requests #21 by cdelmonte-zg
+
+1.5.0 (2019-04-11)
+~~~~~~~~~~~~~~~~~~
+
+https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/compare/master@%7B20days%7D...master[Full
+Changelog]
+
+*Implemented enhancements:*
+
+* split methods of
+io.jenkins.plugins.bitbucketpushandpullrequest.BitBucketPPRJobProbe to
+allow unit tests
+
+*Closed issues:*
+
+* Improvements#10 add ssh uri matching for git clone
+* Improvements#12 No change-logs or description of features
+* Improvements#5 Improve support for BitBucket Server push
+
+*Merged pull requests:*
+
+* [dev] gitignore more project specific entries
+https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/pull/13[#13]
+by macghriogair
+
+ +
+
+Issues
+------
+
+image:.//80aa1f0b2a9410656c8cdd6df9d6ad94eaf19336.jpg[image]
+
+ +
+
+ 
