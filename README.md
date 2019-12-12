@@ -50,8 +50,6 @@ Bitbucket Push And Pull Request Plugin will not work if the old Bitbucket plugin
 # Roadmap
 - Build Status propagation, cf. #23
 - Approve Pull Request on successful build, cf. #29
-- Trigger via Pipeline DSL
-- Multi-branch pipelines support
 
 
 # Dsl Job snippets
@@ -136,7 +134,7 @@ job('example-pull-request-merged') {
 job('example-push') {
   	triggers{
 		bitbucketTriggers {
-			repositoryPushAction(false, "")
+			repositoryPushAction(false, true, "")
 		}
   	}
   	scm {
@@ -174,7 +172,7 @@ job('example-pull-request-created-updated') {
 
 
 # Pipeline script
-Example of pipeline code for building on pull-request create event. It merge from source to target in the PR.
+Example of pipeline code for building on pull-request and push  events.
 
 ```
 properties([
@@ -211,7 +209,8 @@ properties([
                     actionFilter: [
                         $class: 'BitBucketPPRRepositoryPushActionFilter',
                         triggerAlsoIfNothingChanged: true, 
-                        triggerAlsoIfTagPush: false
+                        triggerAlsoIfTagPush: false,
+			allowedBranches: ""
                     ]
                 ]
             ]
