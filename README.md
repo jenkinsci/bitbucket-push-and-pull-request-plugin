@@ -50,7 +50,7 @@ Bitbucket Push And Pull Request Plugin will not work if the old Bitbucket plugin
 # Roadmap
 - Build Status propagation, cf. #23
 - Approve Pull Request on successful build, cf. #29
-- Filter branches for builds triggered through Pull Request 
+- Filter source branches for builds triggered through Pull Request, cf. #61 
 
 
 # Dsl Job snippets
