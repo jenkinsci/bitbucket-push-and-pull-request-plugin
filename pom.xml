@@ -141,7 +141,7 @@
 
 	</dependencies>
 
-	<url>https://wiki.jenkins.io/display/JENKINS/Bitbucket+Push+And+Pull+Request+Plugin</url>
+	<url>https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin</url>
 
 	<scm>
 		<connection>scm:git:git://github.com/jenkinsci/${project.artifactId}-plugin.git</connection>
