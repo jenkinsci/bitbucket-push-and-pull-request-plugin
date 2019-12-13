@@ -4,7 +4,7 @@
 [![Contributors](https://img.shields.io/github/contributors/jenkinsci/bitbucket-push-and-pull-request-plugin.svg)](https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/graphs/contributors)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/fa86435d30714d0a895222aa9e8e95de)](https://www.codacy.com/manual/cdelmonte-zg/bitbucket-push-and-pull-request-plugin?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=jenkinsci/bitbucket-push-and-pull-request-plugin&amp;utm_campaign=Badge_Grade)
 [![Jenkins Plugin](https://img.shields.io/jenkins/plugin/v/bitbucket-push-and-pull-request.svg)](https://plugins.jenkins.io/bitbucket-push-and-pull-request)
-[![GitHub release](https://img.shields.io/github/release/jenkinsci/bitbucket-push-and-pull-request-plugin.svg?label=changelog)](https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/releases/2.2.0)
+[![GitHub release](https://img.shields.io/github/release/jenkinsci/bitbucket-push-and-pull-request-plugin.svg?label=changelog)](https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/releases/latest)
 [![Jenkins Plugin Installs](https://img.shields.io/jenkins/plugin/i/bitbucket-push-and-pull-request.svg?color=blue)](https://plugins.jenkins.io/bitbucket-push-and-pull-request)
 [![Gitter](https://badges.gitter.im/jenkinsci/bitbucket-push-and-pull-request-plugin.svg)](https://gitter.im/jenkinsci/bitbucket-push-and-pull-request-plugin)
 
