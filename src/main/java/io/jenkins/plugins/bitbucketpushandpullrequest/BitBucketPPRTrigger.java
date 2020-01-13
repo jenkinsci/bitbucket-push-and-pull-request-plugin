@@ -174,7 +174,7 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
 
   @Override
   public Collection<? extends hudson.model.Action> getProjectActions() {
-    return Collections.singleton(new BitBucketWebHookPollingAction());
+    return Collections.singleton(new BitBucketPPRWebHookPollingAction());
   }
 
   /**
@@ -196,6 +196,14 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
 
     return file;
   }
+  
+  /**
+   * Check if "bitbucket-polling.log" already exists to initialize it
+   */
+  public boolean IsLogFileInitialized() {
+      File file = new File(job.getRootDir(),"bitbucket-polling.log");
+      return file.exists();
+  }
 
   @Override
   public DescriptorImpl getDescriptor() {
@@ -205,7 +213,7 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
   /**
    * Action object for {@link BitBucketPPRProject}. Used to display the polling log.
    */
-  public final class BitBucketWebHookPollingAction implements hudson.model.Action {
+  public final class BitBucketPPRWebHookPollingAction implements hudson.model.Action {
     public Job<?, ?> getOwner() {
       return job;
     }
@@ -217,12 +225,12 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
 
     @Override
     public String getDisplayName() {
-      return "BitBucket Hook Log";
+      return "BitBucket Push and Pull Request Hook Log";
     }
 
     @Override
     public String getUrlName() {
-      return "BitBucketPollLog";
+      return "BitBucketPPRPollLog";
     }
 
     public String getLog() throws Exception {
@@ -233,7 +241,7 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
      * Writes the annotated log to the given output.
      */
     public void writeLogTo(XMLOutput out) throws Exception {
-      new AnnotatedLargeText<BitBucketWebHookPollingAction>(getLogFile(), Charset.defaultCharset(),
+      new AnnotatedLargeText<BitBucketPPRWebHookPollingAction>(getLogFile(), Charset.defaultCharset(),
           true, this).writeHtmlTo(0, out.asWriter());
     }
   }
