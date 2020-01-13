@@ -197,14 +197,6 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
     return file;
   }
   
-  /**
-   * Check if "bitbucket-polling.log" already exists to initialize it
-   */
-  public boolean IsLogFileInitialized() {
-      File file = new File(job.getRootDir(),"bitbucket-polling.log");
-      return file.exists();
-  }
-
   @Override
   public DescriptorImpl getDescriptor() {
     return (DescriptorImpl) super.getDescriptor();
