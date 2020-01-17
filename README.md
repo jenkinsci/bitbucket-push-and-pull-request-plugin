@@ -35,7 +35,7 @@ Bitbucket Push And Pull Request Plugin will not work if the old Bitbucket plugin
 
 # Environment variables
 
-### Environment variables for Bitbucket Cloud ans Server pull requests
+### Environment variables for Bitbucket Cloud and Server pull requests
 
 | NAME                        | VALUE                  |
 |----------------------------:|:-----------------------|
@@ -43,6 +43,7 @@ Bitbucket Push And Pull Request Plugin will not work if the old Bitbucket plugin
 | BITBUCKET_TARGET_BRANCH     | target branch          |
 | BITBUCKET_PULL_REQUEST_LINK | link                   |
 | BITBUCKET_PULL_REQUEST_ID   | id                     |
+| BITBUCKET_ACTOR             | actor                  |
 | BITBUCKET_PAYLOAD           | payload as json string | 
 
 

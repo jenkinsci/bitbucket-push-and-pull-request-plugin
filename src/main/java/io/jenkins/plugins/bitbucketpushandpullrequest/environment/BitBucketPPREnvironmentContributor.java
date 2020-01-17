@@ -91,6 +91,10 @@ public class BitBucketPPREnvironmentContributor extends EnvironmentContributor {
     String pullRequestId = cause.getPullRequestPayLoad().getPullRequestId();
     putEnvVar(envVars, "BITBUCKET_PULL_REQUEST_ID", pullRequestId);
     LOGGER.log(Level.FINEST, "Injecting BITBUCKET_PULL_REQUEST_ID: {0}", pullRequestId);
+
+    String actor = cause.getPullRequestPayLoad().getUser();
+    putEnvVar(envVars, "BITBUCKET_ACTOR", actor);
+    LOGGER.log(Level.FINEST, "Injecting BITBUCKET_ACTOR: {0}", actor);
   }
 
   private void setEnvVarsForServerPullRequest(EnvVars envVars,
@@ -110,6 +114,10 @@ public class BitBucketPPREnvironmentContributor extends EnvironmentContributor {
     String pullRequestId = cause.getPullRequestPayLoad().getPullRequestId();
     putEnvVar(envVars, "BITBUCKET_PULL_REQUEST_ID", pullRequestId);
     LOGGER.log(Level.FINEST, "Injecting BITBUCKET_PULL_REQUEST_ID: {0}", pullRequestId);
+
+    String actor = cause.getPullRequestPayLoad().getUser();
+    putEnvVar(envVars, "BITBUCKET_ACTOR", actor);
+    LOGGER.log(Level.FINEST, "Injecting BITBUCKET_ACTOR: {0}", actor);
   }
 
   private static void putEnvVar(EnvVars envs, String name, String value) {
