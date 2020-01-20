@@ -37,14 +37,16 @@ Bitbucket Push And Pull Request Plugin will not work if the old Bitbucket plugin
 
 ### Environment variables for Bitbucket Cloud and Server pull requests
 
-| NAME                        | VALUE                  |
-|----------------------------:|:-----------------------|
-| BITBUCKET_SOURCE_BRANCH     | source branch          |
-| BITBUCKET_TARGET_BRANCH     | target branch          |
-| BITBUCKET_PULL_REQUEST_LINK | link                   |
-| BITBUCKET_PULL_REQUEST_ID   | id                     |
-| BITBUCKET_ACTOR             | actor                  |
-| BITBUCKET_PAYLOAD           | payload as json string | 
+| NAME                               | VALUE                  |
+|-----------------------------------:|:-----------------------|
+| BITBUCKET_SOURCE_BRANCH            | source branch          |
+| BITBUCKET_TARGET_BRANCH            | target branch          |
+| BITBUCKET_PULL_REQUEST_LINK        | link                   |
+| BITBUCKET_PULL_REQUEST_ID          | id                     |
+| BITBUCKET_PULL_REQUEST_TITLE       | title                  |
+| BITBUCKET_PULL_REQUEST_DESCRIPTION | description            |
+| BITBUCKET_ACTOR                    | actor                  |
+| BITBUCKET_PAYLOAD                  | payload as json string |
 
 
 
@@ -55,13 +57,13 @@ Bitbucket Push And Pull Request Plugin will not work if the old Bitbucket plugin
 | REPOSITORY_LINK                 | branch (Deprecated. It will be removed.) |
 | BITBUCKET_SOURCE_BRANCH         | branch                                   |
 | BITBUCKET_REPOSITORY_URL        | repository url                           |
-| BITBUCKET_PAYLOAD               | payload as json string                   | 
+| BITBUCKET_PAYLOAD               | payload as json string                   |
 
 
 # Roadmap
 - Build Status propagation, cf. #23
 - Approve Pull Request on successful build, cf. #29
-- Filter source branches for builds triggered through Pull Request, cf. #61 
+- Filter source branches for builds triggered through Pull Request, cf. #61
 
 
 # Dsl Job snippets

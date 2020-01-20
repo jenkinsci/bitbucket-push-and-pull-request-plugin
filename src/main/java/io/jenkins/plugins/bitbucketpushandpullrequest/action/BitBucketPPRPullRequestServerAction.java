@@ -70,4 +70,12 @@ public class BitBucketPPRPullRequestServerAction extends BitBucketPPRAction {
   public String getScm() {
     return payload.getServerPullRequest().getFromRef().getRepository().getScmId();
   }
+
+  public String getTitle() {
+    return payload.getPullRequest().getTitle();
+  }
+
+  public String getDescription() {
+    return payload.getPullRequest().getDescription();
+  }
 }
