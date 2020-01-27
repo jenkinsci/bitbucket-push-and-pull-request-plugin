@@ -33,16 +33,13 @@ public class BitBucketPPRPullRequestTriggerMatcher implements BitBucketPPREventT
   public boolean matchesAction(BitBucketPPREvent bitbucketEvent,
       BitBucketPPRTriggerFilter triggerFilter) {
 
-    if (PULL_REQUEST_APPROVED.equals(bitbucketEvent.getAction())
+    return PULL_REQUEST_APPROVED.equals(bitbucketEvent.getAction())
             && triggerFilter.getActionFilter() instanceof BitBucketPPRPullRequestApprovedActionFilter
         || PULL_REQUEST_UPDATED.equals(bitbucketEvent.getAction())
             && triggerFilter.getActionFilter() instanceof BitBucketPPRPullRequestUpdatedActionFilter
         || PULL_REQUEST_CREATED.equals(bitbucketEvent.getAction())
             && triggerFilter.getActionFilter() instanceof BitBucketPPRPullRequestCreatedActionFilter
         || PULL_REQUEST_MERGED.equals(bitbucketEvent.getAction()) 
-            && triggerFilter.getActionFilter() instanceof BitBucketPPRPullRequestMergedActionFilter) {
-      return true;
-    }
-    return false;
+            && triggerFilter.getActionFilter() instanceof BitBucketPPRPullRequestMergedActionFilter;
   }
 }
