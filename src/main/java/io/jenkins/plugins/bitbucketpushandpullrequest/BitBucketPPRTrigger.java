@@ -185,7 +185,7 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
   public File getLogFile() throws Exception {
 
     if (job == null) {
-      throw new Exception("No job started");
+      throw new NullPointerException("No job started");
     }
 
     File file = new File(job.getRootDir(), "bitbucket-polling.log");

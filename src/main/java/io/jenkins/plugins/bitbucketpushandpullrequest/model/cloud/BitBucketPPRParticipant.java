@@ -69,6 +69,6 @@ public class BitBucketPPRParticipant implements Serializable {
   }
 
   public void setParticipatedOn(final Date participatedOn) {
-    this.participatedOn = new Date(participatedOn.getTime());;
+    this.participatedOn = new Date(participatedOn.getTime());
   }
 }

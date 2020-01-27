@@ -2,27 +2,18 @@ package io.jenkins.plugins.bitbucketpushandpullrequest.processor;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.verify;
-
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.Reader;
 import java.nio.charset.StandardCharsets;
-
 import javax.naming.OperationNotSupportedException;
-
-import org.apache.http.HttpResponse;
+import com.google.gson.Gson;
+import com.google.gson.stream.JsonReader;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-
-import com.google.gson.Gson;
-import com.google.gson.stream.JsonReader;
-
 import io.jenkins.plugins.bitbucketpushandpullrequest.BitBucketPPRJobProbe;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPREvent;
@@ -41,8 +32,6 @@ public class BitBucketPPRRepositoryPayloadProcessorTest {
   @Captor
   private ArgumentCaptor<BitBucketPPRAction> actionCaptor;
 
-  private BitBucketPPRRepositoryPayloadProcessor repositoryPayloadProcessor;
-
   @Test
   public void testRepositoryPushWebhookGit() {
     BitBucketPPREvent bitbucketEvent = null;
@@ -52,7 +41,8 @@ public class BitBucketPPRRepositoryPayloadProcessorTest {
       e.printStackTrace();
     }
 
-    repositoryPayloadProcessor = new BitBucketPPRRepositoryPayloadProcessor(probe, bitbucketEvent);
+    BitBucketPPRRepositoryPayloadProcessor repositoryPayloadProcessor =
+        new BitBucketPPRRepositoryPayloadProcessor(probe, bitbucketEvent);
 
     JsonReader reader = null;
 
@@ -64,7 +54,7 @@ public class BitBucketPPRRepositoryPayloadProcessorTest {
     } catch (Exception e) {
       e.printStackTrace();
     }
-    
+
     BitBucketPPRPayload payload = gson.fromJson(reader, BitBucketPPRNewPayload.class);
 
     repositoryPayloadProcessor.processPayload(payload);

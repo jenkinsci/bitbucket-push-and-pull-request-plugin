@@ -32,20 +32,15 @@ public class BitBucketPPRPullRequestTriggerMatcher implements BitBucketPPREventT
   @Override
   public boolean matchesAction(BitBucketPPREvent bitbucketEvent,
       BitBucketPPRTriggerFilter triggerFilter) {
+
     if (PULL_REQUEST_APPROVED.equals(bitbucketEvent.getAction())
-        && triggerFilter.getActionFilter() instanceof BitBucketPPRPullRequestApprovedActionFilter) {
-      return true;
-    }
-    if (PULL_REQUEST_UPDATED.equals(bitbucketEvent.getAction())
-        && triggerFilter.getActionFilter() instanceof BitBucketPPRPullRequestUpdatedActionFilter) {
-      return true;
-    }
-    if (PULL_REQUEST_CREATED.equals(bitbucketEvent.getAction())
-        && triggerFilter.getActionFilter() instanceof BitBucketPPRPullRequestCreatedActionFilter) {
-      return true;
-    }
-    if (PULL_REQUEST_MERGED.equals(bitbucketEvent.getAction())
-        && triggerFilter.getActionFilter() instanceof BitBucketPPRPullRequestMergedActionFilter) {
+            && triggerFilter.getActionFilter() instanceof BitBucketPPRPullRequestApprovedActionFilter
+        || PULL_REQUEST_UPDATED.equals(bitbucketEvent.getAction())
+            && triggerFilter.getActionFilter() instanceof BitBucketPPRPullRequestUpdatedActionFilter
+        || PULL_REQUEST_CREATED.equals(bitbucketEvent.getAction())
+            && triggerFilter.getActionFilter() instanceof BitBucketPPRPullRequestCreatedActionFilter
+        || PULL_REQUEST_MERGED.equals(bitbucketEvent.getAction()) 
+            && triggerFilter.getActionFilter() instanceof BitBucketPPRPullRequestMergedActionFilter) {
       return true;
     }
     return false;
