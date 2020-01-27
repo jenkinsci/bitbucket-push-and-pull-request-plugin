@@ -24,6 +24,7 @@ package io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.cloud;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.DataBoundConstructor;
 import hudson.Extension;
 import hudson.model.AbstractDescribableImpl;
@@ -52,6 +53,7 @@ public class BitBucketPPRPullRequestTriggerFilter extends BitBucketPPRTriggerFil
     return actionFilter.getCause(pollingLog, action);
   }
 
+  @Symbol("BitBucketPPRCloudPullRequests")
   @Extension
   public static class FilterDescriptorImpl extends BitBucketPPRTriggerFilterDescriptor {
 

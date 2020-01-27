@@ -16,7 +16,6 @@ assignees: ""
 - Jenkins Job Type: (Freestyle, Pipeline etc...)
 - Triggered via: (Bitbucket Cloud or Bitbucket Server?)
 
-
 ## Expected Behavior
 
 Tell us what should happen
