@@ -53,7 +53,6 @@ public class BitBucketPPRPullRequestTriggerFilter extends BitBucketPPRTriggerFil
     return actionFilter.getCause(pollingLog, action);
   }
 
-  @Symbol("BitBucketPPRCloudPullRequests")
   @Extension
   public static class FilterDescriptorImpl extends BitBucketPPRTriggerFilterDescriptor {
 

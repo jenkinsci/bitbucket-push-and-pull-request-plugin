@@ -47,7 +47,6 @@ public class BitBucketPPRPullRequestCreatedActionFilter
     return new BitBucketPPRPullRequestCreatedCause(pollingLog, pullRequestAction);
   }
 
-  @Symbol("BitBucketPPRCloudPullRequestCreated")
   @Extension
   public static class ActionFilterDescriptorImpl extends BitBucketPPRPullRequestActionDescriptor {
 
