@@ -168,7 +168,7 @@ public class BitBucketPPRJobProbe {
       return getBitBucketTrigger(pJob);
     }
 
-    return Optional.empty();
+    return getBitBucketTrigger(job);
   }
 
   private Optional<BitBucketPPRTrigger> getBitBucketTrigger(ParameterizedJob<?, ?> job) {
