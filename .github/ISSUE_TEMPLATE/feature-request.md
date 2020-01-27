@@ -14,7 +14,7 @@ assignees: ''
 
 Provide a general summary of the feature in the Title above
 
-## Please make sure all the following boxes are checked before submitting your feature request - thank you!
+## Please make sure all the following boxes are checked before submitting your feature request - thank you
 
 - [ ] There is no existing issue regarding the same topic
 
