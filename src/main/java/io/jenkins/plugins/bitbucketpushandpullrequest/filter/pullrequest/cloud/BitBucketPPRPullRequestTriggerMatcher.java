@@ -22,7 +22,10 @@
 
 package io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.cloud;
 
-import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConsts.*;
+import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.PULL_REQUEST_APPROVED;
+import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.PULL_REQUEST_CREATED;
+import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.PULL_REQUEST_MERGED;
+import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.PULL_REQUEST_UPDATED;
 import io.jenkins.plugins.bitbucketpushandpullrequest.filter.BitBucketPPREventTriggerMatcher;
 import io.jenkins.plugins.bitbucketpushandpullrequest.filter.BitBucketPPRTriggerFilter;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPREvent;

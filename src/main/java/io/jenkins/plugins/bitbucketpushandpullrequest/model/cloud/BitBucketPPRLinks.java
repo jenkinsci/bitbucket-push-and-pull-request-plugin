@@ -26,7 +26,7 @@ import com.google.gson.annotations.SerializedName;
 public class BitBucketPPRLinks implements Serializable {
   private static final long serialVersionUID = 8607244117530188175L;
 
-  BitBucketPPRHtml html;
+  private BitBucketPPRHtml html;
 
   @SerializedName("self")
   private BitBucketPPRSelf selfProperty;

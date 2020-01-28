@@ -27,7 +27,7 @@ import java.util.Date;
 public class BitBucketPPRApproval implements Serializable {
   private static final long serialVersionUID = -4394761268108854254L;
   private Date date;
-  BitBucketPPRActor user;
+  private BitBucketPPRActor user;
 
   public BitBucketPPRActor getUser() {
     return user;

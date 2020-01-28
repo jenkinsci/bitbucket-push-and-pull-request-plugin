@@ -30,13 +30,12 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-import com.google.gson.Gson;
+// import com.google.gson.Gson;
 import org.eclipse.jgit.transport.URIish;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import hudson.plugins.mercurial.MercurialSCM;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
@@ -44,9 +43,7 @@ import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
 
 @RunWith(MockitoJUnitRunner.class)
 public class BitBucketPPRJobProbeTest {
-  Gson gson = new Gson();
-
-  BitBucketPPRJobProbe jobProbe;
+  private BitBucketPPRJobProbe jobProbe;
 
   @BeforeClass
   public static void beforeClass() {
@@ -82,36 +79,38 @@ public class BitBucketPPRJobProbeTest {
   @Test
   public void testMatchMercurialScm_not() {
     MercurialSCM scm = mock(MercurialSCM.class);
-    Mockito.when(scm.getSource())
-        .thenReturn("https://bitbucket.org/theveryjenkinsadventure/test-mercurial-in-cloud/src/default");
-      
-    URIish remote = mock(org.eclipse.jgit.transport.URIish.class);
-    Mockito.when(remote.toString()).thenReturn("https://bitbucket.org/theveryjenkinsadventure/test-mercurial-in-cloud");
+    when(scm.getSource()).thenReturn(
+        "https://bitbucket.org/theveryjenkinsadventure/test-mercurial-in-cloud/src/default");
+
+    URIish remote = mock(URIish.class);
+    when(remote.toString())
+        .thenReturn("https://bitbucket.org/theveryjenkinsadventure/test-mercurial-in-cloud");
 
     assertFalse(jobProbe.testMatchMercurialScm(scm, remote));
   }
 
   // private BitBucketPPRPayload getPayload() {
-  //   JsonReader reader = null;
+  // Gson gson = new Gson();
+  // JsonReader reader = null;
 
-  //   try {
-  //     ClassLoader classloader = Thread.currentThread().getContextClassLoader();
-  //     InputStream is = classloader.getResourceAsStream("pullrequest_approved.json");
-  //     InputStreamReader isr = new InputStreamReader(is, StandardCharsets.UTF_8);O
-  //     reader = new JsonReader(isr);
-  //   } catch (Exception e) {
-  //     e.printStackTrace();
-  //   }
+  // try {
+  // ClassLoader classloader = Thread.currentThread().getContextClassLoader();
+  // InputStream is = classloader.getResourceAsStream("pullrequest_approved.json");
+  // InputStreamReader isr = new InputStreamReader(is, StandardCharsets.UTF_8);O
+  // reader = new JsonReader(isr);
+  // } catch (Exception e) {
+  // e.printStackTrace();
+  // }
 
-  //   BitBucketPPRPayload payload = null;
-  //   try {
-  //     payload = gson.fromJson(reader, BitBucketPPRNewPayload.class);
-  //   } catch (JsonIOException e) {
-  //     e.printStackTrace();
-  //   } catch (JsonSyntaxException e) {
-  //     e.printStackTrace();
-  //   }
+  // BitBucketPPRPayload payload = null;
+  // try {
+  // payload = gson.fromJson(reader, BitBucketPPRNewPayload.class);
+  // } catch (JsonIOException e) {
+  // e.printStackTrace();
+  // } catch (JsonSyntaxException e) {
+  // e.printStackTrace();
+  // }
 
-  //   return payload;
+  // return payload;
   // }
 }

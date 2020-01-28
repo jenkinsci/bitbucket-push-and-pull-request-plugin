@@ -21,7 +21,7 @@
 
 package io.jenkins.plugins.bitbucketpushandpullrequest;
 
-import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConsts.PULL_REQUEST_MERGED;
+import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.PULL_REQUEST_MERGED;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -50,8 +50,7 @@ import jenkins.model.ParameterizedJobMixIn.ParameterizedJob;
 import jenkins.triggers.SCMTriggerItem;
 
 public class BitBucketPPRJobProbe {
-  private static final Logger LOGGER = Logger.getLogger(
-      io.jenkins.plugins.bitbucketpushandpullrequest.BitBucketPPRJobProbe.class.getName());
+  private static final Logger LOGGER = Logger.getLogger(BitBucketPPRJobProbe.class.getName());
   private BitBucketPPREvent bitbucketEvent;
   private BitBucketPPRAction bitbucketAction;
 
@@ -92,7 +91,7 @@ public class BitBucketPPRJobProbe {
     }).collect(Collectors.toList());
   }
 
-  void triggerScm(Job<?, ?> job, List<URIish> remotes, BitBucketPPRAction bitbucketAction) {
+  private void triggerScm(Job<?, ?> job, List<URIish> remotes, BitBucketPPRAction bitbucketAction) {
     LOGGER.log(Level.FINE, "Considering to poke {0}", job.getFullDisplayName());
     Optional<BitBucketPPRTrigger> bitbucketTrigger = getBitBucketTrigger(job);
     List<SCM> scmTriggered = new ArrayList<>();
@@ -262,7 +261,7 @@ public class BitBucketPPRJobProbe {
     return str.startsWith("$");
   }
 
-  boolean testMatchMercurialScm(SCM scm, URIish remote) {
+  public boolean testMatchMercurialScm(SCM scm, URIish remote) {
     return matchMercurialScm(scm, remote);
   }
 }

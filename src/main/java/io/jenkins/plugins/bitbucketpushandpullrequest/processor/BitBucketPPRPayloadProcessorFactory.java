@@ -20,7 +20,12 @@
  ******************************************************************************/
 package io.jenkins.plugins.bitbucketpushandpullrequest.processor;
 
-import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConsts.*;
+import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.PULL_REQUEST_EVENT;
+import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.PULL_REQUEST_SERVER_EVENT;
+import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.REPOSITORY_EVENT;
+import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.REPOSITORY_POST;
+import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.REPOSITORY_PUSH;
+import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.REPOSITORY_SERVER_PUSH;
 import javax.naming.OperationNotSupportedException;
 import io.jenkins.plugins.bitbucketpushandpullrequest.BitBucketPPRJobProbe;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPREvent;
@@ -33,17 +38,17 @@ public final class BitBucketPPRPayloadProcessorFactory {
     throw new AssertionError();
   }
 
-  public static BitBucketPPRPayloadProcessor createProcessor(BitBucketPPREvent bitbucketEvent)
+  public static BitBucketPPRPayloadProcessor createProcessor(final BitBucketPPREvent bitbucketEvent)
       throws OperationNotSupportedException {
     return createProcessor(new BitBucketPPRJobProbe(), bitbucketEvent);
   }
 
 
-  public static BitBucketPPRPayloadProcessor createProcessor(BitBucketPPRJobProbe probe,
-      BitBucketPPREvent bitbucketEvent) throws OperationNotSupportedException {
+  public static BitBucketPPRPayloadProcessor createProcessor(final BitBucketPPRJobProbe probe,
+      final BitBucketPPREvent bitbucketEvent) throws OperationNotSupportedException {
 
     BitBucketPPRPayloadProcessor processor = null;
-
+    
     if (REPOSITORY_EVENT.equalsIgnoreCase(bitbucketEvent.getEvent())) {
       if (REPOSITORY_PUSH.equalsIgnoreCase(bitbucketEvent.getAction())) {
         processor = new BitBucketPPRRepositoryPayloadProcessor(probe, bitbucketEvent);

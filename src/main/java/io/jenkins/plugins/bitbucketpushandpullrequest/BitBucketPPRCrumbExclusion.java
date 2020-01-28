@@ -21,7 +21,7 @@
 
 package io.jenkins.plugins.bitbucketpushandpullrequest;
 
-import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConsts.HOOK_URL;
+import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.HOOK_URL;
 import java.io.IOException;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;

@@ -32,7 +32,7 @@ public class BitBucketPPROwner implements Serializable {
   @SerializedName("display_name")
   private String displayName;
   private String uuid;
-  BitBucketPPRLinks links;
+  private BitBucketPPRLinks links;
   private String nickname;
 
   public String getType() {

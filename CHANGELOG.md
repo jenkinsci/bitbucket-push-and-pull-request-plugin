@@ -36,7 +36,7 @@
 **Merged pull requests:**
 
 - #49 Add warnings
-- #48 [Enhancement] Add pull request support for Bitbucket Server and Mercurial on Bitbucket Cloud
+- #48 Add pull request support for Bitbucket Server and Mercurial on Bitbucket Cloud
 
 ## 1.6.4 (2019-06-19)
 
@@ -70,8 +70,8 @@
 
 **Merged pull requests:**
 
-- [fix] #41 BranchSpec pattern matching directions (by macghriogair)
-- [enhancement] #34 Create CODE_OF_CONDUCT.md (by eiriarte-mendez)
+- #41 BranchSpec pattern matching directions (by macghriogair)
+- #34 Create CODE_OF_CONDUCT.md (by eiriarte-mendez)
 
 ## 1.6.2 (2019-05-10)
 
@@ -83,7 +83,7 @@
 
 **Merged pull requests:**
 
-- [Bug] #27 Builds not triggering with 1.6.1 and Bitbucket Server 7.0.1 #28
+- Builds not triggering with 1.6.1 and Bitbucket Server 7.0.1 #28
 
 ## 1.6.1 (2019-05-08)
 
@@ -101,7 +101,7 @@
 
 **Merged pull requests:**
 
-- [develop] Enhance environment variables #25
+- _develop_ Enhance environment variables #25
 
 ## 1.6.0 (2019-04-29)
 
@@ -119,9 +119,9 @@
 
 **Merged pull requests:**
 
-- [develop] Remove deprecated username field from payload #17 by macghriogair
-- [develop] add support for pattern matching on branches #18 by macghriogair
-- [develop] Add support for merged pull requests #21 by cdelmonte-zg
+- Remove deprecated username field from payload #17 by macghriogair
+- add support for pattern matching on branches #18 by macghriogair
+- Add support for merged pull requests #21 by cdelmonte-zg
 
 ## 1.5.0 (2019-04-11)
 
@@ -139,4 +139,4 @@
 
 **Merged pull requests:**
 
-- [develop] gitignore more project specific entries [#13](https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/pull/13) by macghriogair
+- gitignore more project specific entries [#13](https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/pull/13) by macghriogair

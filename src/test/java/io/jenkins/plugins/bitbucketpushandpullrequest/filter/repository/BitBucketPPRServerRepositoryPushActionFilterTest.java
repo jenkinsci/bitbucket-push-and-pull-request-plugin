@@ -147,7 +147,7 @@ public class BitBucketPPRServerRepositoryPushActionFilterTest {
   }
 
   @Test
-  public void testMatches_not_1() {
+  public void testMatchesNot1() {
     BitBucketPPRServerRepositoryPushActionFilter c =
         new BitBucketPPRServerRepositoryPushActionFilter(false, false, "*/master");
 
@@ -155,7 +155,7 @@ public class BitBucketPPRServerRepositoryPushActionFilterTest {
   }
 
   @Test
-  public void testMatches_not_2() {
+  public void testMatchesNot2() {
     BitBucketPPRServerRepositoryPushActionFilter c =
         new BitBucketPPRServerRepositoryPushActionFilter(false, false, "develop, :^(?!master$).*");
     assertFalse(c.matches("master"));
@@ -165,7 +165,7 @@ public class BitBucketPPRServerRepositoryPushActionFilterTest {
   }
 
   @Test
-  public void testMatches_empty_branches() {
+  public void testMatchesEmptyBranches() {
     String allowedBranches = "";
     BitBucketPPRServerRepositoryPushActionFilter c =
         new BitBucketPPRServerRepositoryPushActionFilter(false, false, allowedBranches);
