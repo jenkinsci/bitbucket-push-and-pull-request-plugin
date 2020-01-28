@@ -39,7 +39,7 @@ Bitbucket Push And Pull Request Plugin will not work if the Bitbucket plugin (<h
 
 ### Configure the webhook
 
-In case you are using Bitbucket Cloud, configure your Bitbucket repository adding a webhook in the settings page. In the URL field (see image, point A) add your JENKINS_URL followed by "/bitbucket-hook/" (for example <https://my-jenkins.on-my-planet-far-away.com/bitbucket-hook/>) Credentials for the webhook endpoint are not required, the trailing slash is mandatory. For more infos please consult the resource <https://confluence.atlassian.com/bitbucket/manage-webhooks-735643732.html>.
+In case you are using Bitbucket Cloud, configure your Bitbucket repository adding a webhook in the settings page. In the URL field (see image, at point A) add your JENKINS_URL followed by "/bitbucket-hook/" (for example <https://my-jenkins.on-my-planet-far-away.com/bitbucket-hook/>) Credentials for the webhook endpoint are not required, the trailing slash is mandatory. For more infos please consult the resource <https://confluence.atlassian.com/bitbucket/manage-webhooks-735643732.html>.
 
 If you are using Bitbucket Server, follow these instructions: <https://confluence.atlassian.com/bitbucketserver/managing-webhooks-in-bitbucket-server-938025878.html>.
 
