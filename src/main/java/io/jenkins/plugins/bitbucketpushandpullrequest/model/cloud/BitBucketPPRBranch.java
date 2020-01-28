@@ -23,13 +23,14 @@ package io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud;
 import java.io.Serializable;
 
 public class BitBucketPPRBranch implements Serializable {
+  private static final long serialVersionUID = -846166211765005578L;
   private String name;
 
   public String getName() {
     return name;
   }
 
-  public void setName(String name) {
+  public void setName(final String name) {
     this.name = name;
   }
 

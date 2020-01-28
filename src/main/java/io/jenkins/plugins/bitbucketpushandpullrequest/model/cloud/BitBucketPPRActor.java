@@ -25,22 +25,23 @@ import com.google.gson.annotations.SerializedName;
 
 
 public class BitBucketPPRActor implements Serializable {
+  private static final long serialVersionUID = 4266599260720106245L;
 
   @SerializedName("display_name")
-  String displayName;
+  private String displayName;
 
   @SerializedName("account_id")
-  String accountId;
-  String type;
-  BitBucketPPRLinks links;
-  String nickname;
-  String uuid;
+  private String accountId;
+  private String type;
+  private BitBucketPPRLinks links;
+  private String nickname;
+  private String uuid;
 
   public String getDisplayName() {
     return displayName;
   }
 
-  public void setDisplayName(String displayName) {
+  public void setDisplayName(final String displayName) {
     this.displayName = displayName;
   }
 
@@ -48,7 +49,7 @@ public class BitBucketPPRActor implements Serializable {
     return accountId;
   }
 
-  public void setAccountId(String accountId) {
+  public void setAccountId(final String accountId) {
     this.accountId = accountId;
   }
 
@@ -56,7 +57,7 @@ public class BitBucketPPRActor implements Serializable {
     return type;
   }
 
-  public void setType(String type) {
+  public void setType(final String type) {
     this.type = type;
   }
 
@@ -64,7 +65,7 @@ public class BitBucketPPRActor implements Serializable {
     return links;
   }
 
-  public void setLinks(BitBucketPPRLinks links) {
+  public void setLinks(final BitBucketPPRLinks links) {
     this.links = links;
   }
 
@@ -72,7 +73,7 @@ public class BitBucketPPRActor implements Serializable {
     return nickname;
   }
 
-  public void setNickname(String nickname) {
+  public void setNickname(final String nickname) {
     this.nickname = nickname;
   }
 
@@ -80,7 +81,7 @@ public class BitBucketPPRActor implements Serializable {
     return uuid;
   }
 
-  public void setUuid(String uuid) {
+  public void setUuid(final String uuid) {
     this.uuid = uuid;
   }
 

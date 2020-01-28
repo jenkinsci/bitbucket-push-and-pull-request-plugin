@@ -5,6 +5,7 @@ import com.google.gson.annotations.SerializedName;
 
 
 public class BitBucketPPRServerProject implements Serializable {
+  private static final long serialVersionUID = -9104674017591226510L;
   private String key;
   private String id;
   private String name;
@@ -17,7 +18,7 @@ public class BitBucketPPRServerProject implements Serializable {
     return key;
   }
 
-  public void setKey(String key) {
+  public void setKey(final String key) {
     this.key = key;
   }
 
@@ -25,7 +26,7 @@ public class BitBucketPPRServerProject implements Serializable {
     return id;
   }
 
-  public void setId(String id) {
+  public void setId(final String id) {
     this.id = id;
   }
 
@@ -33,7 +34,7 @@ public class BitBucketPPRServerProject implements Serializable {
     return name;
   }
 
-  public void setName(String name) {
+  public void setName(final String name) {
     this.name = name;
   }
 
@@ -41,7 +42,7 @@ public class BitBucketPPRServerProject implements Serializable {
     return isPublic;
   }
 
-  public void setPublic(boolean isPublic) {
+  public void setPublic(final boolean isPublic) {
     this.isPublic = isPublic;
   }
 
@@ -49,7 +50,7 @@ public class BitBucketPPRServerProject implements Serializable {
     return type;
   }
 
-  public void setType(String type) {
+  public void setType(final String type) {
     this.type = type;
   }
 }

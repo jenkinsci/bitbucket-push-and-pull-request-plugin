@@ -32,7 +32,7 @@ import io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.server.
 import io.jenkins.plugins.bitbucketpushandpullrequest.filter.repository.BitBucketPPRRepositoryTriggerFilter;
 import io.jenkins.plugins.bitbucketpushandpullrequest.filter.repository.BitBucketPPRRepositoryTriggerMatcher;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPREvent;
-import io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConsts;
+import io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils;
 
 public class BitBucketPPRFilterMatcher {
   private static final Logger LOGGER = Logger.getLogger(BitBucketPPRFilterMatcher.class.getName());
@@ -60,13 +60,13 @@ public class BitBucketPPRFilterMatcher {
 
   private boolean matchesEventAndAction(BitBucketPPREvent event,
       BitBucketPPRTriggerFilter triggerFilter) {
-    if (BitBucketPPRConsts.PULL_REQUEST_EVENT.equalsIgnoreCase(event.getEvent())
+    if (BitBucketPPRConstsUtils.PULL_REQUEST_EVENT.equalsIgnoreCase(event.getEvent())
         && triggerFilter instanceof BitBucketPPRPullRequestTriggerFilter) {
       return new BitBucketPPRPullRequestTriggerMatcher().matchesAction(event, triggerFilter);
-    } else if (BitBucketPPRConsts.PULL_REQUEST_SERVER_EVENT.equalsIgnoreCase(event.getEvent())
+    } else if (BitBucketPPRConstsUtils.PULL_REQUEST_SERVER_EVENT.equalsIgnoreCase(event.getEvent())
         && triggerFilter instanceof BitBucketPPRPullRequestServerTriggerFilter) {
       return new BitBucketPPRPullRequestServerTriggerMatcher().matchesAction(event, triggerFilter);
-    } else if (BitBucketPPRConsts.REPOSITORY_EVENT.equalsIgnoreCase(event.getEvent())
+    } else if (BitBucketPPRConstsUtils.REPOSITORY_EVENT.equalsIgnoreCase(event.getEvent())
         && triggerFilter instanceof BitBucketPPRRepositoryTriggerFilter) {
       return new BitBucketPPRRepositoryTriggerMatcher().matchesAction(event, triggerFilter);
     }

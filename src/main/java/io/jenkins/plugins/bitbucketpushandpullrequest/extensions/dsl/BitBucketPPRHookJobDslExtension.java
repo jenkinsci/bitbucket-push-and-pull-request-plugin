@@ -43,8 +43,6 @@ import io.jenkins.plugins.bitbucketpushandpullrequest.filter.repository.BitBucke
 import javaposse.jobdsl.dsl.helpers.triggers.TriggerContext;
 import javaposse.jobdsl.plugin.ContextExtensionPoint;
 import javaposse.jobdsl.plugin.DslExtensionMethod;
-import javaposse.jobdsl.plugin.DslEnvironment;
-import io.jenkins.plugins.bitbucketpushandpullrequest.extensions.dsl.BitBucketPPRHookJobDslContext;
 
 @Extension(optional = true)
 public class BitBucketPPRHookJobDslExtension extends ContextExtensionPoint {

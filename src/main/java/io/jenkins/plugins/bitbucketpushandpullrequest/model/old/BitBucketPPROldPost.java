@@ -33,6 +33,7 @@ import io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud.BitBucketPPRRe
 
 
 public class BitBucketPPROldPost implements BitBucketPPRPayload, Serializable {
+  private static final long serialVersionUID = -3802484750667918594L;
   private @SerializedName("canon_url") String canonUrl;
   private List<BitBucketPPROldCommit> commits = new ArrayList<>();
   private BitBucketPPROldRepository repository;
@@ -42,7 +43,7 @@ public class BitBucketPPROldPost implements BitBucketPPRPayload, Serializable {
     return canonUrl;
   }
 
-  public void setCanonUrl(String canonUrl) {
+  public void setCanonUrl(final String canonUrl) {
     this.canonUrl = canonUrl;
   }
 
@@ -50,7 +51,7 @@ public class BitBucketPPROldPost implements BitBucketPPRPayload, Serializable {
     return commits;
   }
 
-  public void setCommits(List<BitBucketPPROldCommit> commits) {
+  public void setCommits(final List<BitBucketPPROldCommit> commits) {
     this.commits = commits;
   }
 
@@ -58,7 +59,7 @@ public class BitBucketPPROldPost implements BitBucketPPRPayload, Serializable {
     return repository;
   }
 
-  public void setOldRepository(BitBucketPPROldRepository repository) {
+  public void setOldRepository(final BitBucketPPROldRepository repository) {
     this.repository = repository;
   }
 
@@ -66,7 +67,7 @@ public class BitBucketPPROldPost implements BitBucketPPRPayload, Serializable {
     return user;
   }
 
-  public void setUser(String user) {
+  public void setUser(final String user) {
     this.user = user;
   }
 

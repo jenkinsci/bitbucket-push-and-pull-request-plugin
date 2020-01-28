@@ -28,6 +28,7 @@ import com.google.gson.annotations.SerializedName;
 
 
 public class BitBucketPPRPullRequest implements Serializable {
+  private static final long serialVersionUID = -530740975503014281L;
   private String id;
   private String title;
   private String description;
@@ -46,7 +47,7 @@ public class BitBucketPPRPullRequest implements Serializable {
     return id;
   }
 
-  public void setId(String id) {
+  public void setId(final String id) {
     this.id = id;
   }
 
@@ -54,7 +55,7 @@ public class BitBucketPPRPullRequest implements Serializable {
     return title;
   }
 
-  public void setTitle(String title) {
+  public void setTitle(final String title) {
     this.title = title;
   }
 
@@ -62,7 +63,7 @@ public class BitBucketPPRPullRequest implements Serializable {
     return description;
   }
 
-  public void setDescription(String description) {
+  public void setDescription(final String description) {
     this.description = description;
   }
 
@@ -70,7 +71,7 @@ public class BitBucketPPRPullRequest implements Serializable {
     return state;
   }
 
-  public void setState(String state) {
+  public void setState(final String state) {
     this.state = state;
   }
 
@@ -78,7 +79,7 @@ public class BitBucketPPRPullRequest implements Serializable {
     return author;
   }
 
-  public void setAuthor(BitBucketPPRActor author) {
+  public void setAuthor(final BitBucketPPRActor author) {
     this.author = author;
   }
 
@@ -86,7 +87,7 @@ public class BitBucketPPRPullRequest implements Serializable {
     return source;
   }
 
-  public void setSource(BitBucketPPRSource source) {
+  public void setSource(final BitBucketPPRSource source) {
     this.source = source;
   }
 
@@ -94,7 +95,7 @@ public class BitBucketPPRPullRequest implements Serializable {
     return destination;
   }
 
-  public void setDestination(BitBucketPPRDestination destination) {
+  public void setDestination(final BitBucketPPRDestination destination) {
     this.destination = destination;
   }
 
@@ -102,7 +103,7 @@ public class BitBucketPPRPullRequest implements Serializable {
     return links;
   }
 
-  public void setLinks(BitBucketPPRLinks links) {
+  public void setLinks(final BitBucketPPRLinks links) {
     this.links = links;
   }
 
@@ -110,7 +111,7 @@ public class BitBucketPPRPullRequest implements Serializable {
     return participants;
   }
 
-  public void setParticipants(List<BitBucketPPRParticipant> participants) {
+  public void setParticipants(final List<BitBucketPPRParticipant> participants) {
     this.participants = participants;
   }
 
@@ -134,7 +135,7 @@ public class BitBucketPPRPullRequest implements Serializable {
     return type;
   }
 
-  public void setType(String type) {
+  public void setType(final String type) {
     this.type = type;
   }
 
@@ -142,7 +143,7 @@ public class BitBucketPPRPullRequest implements Serializable {
     return reason;
   }
 
-  public void setReason(String reason) {
+  public void setReason(final String reason) {
     this.reason = reason;
   }
 

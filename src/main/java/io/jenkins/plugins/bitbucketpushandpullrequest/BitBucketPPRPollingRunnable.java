@@ -35,8 +35,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class BitBucketPPRPollingRunnable implements Runnable {
-  Job<?, ?> job;
-  File logFile;
+  private Job<?, ?> job;
+  private File logFile;
 
   private static final Logger LOGGER =
       Logger.getLogger(BitBucketPPRPollingRunnable.class.getName());

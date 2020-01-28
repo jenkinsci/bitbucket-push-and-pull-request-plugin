@@ -21,6 +21,7 @@
 
 package io.jenkins.plugins.bitbucketpushandpullrequest;
 
+import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.PULL_REQUEST_MERGED;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -29,10 +30,10 @@ import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import com.google.common.base.Objects;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.jgit.transport.RemoteConfig;
 import org.eclipse.jgit.transport.URIish;
-import com.google.common.base.Objects;
 import hudson.model.Job;
 import hudson.plugins.git.GitSCM;
 import hudson.plugins.git.GitStatus;
@@ -42,16 +43,14 @@ import hudson.security.ACL;
 import hudson.security.ACLContext;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPREvent;
+import jenkins.branch.MultiBranchProject;
 import jenkins.model.Jenkins;
 import jenkins.model.ParameterizedJobMixIn;
 import jenkins.model.ParameterizedJobMixIn.ParameterizedJob;
 import jenkins.triggers.SCMTriggerItem;
-import jenkins.branch.MultiBranchProject;
-import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConsts.PULL_REQUEST_MERGED;
 
 public class BitBucketPPRJobProbe {
-  private static final Logger LOGGER = Logger.getLogger(
-      io.jenkins.plugins.bitbucketpushandpullrequest.BitBucketPPRJobProbe.class.getName());
+  private static final Logger LOGGER = Logger.getLogger(BitBucketPPRJobProbe.class.getName());
   private BitBucketPPREvent bitbucketEvent;
   private BitBucketPPRAction bitbucketAction;
 
@@ -64,7 +63,6 @@ public class BitBucketPPRJobProbe {
       throw new UnsupportedOperationException("Unsupported SCM type " + bitbucketAction.getScm());
     }
 
-    // TODO: do we need it?
     Jenkins.get().getACL();
 
     try (ACLContext old = ACL.as(ACL.SYSTEM)) {
@@ -93,7 +91,7 @@ public class BitBucketPPRJobProbe {
     }).collect(Collectors.toList());
   }
 
-  void triggerScm(Job<?, ?> job, List<URIish> remotes, BitBucketPPRAction bitbucketAction) {
+  private void triggerScm(Job<?, ?> job, List<URIish> remotes, BitBucketPPRAction bitbucketAction) {
     LOGGER.log(Level.FINE, "Considering to poke {0}", job.getFullDisplayName());
     Optional<BitBucketPPRTrigger> bitbucketTrigger = getBitBucketTrigger(job);
     List<SCM> scmTriggered = new ArrayList<>();
@@ -263,16 +261,7 @@ public class BitBucketPPRJobProbe {
     return str.startsWith("$");
   }
 
-  // needed cause the ssh and https URI differs in Bitbucket Server.
-  @Deprecated
-  private URIish parseBitBucketUrIish(URIish urIish) {
-    if (urIish.getPath().startsWith("/scm")) {
-      urIish = urIish.setPath(urIish.getPath().substring(4));
-    }
-    return urIish;
-  }
-
-  boolean testMatchMercurialScm(SCM scm, URIish remote) {
+  public boolean testMatchMercurialScm(SCM scm, URIish remote) {
     return matchMercurialScm(scm, remote);
   }
 }

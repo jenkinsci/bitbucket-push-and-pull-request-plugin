@@ -53,7 +53,6 @@ import net.sf.json.JSONObject;
 
 @RunWith(MockitoJUnitRunner.class)
 public class BitBucketPPRPullRequestPayloadProcessorTest {
-  Gson gson = new Gson();
   @Mock
   private BitBucketPPRJobProbe probe;
 
@@ -67,6 +66,7 @@ public class BitBucketPPRPullRequestPayloadProcessorTest {
   @Test
   @Ignore
   public void testProcessPullRequestApprovalWebhookHg() {
+    Gson gson = new Gson();
     String user = "test_user";
     String url = "https://bitbucket.org/test_user/test_repo";
 
@@ -99,6 +99,7 @@ public class BitBucketPPRPullRequestPayloadProcessorTest {
 
   @Test
   public void testProcessPullRequestApprovalWebhookGit() {
+    Gson gson = new Gson();
     BitBucketPPREvent bitbucketEvent = null;
     try {
       bitbucketEvent = new BitBucketPPREvent("pullrequest:approved");

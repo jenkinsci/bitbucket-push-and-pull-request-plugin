@@ -25,7 +25,6 @@ package io.jenkins.plugins.bitbucketpushandpullrequest.filter.repository;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.DataBoundConstructor;
 import hudson.Extension;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
@@ -67,7 +66,7 @@ public class BitBucketPPRRepositoryTriggerFilter extends BitBucketPPRTriggerFilt
 
     public List<BitBucketPPRRepositoryActionDescriptor> getActionDescriptors() {
       // you may want to filter this list of descriptors here, if you are being very fancy
-      return Jenkins.getInstance().getDescriptorList(BitBucketPPRRepositoryActionFilter.class);
+      return Jenkins.get().getDescriptorList(BitBucketPPRRepositoryActionFilter.class);
     }
   }
 

@@ -26,6 +26,7 @@ import java.io.Serializable;
 import com.google.gson.annotations.SerializedName;
 
 public class BitBucketPPRServerRepository implements Serializable {
+  private static final long serialVersionUID = 2888690501986298784L;
   private String slug;
   private String id;
   private String name;
@@ -44,7 +45,7 @@ public class BitBucketPPRServerRepository implements Serializable {
     return slug;
   }
 
-  public void setSlug(String slug) {
+  public void setSlug(final String slug) {
     this.slug = slug;
   }
 
@@ -52,7 +53,7 @@ public class BitBucketPPRServerRepository implements Serializable {
     return id;
   }
 
-  public void setId(String id) {
+  public void setId(final String id) {
     this.id = id;
   }
 
@@ -60,7 +61,7 @@ public class BitBucketPPRServerRepository implements Serializable {
     return name;
   }
 
-  public void setName(String name) {
+  public void setName(final String name) {
     this.name = name;
   }
 
@@ -68,7 +69,7 @@ public class BitBucketPPRServerRepository implements Serializable {
     return scmId;
   }
 
-  public void setScmId(String scmId) {
+  public void setScmId(final String scmId) {
     this.scmId = scmId;
   }
 
@@ -76,7 +77,7 @@ public class BitBucketPPRServerRepository implements Serializable {
     return state;
   }
 
-  public void setState(String state) {
+  public void setState(final String state) {
     this.state = state;
   }
 
@@ -84,7 +85,7 @@ public class BitBucketPPRServerRepository implements Serializable {
     return statusMessage;
   }
 
-  public void setStatusMessage(String statusMessage) {
+  public void setStatusMessage(final String statusMessage) {
     this.statusMessage = statusMessage;
   }
 
@@ -92,7 +93,7 @@ public class BitBucketPPRServerRepository implements Serializable {
     return forkable;
   }
 
-  public void setForkable(boolean forkable) {
+  public void setForkable(final boolean forkable) {
     this.forkable = forkable;
   }
 
@@ -100,7 +101,7 @@ public class BitBucketPPRServerRepository implements Serializable {
     return project;
   }
 
-  public void setProject(BitBucketPPRServerProject project) {
+  public void setProject(final BitBucketPPRServerProject project) {
     this.project = project;
   }
 
@@ -108,7 +109,7 @@ public class BitBucketPPRServerRepository implements Serializable {
     return isPublic;
   }
 
-  public void setPublic(boolean isPublic) {
+  public void setPublic(final boolean isPublic) {
     this.isPublic = isPublic;
   }
 
@@ -116,7 +117,7 @@ public class BitBucketPPRServerRepository implements Serializable {
     return links;
   }
 
-  public void setLinks(BitBucketPPRServerLinks links) {
+  public void setLinks(final BitBucketPPRServerLinks links) {
     this.links = links;
   }
 

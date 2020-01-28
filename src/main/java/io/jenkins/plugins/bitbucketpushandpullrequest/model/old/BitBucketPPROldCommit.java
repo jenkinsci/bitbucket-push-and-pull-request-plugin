@@ -28,6 +28,7 @@ import com.google.gson.annotations.SerializedName;
 
 
 public class BitBucketPPROldCommit implements Serializable {
+  private static final long serialVersionUID = -3167064469251233746L;
   private String author;
   private String branch;
   private List<File> files = new ArrayList<>();
@@ -45,7 +46,7 @@ public class BitBucketPPROldCommit implements Serializable {
     return author;
   }
 
-  public void setAuthor(String author) {
+  public void setAuthor(final String author) {
     this.author = author;
   }
 
@@ -53,7 +54,7 @@ public class BitBucketPPROldCommit implements Serializable {
     return branch;
   }
 
-  public void setBranch(String branch) {
+  public void setBranch(final String branch) {
     this.branch = branch;
   }
 
@@ -61,7 +62,7 @@ public class BitBucketPPROldCommit implements Serializable {
     return files;
   }
 
-  public void setFiles(List<File> files) {
+  public void setFiles(final List<File> files) {
     this.files = files;
   }
 
@@ -69,7 +70,7 @@ public class BitBucketPPROldCommit implements Serializable {
     return message;
   }
 
-  public void setMessage(String message) {
+  public void setMessage(final String message) {
     this.message = message;
   }
 
@@ -77,7 +78,7 @@ public class BitBucketPPROldCommit implements Serializable {
     return node;
   }
 
-  public void setNode(String node) {
+  public void setNode(final String node) {
     this.node = node;
   }
 
@@ -85,7 +86,7 @@ public class BitBucketPPROldCommit implements Serializable {
     return parents;
   }
 
-  public void setParents(List<String> parents) {
+  public void setParents(final List<String> parents) {
     this.parents = parents;
   }
 
@@ -93,7 +94,7 @@ public class BitBucketPPROldCommit implements Serializable {
     return rawAuthor;
   }
 
-  public void setRawAuthor(String rawAuthor) {
+  public void setRawAuthor(final String rawAuthor) {
     this.rawAuthor = rawAuthor;
   }
 
@@ -101,7 +102,7 @@ public class BitBucketPPROldCommit implements Serializable {
     return rawNode;
   }
 
-  public void setRawNode(String rawNode) {
+  public void setRawNode(final String rawNode) {
     this.rawNode = rawNode;
   }
 
@@ -109,7 +110,7 @@ public class BitBucketPPROldCommit implements Serializable {
     return revision;
   }
 
-  public void setRevision(int revision) {
+  public void setRevision(final int revision) {
     this.revision = revision;
   }
 
@@ -117,7 +118,7 @@ public class BitBucketPPROldCommit implements Serializable {
     return size;
   }
 
-  public void setSize(int size) {
+  public void setSize(final int size) {
     this.size = size;
   }
 
@@ -125,7 +126,7 @@ public class BitBucketPPROldCommit implements Serializable {
     return timestamp;
   }
 
-  public void setTimestamp(String timestamp) {
+  public void setTimestamp(final String timestamp) {
     this.timestamp = timestamp;
   }
 
@@ -133,7 +134,7 @@ public class BitBucketPPROldCommit implements Serializable {
     return utctimestamp;
   }
 
-  public void setUtctimestamp(String utctimestamp) {
+  public void setUtctimestamp(final String utctimestamp) {
     this.utctimestamp = utctimestamp;
   }
 

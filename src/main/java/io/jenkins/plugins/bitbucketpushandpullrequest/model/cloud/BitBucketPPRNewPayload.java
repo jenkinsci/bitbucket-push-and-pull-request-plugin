@@ -25,6 +25,8 @@ import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
 
 
 public class BitBucketPPRNewPayload implements BitBucketPPRPayload {
+  private static final long serialVersionUID = -3467640601880230847L;
+
   private BitBucketPPRPush push;
 
   private BitBucketPPRRepository repository;
@@ -37,7 +39,7 @@ public class BitBucketPPRNewPayload implements BitBucketPPRPayload {
     return push;
   }
 
-  public void setPush(BitBucketPPRPush push) {
+  public void setPush(final BitBucketPPRPush push) {
     this.push = push;
   }
 
@@ -45,7 +47,7 @@ public class BitBucketPPRNewPayload implements BitBucketPPRPayload {
     return repository;
   }
 
-  public void setRepository(BitBucketPPRRepository repository) {
+  public void setRepository(final BitBucketPPRRepository repository) {
     this.repository = repository;
   }
 
@@ -53,7 +55,7 @@ public class BitBucketPPRNewPayload implements BitBucketPPRPayload {
     return actor;
   }
 
-  public void setActor(BitBucketPPRActor actor) {
+  public void setActor(final BitBucketPPRActor actor) {
     this.actor = actor;
   }
 
@@ -61,7 +63,7 @@ public class BitBucketPPRNewPayload implements BitBucketPPRPayload {
     return pullRequest;
   }
 
-  public void setPullRequest(BitBucketPPRPullRequest pullRequest) {
+  public void setPullRequest(final BitBucketPPRPullRequest pullRequest) {
     this.pullRequest = pullRequest;
   }
 
@@ -69,7 +71,7 @@ public class BitBucketPPRNewPayload implements BitBucketPPRPayload {
     return approval;
   }
 
-  public void setApproval(BitBucketPPRApproval approval) {
+  public void setApproval(final BitBucketPPRApproval approval) {
     this.approval = approval;
   }
 

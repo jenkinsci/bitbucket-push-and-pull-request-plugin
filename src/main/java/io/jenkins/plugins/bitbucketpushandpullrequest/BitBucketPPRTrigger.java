@@ -47,6 +47,7 @@ import hudson.triggers.TriggerDescriptor;
 import hudson.util.SequentialExecutionQueue;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.cause.BitBucketPPRTriggerCause;
+import io.jenkins.plugins.bitbucketpushandpullrequest.exception.JobNotStartedException;
 import io.jenkins.plugins.bitbucketpushandpullrequest.filter.BitBucketPPRFilterMatcher;
 import io.jenkins.plugins.bitbucketpushandpullrequest.filter.BitBucketPPRTriggerFilter;
 import io.jenkins.plugins.bitbucketpushandpullrequest.filter.BitBucketPPRTriggerFilterDescriptor;
@@ -180,12 +181,12 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
   /**
    * Returns the file that records the last/current polling activity.
    * 
-   * @throws Exception
+   * @throws JobNotStartedException, IOException
    */
-  public File getLogFile() throws Exception {
+  public File getLogFile() throws JobNotStartedException, IOException {
 
     if (job == null) {
-      throw new Exception("No job started");
+      throw new JobNotStartedException("No job started");
     }
 
     File file = new File(job.getRootDir(), "bitbucket-polling.log");
@@ -196,7 +197,7 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
 
     return file;
   }
-  
+
   @Override
   public DescriptorImpl getDescriptor() {
     return (DescriptorImpl) super.getDescriptor();
@@ -233,8 +234,8 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
      * Writes the annotated log to the given output.
      */
     public void writeLogTo(XMLOutput out) throws Exception {
-      new AnnotatedLargeText<BitBucketPPRWebHookPollingAction>(getLogFile(), Charset.defaultCharset(),
-          true, this).writeHtmlTo(0, out.asWriter());
+      new AnnotatedLargeText<BitBucketPPRWebHookPollingAction>(getLogFile(),
+          Charset.defaultCharset(), true, this).writeHtmlTo(0, out.asWriter());
     }
   }
 

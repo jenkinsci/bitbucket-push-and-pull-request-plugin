@@ -26,6 +26,7 @@ import com.google.gson.annotations.SerializedName;
 
 
 public class BitBucketPPRParticipant implements Serializable {
+  private static final long serialVersionUID = 7546251977007143345L;
   private String type;
   private BitBucketPPRActor user;
   private String role;
@@ -36,7 +37,7 @@ public class BitBucketPPRParticipant implements Serializable {
     return type;
   }
 
-  public void setType(String type) {
+  public void setType(final String type) {
     this.type = type;
   }
 
@@ -44,7 +45,7 @@ public class BitBucketPPRParticipant implements Serializable {
     return user;
   }
 
-  public void setUser(BitBucketPPRActor user) {
+  public void setUser(final BitBucketPPRActor user) {
     this.user = user;
   }
 
@@ -52,7 +53,7 @@ public class BitBucketPPRParticipant implements Serializable {
     return role;
   }
 
-  public void setRole(String role) {
+  public void setRole(final String role) {
     this.role = role;
   }
 
@@ -60,7 +61,7 @@ public class BitBucketPPRParticipant implements Serializable {
     return approved;
   }
 
-  public void setApproved(boolean approved) {
+  public void setApproved(final boolean approved) {
     this.approved = approved;
   }
 
@@ -69,6 +70,6 @@ public class BitBucketPPRParticipant implements Serializable {
   }
 
   public void setParticipatedOn(final Date participatedOn) {
-    this.participatedOn = new Date(participatedOn.getTime());;
+    this.participatedOn = new Date(participatedOn.getTime());
   }
 }

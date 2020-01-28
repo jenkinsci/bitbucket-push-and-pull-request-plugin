@@ -20,7 +20,7 @@
  ******************************************************************************/
 package io.jenkins.plugins.bitbucketpushandpullrequest.util;
 
-public final class BitBucketPPRConsts {
+public final class BitBucketPPRConstsUtils {
   public static final String HOOK_URL = "bitbucket-hook";
   public static final String USER_AGENT = "Bitbucket-Webhooks/2.0";
 
@@ -50,7 +50,7 @@ public final class BitBucketPPRConsts {
   public static final String PULL_REQUEST_REVIEWER = "REVIEWER";
   public static final String PULL_REQUEST_PARTICIPANT = "PARTICIPANT";
 
-  private BitBucketPPRConsts() {
+  private BitBucketPPRConstsUtils() {
     throw new AssertionError();
   }
 }

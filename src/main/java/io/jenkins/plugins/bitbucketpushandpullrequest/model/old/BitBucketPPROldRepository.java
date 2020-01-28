@@ -25,6 +25,7 @@ import com.google.gson.annotations.SerializedName;
 
 
 public class BitBucketPPROldRepository implements Serializable {
+  private static final long serialVersionUID = -8606310364160210335L;
   private @SerializedName("absolute_url") String absoluteUrl;
   private boolean fork;
   private @SerializedName("is_private") boolean isPrivate;
@@ -38,7 +39,7 @@ public class BitBucketPPROldRepository implements Serializable {
     return absoluteUrl;
   }
 
-  public void setAbsoluteUrl(String absoluteUrl) {
+  public void setAbsoluteUrl(final String absoluteUrl) {
     this.absoluteUrl = absoluteUrl;
   }
 
@@ -46,7 +47,7 @@ public class BitBucketPPROldRepository implements Serializable {
     return fork;
   }
 
-  public void setFork(boolean fork) {
+  public void setFork(final boolean fork) {
     this.fork = fork;
   }
 
@@ -54,7 +55,7 @@ public class BitBucketPPROldRepository implements Serializable {
     return isPrivate;
   }
 
-  public void setPrivate(boolean isPrivate) {
+  public void setPrivate(final boolean isPrivate) {
     this.isPrivate = isPrivate;
   }
 
@@ -62,7 +63,7 @@ public class BitBucketPPROldRepository implements Serializable {
     return name;
   }
 
-  public void setName(String name) {
+  public void setName(final String name) {
     this.name = name;
   }
 
@@ -70,7 +71,7 @@ public class BitBucketPPROldRepository implements Serializable {
     return owner;
   }
 
-  public void setOwner(String owner) {
+  public void setOwner(final String owner) {
     this.owner = owner;
   }
 
@@ -78,7 +79,7 @@ public class BitBucketPPROldRepository implements Serializable {
     return scm;
   }
 
-  public void setScm(String scm) {
+  public void setScm(final String scm) {
     this.scm = scm;
   }
 
@@ -86,7 +87,7 @@ public class BitBucketPPROldRepository implements Serializable {
     return slug;
   }
 
-  public void setSlug(String slug) {
+  public void setSlug(final String slug) {
     this.slug = slug;
   }
 
@@ -94,7 +95,7 @@ public class BitBucketPPROldRepository implements Serializable {
     return website;
   }
 
-  public void setWebsite(String website) {
+  public void setWebsite(final String website) {
     this.website = website;
   }
 

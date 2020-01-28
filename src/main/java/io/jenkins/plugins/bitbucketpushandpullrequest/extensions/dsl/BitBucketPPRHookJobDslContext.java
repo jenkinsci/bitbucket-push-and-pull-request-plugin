@@ -24,7 +24,6 @@ package io.jenkins.plugins.bitbucketpushandpullrequest.extensions.dsl;
 
 import java.util.ArrayList;
 import java.util.List;
-import io.jenkins.plugins.bitbucketpushandpullrequest.BitBucketPPRTrigger;
 import io.jenkins.plugins.bitbucketpushandpullrequest.filter.BitBucketPPRTriggerFilter;
 import io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.cloud.BitBucketPPRPullRequestApprovedActionFilter;
 import io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.cloud.BitBucketPPRPullRequestCreatedActionFilter;

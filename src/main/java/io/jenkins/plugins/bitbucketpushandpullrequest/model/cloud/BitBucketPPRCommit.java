@@ -24,13 +24,14 @@ import java.io.Serializable;
 
 
 public class BitBucketPPRCommit implements Serializable {
+  private static final long serialVersionUID = 795153370768402207L;
   private String hash;
 
   public String getHash() {
     return hash;
   }
 
-  public void setHash(String hash) {
+  public void setHash(final String hash) {
     this.hash = hash;
   }
 

@@ -22,7 +22,10 @@
 
 package io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.cloud;
 
-import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConsts.*;
+import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.PULL_REQUEST_APPROVED;
+import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.PULL_REQUEST_CREATED;
+import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.PULL_REQUEST_MERGED;
+import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.PULL_REQUEST_UPDATED;
 import io.jenkins.plugins.bitbucketpushandpullrequest.filter.BitBucketPPREventTriggerMatcher;
 import io.jenkins.plugins.bitbucketpushandpullrequest.filter.BitBucketPPRTriggerFilter;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPREvent;
@@ -32,22 +35,14 @@ public class BitBucketPPRPullRequestTriggerMatcher implements BitBucketPPREventT
   @Override
   public boolean matchesAction(BitBucketPPREvent bitbucketEvent,
       BitBucketPPRTriggerFilter triggerFilter) {
-    if (PULL_REQUEST_APPROVED.equals(bitbucketEvent.getAction())
-        && triggerFilter.getActionFilter() instanceof BitBucketPPRPullRequestApprovedActionFilter) {
-      return true;
-    }
-    if (PULL_REQUEST_UPDATED.equals(bitbucketEvent.getAction())
-        && triggerFilter.getActionFilter() instanceof BitBucketPPRPullRequestUpdatedActionFilter) {
-      return true;
-    }
-    if (PULL_REQUEST_CREATED.equals(bitbucketEvent.getAction())
-        && triggerFilter.getActionFilter() instanceof BitBucketPPRPullRequestCreatedActionFilter) {
-      return true;
-    }
-    if (PULL_REQUEST_MERGED.equals(bitbucketEvent.getAction())
-        && triggerFilter.getActionFilter() instanceof BitBucketPPRPullRequestMergedActionFilter) {
-      return true;
-    }
-    return false;
+
+    return PULL_REQUEST_APPROVED.equals(bitbucketEvent.getAction())
+            && triggerFilter.getActionFilter() instanceof BitBucketPPRPullRequestApprovedActionFilter
+        || PULL_REQUEST_UPDATED.equals(bitbucketEvent.getAction())
+            && triggerFilter.getActionFilter() instanceof BitBucketPPRPullRequestUpdatedActionFilter
+        || PULL_REQUEST_CREATED.equals(bitbucketEvent.getAction())
+            && triggerFilter.getActionFilter() instanceof BitBucketPPRPullRequestCreatedActionFilter
+        || PULL_REQUEST_MERGED.equals(bitbucketEvent.getAction()) 
+            && triggerFilter.getActionFilter() instanceof BitBucketPPRPullRequestMergedActionFilter;
   }
 }

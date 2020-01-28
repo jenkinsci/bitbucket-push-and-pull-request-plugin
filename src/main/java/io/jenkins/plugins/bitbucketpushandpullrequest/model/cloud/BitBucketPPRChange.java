@@ -25,20 +25,22 @@ import com.google.gson.annotations.SerializedName;
 
 
 public class BitBucketPPRChange implements Serializable {
+  private static final long serialVersionUID = 7855401280893901392L;
+
   private boolean forced;
-  BitBucketPPRLinks links;
+  private BitBucketPPRLinks links;
   private boolean truncated;
   private boolean created;
   private boolean closed;
 
   @SerializedName("new")
-  BitBucketPPRNew newChange;
+  private BitBucketPPRNew newChange;
 
   public boolean isForced() {
     return forced;
   }
 
-  public void setForced(boolean forced) {
+  public void setForced(final boolean forced) {
     this.forced = forced;
   }
 
@@ -46,7 +48,7 @@ public class BitBucketPPRChange implements Serializable {
     return links;
   }
 
-  public void setLinks(BitBucketPPRLinks links) {
+  public void setLinks(final BitBucketPPRLinks links) {
     this.links = links;
   }
 
@@ -54,7 +56,7 @@ public class BitBucketPPRChange implements Serializable {
     return truncated;
   }
 
-  public void setTruncated(boolean truncated) {
+  public void setTruncated(final boolean truncated) {
     this.truncated = truncated;
   }
 
@@ -63,7 +65,7 @@ public class BitBucketPPRChange implements Serializable {
     return created;
   }
 
-  public void setCreated(boolean created) {
+  public void setCreated(final boolean created) {
     this.created = created;
   }
 
@@ -71,7 +73,7 @@ public class BitBucketPPRChange implements Serializable {
     return closed;
   }
 
-  public void setClosed(boolean closed) {
+  public void setClosed(final boolean closed) {
     this.closed = closed;
   }
 
@@ -79,7 +81,7 @@ public class BitBucketPPRChange implements Serializable {
     return newChange;
   }
 
-  public void setNewChange(BitBucketPPRNew newChange) {
+  public void setNewChange(final BitBucketPPRNew newChange) {
     this.newChange = newChange;
   }
 

@@ -26,13 +26,14 @@ import java.util.List;
 
 
 public class BitBucketPPRPush implements Serializable {
+  private static final long serialVersionUID = 5663991681801028868L;
   private List<BitBucketPPRChange> changes = new ArrayList<>();
 
   public List<BitBucketPPRChange> getChanges() {
     return changes;
   }
 
-  public void setChanges(List<BitBucketPPRChange> changes) {
+  public void setChanges(final List<BitBucketPPRChange> changes) {
     this.changes = changes;
   }
 

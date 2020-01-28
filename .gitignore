@@ -29,6 +29,16 @@ node_modules/*
 /npm-debug.log
 /yarn.lock
 
+### VisualStudioCode ###
+.vscode/*
+.factorypath
+
+### VisualStudioCode Patch ###
+# Ignore all local history of files
+.history
+
+# End of https://www.gitignore.io/api/visualstudiocode
+
 # Linux backup files
 *~
 

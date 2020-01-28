@@ -25,6 +25,7 @@ package io.jenkins.plugins.bitbucketpushandpullrequest.model.server;
 import java.io.Serializable;
 
 public class BitBucketPPRServerActor implements Serializable {
+  private static final long serialVersionUID = -3776450706699542277L;
   private String name;
   private String emailAddress;
   private String id;
@@ -38,7 +39,7 @@ public class BitBucketPPRServerActor implements Serializable {
     return name;
   }
 
-  public void setName(String name) {
+  public void setName(final String name) {
     this.name = name;
   }
 
@@ -46,7 +47,7 @@ public class BitBucketPPRServerActor implements Serializable {
     return emailAddress;
   }
 
-  public void setEmailAddress(String emailAddress) {
+  public void setEmailAddress(final String emailAddress) {
     this.emailAddress = emailAddress;
   }
 
@@ -54,7 +55,7 @@ public class BitBucketPPRServerActor implements Serializable {
     return id;
   }
 
-  public void setId(String id) {
+  public void setId(final String id) {
     this.id = id;
   }
 
@@ -62,7 +63,7 @@ public class BitBucketPPRServerActor implements Serializable {
     return displayName;
   }
 
-  public void setDisplayName(String displayName) {
+  public void setDisplayName(final String displayName) {
     this.displayName = displayName;
   }
 
@@ -70,7 +71,7 @@ public class BitBucketPPRServerActor implements Serializable {
     return active;
   }
 
-  public void setActive(boolean active) {
+  public void setActive(final boolean active) {
     this.active = active;
   }
 
@@ -78,7 +79,7 @@ public class BitBucketPPRServerActor implements Serializable {
     return slug;
   }
 
-  public void setSlug(String slug) {
+  public void setSlug(final String slug) {
     this.slug = slug;
   }
 
@@ -86,7 +87,7 @@ public class BitBucketPPRServerActor implements Serializable {
     return type;
   }
 
-  public void setType(String type) {
+  public void setType(final String type) {
     this.type = type;
   }
 
@@ -94,7 +95,7 @@ public class BitBucketPPRServerActor implements Serializable {
     return links;
   }
 
-  public void setLinks(BitBucketPPRServerLinks links) {
+  public void setLinks(final BitBucketPPRServerLinks links) {
     this.links = links;
   }
 }

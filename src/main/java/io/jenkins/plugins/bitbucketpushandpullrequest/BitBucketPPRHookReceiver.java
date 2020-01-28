@@ -22,8 +22,7 @@
 
 package io.jenkins.plugins.bitbucketpushandpullrequest;
 
-import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConsts.HOOK_URL;
-import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConsts.USER_AGENT;
+import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.HOOK_URL;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
@@ -32,18 +31,15 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.naming.OperationNotSupportedException;
 import javax.servlet.http.HttpServletResponse;
+import com.google.gson.Gson;
 import org.apache.commons.io.IOUtils;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
-import com.google.gson.Gson;
 import hudson.Extension;
 import hudson.model.UnprotectedRootAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPREvent;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayloadFactory;
-import io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud.BitBucketPPRNewPayload;
-import io.jenkins.plugins.bitbucketpushandpullrequest.model.old.BitBucketPPROldPost;
-import io.jenkins.plugins.bitbucketpushandpullrequest.model.server.BitBucketPPRServerPayload;
 import io.jenkins.plugins.bitbucketpushandpullrequest.processor.BitBucketPPRPayloadProcessor;
 import io.jenkins.plugins.bitbucketpushandpullrequest.processor.BitBucketPPRPayloadProcessorFactory;
 
@@ -73,7 +69,8 @@ public class BitBucketPPRHookReceiver implements UnprotectedRootAction {
     return HOOK_URL;
   }
 
-  public void doIndex(StaplerRequest request, StaplerResponse response) throws IOException {
+  public void doIndex(final StaplerRequest request, final StaplerResponse response)
+      throws IOException {
     String inputStream = IOUtils.toString(request.getInputStream());
 
     if (inputStream.isEmpty()) {
@@ -88,32 +85,32 @@ public class BitBucketPPRHookReceiver implements UnprotectedRootAction {
           bitbucketEvent = new BitBucketPPREvent(request.getHeader("x-event-key"));
           logger.log(Level.INFO,
               () -> "Received x-event-key " + request.getHeader("x-event-key") + " from Bitbucket");
-        } catch (OperationNotSupportedException e) {
+        } catch (final OperationNotSupportedException e) {
           logger.warning(e.getMessage());
         }
       } else {
         logger.log(Level.INFO, "Received old POST payload. (Deprecated, it will be removed.)");
         try {
           bitbucketEvent = new BitBucketPPREvent("repo:post");
-        } catch (OperationNotSupportedException e) {
+        } catch (final OperationNotSupportedException e) {
           logger.warning(e.getMessage());
         }
       }
 
       if (bitbucketEvent != null) {
-        Gson gson = new Gson();
+        final Gson gson = new Gson();
         try {
-          BitBucketPPRPayload payload = gson.fromJson(inputStream,
+          final BitBucketPPRPayload payload = gson.fromJson(inputStream,
               BitBucketPPRPayloadFactory.getInstance(bitbucketEvent).getClass());
           logger.fine(() -> "the payload is: " + payload.toString());
 
-          BitBucketPPRPayloadProcessor bitbucketPayloadProcessor =
+          final BitBucketPPRPayloadProcessor bitbucketPayloadProcessor =
               BitBucketPPRPayloadProcessorFactory.createProcessor(bitbucketEvent);
           logger.fine(
               () -> "the selected payload processor is: " + bitbucketPayloadProcessor.toString());
 
           bitbucketPayloadProcessor.processPayload(payload);
-        } catch (Exception e) {
+        } catch (final Exception e) {
           logger.warning(e.getMessage());
         }
       } else {
@@ -125,12 +122,12 @@ public class BitBucketPPRHookReceiver implements UnprotectedRootAction {
         response.setContentType("text/html");
         response.setCharacterEncoding("UTF-8");
         response.setStatus(HttpServletResponse.SC_OK);
-        PrintWriter out = response.getWriter();
+        final PrintWriter out = response.getWriter();
         out.write("ok");
         out.flush();
         out.close();
         logger.log(Level.INFO, "Response sent.");
-      } catch (Exception e) {
+      } catch (final Exception e) {
         logger.warning(e.getMessage());
       }
     } else {
@@ -141,11 +138,13 @@ public class BitBucketPPRHookReceiver implements UnprotectedRootAction {
     }
   }
 
-  private String decodeInputStream(String input, String contentType) {
+  private String decodeInputStream(final String inputStream, final String contentType) {
+    String input = inputStream;
+
     if (contentType != null && contentType.startsWith("application/x-www-form-urlencoded")) {
       try {
         input = URLDecoder.decode(input, "UTF-8");
-      } catch (UnsupportedEncodingException e) {
+      } catch (final UnsupportedEncodingException e) {
         logger.warning(e.getMessage());
       }
     }

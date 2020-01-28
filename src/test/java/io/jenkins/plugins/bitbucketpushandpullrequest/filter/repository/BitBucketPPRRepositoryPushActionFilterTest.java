@@ -2,13 +2,10 @@ package io.jenkins.plugins.bitbucketpushandpullrequest.filter.repository;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-
 import java.util.HashMap;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
-
 import hudson.EnvVars;
 
 
@@ -151,7 +148,7 @@ public class BitBucketPPRRepositoryPushActionFilterTest {
   }
 
   @Test
-  public void testMatches_not_1() {
+  public void testMatchesNot1() {
     BitBucketPPRRepositoryPushActionFilter c =
         new BitBucketPPRRepositoryPushActionFilter(false, false, "*/master");
 
@@ -159,7 +156,7 @@ public class BitBucketPPRRepositoryPushActionFilterTest {
   }
 
   @Test
-  public void testMatches_not_2() {
+  public void testMatchesNot2() {
     BitBucketPPRRepositoryPushActionFilter c =
         new BitBucketPPRRepositoryPushActionFilter(false, false, "develop, :^(?!master$).*");
     assertFalse(c.matches("master"));
@@ -169,7 +166,7 @@ public class BitBucketPPRRepositoryPushActionFilterTest {
   }
 
   @Test
-  public void testMatches_empty_branches() {
+  public void testMatchesEmptyBranches() {
     String allowedBranches = "";
     BitBucketPPRRepositoryPushActionFilter c =
         new BitBucketPPRRepositoryPushActionFilter(false, false, allowedBranches);
@@ -192,8 +189,8 @@ public class BitBucketPPRRepositoryPushActionFilterTest {
 
   @Test
   public void testUsesJavaPatternToExcludeMultipleBranches() {
-    BitBucketPPRRepositoryPushActionFilter m =
-        new BitBucketPPRRepositoryPushActionFilter(false, false, ":^(?!origin/master$|origin/develop$).*");
+    BitBucketPPRRepositoryPushActionFilter m = new BitBucketPPRRepositoryPushActionFilter(false,
+        false, ":^(?!origin/master$|origin/develop$).*");
 
     assertTrue(m.matches("origin/branch1"));
     assertTrue(m.matches("origin/branch-2"));
