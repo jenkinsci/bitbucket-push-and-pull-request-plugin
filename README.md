@@ -88,120 +88,120 @@ If you are using Bitbucket Server, follow these instructions: <https://confluenc
 
 ## Dsl Job snippets
 
-```
+```groovy
 // pullRequestCreatedAction()
 job('example-pull-request-created') {
-  	triggers{
-		bitbucketTriggers {
-			pullRequestCreatedAction()
-		}
-  	}
-  	scm {
-		git {
-		    remote {
-		        url("https://git.company.domain/scm/~username/telegram.git")
-		    }
-		}
-	}
-    steps {
-        shell('echo START pull request created')
+  triggers{
+    bitbucketTriggers {
+      pullRequestCreatedAction()
     }
+  }
+  scm {
+    git {
+      remote {
+        url("https://git.company.domain/scm/~username/telegram.git")
+      }
+    }
+  }
+  steps {
+    shell('echo START pull request created')
+  }
 }
 
 // pullRequestUpdatedAction()
 job('example-pull-request-updated') {
-  	triggers{
-		bitbucketTriggers {
-			pullRequestUpdatedAction()
-		}
-  	}
-  	scm {
-		git {
-		    remote {
-		        url("https://git.company.domain/scm/~username/telegram.git")
-		    }
-		}
-	}
-    steps {
-        shell('echo START pull request updated')
+  triggers{
+    bitbucketTriggers {
+      pullRequestUpdatedAction()
     }
+  }
+  scm {
+    git {
+      remote {
+        url("https://git.company.domain/scm/~username/telegram.git")
+      }
+    }
+  }
+  steps {
+    shell('echo START pull request updated')
+  }
 }
 
 // pullRequestApprovedAction(boolean onlyIfReviewersApproved)
 job('example-pull-request-approved') {
-  	triggers{
-		bitbucketTriggers {
-			pullRequestApprovedAction(false)
-		}
-  	}
-  	scm {
-		git {
-		    remote {
-		        url("https://git.company.domain/scm/~username/telegram.git")
-		    }
-		}
-	}
-    steps {
-        shell('echo START pull request approved')
+  triggers{
+    bitbucketTriggers {
+      pullRequestApprovedAction(false)
     }
+  }
+  scm {
+    git {
+      remote {
+        url("https://git.company.domain/scm/~username/telegram.git")
+      }
+    }
+  }
+  steps {
+    shell('echo START pull request approved')
+  }
 }
 
 // pullRequestMergedAction()
 job('example-pull-request-merged') {
-  	triggers{
-		bitbucketTriggers {
-			pullRequestMergedAction()
-		}
-  	}
-  	scm {
-		git {
-		    remote {
-		        url("https://git.company.domain/scm/~username/telegram.git")
-		    }
-		}
-	}
-    steps {
-        shell('echo START pull request approved')
+  triggers{
+    bitbucketTriggers {
+      pullRequestMergedAction()
     }
+  }
+  scm {
+    git {
+      remote {
+        url("https://git.company.domain/scm/~username/telegram.git")
+      }
+    }
+  }
+  steps {
+    shell('echo START pull request approved')
+  }
 }
 
 // repositoryPushAction(boolean triggerAlsoIfTagPush, String allowedBranches)
 job('example-push') {
-  	triggers{
-		bitbucketTriggers {
-			repositoryPushAction(false, true, "")
-		}
-  	}
-  	scm {
-		git {
-		    remote {
-		        url("https://git.company.domain/scm/~username/telegram.git")
-		    }
-		}
-	}
-    steps {
-        shell('echo START push')
+  triggers{
+    bitbucketTriggers {
+      repositoryPushAction(false, true, "")
     }
+  }
+  scm {
+    git {
+      remote {
+        url("https://git.company.domain/scm/~username/telegram.git")
+      }
+    }
+  }
+  steps {
+      shell('echo START push')
+  }
 }
 
 // combination of triggers is also possible
 job('example-pull-request-created-updated') {
-  	triggers{
-		bitbucketTriggers {
-			pullRequestCreatedAction()
-			pullRequestUpdatedAction()
-		}
-  	}
-  	scm {
-		git {
-		    remote {
-		        url("https://git.company.domain/scm/~username/telegram.git")
-		    }
-		}
-	}
-    steps {
-        shell('echo START pull request created')
+  triggers{
+    bitbucketTriggers {
+      pullRequestCreatedAction()
+      pullRequestUpdatedAction()
     }
+  }
+  scm {
+    git {
+      remote {
+          url("https://git.company.domain/scm/~username/telegram.git")
+      }
+    }
+  }
+  steps {
+      shell('echo START pull request created')
+  }
 }
 ```
 
@@ -209,80 +209,80 @@ job('example-pull-request-created-updated') {
 
 Example of pipeline code for building on pull-request and push events.
 
-```
+```groovy
 properties([
-    pipelineTriggers([
+  pipelineTriggers([
+    [
+      $class: 'BitBucketPPRTrigger',
+      triggers : [
         [
-            $class: 'BitBucketPPRTrigger',
-            triggers : [
-                [
-                    $class: 'BitBucketPPRPullRequestTriggerFilter',
-                    actionFilter: [
-                        $class: 'BitBucketPPRPullRequestCreatedActionFilter',
-                    ]
-                ],
-                [
-                    $class: 'BitBucketPPRPullRequestTriggerFilter',
-                    actionFilter: [
-                        $class: 'BitBucketPPRPullRequestApprovedActionFilter',
-                    ]
-                ],
-                [
-                    $class: 'BitBucketPPRPullRequestTriggerFilter',
-                    actionFilter: [
-                        $class: 'BitBucketPPRPullRequestUpdatedActionFilter',
-                    ]
-                ],
-                [
-                    $class: 'BitBucketPPRPullRequestTriggerFilter',
-                    actionFilter: [
-                        $class: 'BitBucketPPRPullRequestMergedActionFilter',
-                    ]
-                ],
-                [
-                    $class: 'BitBucketPPRRepositoryTriggerFilter',
-                    actionFilter: [
-                        $class: 'BitBucketPPRRepositoryPushActionFilter',
-                        triggerAlsoIfNothingChanged: true,
-                        triggerAlsoIfTagPush: false,
-			allowedBranches: ""
-                    ]
-                ]
-            ]
+          $class: 'BitBucketPPRPullRequestTriggerFilter',
+          actionFilter: [
+            $class: 'BitBucketPPRPullRequestCreatedActionFilter',
+          ]
+        ],
+        [
+          $class: 'BitBucketPPRPullRequestTriggerFilter',
+          actionFilter: [
+            $class: 'BitBucketPPRPullRequestApprovedActionFilter',
+          ]
+        ],
+        [
+          $class: 'BitBucketPPRPullRequestTriggerFilter',
+          actionFilter: [
+            $class: 'BitBucketPPRPullRequestUpdatedActionFilter',
+          ]
+        ],
+        [
+          $class: 'BitBucketPPRPullRequestTriggerFilter',
+          actionFilter: [
+            $class: 'BitBucketPPRPullRequestMergedActionFilter',
+          ]
+        ],
+        [
+          $class: 'BitBucketPPRRepositoryTriggerFilter',
+          actionFilter: [
+            $class: 'BitBucketPPRRepositoryPushActionFilter',
+            triggerAlsoIfNothingChanged: true,
+            triggerAlsoIfTagPush: false,
+            allowedBranches: ""
+          ]
         ]
-    ])
+      ]
+    ]
+  ])
 ])
 
 pipeline {
-    agent any
+  agent any
 
-    stages {
-        stage('Build') {
-            steps {
-                echo 'Building...'
+  stages {
+  stage('Build') {
+      steps {
+        echo 'Building...'
 
-                echo 'Env vars for cloud pull request...'
-                echo "BITBUCKET_SOURCE_BRANCH ${env.BITBUCKET_SOURCE_BRANCH}"
-		echo "BITBUCKET_TARGET_BRANCH ${env.BITBUCKET_TARGET_BRANCH}"
-		echo "BITBUCKET_PULL_REQUEST_LINK ${env.BITBUCKET_PULL_REQUEST_LINK}"
-		echo "BITBUCKET_PULL_REQUEST_ID ${env.BITBUCKET_PULL_REQUEST_ID}"
-		echo "BITBUCKET_PAYLOAD ${env.BITBUCKET_PAYLOAD}"
+        echo 'Env vars for cloud pull request...'
+        echo "BITBUCKET_SOURCE_BRANCH ${env.BITBUCKET_SOURCE_BRANCH}"
+        echo "BITBUCKET_TARGET_BRANCH ${env.BITBUCKET_TARGET_BRANCH}"
+        echo "BITBUCKET_PULL_REQUEST_LINK ${env.BITBUCKET_PULL_REQUEST_LINK}"
+        echo "BITBUCKET_PULL_REQUEST_ID ${env.BITBUCKET_PULL_REQUEST_ID}"
+        echo "BITBUCKET_PAYLOAD ${env.BITBUCKET_PAYLOAD}"
 
-		echo 'Env vars for cloud push...'
-		echo "REPOSITORY_LINK ${env.REPOSITORY_LINK}"
-		echo "BITBUCKET_SOURCE_BRANCH ${env.BITBUCKET_SOURCE_BRANCH}"
-		echo "BITBUCKET_REPOSITORY_URL ${env.BITBUCKET_REPOSITORY_URL}"
-		echo "BITBUCKET_PUSH_REPOSITORY_UUID ${env.BITBUCKET_PUSH_REPOSITORY_UUID}"
-		echo "BITBUCKET_PAYLOAD ${env.BITBUCKET_PAYLOAD}"
+        echo 'Env vars for cloud push...'
+        echo "REPOSITORY_LINK ${env.REPOSITORY_LINK}"
+        echo "BITBUCKET_SOURCE_BRANCH ${env.BITBUCKET_SOURCE_BRANCH}"
+        echo "BITBUCKET_REPOSITORY_URL ${env.BITBUCKET_REPOSITORY_URL}"
+        echo "BITBUCKET_PUSH_REPOSITORY_UUID ${env.BITBUCKET_PUSH_REPOSITORY_UUID}"
+        echo "BITBUCKET_PAYLOAD ${env.BITBUCKET_PAYLOAD}"
 
-		echo 'Env vars for server push...'
-		echo "REPOSITORY_LINK ${env.REPOSITORY_LINK}"
-		echo "BITBUCKET_SOURCE_BRANCH ${env.BITBUCKET_SOURCE_BRANCH}"
-		echo "BITBUCKET_REPOSITORY_URL ${env.BITBUCKET_REPOSITORY_URL}"
-		echo "BITBUCKET_PUSH_REPOSITORY_UUID ${env.BITBUCKET_PUSH_REPOSITORY_UUID}"
-		echo "BITBUCKET_PAYLOAD ${env.BITBUCKET_PAYLOAD}"
-            }
-    	}
+        echo 'Env vars for server push...'
+        echo "REPOSITORY_LINK ${env.REPOSITORY_LINK}"
+        echo "BITBUCKET_SOURCE_BRANCH ${env.BITBUCKET_SOURCE_BRANCH}"
+        echo "BITBUCKET_REPOSITORY_URL ${env.BITBUCKET_REPOSITORY_URL}"
+        echo "BITBUCKET_PUSH_REPOSITORY_UUID ${env.BITBUCKET_PUSH_REPOSITORY_UUID}"
+        echo "BITBUCKET_PAYLOAD ${env.BITBUCKET_PAYLOAD}"
+      }
     }
+  }
 }
 ```

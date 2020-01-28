@@ -33,7 +33,6 @@ import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPREvent;
 
 public final class BitBucketPPRPayloadProcessorFactory {
 
-
   private BitBucketPPRPayloadProcessorFactory() {
     throw new AssertionError();
   }
@@ -48,7 +47,7 @@ public final class BitBucketPPRPayloadProcessorFactory {
       final BitBucketPPREvent bitbucketEvent) throws OperationNotSupportedException {
 
     BitBucketPPRPayloadProcessor processor = null;
-    
+
     if (REPOSITORY_EVENT.equalsIgnoreCase(bitbucketEvent.getEvent())) {
       if (REPOSITORY_PUSH.equalsIgnoreCase(bitbucketEvent.getAction())) {
         processor = new BitBucketPPRRepositoryPayloadProcessor(probe, bitbucketEvent);
