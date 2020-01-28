@@ -29,6 +29,8 @@ import com.google.gson.annotations.SerializedName;
 
 
 public class BitBucketPPRServerLinks implements Serializable {
+  private static final long serialVersionUID = -8908433977563131277L;
+
   @SerializedName("clone")
   private List<BitBucketPPRServerClone> cloneProperty = new ArrayList<>();
 
@@ -39,7 +41,7 @@ public class BitBucketPPRServerLinks implements Serializable {
     return new ArrayList<>(cloneProperty);
   }
 
-  public void setCloneProperty(List<BitBucketPPRServerClone> cloneProperty) {
+  public void setCloneProperty(final List<BitBucketPPRServerClone> cloneProperty) {
     this.cloneProperty = cloneProperty;
   }
 
@@ -47,7 +49,7 @@ public class BitBucketPPRServerLinks implements Serializable {
     return new ArrayList<>(selfProperty);
   }
 
-  public void setSelfProperty(List<BitBucketPPRServerSelf> selfProperty) {
+  public void setSelfProperty(final List<BitBucketPPRServerSelf> selfProperty) {
     this.selfProperty = selfProperty;
   }
 }

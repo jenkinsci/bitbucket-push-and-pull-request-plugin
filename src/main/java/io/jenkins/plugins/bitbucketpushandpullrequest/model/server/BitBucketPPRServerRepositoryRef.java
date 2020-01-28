@@ -25,7 +25,7 @@ package io.jenkins.plugins.bitbucketpushandpullrequest.model.server;
 import java.io.Serializable;
 
 public class BitBucketPPRServerRepositoryRef implements Serializable {
-
+  private static final long serialVersionUID = 5693884607853431041L;
   private String id;
   private String displayId;
   private String latestCommit;
@@ -35,7 +35,7 @@ public class BitBucketPPRServerRepositoryRef implements Serializable {
     return id;
   }
 
-  public void setId(String id) {
+  public void setId(final String id) {
     this.id = id;
   }
 
@@ -43,7 +43,7 @@ public class BitBucketPPRServerRepositoryRef implements Serializable {
     return displayId;
   }
 
-  public void setDisplayId(String displayId) {
+  public void setDisplayId(final String displayId) {
     this.displayId = displayId;
   }
 
@@ -51,7 +51,7 @@ public class BitBucketPPRServerRepositoryRef implements Serializable {
     return latestCommit;
   }
 
-  public void setLatestCommit(String latestCommit) {
+  public void setLatestCommit(final String latestCommit) {
     this.latestCommit = latestCommit;
   }
 
@@ -59,7 +59,7 @@ public class BitBucketPPRServerRepositoryRef implements Serializable {
     return repository;
   }
 
-  public void setRepository(BitBucketPPRServerRepository repository) {
+  public void setRepository(final BitBucketPPRServerRepository repository) {
     this.repository = repository;
   }
 

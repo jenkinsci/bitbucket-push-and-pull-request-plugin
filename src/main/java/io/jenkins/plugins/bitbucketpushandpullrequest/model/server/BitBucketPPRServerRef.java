@@ -26,6 +26,7 @@ import java.io.Serializable;
 
 
 public class BitBucketPPRServerRef implements Serializable {
+  private static final long serialVersionUID = -8845585960950746623L;
   private String id;
   private String displayId;
   private String type;
@@ -34,7 +35,7 @@ public class BitBucketPPRServerRef implements Serializable {
     return id;
   }
 
-  public void setId(String id) {
+  public void setId(final String id) {
     this.id = id;
   }
 
@@ -42,7 +43,7 @@ public class BitBucketPPRServerRef implements Serializable {
     return displayId;
   }
 
-  public void setDisplayId(String displayId) {
+  public void setDisplayId(final String displayId) {
     this.displayId = displayId;
   }
 
@@ -50,7 +51,7 @@ public class BitBucketPPRServerRef implements Serializable {
     return type;
   }
 
-  public void setType(String type) {
+  public void setType(final String type) {
     this.type = type;
   }
 }

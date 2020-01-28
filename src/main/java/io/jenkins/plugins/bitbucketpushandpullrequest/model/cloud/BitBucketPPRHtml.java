@@ -26,6 +26,7 @@ import java.io.Serializable;
 
 
 public class BitBucketPPRHtml implements Serializable {
+  private static final long serialVersionUID = -6887496731660740096L;
   private String href;
 
   public String getHref() {

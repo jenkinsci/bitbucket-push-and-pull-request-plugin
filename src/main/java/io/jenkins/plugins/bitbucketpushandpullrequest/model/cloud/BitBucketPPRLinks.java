@@ -24,6 +24,8 @@ import java.io.Serializable;
 import com.google.gson.annotations.SerializedName;
 
 public class BitBucketPPRLinks implements Serializable {
+  private static final long serialVersionUID = 8607244117530188175L;
+
   BitBucketPPRHtml html;
 
   @SerializedName("self")
@@ -33,7 +35,7 @@ public class BitBucketPPRLinks implements Serializable {
     return html;
   }
 
-  public void setHtml(BitBucketPPRHtml html) {
+  public void setHtml(final BitBucketPPRHtml html) {
     this.html = html;
   }
 
@@ -41,7 +43,7 @@ public class BitBucketPPRLinks implements Serializable {
     return selfProperty;
   }
 
-  public void setSelf(BitBucketPPRSelf selfProperty) {
+  public void setSelf(final BitBucketPPRSelf selfProperty) {
     this.selfProperty = selfProperty;
   }
 

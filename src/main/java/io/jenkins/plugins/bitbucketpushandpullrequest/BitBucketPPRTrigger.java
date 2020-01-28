@@ -197,7 +197,7 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
 
     return file;
   }
-  
+
   @Override
   public DescriptorImpl getDescriptor() {
     return (DescriptorImpl) super.getDescriptor();
@@ -234,8 +234,8 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
      * Writes the annotated log to the given output.
      */
     public void writeLogTo(XMLOutput out) throws Exception {
-      new AnnotatedLargeText<BitBucketPPRWebHookPollingAction>(getLogFile(), Charset.defaultCharset(),
-          true, this).writeHtmlTo(0, out.asWriter());
+      new AnnotatedLargeText<BitBucketPPRWebHookPollingAction>(getLogFile(),
+          Charset.defaultCharset(), true, this).writeHtmlTo(0, out.asWriter());
     }
   }
 

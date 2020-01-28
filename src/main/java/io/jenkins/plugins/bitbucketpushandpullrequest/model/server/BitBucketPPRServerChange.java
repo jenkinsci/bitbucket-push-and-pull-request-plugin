@@ -1,10 +1,10 @@
 package io.jenkins.plugins.bitbucketpushandpullrequest.model.server;
 
 import java.io.Serializable;
-import com.google.gson.annotations.SerializedName;
 
 
 public class BitBucketPPRServerChange implements Serializable {
+  private static final long serialVersionUID = 49898612250869977L;
   private BitBucketPPRServerRef ref;
   private String refId;
   private String fromHash;
@@ -15,7 +15,7 @@ public class BitBucketPPRServerChange implements Serializable {
     return ref;
   }
 
-  public void setRef(BitBucketPPRServerRef ref) {
+  public void setRef(final BitBucketPPRServerRef ref) {
     this.ref = ref;
   }
 
@@ -23,7 +23,7 @@ public class BitBucketPPRServerChange implements Serializable {
     return refId;
   }
 
-  public void setRefId(String refId) {
+  public void setRefId(final String refId) {
     this.refId = refId;
   }
 
@@ -31,7 +31,7 @@ public class BitBucketPPRServerChange implements Serializable {
     return fromHash;
   }
 
-  public void setFromHash(String fromHash) {
+  public void setFromHash(final String fromHash) {
     this.fromHash = fromHash;
   }
 
@@ -39,7 +39,7 @@ public class BitBucketPPRServerChange implements Serializable {
     return toHash;
   }
 
-  public void setToHash(String toHash) {
+  public void setToHash(final String toHash) {
     this.toHash = toHash;
   }
 
@@ -47,7 +47,7 @@ public class BitBucketPPRServerChange implements Serializable {
     return type;
   }
 
-  public void setType(String type) {
+  public void setType(final String type) {
     this.type = type;
   }
 }

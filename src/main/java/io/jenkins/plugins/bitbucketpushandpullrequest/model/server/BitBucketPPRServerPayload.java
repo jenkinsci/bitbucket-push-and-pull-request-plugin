@@ -7,10 +7,11 @@ import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
 
 
 public class BitBucketPPRServerPayload implements BitBucketPPRPayload {
+  private static final long serialVersionUID = -5088466617368578337L;
   private BitBucketPPRServerActor actor;
   private BitBucketPPRServerPullRequest pullRequest;
   private BitBucketPPRServerRepository repository;
-  private List<BitBucketPPRServerChange> changes = new ArrayList<>();
+  private final List<BitBucketPPRServerChange> changes = new ArrayList<>();
 
   @SuppressFBWarnings
   @Override

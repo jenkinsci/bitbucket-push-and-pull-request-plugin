@@ -21,10 +21,10 @@
 package io.jenkins.plugins.bitbucketpushandpullrequest.model.server;
 
 import java.io.Serializable;
-import java.util.Arrays;
 
 
 public class BitBucketPPRServerClone implements Serializable {
+  private static final long serialVersionUID = 8260609430213080172L;
   private String href;
   private String name;
 
@@ -32,7 +32,7 @@ public class BitBucketPPRServerClone implements Serializable {
     return href;
   }
 
-  public void setHref(String href) {
+  public void setHref(final String href) {
     this.href = href;
   }
 
@@ -40,7 +40,7 @@ public class BitBucketPPRServerClone implements Serializable {
     return name;
   }
 
-  public void setName(String name) {
+  public void setName(final String name) {
     this.name = name;
   }
 

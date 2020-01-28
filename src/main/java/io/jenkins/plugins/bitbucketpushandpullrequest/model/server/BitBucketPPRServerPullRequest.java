@@ -23,11 +23,11 @@
 package io.jenkins.plugins.bitbucketpushandpullrequest.model.server;
 
 import java.io.Serializable;
-import java.sql.Timestamp;
 import java.util.List;
 
 
 public class BitBucketPPRServerPullRequest implements Serializable {
+  private static final long serialVersionUID = -2700597086308321013L;
   private Long id;
   private Long version;
   private String title;
@@ -52,7 +52,7 @@ public class BitBucketPPRServerPullRequest implements Serializable {
     return id;
   }
 
-  public void setId(Long id) {
+  public void setId(final Long id) {
     this.id = id;
   }
 
@@ -60,7 +60,7 @@ public class BitBucketPPRServerPullRequest implements Serializable {
     return version;
   }
 
-  public void setVersion(Long version) {
+  public void setVersion(final Long version) {
     this.version = version;
   }
 
@@ -68,7 +68,7 @@ public class BitBucketPPRServerPullRequest implements Serializable {
     return title;
   }
 
-  public void setTitle(String title) {
+  public void setTitle(final String title) {
     this.title = title;
   }
 
@@ -76,7 +76,7 @@ public class BitBucketPPRServerPullRequest implements Serializable {
     return state;
   }
 
-  public void setState(String state) {
+  public void setState(final String state) {
     this.state = state;
   }
 
@@ -84,7 +84,7 @@ public class BitBucketPPRServerPullRequest implements Serializable {
     return open;
   }
 
-  public void setOpen(Boolean open) {
+  public void setOpen(final Boolean open) {
     this.open = open;
   }
 
@@ -92,7 +92,7 @@ public class BitBucketPPRServerPullRequest implements Serializable {
     return closed;
   }
 
-  public void setClosed(Boolean closed) {
+  public void setClosed(final Boolean closed) {
     this.closed = closed;
   }
 
@@ -100,7 +100,7 @@ public class BitBucketPPRServerPullRequest implements Serializable {
     return createdDate;
   }
 
-  public void setCreatedDate(Long createdDate) {
+  public void setCreatedDate(final Long createdDate) {
     this.createdDate = createdDate;
   }
 
@@ -108,7 +108,7 @@ public class BitBucketPPRServerPullRequest implements Serializable {
     return updatedDate;
   }
 
-  public void setUpdatedDate(Long updatedDate) {
+  public void setUpdatedDate(final Long updatedDate) {
     this.updatedDate = updatedDate;
   }
 
@@ -116,7 +116,7 @@ public class BitBucketPPRServerPullRequest implements Serializable {
     return locked;
   }
 
-  public void setLocked(Boolean locked) {
+  public void setLocked(final Boolean locked) {
     this.locked = locked;
   }
 
@@ -124,7 +124,7 @@ public class BitBucketPPRServerPullRequest implements Serializable {
     return author;
   }
 
-  public void setAuthor(BitBucketPPRServerActor author) {
+  public void setAuthor(final BitBucketPPRServerActor author) {
     this.author = author;
   }
 
@@ -132,7 +132,7 @@ public class BitBucketPPRServerPullRequest implements Serializable {
     return reviewers;
   }
 
-  public void setReviewers(List<BitBucketPPRServerActor> reviewers) {
+  public void setReviewers(final List<BitBucketPPRServerActor> reviewers) {
     this.reviewers = reviewers;
   }
 
@@ -140,7 +140,7 @@ public class BitBucketPPRServerPullRequest implements Serializable {
     return participants;
   }
 
-  public void setParticipants(List<BitBucketPPRServerActor> participants) {
+  public void setParticipants(final List<BitBucketPPRServerActor> participants) {
     this.participants = participants;
   }
 
@@ -148,7 +148,7 @@ public class BitBucketPPRServerPullRequest implements Serializable {
     return links;
   }
 
-  public void setLinks(BitBucketPPRServerLinks links) {
+  public void setLinks(final BitBucketPPRServerLinks links) {
     this.links = links;
   }
 
@@ -156,7 +156,7 @@ public class BitBucketPPRServerPullRequest implements Serializable {
     return fromRef;
   }
 
-  public void setFromRef(BitBucketPPRServerRepositoryRef fromRef) {
+  public void setFromRef(final BitBucketPPRServerRepositoryRef fromRef) {
     this.fromRef = fromRef;
   }
 
@@ -164,7 +164,7 @@ public class BitBucketPPRServerPullRequest implements Serializable {
     return toRef;
   }
 
-  public void setToRef(BitBucketPPRServerRepositoryRef toRef) {
+  public void setToRef(final BitBucketPPRServerRepositoryRef toRef) {
     this.toRef = toRef;
   }
 

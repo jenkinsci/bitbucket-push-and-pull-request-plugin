@@ -1,6 +1,7 @@
 package io.jenkins.plugins.bitbucketpushandpullrequest.environment;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -32,20 +33,29 @@ public class BitBucketPPREnvironmentContributor extends EnvironmentContributor {
 
     LOGGER.log(Level.INFO, "Injecting env vars because of pull request cause.");
 
-    List<Cause> causes = run.getCauses();
+    List<Cause> causes = new ArrayList<>();
+    for (Object c : run.getCauses()) {
+      causes.add((Cause) c);
+    }
 
     for (Cause cause : causes) {
       if (cause instanceof BitBucketPPRPullRequestCause) {
         setEnvVarsForCloudPullRequest(envVars, (BitBucketPPRPullRequestCause) cause);
-      } else if (cause instanceof BitBucketPPRPullRequestServerCause) {
+        continue;
+      }
+      if (cause instanceof BitBucketPPRPullRequestServerCause) {
         setEnvVarsForServerPullRequest(envVars, (BitBucketPPRPullRequestServerCause) cause);
-      } else if (cause instanceof BitBucketPPRRepositoryCause) {
+        continue;
+      }
+      if (cause instanceof BitBucketPPRRepositoryCause) {
         try {
           setEnvVarsForCloudRepository(envVars, (BitBucketPPRRepositoryCause) cause);
         } catch (Exception e) {
           LOGGER.log(Level.WARNING, "Something didn't work: {0}", e.getMessage());
         }
-      } else if (cause instanceof BitBucketPPRServerRepositoryCause) {
+        continue;
+      }
+      if (cause instanceof BitBucketPPRServerRepositoryCause) {
         setEnvVarsForServerRepository(envVars, (BitBucketPPRServerRepositoryCause) cause);
       }
     }
