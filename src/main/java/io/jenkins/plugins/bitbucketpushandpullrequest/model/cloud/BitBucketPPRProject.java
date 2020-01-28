@@ -24,7 +24,8 @@ import java.io.Serializable;
 
 
 public class BitBucketPPRProject implements Serializable {
-  BitBucketPPRLinks links;
+  private static final long serialVersionUID = 2452121553837931076L;
+  private BitBucketPPRLinks links;
   private String type;
   private String uuid;
   private String key;
@@ -34,7 +35,7 @@ public class BitBucketPPRProject implements Serializable {
     return links;
   }
 
-  public void setLinks(BitBucketPPRLinks links) {
+  public void setLinks(final BitBucketPPRLinks links) {
     this.links = links;
   }
 
@@ -42,7 +43,7 @@ public class BitBucketPPRProject implements Serializable {
     return type;
   }
 
-  public void setType(String type) {
+  public void setType(final String type) {
     this.type = type;
   }
 
@@ -50,7 +51,7 @@ public class BitBucketPPRProject implements Serializable {
     return uuid;
   }
 
-  public void setUuid(String uuid) {
+  public void setUuid(final String uuid) {
     this.uuid = uuid;
   }
 
@@ -58,7 +59,7 @@ public class BitBucketPPRProject implements Serializable {
     return key;
   }
 
-  public void setKey(String key) {
+  public void setKey(final String key) {
     this.key = key;
   }
 
@@ -66,7 +67,7 @@ public class BitBucketPPRProject implements Serializable {
     return name;
   }
 
-  public void setName(String name) {
+  public void setName(final String name) {
     this.name = name;
   }
 

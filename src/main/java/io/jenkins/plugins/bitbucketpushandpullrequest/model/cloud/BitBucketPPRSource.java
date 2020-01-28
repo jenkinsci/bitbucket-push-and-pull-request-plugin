@@ -24,6 +24,7 @@ import java.io.Serializable;
 
 
 public class BitBucketPPRSource implements Serializable {
+  private static final long serialVersionUID = 8130236986503988538L;
   private BitBucketPPRBranch branch;
   private BitBucketPPRCommit commit;
   private BitBucketPPRRepository repository;
@@ -32,7 +33,7 @@ public class BitBucketPPRSource implements Serializable {
     return commit;
   }
 
-  public void setCommit(BitBucketPPRCommit commit) {
+  public void setCommit(final BitBucketPPRCommit commit) {
     this.commit = commit;
   }
 
@@ -40,7 +41,7 @@ public class BitBucketPPRSource implements Serializable {
     return repository;
   }
 
-  public void setRepository(BitBucketPPRRepository repository) {
+  public void setRepository(final BitBucketPPRRepository repository) {
     this.repository = repository;
   }
 
@@ -48,7 +49,7 @@ public class BitBucketPPRSource implements Serializable {
     return branch;
   }
 
-  public void setBranch(BitBucketPPRBranch branch) {
+  public void setBranch(final BitBucketPPRBranch branch) {
     this.branch = branch;
   }
 

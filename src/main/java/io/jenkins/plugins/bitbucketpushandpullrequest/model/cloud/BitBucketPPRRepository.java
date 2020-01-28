@@ -25,24 +25,25 @@ import com.google.gson.annotations.SerializedName;
 
 
 public class BitBucketPPRRepository implements Serializable {
-  String scm;
-  String website;
-  String name;
-  BitBucketPPRLinks links;
-  BitBucketPPRProject project;
-  BitBucketPPROwner owner;
-  String fullName;
-  String type;
+  private static final long serialVersionUID = -5358049446460018798L;
+  private String scm;
+  private String website;
+  private String name;
+  private BitBucketPPRLinks links;
+  private BitBucketPPRProject project;
+  private BitBucketPPROwner owner;
+  private String fullName;
+  private String type;
 
   @SerializedName("is_private")
-  Boolean isPrivate;
-  String uuid;
+  private Boolean isPrivate;
+  private String uuid;
 
   public String getScm() {
     return scm;
   }
 
-  public void setScm(String scm) {
+  public void setScm(final String scm) {
     this.scm = scm;
   }
 
@@ -50,7 +51,7 @@ public class BitBucketPPRRepository implements Serializable {
     return website;
   }
 
-  public void setWebsite(String website) {
+  public void setWebsite(final String website) {
     this.website = website;
   }
 
@@ -58,7 +59,7 @@ public class BitBucketPPRRepository implements Serializable {
     return name;
   }
 
-  public void setName(String name) {
+  public void setName(final String name) {
     this.name = name;
   }
 
@@ -66,7 +67,7 @@ public class BitBucketPPRRepository implements Serializable {
     return fullName;
   }
 
-  public void setFullName(String fullName) {
+  public void setFullName(final String fullName) {
     this.fullName = fullName;
   }
 
@@ -74,7 +75,7 @@ public class BitBucketPPRRepository implements Serializable {
     return type;
   }
 
-  public void setType(String type) {
+  public void setType(final String type) {
     this.type = type;
   }
 
@@ -82,7 +83,7 @@ public class BitBucketPPRRepository implements Serializable {
     return isPrivate;
   }
 
-  public void setIsPrivate(Boolean isPrivate) {
+  public void setIsPrivate(final Boolean isPrivate) {
     this.isPrivate = isPrivate;
   }
 
@@ -90,7 +91,7 @@ public class BitBucketPPRRepository implements Serializable {
     return uuid;
   }
 
-  public void setUuid(String uuid) {
+  public void setUuid(final String uuid) {
     this.uuid = uuid;
   }
 
@@ -98,7 +99,7 @@ public class BitBucketPPRRepository implements Serializable {
     return links;
   }
 
-  public void setLinks(BitBucketPPRLinks links) {
+  public void setLinks(final BitBucketPPRLinks links) {
     this.links = links;
   }
 
@@ -106,7 +107,7 @@ public class BitBucketPPRRepository implements Serializable {
     return project;
   }
 
-  public void setProject(BitBucketPPRProject project) {
+  public void setProject(final BitBucketPPRProject project) {
     this.project = project;
   }
 
@@ -114,7 +115,7 @@ public class BitBucketPPRRepository implements Serializable {
     return owner;
   }
 
-  public void setOwner(BitBucketPPROwner owner) {
+  public void setOwner(final BitBucketPPROwner owner) {
     this.owner = owner;
   }
 
