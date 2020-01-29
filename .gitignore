@@ -30,7 +30,7 @@ node_modules/*
 /yarn.lock
 
 ### VisualStudioCode ###
-.vscode/*
+/.vscode/
 .factorypath
 
 ### VisualStudioCode Patch ###
@@ -45,5 +45,5 @@ node_modules/*
 /target/
 
 # Others
-.sts4-cache
+/.sts4-cache/
 .checkstyle
