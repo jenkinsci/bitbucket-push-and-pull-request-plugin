@@ -43,3 +43,7 @@ node_modules/*
 *~
 
 /target/
+
+# Others
+.sts4-cache
+.checkstyle
