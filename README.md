@@ -165,7 +165,7 @@ job('example-pull-request-merged') {
   }
 }
 
-// repositoryPushAction(boolean triggerAlsoIfTagPush, String allowedBranches)
+// repositoryPushAction(boolean triggerAlsoIfTagPush, boolean triggerAlsoIfNothingChanged, String allowedBranches)
 job('example-push') {
   triggers{
     bitbucketTriggers {
