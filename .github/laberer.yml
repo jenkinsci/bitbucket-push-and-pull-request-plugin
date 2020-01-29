@@ -1,0 +1,10 @@
+# Add 'repo' label to any root file changes
+repo:
+  - ./*
+
+@domain/extensions:
+  - src/main/java/io/jenkins/plugins/bitbucketpushandpullrequest/extensions/**/*
+
+# Add 'test' label to any change to *.spec.js files within the source dir
+test:
+  - src/**/:^.*Test\.java$
