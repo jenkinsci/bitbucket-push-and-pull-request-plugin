@@ -1,7 +1,7 @@
 /*******************************************************************************
  * The MIT License
  * 
- * Copyright (C) 2019, CloudBees, Inc.
+ * Copyright (C) 2020, CloudBees, Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -26,9 +26,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.logging.Logger;
 import org.kohsuke.stapler.DataBoundConstructor;
-import hudson.EnvVars;
 import hudson.Extension;
-import hudson.plugins.git.BranchSpec;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.cause.BitBucketPPRTriggerCause;
 import io.jenkins.plugins.bitbucketpushandpullrequest.cause.repository.BitBucketPPRServerRepositoryCause;
@@ -36,7 +34,7 @@ import io.jenkins.plugins.bitbucketpushandpullrequest.cause.repository.BitBucket
 
 public class BitBucketPPRServerRepositoryPushActionFilter
     extends BitBucketPPRRepositoryActionFilter {
-  private static final Logger logger =
+  private static final Logger LOGGER =
       Logger.getLogger(BitBucketPPRServerRepositoryPushActionFilter.class.getName());
 
   public boolean triggerAlsoIfTagPush;
@@ -53,59 +51,20 @@ public class BitBucketPPRServerRepositoryPushActionFilter
 
   @Override
   public boolean shouldTriggerBuild(BitBucketPPRAction bitbucketAction) {
-    logger
+    LOGGER
         .info(() -> "Should trigger build for bitbucket action" + bitbucketAction.toString() + "?");
 
     if (!bitbucketAction.getType().equalsIgnoreCase("BRANCH")
         && !bitbucketAction.getType().equalsIgnoreCase("named_branch")
         && !bitbucketAction.getType().equalsIgnoreCase("UPDATE") && !this.triggerAlsoIfTagPush) {
-      logger.info(
+          LOGGER.info(
           () -> "Neither bitbucketActionType is BRANCH, nor UPDATE, nor trigger on tag push is set for bitbucket type: "
               + bitbucketAction.getType() + ".");
 
       return false;
     }
 
-    return matches(bitbucketAction.getTargetBranch());
-  }
-
-  protected boolean matches(String branchName) {
-    logger.info(() -> "Following allowed branches patterns are set: " + allowedBranches);
-    logger.info(() -> "The branchName in action is: " + branchName);
-
-    String[] branchSpecs = allowedBranches.split(",");
-    for (String branchSpec : branchSpecs) {
-      BranchSpec pattern = new BranchSpec(branchSpec.trim());
-
-      logger.info(() -> "Matching branch: " + branchName + " with branchSpec pattern: "
-          + pattern.getName());
-
-      if (pattern.matches(branchName)) {
-        return true;
-      }
-    }
-
-    return false;
-  }
-
-  public boolean matches(String branchName, EnvVars env) {
-    logger.info(() -> "Following allowed branches patterns are set: " + allowedBranches);
-    logger.info(() -> "The branchName in action is: " + branchName);
-
-    String[] branchSpecs = allowedBranches.split(",");
-
-    for (String branchSpec : branchSpecs) {
-      BranchSpec pattern = new BranchSpec(branchSpec.trim());
-
-      logger.info(() -> "Matching branch: " + branchName + " with branchSpec pattern: "
-          + pattern.getName());
-
-      if (pattern.matches(branchName, env)) {
-        return true;
-      }
-    }
-
-    return false;
+    return matches(allowedBranches, bitbucketAction.getTargetBranch(), null);
   }
 
   @Override

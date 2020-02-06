@@ -5,5 +5,7 @@
                     title="Trigger only if all reviewers have approved"
                     checked="${instance.triggerOnlyIfAllReviewersApproved}">
         </f:checkbox>
+        <f:entry title="Allowed Branches">
+  	      <f:textbox field="allowedBranches" />
     </f:entry>
 </j:jelly>

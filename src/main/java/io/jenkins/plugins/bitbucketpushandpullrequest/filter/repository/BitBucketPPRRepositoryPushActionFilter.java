@@ -26,9 +26,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.logging.Logger;
 import org.kohsuke.stapler.DataBoundConstructor;
-import hudson.EnvVars;
 import hudson.Extension;
-import hudson.plugins.git.BranchSpec;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.cause.BitBucketPPRTriggerCause;
 import io.jenkins.plugins.bitbucketpushandpullrequest.cause.repository.BitBucketPPRRepositoryCause;
@@ -66,48 +64,8 @@ public class BitBucketPPRRepositoryPushActionFilter extends BitBucketPPRReposito
       return false;
     }
 
-    return matches(bitbucketAction.getTargetBranch());
+    return matches(allowedBranches, bitbucketAction.getTargetBranch(), null);
   }
-
-  protected boolean matches(String branchName) {
-    logger.info(() -> "Following allowed branches patterns are set: " + allowedBranches);
-    logger.info(() -> "The branchName in action is: " + branchName);
-
-    String[] branchSpecs = allowedBranches.split(",");
-    for (String branchSpec : branchSpecs) {
-      BranchSpec pattern = new BranchSpec(branchSpec.trim());
-
-      logger.info(() -> "Matching branch: " + branchName + " with branchSpec pattern: "
-          + pattern.getName());
-
-      if (pattern.matches(branchName)) {
-        return true;
-      }
-    }
-
-    return false;
-  }
-
-  public boolean matches(String branchName, EnvVars env) {
-    logger.info(() -> "Following allowed branches patterns are set: " + allowedBranches);
-    logger.info(() -> "The branchName in action is: " + branchName);
-
-    String[] branchSpecs = allowedBranches.split(",");
-
-    for (String branchSpec : branchSpecs) {
-      BranchSpec pattern = new BranchSpec(branchSpec.trim());
-
-      logger.info(() -> "Matching branch: " + branchName + " with branchSpec pattern: "
-          + pattern.getName());
-
-      if (pattern.matches(branchName, env)) {
-        return true;
-      }
-    }
-
-    return false;
-  }
-
 
   @Override
   public BitBucketPPRTriggerCause getCause(File pollingLog, BitBucketPPRAction bitbucketAction)

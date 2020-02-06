@@ -14,50 +14,51 @@ public class BitBucketPPRRepositoryPushActionFilterTest {
 
   @Test
   public void testMatches() {
+    String allowedBranches = "master";
+    
     BitBucketPPRRepositoryPushActionFilter c =
-        new BitBucketPPRRepositoryPushActionFilter(false, false, "master");
+        new BitBucketPPRRepositoryPushActionFilter(false, false, allowedBranches);
 
-    assertTrue(c.matches("origin/master"));
-    assertFalse(c.matches("origin/something/master"));
-    assertTrue(c.matches("master"));
-    assertFalse(c.matches("dev"));
+    assertTrue(c.matches(allowedBranches, "origin/master", null));
+    assertFalse(c.matches(allowedBranches, "origin/something/master", null));
+    assertTrue(c.matches(allowedBranches, "master", null));
+    assertFalse(c.matches(allowedBranches, "dev", null));
 
+    allowedBranches = "origin/*/dev";
 
-    c.setAllowedBranches("origin/*/dev");
+    assertFalse(c.matches(allowedBranches, "origintestdev", null));
+    assertTrue(c.matches(allowedBranches, "origin/test/dev", null));
+    assertFalse(c.matches(allowedBranches, "origin/test/release", null));
+    assertFalse(c.matches(allowedBranches, "origin/test/something/release", null));
 
-    assertFalse(c.matches("origintestdev"));
-    assertTrue(c.matches("origin/test/dev"));
-    assertFalse(c.matches("origin/test/release"));
-    assertFalse(c.matches("origin/test/something/release"));
+    allowedBranches = "origin/*";
 
-    c.setAllowedBranches("origin/*");
+    assertTrue(c.matches(allowedBranches, "origin/master", null));
 
-    assertTrue(c.matches("origin/master"));
+    allowedBranches = "**/magnayn/*";
 
-    c.setAllowedBranches("**/magnayn/*");
+    assertTrue(c.matches(allowedBranches, "origin/magnayn/b1", null));
+    assertTrue(c.matches(allowedBranches, "remote/origin/magnayn/b1", null));
+    assertTrue(c.matches(allowedBranches, "remotes/origin/magnayn/b1", null));
 
-    assertTrue(c.matches("origin/magnayn/b1"));
-    assertTrue(c.matches("remote/origin/magnayn/b1"));
-    assertTrue(c.matches("remotes/origin/magnayn/b1"));
+    allowedBranches = ("*/my.branch/*");
 
-    c.setAllowedBranches("*/my.branch/*");
+    assertTrue(c.matches(allowedBranches, "origin/my.branch/b1", null));
+    assertFalse(c.matches(allowedBranches, "origin/my-branch/b1", null));
+    assertFalse(c.matches(allowedBranches, "remote/origin/my.branch/b1", null));
+    assertTrue(c.matches(allowedBranches, "remotes/origin/my.branch/b1", null));
 
-    assertTrue(c.matches("origin/my.branch/b1"));
-    assertFalse(c.matches("origin/my-branch/b1"));
-    assertFalse(c.matches("remote/origin/my.branch/b1"));
-    assertTrue(c.matches("remotes/origin/my.branch/b1"));
+    allowedBranches = "**";
 
-    c.setAllowedBranches("**");
+    assertTrue(c.matches(allowedBranches, "origin/my.branch/b1", null));
+    assertTrue(c.matches(allowedBranches, "origin/my-branch/b1", null));
+    assertTrue(c.matches(allowedBranches, "remote/origin/my.branch/b1", null));
+    assertTrue(c.matches(allowedBranches, "remotes/origin/my.branch/b1", null));
 
-    assertTrue(c.matches("origin/my.branch/b1"));
-    assertTrue(c.matches("origin/my-branch/b1"));
-    assertTrue(c.matches("remote/origin/my.branch/b1"));
-    assertTrue(c.matches("remotes/origin/my.branch/b1"));
+    allowedBranches = "*";
 
-    c.setAllowedBranches("*");
-
-    assertTrue(c.matches("origin/x"));
-    assertFalse(c.matches("origin/my-branch/b1"));
+    assertTrue(c.matches(allowedBranches, "origin/x", null));
+    assertFalse(c.matches(allowedBranches, "origin/my-branch/b1", null));
   }
 
   @Test
@@ -73,130 +74,149 @@ public class BitBucketPPRRepositoryPushActionFilterTest {
     envMap.put("anyEmpty", "");
     EnvVars env = new EnvVars(envMap);
 
+    String allowedBranches = "${master}";
+
     BitBucketPPRRepositoryPushActionFilter c =
-        new BitBucketPPRRepositoryPushActionFilter(false, false, "${master}");
+        new BitBucketPPRRepositoryPushActionFilter(false, false, allowedBranches);
 
-    assertTrue(c.matches("origin/master", env));
-    assertFalse(c.matches("origin/something/master", env));
-    assertTrue(c.matches("master", env));
-    assertFalse(c.matches("dev", env));
+    assertTrue(c.matches(allowedBranches, "origin/master", env));
+    assertFalse(c.matches(allowedBranches, "origin/something/master", env));
+    assertTrue(c.matches(allowedBranches, "master", env));
+    assertFalse(c.matches(allowedBranches, "dev", env));
 
-    c.setAllowedBranches("${origin}/*/${dev}");
+    allowedBranches = "${origin}/*/${dev}";
 
-    assertFalse(c.matches("origintestdev", env));
-    assertTrue(c.matches("origin/test/dev", env));
-    assertFalse(c.matches("origin/test/release", env));
-    assertFalse(c.matches("origin/test/something/release", env));
+    assertFalse(c.matches(allowedBranches, "origintestdev", env));
+    assertTrue(c.matches(allowedBranches, "origin/test/dev", env));
+    assertFalse(c.matches(allowedBranches, "origin/test/release", env));
+    assertFalse(c.matches(allowedBranches, "origin/test/something/release", env));
 
-    c.setAllowedBranches("${origin}/*");
+    allowedBranches = "${origin}/*";
 
-    assertTrue(c.matches("origin/master", env));
+    assertTrue(c.matches(allowedBranches, "origin/master", env));
 
-    c.setAllowedBranches("**/${magnayn}/*");
+    allowedBranches = "**/${magnayn}/*";
 
-    assertTrue(c.matches("origin/magnayn/b1", env));
-    assertTrue(c.matches("remote/origin/magnayn/b1", env));
+    assertTrue(c.matches(allowedBranches, "origin/magnayn/b1", env));
+    assertTrue(c.matches(allowedBranches, "remote/origin/magnayn/b1", env));
 
-    c.setAllowedBranches("*/${mybranch}/*");
+    allowedBranches = "*/${mybranch}/*";
 
-    assertTrue(c.matches("origin/my.branch/b1", env));
-    assertFalse(c.matches("origin/my-branch/b1", env));
-    assertFalse(c.matches("remote/origin/my.branch/b1", env));
+    assertTrue(c.matches(allowedBranches, "origin/my.branch/b1", env));
+    assertFalse(c.matches(allowedBranches, "origin/my-branch/b1", env));
+    assertFalse(c.matches(allowedBranches, "remote/origin/my.branch/b1", env));
 
-    c.setAllowedBranches("${anyLong}");
+    allowedBranches = "${anyLong}";
 
-    assertTrue(c.matches("origin/my.branch/b1", env));
-    assertTrue(c.matches("origin/my-branch/b1", env));
-    assertTrue(c.matches("remote/origin/my.branch/b1", env));
+    assertTrue(c.matches(allowedBranches, "origin/my.branch/b1", env));
+    assertTrue(c.matches(allowedBranches, "origin/my-branch/b1", env));
+    assertTrue(c.matches(allowedBranches, "remote/origin/my.branch/b1", env));
 
-    c.setAllowedBranches("${anyShort}");
+    allowedBranches = "${anyShort}";
 
-    assertTrue(c.matches("origin/x", env));
-    assertFalse(c.matches("origin/my-branch/b1", env));
+    assertTrue(c.matches(allowedBranches, "origin/x", env));
+    assertFalse(c.matches(allowedBranches, "origin/my-branch/b1", env));
 
-    c.setAllowedBranches("${anyEmpty}");
+    allowedBranches = "${anyEmpty}";
 
-    assertTrue(c.matches("origin/my.branch/b1", env));
-    assertTrue(c.matches("origin/my-branch/b1", env));
-    assertTrue(c.matches("remote/origin/my.branch/b1", env));
+    assertTrue(c.matches(allowedBranches, "origin/my.branch/b1", env));
+    assertTrue(c.matches(allowedBranches, "origin/my-branch/b1", env));
+    assertTrue(c.matches(allowedBranches, "remote/origin/my.branch/b1", env));
   }
 
   @Test
   public void testUsesRefsHeads() {
-    BitBucketPPRRepositoryPushActionFilter c =
-        new BitBucketPPRRepositoryPushActionFilter(false, false, "refs/heads/j*n*");
+    String allowedBranches = "refs/heads/j*n*";
 
-    assertTrue(c.matches("refs/heads/jenkins"));
-    assertTrue(c.matches("refs/heads/jane"));
-    assertTrue(c.matches("refs/heads/jones"));
-    assertFalse(c.matches("origin/jenkins"));
-    assertFalse(c.matches("remote/origin/jane"));
+    BitBucketPPRRepositoryPushActionFilter c =
+        new BitBucketPPRRepositoryPushActionFilter(false, false, allowedBranches);
+
+
+    assertTrue(c.matches(allowedBranches, "refs/heads/jenkins", null));
+    assertTrue(c.matches(allowedBranches, "refs/heads/jane", null));
+    assertTrue(c.matches(allowedBranches, "refs/heads/jones", null));
+    assertFalse(c.matches(allowedBranches, "origin/jenkins", null));
+    assertFalse(c.matches(allowedBranches, "remote/origin/jane", null));
   }
 
   @Test
   public void testUsesJavaPatternDirectlyIfPrefixedWithColon() {
 
-    BitBucketPPRRepositoryPushActionFilter m =
-        new BitBucketPPRRepositoryPushActionFilter(false, false, ":^(?!(origin/prefix)).*");
+    String allowedBranches = ":^(?!(origin/prefix)).*";
 
-    assertTrue(m.matches("origin"));
-    assertTrue(m.matches("origin/master"));
-    assertTrue(m.matches("origin/feature"));
-    assertFalse(m.matches("origin/prefix_123"));
-    assertFalse(m.matches("origin/prefix"));
-    assertFalse(m.matches("origin/prefix-abc"));
+    BitBucketPPRRepositoryPushActionFilter m =
+        new BitBucketPPRRepositoryPushActionFilter(false, false, allowedBranches);
+
+    assertTrue(m.matches(allowedBranches, "origin", null));
+    assertTrue(m.matches(allowedBranches, "origin/master", null));
+    assertTrue(m.matches(allowedBranches, "origin/feature", null));
+    assertFalse(m.matches(allowedBranches, "origin/prefix_123", null));
+    assertFalse(m.matches(allowedBranches, "origin/prefix", null));
+    assertFalse(m.matches(allowedBranches, "origin/prefix-abc", null));
   }
 
   @Test
   public void testMatchesNot1() {
-    BitBucketPPRRepositoryPushActionFilter c =
-        new BitBucketPPRRepositoryPushActionFilter(false, false, "*/master");
+    String allowedBranches = "*/master";
 
-    assertFalse(c.matches("master"));
+    BitBucketPPRRepositoryPushActionFilter c =
+        new BitBucketPPRRepositoryPushActionFilter(false, false, allowedBranches);
+
+    assertFalse(c.matches(allowedBranches, "master", null));
   }
 
   @Test
   public void testMatchesNot2() {
-    BitBucketPPRRepositoryPushActionFilter c =
-        new BitBucketPPRRepositoryPushActionFilter(false, false, "develop, :^(?!master$).*");
-    assertFalse(c.matches("master"));
+    String allowedBranches = "develop, :^(?!master$).*";
 
-    c.setAllowedBranches(":^(?!develop$).*");
-    assertFalse(c.matches("develop"));
+    BitBucketPPRRepositoryPushActionFilter c =
+        new BitBucketPPRRepositoryPushActionFilter(false, false, allowedBranches);
+
+    assertFalse(c.matches(allowedBranches, "master", null));
+
+    allowedBranches = ":^(?!develop$).*";
+    assertFalse(c.matches(allowedBranches, "develop", null));
   }
 
   @Test
   public void testMatchesEmptyBranches() {
+
     String allowedBranches = "";
+
     BitBucketPPRRepositoryPushActionFilter c =
         new BitBucketPPRRepositoryPushActionFilter(false, false, allowedBranches);
 
-    assertTrue(c.matches("master"));
-    assertTrue(c.matches("develop"));
-    assertTrue(c.matches("feature/new-stuff"));
+    assertTrue(c.matches(allowedBranches, "master", null));
+    assertTrue(c.matches(allowedBranches, "develop", null));
+    assertTrue(c.matches(allowedBranches, "feature/new-stuff", null));
   }
 
 
   @Test
   public void testUsesJavaPatternWithRepetition() {
+    String allowedBranches = ":origin/release-\\d{8}";
+
     BitBucketPPRRepositoryPushActionFilter m =
-        new BitBucketPPRRepositoryPushActionFilter(false, false, ":origin/release-\\d{8}");
-    assertTrue(m.matches("origin/release-20150101"));
-    assertFalse(m.matches("origin/release-2015010"));
-    assertFalse(m.matches("origin/release-201501011"));
-    assertFalse(m.matches("origin/release-20150101-something"));
+        new BitBucketPPRRepositoryPushActionFilter(false, false, allowedBranches);
+
+    assertTrue(m.matches(allowedBranches, "origin/release-20150101", null));
+    assertFalse(m.matches(allowedBranches, "origin/release-2015010", null));
+    assertFalse(m.matches(allowedBranches, "origin/release-201501011", null));
+    assertFalse(m.matches(allowedBranches, "origin/release-20150101-something", null));
   }
 
   @Test
   public void testUsesJavaPatternToExcludeMultipleBranches() {
-    BitBucketPPRRepositoryPushActionFilter m = new BitBucketPPRRepositoryPushActionFilter(false,
-        false, ":^(?!origin/master$|origin/develop$).*");
+    String allowedBranches = ":^(?!origin/master$|origin/develop$).*";
 
-    assertTrue(m.matches("origin/branch1"));
-    assertTrue(m.matches("origin/branch-2"));
-    assertTrue(m.matches("origin/master123"));
-    assertTrue(m.matches("origin/develop-123"));
-    assertFalse(m.matches("origin/master"));
-    assertFalse(m.matches("origin/develop"));
+    BitBucketPPRRepositoryPushActionFilter m =
+        new BitBucketPPRRepositoryPushActionFilter(false, false, allowedBranches);
+
+    assertTrue(m.matches(allowedBranches, "origin/branch1", null));
+    assertTrue(m.matches(allowedBranches, "origin/branch-2", null));
+    assertTrue(m.matches(allowedBranches, "origin/master123", null));
+    assertTrue(m.matches(allowedBranches, "origin/develop-123", null));
+    assertFalse(m.matches(allowedBranches, "origin/master", null));
+    assertFalse(m.matches(allowedBranches, "origin/develop", null));
   }
 }

@@ -42,9 +42,10 @@ public class BitBucketPPRPullRequestApprovedActionFilter
       Logger.getLogger(BitBucketPPRPullRequestApprovedActionFilter.class.getName());
 
   public boolean triggerOnlyIfAllReviewersApproved;
+  public String allowedBranches;
 
   @DataBoundConstructor
-  public BitBucketPPRPullRequestApprovedActionFilter(boolean triggerOnlyIfAllReviewersApproved) {
+  public BitBucketPPRPullRequestApprovedActionFilter(boolean triggerOnlyIfAllReviewersApproved, String allowedBranches) {
     this.triggerOnlyIfAllReviewersApproved = triggerOnlyIfAllReviewersApproved;
   }
 
