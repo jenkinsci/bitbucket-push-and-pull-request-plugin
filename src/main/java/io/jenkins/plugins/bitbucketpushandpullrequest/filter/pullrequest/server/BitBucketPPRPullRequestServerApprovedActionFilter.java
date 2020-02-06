@@ -25,8 +25,6 @@ package io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.server
 import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.PULL_REQUEST_REVIEWER;
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
-import java.util.function.Function;
 import java.util.logging.Logger;
 import org.kohsuke.stapler.DataBoundConstructor;
 import hudson.Extension;
@@ -34,7 +32,6 @@ import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.cause.BitBucketPPRTriggerCause;
 import io.jenkins.plugins.bitbucketpushandpullrequest.cause.pullrequest.server.BitBucketPPRPullRequestServerApprovedCause;
 import io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.cloud.BitBucketPPRPullRequestApprovedActionFilter;
-import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud.BitBucketPPRParticipant;
 
 public class BitBucketPPRPullRequestServerApprovedActionFilter
