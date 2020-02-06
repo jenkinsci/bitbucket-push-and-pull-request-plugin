@@ -32,12 +32,18 @@ import io.jenkins.plugins.bitbucketpushandpullrequest.cause.pullrequest.cloud.Bi
 public class BitBucketPPRPullRequestCreatedActionFilter
     extends BitBucketPPRPullRequestActionFilter {
 
-  @DataBoundConstructor
+  public String allowedBranches;
+
   public BitBucketPPRPullRequestCreatedActionFilter() {}
+
+  @DataBoundConstructor
+  public BitBucketPPRPullRequestCreatedActionFilter(String allowedBranches) {
+    this.allowedBranches = allowedBranches;
+  }
 
   @Override
   public boolean shouldTriggerBuild(BitBucketPPRAction bitbucketAction) {
-    return true;
+    return matches(allowedBranches, bitbucketAction.getTargetBranch(), null);
   }
 
   @Override

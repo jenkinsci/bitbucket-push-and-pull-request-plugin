@@ -31,14 +31,17 @@ import hudson.plugins.git.BranchSpec;
 
 public class BitBucketPPRUtils {
 
-  private static final Logger LOGGER =
-  Logger.getLogger(BitBucketPPRUtils.class.getName());
+  private static final Logger LOGGER = Logger.getLogger(BitBucketPPRUtils.class.getName());
 
 
   public static boolean matches(String allowedBranches, String branchName, EnvVars env) {
-    LOGGER.info(() -> "Following allowed branches patterns are set: " + allowedBranches);
-    LOGGER.info(() -> "The branchName in action is: " + branchName);
-    LOGGER.info(() -> "The environment variables are: " + env);
+    if (allowedBranches == null) {
+      allowedBranches = "";
+    }
+
+    LOGGER.info("Following allowed branches patterns are set: " + allowedBranches);
+    LOGGER.info("The branchName in action is: " + branchName);
+    LOGGER.info("The environment variables are: " + env);
 
     BiFunction<List<String>, BiPredicate<String, EnvVars>, List<String>> filter =
         (List<String> list, BiPredicate<String, EnvVars> p) -> {

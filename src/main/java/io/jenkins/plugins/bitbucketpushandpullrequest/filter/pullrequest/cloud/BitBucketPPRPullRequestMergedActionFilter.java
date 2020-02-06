@@ -24,19 +24,25 @@ package io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.cloud;
 import java.io.File;
 import java.io.IOException;
 import org.kohsuke.stapler.DataBoundConstructor;
+import hudson.EnvVars;
 import hudson.Extension;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.cause.BitBucketPPRTriggerCause;
 import io.jenkins.plugins.bitbucketpushandpullrequest.cause.pullrequest.cloud.BitBucketPPRPullRequestUpdatedCause;
 
 public class BitBucketPPRPullRequestMergedActionFilter extends BitBucketPPRPullRequestActionFilter {
+  public String allowedBranches;
 
-  @DataBoundConstructor
   public BitBucketPPRPullRequestMergedActionFilter() {}
 
+  @DataBoundConstructor
+  public BitBucketPPRPullRequestMergedActionFilter(String allowedBranches) {
+    this.allowedBranches = allowedBranches;
+  }
+  
   @Override
   public boolean shouldTriggerBuild(BitBucketPPRAction bitbucketAction) {
-    return true;
+    return matches(allowedBranches, bitbucketAction.getTargetBranch(), null);
   }
 
   @Override

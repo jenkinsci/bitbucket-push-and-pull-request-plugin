@@ -46,6 +46,11 @@ public class BitBucketPPRPullRequestApprovedActionFilter
 
   @DataBoundConstructor
   public BitBucketPPRPullRequestApprovedActionFilter(boolean triggerOnlyIfAllReviewersApproved, String allowedBranches) {
+    this.allowedBranches = allowedBranches;
+    this.triggerOnlyIfAllReviewersApproved = triggerOnlyIfAllReviewersApproved;
+  }
+
+  public BitBucketPPRPullRequestApprovedActionFilter(boolean triggerOnlyIfAllReviewersApproved) {
     this.triggerOnlyIfAllReviewersApproved = triggerOnlyIfAllReviewersApproved;
   }
 
@@ -56,7 +61,7 @@ public class BitBucketPPRPullRequestApprovedActionFilter
       return false;
     }
 
-    return true;
+    return matches(allowedBranches, bitbucketAction.getTargetBranch(), null);
   }
 
   @Override
