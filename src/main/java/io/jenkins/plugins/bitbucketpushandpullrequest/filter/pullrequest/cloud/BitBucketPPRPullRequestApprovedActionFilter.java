@@ -25,14 +25,12 @@ package io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.cloud;
 import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.PULL_REQUEST_REVIEWER;
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 import java.util.logging.Logger;
 import org.kohsuke.stapler.DataBoundConstructor;
 import hudson.Extension;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.cause.BitBucketPPRTriggerCause;
 import io.jenkins.plugins.bitbucketpushandpullrequest.cause.pullrequest.cloud.BitBucketPPRPullRequestApprovedCause;
-import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud.BitBucketPPRParticipant;
 
 
@@ -45,7 +43,8 @@ public class BitBucketPPRPullRequestApprovedActionFilter
   public String allowedBranches;
 
   @DataBoundConstructor
-  public BitBucketPPRPullRequestApprovedActionFilter(boolean triggerOnlyIfAllReviewersApproved, String allowedBranches) {
+  public BitBucketPPRPullRequestApprovedActionFilter(boolean triggerOnlyIfAllReviewersApproved,
+      String allowedBranches) {
     this.allowedBranches = allowedBranches;
     this.triggerOnlyIfAllReviewersApproved = triggerOnlyIfAllReviewersApproved;
   }
@@ -84,18 +83,8 @@ public class BitBucketPPRPullRequestApprovedActionFilter
   }
 
   private boolean allReviewersHaveApproved(BitBucketPPRAction pullRequestAction) {
-    BitBucketPPRPayload payload = pullRequestAction.getPayload();
-    List<BitBucketPPRParticipant> participants = payload.getPullRequest().getParticipants();
-
-    boolean allApproved = true;
-
-    for (BitBucketPPRParticipant participant : participants) {
-      if (isReviewer(participant) && !participant.getApproved()) {
-        allApproved = false;
-      }
-    }
-
-    return allApproved;
+    return pullRequestAction.getPayload().getPullRequest().getParticipants().stream()
+        .filter(p -> isReviewer(p) && !p.getApproved()).count() == 0;
   }
 
   private boolean isReviewer(BitBucketPPRParticipant pullRequestParticipant) {
