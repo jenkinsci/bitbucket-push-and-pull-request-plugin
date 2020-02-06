@@ -43,7 +43,7 @@ import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
 
 @RunWith(MockitoJUnitRunner.class)
 public class BitBucketPPRJobProbeTest {
-  private BitBucketPPRJobProbe jobProbe;
+  BitBucketPPRJobProbe jobProbe;
 
   @BeforeClass
   public static void beforeClass() {
