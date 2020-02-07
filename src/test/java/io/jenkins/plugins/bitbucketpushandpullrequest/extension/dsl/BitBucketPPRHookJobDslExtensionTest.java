@@ -103,6 +103,28 @@ public class BitBucketPPRHookJobDslExtensionTest {
   }
 
   @Test
+  public void testDslTriggerPRAllowedBranchesApproved() throws Exception {
+    /* Create seed job which will process DSL */
+    createSeedJob(
+        "freeStyleJob('test-job') { triggers { bitbucketTriggers { pullRequestApprovedAction(false, \"**\") } } }");
+    /* Fetch the newly created job and check its trigger configuration */
+    FreeStyleProject createdJob = (FreeStyleProject) j.getInstance().getItem("test-job");
+    /* Go through all triggers to validate DSL */
+    Map<TriggerDescriptor, Trigger<?>> triggers = createdJob.getTriggers();
+    assertEquals(1, triggers.size());
+    List<String> dispNames = new ArrayList<>();
+    for (Trigger<?> entry : triggers.values()) {
+      BitBucketPPRTrigger tmp2 = (BitBucketPPRTrigger) entry;
+      assertEquals(1, tmp2.getTriggers().size());
+      String tmpNname = tmp2.getTriggers().get(0).getActionFilter().getClass().getName();
+      String dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      dispNames.add(dispName);
+    }
+    assertEquals(1, dispNames.size());
+    assertEquals(dispNames.get(0), "BitBucketPPRPullRequestApprovedActionFilter");
+  }
+
+  @Test
   public void testDslTriggerPRCreated() throws Exception {
     /* Create seed job which will process DSL */
     createSeedJob(
@@ -123,6 +145,29 @@ public class BitBucketPPRHookJobDslExtensionTest {
     assertEquals(1, dispNames.size());
     assertEquals(dispNames.get(0), "BitBucketPPRPullRequestCreatedActionFilter");
   }
+
+  @Test
+  public void testDslTriggerPRAllowBranchesCreated() throws Exception {
+    /* Create seed job which will process DSL */
+    createSeedJob(
+        "freeStyleJob('test-job') { triggers { bitbucketTriggers { pullRequestCreatedAction(\"**\") } } }");
+    /* Fetch the newly created job and check its trigger configuration */
+    FreeStyleProject createdJob = (FreeStyleProject) j.getInstance().getItem("test-job");
+    /* Go through all triggers to validate DSL */
+    Map<TriggerDescriptor, Trigger<?>> triggers = createdJob.getTriggers();
+    assertEquals(1, triggers.size());
+    List<String> dispNames = new ArrayList<>();
+    for (Trigger<?> entry : triggers.values()) {
+      BitBucketPPRTrigger tmp2 = (BitBucketPPRTrigger) entry;
+      assertEquals(1, tmp2.getTriggers().size());
+      String tmpNname = tmp2.getTriggers().get(0).getActionFilter().getClass().getName();
+      String dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      dispNames.add(dispName);
+    }
+    assertEquals(1, dispNames.size());
+    assertEquals(dispNames.get(0), "BitBucketPPRPullRequestCreatedActionFilter");
+  }
+
 
   @Test
   public void testDslTriggerPRUpdated() throws Exception {
@@ -147,10 +192,55 @@ public class BitBucketPPRHookJobDslExtensionTest {
   }
 
   @Test
+  public void testDslTriggerPRAllowedBranchesUpdated() throws Exception {
+    /* Create seed job which will process DSL */
+    createSeedJob(
+        "freeStyleJob('test-job') { triggers { bitbucketTriggers { pullRequestUpdatedAction(\"**\") } } }");
+    /* Fetch the newly created job and check its trigger configuration */
+    FreeStyleProject createdJob = (FreeStyleProject) j.getInstance().getItem("test-job");
+    /* Go through all triggers to validate DSL */
+    Map<TriggerDescriptor, Trigger<?>> triggers = createdJob.getTriggers();
+    assertEquals(1, triggers.size());
+    List<String> dispNames = new ArrayList<>();
+    for (Trigger<?> entry : triggers.values()) {
+      BitBucketPPRTrigger tmp2 = (BitBucketPPRTrigger) entry;
+      assertEquals(1, tmp2.getTriggers().size());
+      String tmpNname = tmp2.getTriggers().get(0).getActionFilter().getClass().getName();
+      String dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      dispNames.add(dispName);
+    }
+    assertEquals(1, dispNames.size());
+    assertEquals(dispNames.get(0), "BitBucketPPRPullRequestUpdatedActionFilter");
+  }
+
+
+  @Test
   public void testDslTriggerPRMerged() throws Exception {
     /* Create seed job which will process DSL */
     createSeedJob(
         "freeStyleJob('test-job') { triggers { bitbucketTriggers { pullRequestMergedAction() } } }");
+    /* Fetch the newly created job and check its trigger configuration */
+    FreeStyleProject createdJob = (FreeStyleProject) j.getInstance().getItem("test-job");
+    /* Go through all triggers to validate DSL */
+    Map<TriggerDescriptor, Trigger<?>> triggers = createdJob.getTriggers();
+    assertEquals(1, triggers.size());
+    List<String> dispNames = new ArrayList<>();
+    for (Trigger<?> entry : triggers.values()) {
+      BitBucketPPRTrigger tmp2 = (BitBucketPPRTrigger) entry;
+      assertEquals(1, tmp2.getTriggers().size());
+      String tmpNname = tmp2.getTriggers().get(0).getActionFilter().getClass().getName();
+      String dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      dispNames.add(dispName);
+    }
+    assertEquals(1, dispNames.size());
+    assertEquals(dispNames.get(0), "BitBucketPPRPullRequestMergedActionFilter");
+  }
+
+  @Test
+  public void testDslTriggerPRAllowedBranchesMerged() throws Exception {
+    /* Create seed job which will process DSL */
+    createSeedJob(
+        "freeStyleJob('test-job') { triggers { bitbucketTriggers { pullRequestMergedAction(\"**\") } } }");
     /* Fetch the newly created job and check its trigger configuration */
     FreeStyleProject createdJob = (FreeStyleProject) j.getInstance().getItem("test-job");
     /* Go through all triggers to validate DSL */
@@ -198,6 +288,42 @@ public class BitBucketPPRHookJobDslExtensionTest {
     assertEquals(dispNames.get(0), "BitBucketPPRPullRequestCreatedActionFilter");
     assertEquals(dispNames.get(1), "BitBucketPPRPullRequestUpdatedActionFilter");
     assertEquals(dispNames.get(2), "BitBucketPPRPullRequestApprovedActionFilter");
+  }
+
+  @Test
+  public void testDslTriggerCreateUpdatedMergedApprovedPRAllowBranchesActions() throws Exception {
+    /* Create seed job which will process DSL */
+    createSeedJob(
+        "freeStyleJob('test-job') { triggers { bitbucketTriggers { pullRequestCreatedAction(\"**\")\npullRequestUpdatedAction(\"**\")\npullRequestMergedAction(\"**\")\npullRequestApprovedAction(false, \"**\") } } }");
+    /* Fetch the newly created job and check its trigger configuration */
+    FreeStyleProject createdJob = (FreeStyleProject) j.getInstance().getItem("test-job");
+    /* Go through all triggers to validate DSL */
+    Map<TriggerDescriptor, Trigger<?>> triggers = createdJob.getTriggers();
+    /* Only one 'triggers{}' closure */
+    assertEquals(1, triggers.size());
+    List<String> dispNames = new ArrayList<>();
+    for (Trigger<?> entry : triggers.values()) {
+      BitBucketPPRTrigger tmp2 = (BitBucketPPRTrigger) entry;
+      /* Three different triggers expected */
+      assertEquals(4, tmp2.getTriggers().size());
+      String tmpNname = tmp2.getTriggers().get(0).getActionFilter().getClass().getName();
+      String dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      dispNames.add(dispName);
+      tmpNname = tmp2.getTriggers().get(1).getActionFilter().getClass().getName();
+      dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      dispNames.add(dispName);
+      tmpNname = tmp2.getTriggers().get(2).getActionFilter().getClass().getName();
+      dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      dispNames.add(dispName);
+      tmpNname = tmp2.getTriggers().get(3).getActionFilter().getClass().getName();
+      dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      dispNames.add(dispName);
+    }
+    assertEquals(4, dispNames.size());
+    assertEquals(dispNames.get(0), "BitBucketPPRPullRequestCreatedActionFilter");
+    assertEquals(dispNames.get(1), "BitBucketPPRPullRequestUpdatedActionFilter");
+    assertEquals(dispNames.get(2), "BitBucketPPRPullRequestMergedActionFilter");
+    assertEquals(dispNames.get(3), "BitBucketPPRPullRequestApprovedActionFilter");
   }
 
   @Test
@@ -277,5 +403,109 @@ public class BitBucketPPRHookJobDslExtensionTest {
     assertEquals(dispNames.get(1), "BitBucketPPRPullRequestServerUpdatedActionFilter");
     assertEquals(dispNames.get(2), "BitBucketPPRPullRequestServerApprovedActionFilter");
     assertEquals(dispNames.get(3), "BitBucketPPRPullRequestServerMergedActionFilter");
+  }
+
+  @Test
+  public void testDslServerAllPRAllowedBranchesActions() throws Exception {
+    String seedJobDesc = "freeStyleJob('test-job') { triggers { bitbucketTriggers {";
+    seedJobDesc += "pullRequestServerCreatedAction(\"*\")\n";
+    seedJobDesc += "pullRequestServerUpdatedAction(\"*\")\n";
+    seedJobDesc += "pullRequestServerApprovedAction(false, \"*\")\n";
+    seedJobDesc += "pullRequestServerMergedAction(\"*\")";
+    seedJobDesc += "} } }";
+    /* Create seed job which will process DSL */
+    createSeedJob(seedJobDesc);
+    /* Fetch the newly created job and check its trigger configuration */
+    FreeStyleProject createdJob = (FreeStyleProject) j.getInstance().getItem("test-job");
+    /* Go through all triggers to validate DSL */
+    Map<TriggerDescriptor, Trigger<?>> triggers = createdJob.getTriggers();
+    /* Only one 'triggers{}' closure */
+    assertEquals(1, triggers.size());
+    List<String> dispNames = new ArrayList<>();
+    for (Trigger<?> entry : triggers.values()) {
+      BitBucketPPRTrigger tmp2 = (BitBucketPPRTrigger) entry;
+      /* Four different triggers expected */
+      assertEquals(4, tmp2.getTriggers().size());
+      String tmpNname = tmp2.getTriggers().get(0).getActionFilter().getClass().getName();
+      String dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      dispNames.add(dispName);
+      tmpNname = tmp2.getTriggers().get(1).getActionFilter().getClass().getName();
+      dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      dispNames.add(dispName);
+      tmpNname = tmp2.getTriggers().get(2).getActionFilter().getClass().getName();
+      dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      dispNames.add(dispName);
+      tmpNname = tmp2.getTriggers().get(3).getActionFilter().getClass().getName();
+      dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      dispNames.add(dispName);
+    }
+    assertEquals(4, dispNames.size());
+    assertEquals(dispNames.get(0), "BitBucketPPRPullRequestServerCreatedActionFilter");
+    assertEquals(dispNames.get(1), "BitBucketPPRPullRequestServerUpdatedActionFilter");
+    assertEquals(dispNames.get(2), "BitBucketPPRPullRequestServerApprovedActionFilter");
+    assertEquals(dispNames.get(3), "BitBucketPPRPullRequestServerMergedActionFilter");
+  }
+
+  @Test
+  public void testDslServerAllPRUnfilteredAndAllowedBranchesActions() throws Exception {
+    String seedJobDesc = "freeStyleJob('test-job') { triggers { bitbucketTriggers {";
+    seedJobDesc += "pullRequestServerCreatedAction()\n";
+    seedJobDesc += "pullRequestServerUpdatedAction()\n";
+    seedJobDesc += "pullRequestServerApprovedAction(false)\n";
+    seedJobDesc += "pullRequestServerMergedAction()\n";
+
+    seedJobDesc += "pullRequestServerCreatedAction(\"*\")\n";
+    seedJobDesc += "pullRequestServerUpdatedAction(\"*\")\n";
+    seedJobDesc += "pullRequestServerApprovedAction(false, \"*\")\n";
+    seedJobDesc += "pullRequestServerMergedAction(\"*\")";
+    seedJobDesc += "} } }";
+    /* Create seed job which will process DSL */
+    createSeedJob(seedJobDesc);
+    /* Fetch the newly created job and check its trigger configuration */
+    FreeStyleProject createdJob = (FreeStyleProject) j.getInstance().getItem("test-job");
+    /* Go through all triggers to validate DSL */
+    Map<TriggerDescriptor, Trigger<?>> triggers = createdJob.getTriggers();
+    /* Only one 'triggers{}' closure */
+    assertEquals(1, triggers.size());
+    List<String> dispNames = new ArrayList<>();
+    for (Trigger<?> entry : triggers.values()) {
+      BitBucketPPRTrigger tmp2 = (BitBucketPPRTrigger) entry;
+      /* Four different triggers expected */
+      assertEquals(8, tmp2.getTriggers().size());
+      String tmpNname = tmp2.getTriggers().get(0).getActionFilter().getClass().getName();
+      String dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      dispNames.add(dispName);
+      tmpNname = tmp2.getTriggers().get(1).getActionFilter().getClass().getName();
+      dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      dispNames.add(dispName);
+      tmpNname = tmp2.getTriggers().get(2).getActionFilter().getClass().getName();
+      dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      dispNames.add(dispName);
+      tmpNname = tmp2.getTriggers().get(3).getActionFilter().getClass().getName();
+      dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      dispNames.add(dispName);
+
+      tmpNname = tmp2.getTriggers().get(4).getActionFilter().getClass().getName();
+      dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      dispNames.add(dispName);
+      tmpNname = tmp2.getTriggers().get(5).getActionFilter().getClass().getName();
+      dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      dispNames.add(dispName);
+      tmpNname = tmp2.getTriggers().get(6).getActionFilter().getClass().getName();
+      dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      dispNames.add(dispName);
+      tmpNname = tmp2.getTriggers().get(7).getActionFilter().getClass().getName();
+      dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      dispNames.add(dispName);
+    }
+    assertEquals(8, dispNames.size());
+    assertEquals(dispNames.get(0), "BitBucketPPRPullRequestServerCreatedActionFilter");
+    assertEquals(dispNames.get(1), "BitBucketPPRPullRequestServerUpdatedActionFilter");
+    assertEquals(dispNames.get(2), "BitBucketPPRPullRequestServerApprovedActionFilter");
+    assertEquals(dispNames.get(3), "BitBucketPPRPullRequestServerMergedActionFilter");
+    assertEquals(dispNames.get(4), "BitBucketPPRPullRequestServerCreatedActionFilter");
+    assertEquals(dispNames.get(5), "BitBucketPPRPullRequestServerUpdatedActionFilter");
+    assertEquals(dispNames.get(6), "BitBucketPPRPullRequestServerApprovedActionFilter");
+    assertEquals(dispNames.get(7), "BitBucketPPRPullRequestServerMergedActionFilter");
   }
 }
