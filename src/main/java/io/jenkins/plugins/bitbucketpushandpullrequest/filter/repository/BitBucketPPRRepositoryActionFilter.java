@@ -24,7 +24,6 @@ package io.jenkins.plugins.bitbucketpushandpullrequest.filter.repository;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.logging.Logger;
 import hudson.EnvVars;
 import hudson.model.AbstractDescribableImpl;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;

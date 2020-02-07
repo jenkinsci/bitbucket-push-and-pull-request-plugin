@@ -34,10 +34,8 @@ public class BitBucketPPRUtils {
   private static final Logger LOGGER = Logger.getLogger(BitBucketPPRUtils.class.getName());
 
 
-  public static boolean matches(String allowedBranches, String branchName, EnvVars env) {
-    if (allowedBranches == null) {
-      allowedBranches = "";
-    }
+  public static boolean matches(String allBranches, String branchName, EnvVars env) {
+    String allowedBranches = allBranches != null ? allBranches : "";
 
     LOGGER.info("Following allowed branches patterns are set: " + allowedBranches);
     LOGGER.info("The branchName in action is: " + branchName);
