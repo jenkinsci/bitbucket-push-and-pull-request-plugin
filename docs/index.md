@@ -397,3 +397,7 @@ pipeline {
   }
 }
 ```
+
+## Sponsored By
+
+<img src="img/silpion_logo.png">
