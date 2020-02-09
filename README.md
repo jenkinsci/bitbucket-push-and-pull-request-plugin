@@ -86,6 +86,35 @@ If you are using Bitbucket Server, follow these instructions: <https://confluenc
 - Approve Pull Request on successful build, cf. #29
 - Filter source branches for builds triggered through Pull Request, cf. #61
 
+## Dsl Job actions for Bitbucket Push and Pull Request Trigger
+
+```groovy
+bitbucketTriggers {
+  
+  // For Bitbucket Cloud
+  repositoryPushAction(triggerAlsoIfTagPush: boolean, triggerAlsoIfNothingChanged: boolean, allowedBranches: String)
+  pullRequestApprovedAction(onlyIfReviewersApproved: boolean, allowedBranches: String)
+  pullRequestApprovedAction(onlyIfReviewersApproved: boolean)
+  pullRequestCreatedAction()
+  pullRequestCreatedAction(allowedBranches: String)
+  pullRequestUpdatedAction()
+  pullRequestUpdatedAction(allowedBranches: String)
+  pullRequestMergedAction()
+  pullRequestMergedAction(allowedBranches: String)
+  
+  // For Bitbucket Server
+  repositoryServerPushAction(triggerAlsoIfTagPush: boolean, triggerAlsoIfNothingChanged: boolean, allowedBranches: String)
+  pullRequestServerApprovedAction(onlyIfReviewersApproved: boolean)
+  pullRequestServerApprovedAction(onlyIfReviewersApproved: boolean, allowedBranches: String)
+  pullRequestServerCreatedAction()
+  pullRequestServerCreatedAction(allowedBranches: String)
+  pullRequestServerUpdatedAction()
+  pullRequestServerUpdatedAction(allowedBranches: String)
+  pullRequestServerMergedAction()
+  pullRequestServerMergedAction(allowedBranches: String)
+}
+```
+
 ## Dsl Job snippets
 
 ```groovy
@@ -108,6 +137,25 @@ job('example-pull-request-created') {
   }
 }
 
+// pullRequestCreatedAction() with filter on branches
+job('example-pull-request-created-with-filter-on-branches') {
+  triggers{
+    bitbucketTriggers {
+      pullRequestCreatedAction("master")
+    }
+  }
+  scm {
+    git {
+      remote {
+        url("https://git.company.domain/scm/~username/telegram.git")
+      }
+    }
+  }
+  steps {
+    shell('echo START pull request created with filter on branches')
+  }
+}
+
 // pullRequestUpdatedAction()
 job('example-pull-request-updated') {
   triggers{
@@ -124,6 +172,25 @@ job('example-pull-request-updated') {
   }
   steps {
     shell('echo START pull request updated')
+  }
+}
+
+// pullRequestUpdatedAction() wiht filter on branches
+job('example-pull-request-updated-with-filter-on-branches') {
+  triggers{
+    bitbucketTriggers {
+      pullRequestUpdatedAction("master")
+    }
+  }
+  scm {
+    git {
+      remote {
+        url("https://git.company.domain/scm/~username/telegram.git")
+      }
+    }
+  }
+  steps {
+    shell('echo START pull request updated with filter on branches')
   }
 }
 
@@ -146,6 +213,25 @@ job('example-pull-request-approved') {
   }
 }
 
+// pullRequestApprovedAction(boolean onlyIfReviewersApproved) with filter on branches
+job('example-pull-request-approved-with-filter-on-branches') {
+  triggers{
+    bitbucketTriggers {
+      pullRequestApprovedAction(false, "master")
+    }
+  }
+  scm {
+    git {
+      remote {
+        url("https://git.company.domain/scm/~username/telegram.git")
+      }
+    }
+  }
+  steps {
+    shell('echo START pull request approved with filter on branches')
+  }
+}
+
 // pullRequestMergedAction()
 job('example-pull-request-merged') {
   triggers{
@@ -161,7 +247,26 @@ job('example-pull-request-merged') {
     }
   }
   steps {
-    shell('echo START pull request approved')
+    shell('echo START pull request merged')
+  }
+}
+
+// pullRequestMergedAction() with filter on branches
+job('example-pull-request-merged-with-filter-on-branches') {
+  triggers{
+    bitbucketTriggers {
+      pullRequestMergedAction("master")
+    }
+  }
+  scm {
+    git {
+      remote {
+        url("https://git.company.domain/scm/~username/telegram.git")
+      }
+    }
+  }
+  steps {
+    shell('echo START pull request merged with filter on branches')
   }
 }
 
@@ -169,7 +274,7 @@ job('example-pull-request-merged') {
 job('example-push') {
   triggers{
     bitbucketTriggers {
-      repositoryPushAction(false, true, "")
+      repositoryPushAction(false, true, "master")
     }
   }
   scm {
@@ -190,6 +295,7 @@ job('example-pull-request-created-updated') {
     bitbucketTriggers {
       pullRequestCreatedAction()
       pullRequestUpdatedAction()
+      pullRequestMergedAction("master")
     }
   }
   scm {
