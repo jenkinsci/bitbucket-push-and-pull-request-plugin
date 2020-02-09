@@ -84,7 +84,6 @@ If you are using Bitbucket Server, follow these instructions: <https://confluenc
 
 - Build Status propagation, cf. #23
 - Approve Pull Request on successful build, cf. #29
-- Filter source branches for builds triggered through Pull Request, cf. #61
 
 ## Dsl Job actions for Bitbucket Push and Pull Request Trigger
 
