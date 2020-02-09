@@ -6,3 +6,6 @@ test:
 
 docs:
   - docs/**/*
+
+views:
+  - src/main/resources/**/*
