@@ -47,17 +47,23 @@ If you are using Bitbucket Server, follow these instructions: <https://confluenc
 
 1. Configure the Bitbucket Repository under the Source Code Management with your credentials. For git:
 
-   <img src="docs/b7fc82d417c72eb80f3c22945214709bf5295d66.png" width="580">
+   <img src="docs/img/conf_git.png" width="580">
 
    In case you are using Mercurial instead of git, configure it as follows:
 
-   <img src="docs/a83313a918370e7a399e2f7a02f0edb450ed048b.png" width="580">
+   <img src="docs/img/conf_mercurial.png" width="580">
 
    _Please note: the branch, related to the events which trigger the builds, must be specified in the field Revision._
 
 2. Now activate the plugin in your job selecting the "Build with Bitbucket Push and Pull Request Plugin" option in the Build Triggers pane.
 
-   <img src="docs/25de6f8dfbf5548d06d2ac4605f20501193b1b63.png" width="580">
+   <img src="docs/img/example_config_jenkins_bb_ppr_1.png" width="580">
+
+   <img src="docs/img/example_config_jenkins_bb_ppr_2.png" width="580">
+
+   <img src="docs/img/example_config_jenkins_bb_ppr_3.png" width="580">
+
+   <img src="docs/img/example_config_jenkins_bb_ppr_4.png" width="580">
 
 ## Environment variables
 
