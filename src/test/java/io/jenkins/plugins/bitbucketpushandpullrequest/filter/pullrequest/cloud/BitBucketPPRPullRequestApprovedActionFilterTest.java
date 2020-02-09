@@ -3,20 +3,26 @@ package io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.cloud;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import java.util.HashMap;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.jvnet.hudson.test.JenkinsRule;
 import org.mockito.junit.MockitoJUnitRunner;
 import hudson.EnvVars;
 
 @RunWith(MockitoJUnitRunner.class)
 public class BitBucketPPRPullRequestApprovedActionFilterTest {
 
+  @Rule
+  public JenkinsRule jenkins = new JenkinsRule();
+
   @Test
   public void testMatches() {
     String allowedBranches = "master";
 
     BitBucketPPRPullRequestApprovedActionFilter c =
-        new BitBucketPPRPullRequestApprovedActionFilter(false, allowedBranches);
+        new BitBucketPPRPullRequestApprovedActionFilter(false);
+    c.setAllowedBranches(allowedBranches);
 
     assertTrue(c.matches(allowedBranches, "origin/master", null));
     assertFalse(c.matches(allowedBranches, "origin/something/master", null));
@@ -76,7 +82,8 @@ public class BitBucketPPRPullRequestApprovedActionFilterTest {
     String allowedBranches = "${master}";
 
     BitBucketPPRPullRequestApprovedActionFilter c =
-        new BitBucketPPRPullRequestApprovedActionFilter(false, allowedBranches);
+        new BitBucketPPRPullRequestApprovedActionFilter(false);
+    c.setAllowedBranches(allowedBranches);
 
     assertTrue(c.matches(allowedBranches, "origin/master", env));
     assertFalse(c.matches(allowedBranches, "origin/something/master", env));
@@ -128,7 +135,8 @@ public class BitBucketPPRPullRequestApprovedActionFilterTest {
     String allowedBranches = "refs/heads/j*n*";
 
     BitBucketPPRPullRequestApprovedActionFilter c =
-        new BitBucketPPRPullRequestApprovedActionFilter(false, allowedBranches);
+        new BitBucketPPRPullRequestApprovedActionFilter(false);
+    c.setAllowedBranches(allowedBranches);
 
 
     assertTrue(c.matches(allowedBranches, "refs/heads/jenkins", null));
@@ -144,7 +152,8 @@ public class BitBucketPPRPullRequestApprovedActionFilterTest {
     String allowedBranches = ":^(?!(origin/prefix)).*";
 
     BitBucketPPRPullRequestApprovedActionFilter c =
-        new BitBucketPPRPullRequestApprovedActionFilter(false, allowedBranches);
+        new BitBucketPPRPullRequestApprovedActionFilter(false);
+    c.setAllowedBranches(allowedBranches);
 
     assertTrue(c.matches(allowedBranches, "origin", null));
     assertTrue(c.matches(allowedBranches, "origin/master", null));
@@ -159,7 +168,8 @@ public class BitBucketPPRPullRequestApprovedActionFilterTest {
     String allowedBranches = "*/master";
 
     BitBucketPPRPullRequestApprovedActionFilter c =
-        new BitBucketPPRPullRequestApprovedActionFilter(false, allowedBranches);
+        new BitBucketPPRPullRequestApprovedActionFilter(false);
+    c.setAllowedBranches(allowedBranches);
 
     assertFalse(c.matches(allowedBranches, "master", null));
   }
@@ -169,7 +179,8 @@ public class BitBucketPPRPullRequestApprovedActionFilterTest {
     String allowedBranches = "develop, :^(?!master$).*";
 
     BitBucketPPRPullRequestApprovedActionFilter c =
-        new BitBucketPPRPullRequestApprovedActionFilter(false, allowedBranches);
+        new BitBucketPPRPullRequestApprovedActionFilter(false);
+    c.setAllowedBranches(allowedBranches);
 
     assertFalse(c.matches(allowedBranches, "master", null));
 
@@ -183,7 +194,8 @@ public class BitBucketPPRPullRequestApprovedActionFilterTest {
     String allowedBranches = "";
 
     BitBucketPPRPullRequestApprovedActionFilter c =
-        new BitBucketPPRPullRequestApprovedActionFilter(false, allowedBranches);
+        new BitBucketPPRPullRequestApprovedActionFilter(false);
+    c.setAllowedBranches(allowedBranches);
 
     assertTrue(c.matches(allowedBranches, "master", null));
     assertTrue(c.matches(allowedBranches, "develop", null));
@@ -196,7 +208,8 @@ public class BitBucketPPRPullRequestApprovedActionFilterTest {
     String allowedBranches = ":origin/release-\\d{8}";
 
     BitBucketPPRPullRequestApprovedActionFilter c =
-        new BitBucketPPRPullRequestApprovedActionFilter(false, allowedBranches);
+        new BitBucketPPRPullRequestApprovedActionFilter(false);
+    c.setAllowedBranches(allowedBranches);
 
     assertTrue(c.matches(allowedBranches, "origin/release-20150101", null));
     assertFalse(c.matches(allowedBranches, "origin/release-2015010", null));
@@ -209,7 +222,8 @@ public class BitBucketPPRPullRequestApprovedActionFilterTest {
     String allowedBranches = ":^(?!origin/master$|origin/develop$).*";
 
     BitBucketPPRPullRequestApprovedActionFilter c =
-        new BitBucketPPRPullRequestApprovedActionFilter(false, allowedBranches);
+        new BitBucketPPRPullRequestApprovedActionFilter(false);
+    c.setAllowedBranches(allowedBranches);
 
     assertTrue(c.matches(allowedBranches, "origin/branch1", null));
     assertTrue(c.matches(allowedBranches, "origin/branch-2", null));

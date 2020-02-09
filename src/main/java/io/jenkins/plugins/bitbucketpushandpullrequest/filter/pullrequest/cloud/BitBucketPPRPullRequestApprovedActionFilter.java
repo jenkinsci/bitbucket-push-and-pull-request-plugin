@@ -27,6 +27,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.logging.Logger;
 import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.DataBoundSetter;
 import hudson.Extension;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.cause.BitBucketPPRTriggerCause;
@@ -43,14 +44,17 @@ public class BitBucketPPRPullRequestApprovedActionFilter
   public String allowedBranches;
 
   @DataBoundConstructor
-  public BitBucketPPRPullRequestApprovedActionFilter(boolean triggerOnlyIfAllReviewersApproved,
-      String allowedBranches) {
-    this.allowedBranches = allowedBranches;
+  public BitBucketPPRPullRequestApprovedActionFilter(boolean triggerOnlyIfAllReviewersApproved) {
     this.triggerOnlyIfAllReviewersApproved = triggerOnlyIfAllReviewersApproved;
   }
 
-  public BitBucketPPRPullRequestApprovedActionFilter(boolean triggerOnlyIfAllReviewersApproved) {
-    this.triggerOnlyIfAllReviewersApproved = triggerOnlyIfAllReviewersApproved;
+  @DataBoundSetter
+  public void setAllowedBranches(String allowedBranches) {
+    if (allowedBranches == null || "".equals(allowedBranches)) {
+      this.allowedBranches = "";
+    } else {
+      this.allowedBranches = allowedBranches;
+    }
   }
 
   @Override

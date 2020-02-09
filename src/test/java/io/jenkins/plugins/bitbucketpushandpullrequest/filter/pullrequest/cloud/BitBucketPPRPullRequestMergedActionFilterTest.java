@@ -15,8 +15,9 @@ public class BitBucketPPRPullRequestMergedActionFilterTest {
   public void testMatches() {
     String allowedBranches = "master";
 
-    BitBucketPPRPullRequestMergedActionFilter c =
-        new BitBucketPPRPullRequestMergedActionFilter(allowedBranches);
+    BitBucketPPRPullRequestMergedActionFilter c = new BitBucketPPRPullRequestMergedActionFilter();
+    c.setAllowedBranches(allowedBranches);
+
 
     assertTrue(c.matches(allowedBranches, "origin/master", null));
     assertFalse(c.matches(allowedBranches, "origin/something/master", null));
@@ -75,8 +76,9 @@ public class BitBucketPPRPullRequestMergedActionFilterTest {
 
     String allowedBranches = "${master}";
 
-    BitBucketPPRPullRequestMergedActionFilter c =
-        new BitBucketPPRPullRequestMergedActionFilter(allowedBranches);
+    BitBucketPPRPullRequestMergedActionFilter c = new BitBucketPPRPullRequestMergedActionFilter();
+    c.setAllowedBranches(allowedBranches);
+
 
     assertTrue(c.matches(allowedBranches, "origin/master", env));
     assertFalse(c.matches(allowedBranches, "origin/something/master", env));
@@ -127,9 +129,8 @@ public class BitBucketPPRPullRequestMergedActionFilterTest {
   public void testUsesRefsHeads() {
     String allowedBranches = "refs/heads/j*n*";
 
-    BitBucketPPRPullRequestMergedActionFilter c =
-        new BitBucketPPRPullRequestMergedActionFilter(allowedBranches);
-
+    BitBucketPPRPullRequestMergedActionFilter c = new BitBucketPPRPullRequestMergedActionFilter();
+    c.setAllowedBranches(allowedBranches);
 
     assertTrue(c.matches(allowedBranches, "refs/heads/jenkins", null));
     assertTrue(c.matches(allowedBranches, "refs/heads/jane", null));
@@ -143,8 +144,9 @@ public class BitBucketPPRPullRequestMergedActionFilterTest {
 
     String allowedBranches = ":^(?!(origin/prefix)).*";
 
-    BitBucketPPRPullRequestMergedActionFilter c =
-        new BitBucketPPRPullRequestMergedActionFilter(allowedBranches);
+    BitBucketPPRPullRequestMergedActionFilter c = new BitBucketPPRPullRequestMergedActionFilter();
+    c.setAllowedBranches(allowedBranches);
+
 
     assertTrue(c.matches(allowedBranches, "origin", null));
     assertTrue(c.matches(allowedBranches, "origin/master", null));
@@ -158,8 +160,8 @@ public class BitBucketPPRPullRequestMergedActionFilterTest {
   public void testMatchesNot1() {
     String allowedBranches = "*/master";
 
-    BitBucketPPRPullRequestMergedActionFilter c =
-        new BitBucketPPRPullRequestMergedActionFilter(allowedBranches);
+    BitBucketPPRPullRequestMergedActionFilter c = new BitBucketPPRPullRequestMergedActionFilter();
+    c.setAllowedBranches(allowedBranches);
 
     assertFalse(c.matches(allowedBranches, "master", null));
   }
@@ -168,8 +170,8 @@ public class BitBucketPPRPullRequestMergedActionFilterTest {
   public void testMatchesNot2() {
     String allowedBranches = "develop, :^(?!master$).*";
 
-    BitBucketPPRPullRequestMergedActionFilter c =
-        new BitBucketPPRPullRequestMergedActionFilter(allowedBranches);
+    BitBucketPPRPullRequestMergedActionFilter c = new BitBucketPPRPullRequestMergedActionFilter();
+    c.setAllowedBranches(allowedBranches);
 
     assertFalse(c.matches(allowedBranches, "master", null));
 
@@ -182,8 +184,8 @@ public class BitBucketPPRPullRequestMergedActionFilterTest {
 
     String allowedBranches = "";
 
-    BitBucketPPRPullRequestMergedActionFilter c =
-        new BitBucketPPRPullRequestMergedActionFilter(allowedBranches);
+    BitBucketPPRPullRequestMergedActionFilter c = new BitBucketPPRPullRequestMergedActionFilter();
+    c.setAllowedBranches(allowedBranches);
 
     assertTrue(c.matches(allowedBranches, "master", null));
     assertTrue(c.matches(allowedBranches, "develop", null));
@@ -195,8 +197,8 @@ public class BitBucketPPRPullRequestMergedActionFilterTest {
   public void testUsesJavaPatternWithRepetition() {
     String allowedBranches = ":origin/release-\\d{8}";
 
-    BitBucketPPRPullRequestMergedActionFilter c =
-        new BitBucketPPRPullRequestMergedActionFilter(allowedBranches);
+    BitBucketPPRPullRequestMergedActionFilter c = new BitBucketPPRPullRequestMergedActionFilter();
+    c.setAllowedBranches(allowedBranches);
 
     assertTrue(c.matches(allowedBranches, "origin/release-20150101", null));
     assertFalse(c.matches(allowedBranches, "origin/release-2015010", null));
@@ -208,9 +210,9 @@ public class BitBucketPPRPullRequestMergedActionFilterTest {
   public void testUsesJavaPatternToExcludeMultipleBranches() {
     String allowedBranches = ":^(?!origin/master$|origin/develop$).*";
 
-    BitBucketPPRPullRequestMergedActionFilter c =
-        new BitBucketPPRPullRequestMergedActionFilter(allowedBranches);
-
+    BitBucketPPRPullRequestMergedActionFilter c = new BitBucketPPRPullRequestMergedActionFilter();
+    c.setAllowedBranches(allowedBranches);
+    
     assertTrue(c.matches(allowedBranches, "origin/branch1", null));
     assertTrue(c.matches(allowedBranches, "origin/branch-2", null));
     assertTrue(c.matches(allowedBranches, "origin/master123", null));

@@ -48,7 +48,6 @@ public class BitBucketPPRRepositoryPushActionFilter extends BitBucketPPRReposito
     this.allowedBranches = allowedBranches;
   }
 
-
   @Override
   public boolean shouldTriggerBuild(BitBucketPPRAction bitbucketAction) {
     logger.info(

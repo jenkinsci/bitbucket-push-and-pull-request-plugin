@@ -25,6 +25,7 @@ package io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.server
 import java.io.File;
 import java.io.IOException;
 import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.DataBoundSetter;
 import hudson.Extension;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.cause.BitBucketPPRTriggerCause;
@@ -34,15 +35,19 @@ import io.jenkins.plugins.bitbucketpushandpullrequest.cause.pullrequest.server.B
 public class BitBucketPPRPullRequestServerUpdatedActionFilter
     extends BitBucketPPRPullRequestServerActionFilter {
 
-  private String allowedBranches;
-
-  public BitBucketPPRPullRequestServerUpdatedActionFilter(String allowedBranches) {
-    this.allowedBranches = allowedBranches;
-  }
+  public String allowedBranches;
 
   @DataBoundConstructor
   public BitBucketPPRPullRequestServerUpdatedActionFilter() {}
 
+  @DataBoundSetter
+  public void setAllowedBranches(String allowedBranches) {
+    if (allowedBranches == null || "".equals(allowedBranches)) {
+      this.allowedBranches = "";
+    } else {
+      this.allowedBranches = allowedBranches;
+    }
+  }
 
   @Override
   public boolean shouldTriggerBuild(BitBucketPPRAction bitbucketAction) {

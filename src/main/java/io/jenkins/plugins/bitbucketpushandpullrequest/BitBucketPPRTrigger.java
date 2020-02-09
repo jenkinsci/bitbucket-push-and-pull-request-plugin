@@ -203,6 +203,10 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
     return (DescriptorImpl) super.getDescriptor();
   }
 
+  public List<BitBucketPPRTriggerFilter> getTriggers() {
+    return triggers;
+  }
+
   /**
    * Action object for {@link BitBucketPPRProject}. Used to display the polling log.
    */
@@ -261,9 +265,5 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
       // fancy
       return Jenkins.get().getDescriptorList(BitBucketPPRTriggerFilter.class);
     }
-  }
-
-  public List<BitBucketPPRTriggerFilter> getTriggers() {
-    return triggers;
   }
 }
