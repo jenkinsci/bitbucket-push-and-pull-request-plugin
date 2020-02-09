@@ -24,17 +24,22 @@ package io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.cloud;
 
 import java.io.File;
 import java.io.IOException;
+import hudson.EnvVars;
 import hudson.model.AbstractDescribableImpl;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.cause.BitBucketPPRTriggerCause;
+import io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRUtils;
 
 
 public abstract class BitBucketPPRPullRequestActionFilter
     extends AbstractDescribableImpl<BitBucketPPRPullRequestActionFilter> {
+
+  public boolean matches(String allowedBranches, String branchName, EnvVars env) {
+    return BitBucketPPRUtils.matches(allowedBranches, branchName, env);
+  }
 
   public abstract boolean shouldTriggerBuild(BitBucketPPRAction bitbucketAction);
 
   public abstract BitBucketPPRTriggerCause getCause(File pollingLog,
       BitBucketPPRAction pullRequestAction) throws IOException;
 }
-

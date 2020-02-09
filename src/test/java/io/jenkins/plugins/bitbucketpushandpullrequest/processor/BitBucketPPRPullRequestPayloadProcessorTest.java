@@ -61,7 +61,7 @@ public class BitBucketPPRPullRequestPayloadProcessorTest {
   @Captor
   private ArgumentCaptor<BitBucketPPRAction> actionCaptor;
 
-  private BitBucketPPRPullRequestPayloadProcessor pullRequestPayloadProcessor;
+  BitBucketPPRPullRequestPayloadProcessor pullRequestPayloadProcessor;
 
   @Test
   @Ignore

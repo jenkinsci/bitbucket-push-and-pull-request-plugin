@@ -25,15 +25,14 @@ package io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.server
 import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.PULL_REQUEST_REVIEWER;
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 import java.util.logging.Logger;
 import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.DataBoundSetter;
 import hudson.Extension;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.cause.BitBucketPPRTriggerCause;
 import io.jenkins.plugins.bitbucketpushandpullrequest.cause.pullrequest.server.BitBucketPPRPullRequestServerApprovedCause;
 import io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.cloud.BitBucketPPRPullRequestApprovedActionFilter;
-import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud.BitBucketPPRParticipant;
 
 public class BitBucketPPRPullRequestServerApprovedActionFilter
@@ -41,12 +40,22 @@ public class BitBucketPPRPullRequestServerApprovedActionFilter
   private static final Logger LOGGER =
       Logger.getLogger(BitBucketPPRPullRequestApprovedActionFilter.class.getName());
 
+  public String allowedBranches;
   public boolean triggerOnlyIfAllReviewersApproved;
 
   @DataBoundConstructor
   public BitBucketPPRPullRequestServerApprovedActionFilter(
       boolean triggerOnlyIfAllReviewersApproved) {
     this.triggerOnlyIfAllReviewersApproved = triggerOnlyIfAllReviewersApproved;
+  }
+
+  @DataBoundSetter
+  public void setAllowedBranches(String allowedBranches) {
+    if (allowedBranches == null || "".equals(allowedBranches)) {
+      this.allowedBranches = "";
+    } else {
+      this.allowedBranches = allowedBranches;
+    }
   }
 
   @Override
@@ -56,7 +65,7 @@ public class BitBucketPPRPullRequestServerApprovedActionFilter
       return false;
     }
 
-    return true;
+    return matches(allowedBranches, bitbucketAction.getTargetBranch(), null);
   }
 
   @Override
@@ -80,18 +89,8 @@ public class BitBucketPPRPullRequestServerApprovedActionFilter
   }
 
   private boolean allReviewersHaveApproved(BitBucketPPRAction pullRequestAction) {
-    BitBucketPPRPayload payload = pullRequestAction.getPayload();
-    List<BitBucketPPRParticipant> participants = payload.getPullRequest().getParticipants();
-
-    boolean allApproved = true;
-
-    for (BitBucketPPRParticipant participant : participants) {
-      if (isReviewer(participant) && !participant.getApproved()) {
-        allApproved = false;
-      }
-    }
-
-    return allApproved;
+    return pullRequestAction.getPayload().getPullRequest().getParticipants().stream()
+        .filter(p -> isReviewer(p) && !p.getApproved()).count() == 0;
   }
 
   private boolean isReviewer(BitBucketPPRParticipant pullRequestParticipant) {
