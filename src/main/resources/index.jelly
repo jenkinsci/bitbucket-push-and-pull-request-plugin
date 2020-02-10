@@ -1,6 +1,4 @@
 <?jelly escape-by-default='true'?>
 <div>
-  Integrates with Bitbucket Cloud (rest api version >=2.0) Server triggering on push and pull requests
-  <div class="compatWarning">Warning: After updating the plugin from a version prior to 2.x.x, 
-  the jobs with a pull request need to be reconfigured.</div>
+  Integrates with Bitbucket Cloud (rest api version >=2.0) Server triggering on push and pull requests.
 </div>

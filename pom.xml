@@ -17,7 +17,8 @@
 	<properties>
 		<jenkins.version>2.138.2</jenkins.version>
 		<java.level>8</java.level>
-		<powermock.version>2.0.0</powermock.version>
+    <powermock.version>2.0.0</powermock.version>
+    <hpi.compatibleSinceVersion>2.0</hpi.compatibleSinceVersion>
 	</properties>
 
 	<name>Bitbucket Push and Pull Request Plugin</name>
@@ -34,6 +35,10 @@
 		<developer>
 			<id>cdelmonte</id>
 			<name>Christian Del Monte</name>
+    </developer>
+    <developer>
+			<id>macghriogair</id>
+			<name>Patrick Mac Gregor</name>
 		</developer>
 	</developers>
 
