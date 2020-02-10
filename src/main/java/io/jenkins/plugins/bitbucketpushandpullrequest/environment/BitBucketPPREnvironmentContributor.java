@@ -23,15 +23,15 @@ import io.jenkins.plugins.bitbucketpushandpullrequest.cause.repository.BitBucket
 @Extension
 public class BitBucketPPREnvironmentContributor extends EnvironmentContributor {
 
-  private static final String BITBUCKET_PULL_REQUEST_ID = "BITBUCKET_PULL_REQUEST_ID";
-  private static final String BITBUCKET_PULL_REQUEST_LINK = "BITBUCKET_PULL_REQUEST_LINK";
-  private static final String BITBUCKET_TARGET_BRANCH = "BITBUCKET_TARGET_BRANCH";
-  private static final String BITBUCKET_REPOSITORY_UUID = "BITBUCKET_REPOSITORY_UUID";
-  private static final String BITBUCKET_REPOSITORY_URL = "BITBUCKET_REPOSITORY_URL";
-  private static final String BITBUCKET_SOURCE_BRANCH = "BITBUCKET_SOURCE_BRANCH";
-  private static final String REPOSITORY_LINK = "REPOSITORY_LINK";
-  private static final String REPOSITORY_NAME = "REPOSITORY_NAME";
-  private static final Logger LOGGER =
+  static final String BITBUCKET_PULL_REQUEST_ID = "BITBUCKET_PULL_REQUEST_ID";
+  static final String BITBUCKET_PULL_REQUEST_LINK = "BITBUCKET_PULL_REQUEST_LINK";
+  static final String BITBUCKET_TARGET_BRANCH = "BITBUCKET_TARGET_BRANCH";
+  static final String BITBUCKET_REPOSITORY_UUID = "BITBUCKET_REPOSITORY_UUID";
+  static final String BITBUCKET_REPOSITORY_URL = "BITBUCKET_REPOSITORY_URL";
+  static final String BITBUCKET_SOURCE_BRANCH = "BITBUCKET_SOURCE_BRANCH";
+  static final String REPOSITORY_LINK = "REPOSITORY_LINK";
+  static final String REPOSITORY_NAME = "REPOSITORY_NAME";
+  static final Logger LOGGER =
       Logger.getLogger(BitBucketPPREnvironmentContributor.class.getName());
 
   @Override
