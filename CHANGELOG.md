@@ -1,5 +1,20 @@
 # Change Log
 
+
+## 2.3.0 (2020-02-10)
+
+[Full Changelog](https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/compare/bitbucket-push-and-pull-request-2.2.0...bitbucket-push-and-pull-request-2.3.0)
+
+**Implemented enhancements:**
+- Moved wiki files to Github
+- Improved documentation
+- Refactoring
+- Code Style fixes
+- Add filter for branches on pull requests
+
+**Bug fixes**
+- Issue #71: Polling is not available
+
 ## 2.2.0 (2019-10-14)
 
 [Full Changelog](https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/compare/bitbucket-push-and-pull-request-2.0.0...bitbucket-push-and-pull-request-2.2.0)
