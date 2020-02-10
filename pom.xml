@@ -35,8 +35,8 @@
 		<developer>
 			<id>cdelmonte</id>
 			<name>Christian Del Monte</name>
-    </developer>
-    <developer>
+    		</developer>
+    		<developer>
 			<id>macghriogair</id>
 			<name>Patrick Mac Gregor</name>
 		</developer>
@@ -152,7 +152,7 @@
 		<connection>scm:git:git://github.com/jenkinsci/${project.artifactId}-plugin.git</connection>
 		<developerConnection>scm:git:git@github.com:jenkinsci/${project.artifactId}-plugin.git</developerConnection>
 		<url>https://github.com/jenkinsci/${project.artifactId}-plugin</url>
-		<tag>bitbucket-push-and-pull-request-2.2.0</tag>
+		<tag>bitbucket-push-and-pull-request-2.3.0</tag>
 	</scm>
 
 	<repositories>
