@@ -31,8 +31,7 @@ public class BitBucketPPREnvironmentContributor extends EnvironmentContributor {
   static final String BITBUCKET_SOURCE_BRANCH = "BITBUCKET_SOURCE_BRANCH";
   static final String REPOSITORY_LINK = "REPOSITORY_LINK";
   static final String REPOSITORY_NAME = "REPOSITORY_NAME";
-  static final Logger LOGGER =
-      Logger.getLogger(BitBucketPPREnvironmentContributor.class.getName());
+  static final Logger LOGGER = Logger.getLogger(BitBucketPPREnvironmentContributor.class.getName());
 
   @Override
   public void buildEnvironmentFor(@Nonnull Run run, EnvVars envVars, TaskListener taskListener)
@@ -64,13 +63,14 @@ public class BitBucketPPREnvironmentContributor extends EnvironmentContributor {
     });
   }
 
-  private void setEnvVarsForServerRepository(EnvVars envVars,
+  private static void setEnvVarsForServerRepository(EnvVars envVars,
       BitBucketPPRServerRepositoryAction action) {
     String repoName = action.getRepositoryName();
-    putEnvVar(envVars, REPOSITORY_NAME, repoName);
+    BitBucketPPREnvironmentContributor.putEnvVar(envVars, REPOSITORY_NAME, repoName);
   }
 
-  private void setEnvVarsForCloudRepository(EnvVars envVars, BitBucketPPRRepositoryAction action) {
+  private static void setEnvVarsForCloudRepository(EnvVars envVars,
+      BitBucketPPRRepositoryAction action) {
     String urlBranchDeprecated = action.getRepositoryUrl();
     putEnvVar(envVars, REPOSITORY_LINK, urlBranchDeprecated);
     LOGGER.log(Level.FINEST, "Injecting REPOSOTORY_LINK: {0}", urlBranchDeprecated);
@@ -88,7 +88,7 @@ public class BitBucketPPREnvironmentContributor extends EnvironmentContributor {
     LOGGER.log(Level.FINEST, "Injecting BITBUCKET_PUSH_REPOSITORY_UUID: {0}", repositoryUuid);
   }
 
-  private void setEnvVarsForCloudPullRequest(EnvVars envVars,
+  private static void setEnvVarsForCloudPullRequest(EnvVars envVars,
       BitBucketPPRPullRequestAction action) {
     String pullRequestSourceBranch = action.getSourceBranch();
     putEnvVar(envVars, BITBUCKET_SOURCE_BRANCH, pullRequestSourceBranch);
@@ -107,7 +107,7 @@ public class BitBucketPPREnvironmentContributor extends EnvironmentContributor {
     LOGGER.log(Level.FINEST, "Injecting BITBUCKET_PULL_REQUEST_ID: {0}", pullRequestId);
   }
 
-  private void setEnvVarsForServerPullRequest(EnvVars envVars,
+  private static void setEnvVarsForServerPullRequest(EnvVars envVars,
       BitBucketPPRPullRequestServerAction action) {
     String pullRequestSourceBranch = action.getSourceBranch();
     putEnvVar(envVars, BITBUCKET_SOURCE_BRANCH, pullRequestSourceBranch);
@@ -127,10 +127,6 @@ public class BitBucketPPREnvironmentContributor extends EnvironmentContributor {
   }
 
   private static void putEnvVar(EnvVars envs, String name, String value) {
-    envs.put(name, getString(value, ""));
-  }
-
-  private static String getString(String actual, String d) {
-    return actual == null ? d : actual;
+    envs.put(name, (value == null ? "" : value));
   }
 }
