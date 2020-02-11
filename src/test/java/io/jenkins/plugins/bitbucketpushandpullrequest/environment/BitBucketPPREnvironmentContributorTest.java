@@ -57,7 +57,6 @@ public class BitBucketPPREnvironmentContributorTest {
 
   @Test
   public void buildEnvironmentForCloudRepoPushTest() {
-
     BitBucketPPRPayload payload = getPayload("./cloud/repo_push.json");
 
     BitBucketPPREnvironmentContributor envContributor = new BitBucketPPREnvironmentContributor();
@@ -90,31 +89,9 @@ public class BitBucketPPREnvironmentContributorTest {
             "{6b5a1057-07ff-47c1-a65e-6c136cce4hj4}"));
   }
 
-
-
-  // String pullRequestSourceBranch = action.getSourceBranch();
-  // putEnvVar(envVars, BITBUCKET_SOURCE_BRANCH, pullRequestSourceBranch);
-  // LOGGER.log(Level.FINEST, "Injecting BITBUCKET_SOURCE_BRANCH: {0}", pullRequestSourceBranch);
-
-  // String pullRequestTargetBranch = action.getTargetBranch();
-  // putEnvVar(envVars, BITBUCKET_TARGET_BRANCH, pullRequestTargetBranch);
-  // LOGGER.log(Level.FINEST, "Injecting BITBUCKET_TARGET_BRANCH: {0}", pullRequestTargetBranch);
-
-  // String pullRequestUrlBranch = action.getPullRequestUrl();
-  // putEnvVar(envVars, BITBUCKET_PULL_REQUEST_LINK, pullRequestUrlBranch);
-  // LOGGER.log(Level.FINEST, "Injecting BITBUCKET_PULL_REQUEST_LINK: {0}", pullRequestUrlBranch);
-
-  // String pullRequestId = action.getPullRequestId();
-  // putEnvVar(envVars, BITBUCKET_PULL_REQUEST_ID, pullRequestId);
-  // LOGGER.log(Level.FINEST, "Injecting BITBUCKET_PULL_REQUEST_ID: {0}", pullRequestId);
-  // }
-
-
   @Test
   public void buildEnvironmentForCloudPullRequestCreatedTest() {
-
     BitBucketPPRPayload payload = getPayload("./cloud/pr_created.json");
-
 
     BitBucketPPREnvironmentContributor envContributor = new BitBucketPPREnvironmentContributor();
     Run run = mock(Run.class);
@@ -145,6 +122,104 @@ public class BitBucketPPREnvironmentContributorTest {
         .hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_ID, "198"));
   }
 
+  @Test
+  public void buildEnvironmentForCloudPullRequestMergedTest() {
+    BitBucketPPRPayload payload = getPayload("./cloud/pr_fulfilled.json");
+
+    BitBucketPPREnvironmentContributor envContributor = new BitBucketPPREnvironmentContributor();
+    Run run = mock(Run.class);
+    EnvVars envVars = spy(EnvVars.class);
+    TaskListener taskListener = mock(TaskListener.class);
+
+    BitBucketPPRPullRequestCause cause = mock(BitBucketPPRPullRequestCause.class);
+    List<Cause> causes = new ArrayList<>();
+    causes.add(cause);
+    when(run.getCauses()).thenReturn(causes);
+    when(cause.getPullRequestPayLoad()).thenReturn(new BitBucketPPRPullRequestAction(payload));
+
+    try {
+      envContributor.buildEnvironmentFor(run, envVars, taskListener);
+    } catch (Exception e) {
+      e.printStackTrace();
+      fail("Excetion thrown");
+    }
+
+    assertThat(envVars, IsMapContaining.hasEntry(
+        BitBucketPPREnvironmentContributor.BITBUCKET_SOURCE_BRANCH, "feature/do-not-merge"));
+    assertThat(envVars, IsMapContaining
+        .hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_TARGET_BRANCH, "develop"));
+    assertThat(envVars,
+        IsMapContaining.hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_LINK,
+            "https://bitbucket.org/some-repo-namespace/some-repo/pull-requests/198"));
+    assertThat(envVars, IsMapContaining
+        .hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_ID, "198"));
+  }
+
+  @Test
+  public void buildEnvironmentForCloudPullRequestUpdatedTest() {
+    BitBucketPPRPayload payload = getPayload("./cloud/pr_updated.json");
+
+    BitBucketPPREnvironmentContributor envContributor = new BitBucketPPREnvironmentContributor();
+    Run run = mock(Run.class);
+    EnvVars envVars = spy(EnvVars.class);
+    TaskListener taskListener = mock(TaskListener.class);
+
+    BitBucketPPRPullRequestCause cause = mock(BitBucketPPRPullRequestCause.class);
+    List<Cause> causes = new ArrayList<>();
+    causes.add(cause);
+    when(run.getCauses()).thenReturn(causes);
+    when(cause.getPullRequestPayLoad()).thenReturn(new BitBucketPPRPullRequestAction(payload));
+
+    try {
+      envContributor.buildEnvironmentFor(run, envVars, taskListener);
+    } catch (Exception e) {
+      e.printStackTrace();
+      fail("Excetion thrown");
+    }
+
+    assertThat(envVars, IsMapContaining.hasEntry(
+        BitBucketPPREnvironmentContributor.BITBUCKET_SOURCE_BRANCH, "feature/do-not-merge"));
+    assertThat(envVars, IsMapContaining
+        .hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_TARGET_BRANCH, "develop"));
+    assertThat(envVars,
+        IsMapContaining.hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_LINK,
+            "https://bitbucket.org/some-repo-namespace/some-repo/pull-requests/198"));
+    assertThat(envVars, IsMapContaining
+        .hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_ID, "198"));
+  }
+
+  @Test
+  public void buildEnvironmentForCloudPullRequestApprovedTest() {
+    BitBucketPPRPayload payload = getPayload("./cloud/pr_approved.json");
+
+    BitBucketPPREnvironmentContributor envContributor = new BitBucketPPREnvironmentContributor();
+    Run run = mock(Run.class);
+    EnvVars envVars = spy(EnvVars.class);
+    TaskListener taskListener = mock(TaskListener.class);
+
+    BitBucketPPRPullRequestCause cause = mock(BitBucketPPRPullRequestCause.class);
+    List<Cause> causes = new ArrayList<>();
+    causes.add(cause);
+    when(run.getCauses()).thenReturn(causes);
+    when(cause.getPullRequestPayLoad()).thenReturn(new BitBucketPPRPullRequestAction(payload));
+
+    try {
+      envContributor.buildEnvironmentFor(run, envVars, taskListener);
+    } catch (Exception e) {
+      e.printStackTrace();
+      fail("Excetion thrown");
+    }
+
+    assertThat(envVars, IsMapContaining.hasEntry(
+        BitBucketPPREnvironmentContributor.BITBUCKET_SOURCE_BRANCH, "feature/do-not-merge"));
+    assertThat(envVars, IsMapContaining
+        .hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_TARGET_BRANCH, "develop"));
+    assertThat(envVars,
+        IsMapContaining.hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_LINK,
+            "https://bitbucket.org/some-repo-namespace/some-repo/pull-requests/198"));
+    assertThat(envVars, IsMapContaining
+        .hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_ID, "198"));
+  }
 
   private BitBucketPPRPayload getPayload(String res) {
     JsonReader reader = null;
