@@ -1,50 +1,38 @@
-# Bug Report
+---
+name: Bug report
+about: Create a report to help us improve
+title: ''
+labels: ''
+assignees: ''
 
 ---
 
-name: Bug report
-about: Create a report to help us improve
-title: ""
-labels: ""
-assignees: ""
----# Please make sure all the following boxes are checked before submitting your feature request - thank you!
+**Describe the bug**
+A clear and concise description of what the bug is.
 
-- [ ] You're not able to fix the problem yourself and send us a pull request instead of an issue.
-- [ ] There is no existing issue regarding the same topic
-- Plugin Version: (check at \<JenkinsURL>/pluginManager/installed )
-- Jenkins Version:
-- Jenkins Job Type: (Freestyle, Pipeline etc...)
-- Triggered via: (Bitbucket Cloud or Bitbucket Server?)
+**To Reproduce**
+Steps to reproduce the behavior:
+1. Go to '...'
+2. Click on '....'
+3. Scroll down to '....'
+4. See error
 
-## Expected Behavior
+**Expected behavior**
+A clear and concise description of what you expected to happen.
 
-Tell us what should happen
+**Screenshots**
+If applicable, add screenshots to help explain your problem.
 
-## Actual Behavior
+**Desktop (please complete the following information):**
+ - OS: [e.g. iOS]
+ - Browser [e.g. chrome, safari]
+ - Version [e.g. 22]
 
-Tell us what happens instead of the expected behavior
+**Smartphone (please complete the following information):**
+ - Device: [e.g. iPhone6]
+ - OS: [e.g. iOS8.1]
+ - Browser [e.g. stock browser, safari]
+ - Version [e.g. 22]
 
-## Possible Solution
-
-Not obligatory, but suggest a fix/reason for the bug
-
-## Steps to Reproduce
-
-Provide an unambiguous set of steps to reproduce this bug 1. 1. 1. 1.
-
-## Context
-
-How has this issue affected you? What are you trying to accomplish?
-Providing context helps us come up with a solution that is most useful in the real world.
-
-## Bitbucket payload
-
-Only if relevant, will be helpful for reproducing the issue
-
-## Jenkins Job configuration
-
-Only if relevant. Mainly scm and plugin parts will be helpful for reproducing the issue
-
-## Jenkins logs
-
-Only if relevant, will be helpful for debugging
+**Additional context**
+Add any other context about the problem here.

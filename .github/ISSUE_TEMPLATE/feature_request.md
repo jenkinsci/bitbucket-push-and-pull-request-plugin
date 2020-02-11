@@ -1,7 +1,4 @@
-# Feature Request
-
 ---
-
 name: Feature request
 about: Suggest an idea for this project
 title: ''
@@ -10,16 +7,14 @@ assignees: ''
 
 ---
 
-## Summary
+**Is your feature request related to a problem? Please describe.**
+A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]
 
-Provide a general summary of the feature in the Title above
+**Describe the solution you'd like**
+A clear and concise description of what you want to happen.
 
-## Please make sure all the following boxes are checked before submitting your feature request - thank you
+**Describe alternatives you've considered**
+A clear and concise description of any alternative solutions or features you've considered.
 
-- [ ] There is no existing issue regarding the same topic
-
-## Feature description
-
-## Possible Implementation
-
-Not obligatory, but suggest an idea for implementing addition or change
+**Additional context**
+Add any other context or screenshots about the feature request here.
