@@ -1,0 +1,162 @@
+{
+    "actor": {
+        "active": true,
+        "displayName": "me display name",
+        "emailAddress": "me@example.org",
+        "id": 99,
+        "links": {
+            "self": [
+                {
+                    "href": "https://example.org/users/abc123"
+                }
+            ]
+        },
+        "name": "me-name",
+        "slug": "me-slug",
+        "type": "NORMAL"
+    },
+    "date": "2019-10-10T17:06:34+0200",
+    "eventKey": "pr:modified",
+    "previousDescription": null,
+    "previousTarget": {
+        "displayId": "master",
+        "id": "refs/heads/master",
+        "latestChangeset": "0ebb2143c60e66364d0c206fbed6aa5c1bf29a3f",
+        "latestCommit": "0ebb2143c60e66364d0c206fbed6aa5c1bf29a3f",
+        "type": "BRANCH"
+    },
+    "previousTitle": "test",
+    "pullRequest": {
+        "author": {
+            "approved": false,
+            "role": "AUTHOR",
+            "status": "UNAPPROVED",
+            "user": {
+                "active": true,
+                "displayName": "me display name",
+                "emailAddress": "me@example.org",
+                "id": 99,
+                "links": {
+                    "self": [
+                        {
+                            "href": "https://example.org/users/abc123"
+                        }
+                    ]
+                },
+                "name": "me-name",
+                "slug": "me-slug",
+                "type": "NORMAL"
+            }
+        },
+        "closed": false,
+        "createdDate": 1570719921951,
+        "fromRef": {
+            "displayId": "develop",
+            "id": "refs/heads/develop",
+            "latestCommit": "c44479dab8ff2218a6023a82214eb739713e9c57",
+            "repository": {
+                "forkable": true,
+                "id": 99,
+                "links": {
+                    "clone": [
+                        {
+                            "href": "https://example.org/scm/some-namespace/some-repo.git",
+                            "name": "https"
+                        },
+                        {
+                            "href": "ssh://git@example.org/some-namespace/some-repo.git",
+                            "name": "ssh"
+                        }
+                    ],
+                    "self": [
+                        {
+                            "href": "http://example.org/projects/ABC/repos/some-repo/browse"
+                        }
+                    ]
+                },
+                "name": "some-repo",
+                "project": {
+                    "id": 11,
+                    "key": "ABC",
+                    "links": {
+                        "self": [
+                            {
+                                "href": "https://example.org/projects/ABC"
+                            }
+                        ]
+                    },
+                    "name": "some-project-name",
+                    "public": false,
+                    "type": "NORMAL"
+                },
+                "public": false,
+                "scmId": "git",
+                "slug": "some-repo-slug",
+                "state": "AVAILABLE",
+                "statusMessage": "Available"
+            }
+        },
+        "id": 13,
+        "links": {
+            "self": [
+                {
+                    "href": "http://example.org/projects/ABC/repos/some-repo/pull-requests/13"
+                }
+            ]
+        },
+        "locked": false,
+        "open": true,
+        "participants": [],
+        "reviewers": [],
+        "state": "OPEN",
+        "title": "test",
+        "toRef": {
+            "displayId": "master",
+            "id": "refs/heads/master",
+            "latestCommit": "0ebb2143c60e66364d0c206fbed6aa5c1bf29a3f",
+            "repository": {
+                "forkable": true,
+                "id": 99,
+                "links": {
+                    "clone": [
+                        {
+                            "href": "https://example.org/scm/some-namespace/some-repo.git",
+                            "name": "https"
+                        },
+                        {
+                            "href": "ssh://git@example.org/some-namespace/some-repo.git",
+                            "name": "ssh"
+                        }
+                    ],
+                    "self": [
+                        {
+                            "href": "http://example.org/projects/ABC/repos/some-repo/browse"
+                        }
+                    ]
+                },
+                "name": "some-repo",
+                "project": {
+                    "id": 11,
+                    "key": "ABC",
+                    "links": {
+                        "self": [
+                            {
+                                "href": "https://example.org/projects/ABC"
+                            }
+                        ]
+                    },
+                    "name": "some-project-name",
+                    "public": false,
+                    "type": "NORMAL"
+                },
+                "public": false,
+                "scmId": "git",
+                "slug": "some-repo-slug",
+                "state": "AVAILABLE",
+                "statusMessage": "Available"
+            }
+        },
+        "updatedDate": 1570719994865,
+        "version": 2
+    }
+}
