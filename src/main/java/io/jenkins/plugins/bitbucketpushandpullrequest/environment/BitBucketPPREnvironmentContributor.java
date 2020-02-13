@@ -31,6 +31,7 @@ public class BitBucketPPREnvironmentContributor extends EnvironmentContributor {
   static final String BITBUCKET_SOURCE_BRANCH = "BITBUCKET_SOURCE_BRANCH";
   static final String REPOSITORY_LINK = "REPOSITORY_LINK";
   static final String REPOSITORY_NAME = "REPOSITORY_NAME";
+
   static final Logger LOGGER = Logger.getLogger(BitBucketPPREnvironmentContributor.class.getName());
 
   @Override
@@ -65,68 +66,65 @@ public class BitBucketPPREnvironmentContributor extends EnvironmentContributor {
 
   private static void setEnvVarsForServerRepository(EnvVars envVars,
       BitBucketPPRServerRepositoryAction action) {
+    LOGGER.log(Level.FINEST, "Injecting env vars for Server Push");
+
     String repoName = action.getRepositoryName();
-    BitBucketPPREnvironmentContributor.putEnvVar(envVars, REPOSITORY_NAME, repoName);
+    putEnvVar(envVars, REPOSITORY_NAME, repoName);
   }
 
   private static void setEnvVarsForCloudRepository(EnvVars envVars,
       BitBucketPPRRepositoryAction action) {
+    LOGGER.log(Level.FINEST, "Injecting env vars for Cloud Push");
+
     String urlBranchDeprecated = action.getRepositoryUrl();
     putEnvVar(envVars, REPOSITORY_LINK, urlBranchDeprecated);
-    LOGGER.log(Level.FINEST, "Injecting REPOSOTORY_LINK: {0}", urlBranchDeprecated);
 
     String targetBranch = action.getTargetBranch();
     putEnvVar(envVars, BITBUCKET_SOURCE_BRANCH, targetBranch);
-    LOGGER.log(Level.FINEST, "Injecting BITBUCKET_SOURCE_BRANCH: {0}", targetBranch);
 
     String urlBranch = action.getRepositoryUrl();
     putEnvVar(envVars, BITBUCKET_REPOSITORY_URL, urlBranch);
-    LOGGER.log(Level.FINEST, "Injecting BITBUCKET_REPOSITORY_URL: {0}", urlBranch);
 
     String repositoryUuid = action.getRepositoryUuid();
     putEnvVar(envVars, BITBUCKET_REPOSITORY_UUID, repositoryUuid);
-    LOGGER.log(Level.FINEST, "Injecting BITBUCKET_PUSH_REPOSITORY_UUID: {0}", repositoryUuid);
   }
 
   private static void setEnvVarsForCloudPullRequest(EnvVars envVars,
       BitBucketPPRPullRequestAction action) {
+    LOGGER.log(Level.FINEST, "Injecting env vars for Cloud PR");
+
     String pullRequestSourceBranch = action.getSourceBranch();
     putEnvVar(envVars, BITBUCKET_SOURCE_BRANCH, pullRequestSourceBranch);
-    LOGGER.log(Level.FINEST, "Injecting BITBUCKET_SOURCE_BRANCH: {0}", pullRequestSourceBranch);
 
     String pullRequestTargetBranch = action.getTargetBranch();
     putEnvVar(envVars, BITBUCKET_TARGET_BRANCH, pullRequestTargetBranch);
-    LOGGER.log(Level.FINEST, "Injecting BITBUCKET_TARGET_BRANCH: {0}", pullRequestTargetBranch);
 
     String pullRequestUrlBranch = action.getPullRequestUrl();
     putEnvVar(envVars, BITBUCKET_PULL_REQUEST_LINK, pullRequestUrlBranch);
-    LOGGER.log(Level.FINEST, "Injecting BITBUCKET_PULL_REQUEST_LINK: {0}", pullRequestUrlBranch);
 
     String pullRequestId = action.getPullRequestId();
     putEnvVar(envVars, BITBUCKET_PULL_REQUEST_ID, pullRequestId);
-    LOGGER.log(Level.FINEST, "Injecting BITBUCKET_PULL_REQUEST_ID: {0}", pullRequestId);
   }
 
   private static void setEnvVarsForServerPullRequest(EnvVars envVars,
       BitBucketPPRPullRequestServerAction action) {
+    LOGGER.log(Level.FINEST, "Injecting env vars for Server PR");
+
     String pullRequestSourceBranch = action.getSourceBranch();
     putEnvVar(envVars, BITBUCKET_SOURCE_BRANCH, pullRequestSourceBranch);
-    LOGGER.log(Level.FINEST, "Injecting BITBUCKET_SOURCE_BRANCH: {0}", pullRequestSourceBranch);
 
     String pullRequestTargetBranch = action.getTargetBranch();
     putEnvVar(envVars, BITBUCKET_TARGET_BRANCH, pullRequestTargetBranch);
-    LOGGER.log(Level.FINEST, "Injecting BITBUCKET_TARGET_BRANCH: {0}", pullRequestTargetBranch);
 
     String pullRequestUrlBranch = action.getPullRequestUrl();
     putEnvVar(envVars, BITBUCKET_PULL_REQUEST_LINK, pullRequestUrlBranch);
-    LOGGER.log(Level.FINEST, "Injecting BITBUCKET_PULL_REQUEST_LINK: {0}", pullRequestUrlBranch);
 
     String pullRequestId = action.getPullRequestId();
     putEnvVar(envVars, BITBUCKET_PULL_REQUEST_ID, pullRequestId);
-    LOGGER.log(Level.FINEST, "Injecting BITBUCKET_PULL_REQUEST_ID: {0}", pullRequestId);
   }
 
   private static void putEnvVar(EnvVars envs, String name, String value) {
     envs.put(name, (value == null ? "" : value));
+    LOGGER.log(Level.FINEST, String.format("Injecting env var: {0}={1}", name, value));
   }
 }
