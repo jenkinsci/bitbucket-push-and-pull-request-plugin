@@ -21,207 +21,258 @@
 
 package io.jenkins.plugins.bitbucketpushandpullrequest.environment;
 
+import static org.hamcrest.collection.IsMapContaining.hasEntry;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
+
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
-import org.hamcrest.collection.IsMapContaining;
+
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+
 import hudson.EnvVars;
 import hudson.model.Cause;
 import hudson.model.Run;
 import hudson.model.TaskListener;
-import io.jenkins.plugins.bitbucketpushandpullrequest.BitBucketPPRJobProbe;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRPullRequestAction;
+import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRPullRequestServerAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRRepositoryAction;
+import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRServerRepositoryAction;
+import io.jenkins.plugins.bitbucketpushandpullrequest.cause.BitBucketPPRTriggerCause;
 import io.jenkins.plugins.bitbucketpushandpullrequest.cause.pullrequest.cloud.BitBucketPPRPullRequestCause;
+import io.jenkins.plugins.bitbucketpushandpullrequest.cause.pullrequest.server.BitBucketPPRPullRequestServerCause;
 import io.jenkins.plugins.bitbucketpushandpullrequest.cause.repository.BitBucketPPRRepositoryCause;
+import io.jenkins.plugins.bitbucketpushandpullrequest.cause.repository.BitBucketPPRServerRepositoryCause;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud.BitBucketPPRNewPayload;
+import io.jenkins.plugins.bitbucketpushandpullrequest.model.server.BitBucketPPRServerPayload;
 
 @RunWith(MockitoJUnitRunner.class)
 public class BitBucketPPREnvironmentContributorTest {
-  @Mock
-  private BitBucketPPRJobProbe probe;
+
+  private EnvVars envVars;
+
+  @Before
+  public void buildEnvVarsSpy() {
+    envVars = spy(EnvVars.class);
+  }
 
   @Test
   public void buildEnvironmentForCloudRepoPushTest() {
-    BitBucketPPRPayload payload = getPayload("./cloud/repo_push.json");
+    BitBucketPPRPayload payload = getCloudPayload("./cloud/repo_push.json");
 
-    BitBucketPPREnvironmentContributor envContributor = new BitBucketPPREnvironmentContributor();
-    Run run = mock(Run.class);
-    EnvVars envVars = spy(EnvVars.class);
-    TaskListener taskListener = mock(TaskListener.class);
     BitBucketPPRRepositoryCause cause = mock(BitBucketPPRRepositoryCause.class);
-
-    List<Cause> causes = new ArrayList<>();
-    causes.add(cause);
-    when(run.getCauses()).thenReturn(causes);
     when(cause.getRepositoryPayLoad()).thenReturn(new BitBucketPPRRepositoryAction(payload));
 
-    try {
-      envContributor.buildEnvironmentFor(run, envVars, taskListener);
-    } catch (Exception e) {
-      e.printStackTrace();
-      fail("Excetion thrown");
-    }
+    // do
+    runEnvironmentContributorForCause(cause);
 
-    assertThat(envVars, IsMapContaining.hasEntry(
+    // assert
+    assertThat(envVars, hasEntry(
         BitBucketPPREnvironmentContributor.BITBUCKET_SOURCE_BRANCH, "feature/do-not-merge"));
-    assertThat(envVars, IsMapContaining.hasEntry(BitBucketPPREnvironmentContributor.REPOSITORY_LINK,
+    assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.REPOSITORY_LINK,
         "https://bitbucket.org/some-repository/some-repo"));
     assertThat(envVars,
-        IsMapContaining.hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_REPOSITORY_URL,
+        hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_REPOSITORY_URL,
             "https://bitbucket.org/some-repository/some-repo"));
     assertThat(envVars,
-        IsMapContaining.hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_REPOSITORY_UUID,
+        hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_REPOSITORY_UUID,
             "{6b5a1057-07ff-47c1-a65e-6c136cce4hj4}"));
   }
 
   @Test
   public void buildEnvironmentForCloudPullRequestCreatedTest() {
-    BitBucketPPRPayload payload = getPayload("./cloud/pr_created.json");
-
-    BitBucketPPREnvironmentContributor envContributor = new BitBucketPPREnvironmentContributor();
-    Run run = mock(Run.class);
-    EnvVars envVars = spy(EnvVars.class);
-    TaskListener taskListener = mock(TaskListener.class);
+    BitBucketPPRPayload payload = getCloudPayload("./cloud/pr_created.json");
 
     BitBucketPPRPullRequestCause cause = mock(BitBucketPPRPullRequestCause.class);
-    List<Cause> causes = new ArrayList<>();
-    causes.add(cause);
-    when(run.getCauses()).thenReturn(causes);
     when(cause.getPullRequestPayLoad()).thenReturn(new BitBucketPPRPullRequestAction(payload));
 
-    try {
-      envContributor.buildEnvironmentFor(run, envVars, taskListener);
-    } catch (Exception e) {
-      e.printStackTrace();
-      fail("Excetion thrown");
-    }
+    // do
+    runEnvironmentContributorForCause(cause);
 
-    assertThat(envVars, IsMapContaining.hasEntry(
+    // assert
+    assertThat(envVars, hasEntry(
         BitBucketPPREnvironmentContributor.BITBUCKET_SOURCE_BRANCH, "feature/do-not-merge"));
-    assertThat(envVars, IsMapContaining
-        .hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_TARGET_BRANCH, "develop"));
+    assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_TARGET_BRANCH, "develop"));
     assertThat(envVars,
-        IsMapContaining.hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_LINK,
+        hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_LINK,
             "https://bitbucket.org/some-repo-namespace/some-repo/pull-requests/198"));
-    assertThat(envVars, IsMapContaining
-        .hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_ID, "198"));
+    assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_ID, "198"));
   }
 
   @Test
   public void buildEnvironmentForCloudPullRequestMergedTest() {
-    BitBucketPPRPayload payload = getPayload("./cloud/pr_fulfilled.json");
-
-    BitBucketPPREnvironmentContributor envContributor = new BitBucketPPREnvironmentContributor();
-    Run run = mock(Run.class);
-    EnvVars envVars = spy(EnvVars.class);
-    TaskListener taskListener = mock(TaskListener.class);
+    BitBucketPPRPayload payload = getCloudPayload("./cloud/pr_fulfilled.json");
 
     BitBucketPPRPullRequestCause cause = mock(BitBucketPPRPullRequestCause.class);
-    List<Cause> causes = new ArrayList<>();
-    causes.add(cause);
-    when(run.getCauses()).thenReturn(causes);
     when(cause.getPullRequestPayLoad()).thenReturn(new BitBucketPPRPullRequestAction(payload));
 
-    try {
-      envContributor.buildEnvironmentFor(run, envVars, taskListener);
-    } catch (Exception e) {
-      e.printStackTrace();
-      fail("Excetion thrown");
-    }
+    // do
+    runEnvironmentContributorForCause(cause);
 
-    assertThat(envVars, IsMapContaining.hasEntry(
+    // assert
+    assertThat(envVars, hasEntry(
         BitBucketPPREnvironmentContributor.BITBUCKET_SOURCE_BRANCH, "feature/do-not-merge"));
-    assertThat(envVars, IsMapContaining
-        .hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_TARGET_BRANCH, "develop"));
+    assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_TARGET_BRANCH, "develop"));
     assertThat(envVars,
-        IsMapContaining.hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_LINK,
+        hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_LINK,
             "https://bitbucket.org/some-repo-namespace/some-repo/pull-requests/198"));
-    assertThat(envVars, IsMapContaining
-        .hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_ID, "198"));
+    assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_ID, "198"));
   }
 
   @Test
   public void buildEnvironmentForCloudPullRequestUpdatedTest() {
-    BitBucketPPRPayload payload = getPayload("./cloud/pr_updated.json");
-
-    BitBucketPPREnvironmentContributor envContributor = new BitBucketPPREnvironmentContributor();
-    Run run = mock(Run.class);
-    EnvVars envVars = spy(EnvVars.class);
-    TaskListener taskListener = mock(TaskListener.class);
+    BitBucketPPRPayload payload = getCloudPayload("./cloud/pr_updated.json");
 
     BitBucketPPRPullRequestCause cause = mock(BitBucketPPRPullRequestCause.class);
-    List<Cause> causes = new ArrayList<>();
-    causes.add(cause);
-    when(run.getCauses()).thenReturn(causes);
     when(cause.getPullRequestPayLoad()).thenReturn(new BitBucketPPRPullRequestAction(payload));
 
-    try {
-      envContributor.buildEnvironmentFor(run, envVars, taskListener);
-    } catch (Exception e) {
-      e.printStackTrace();
-      fail("Excetion thrown");
-    }
+    // do
+    runEnvironmentContributorForCause(cause);
 
-    assertThat(envVars, IsMapContaining.hasEntry(
+    // assert
+    assertThat(envVars, hasEntry(
         BitBucketPPREnvironmentContributor.BITBUCKET_SOURCE_BRANCH, "feature/do-not-merge"));
-    assertThat(envVars, IsMapContaining
-        .hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_TARGET_BRANCH, "develop"));
+    assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_TARGET_BRANCH, "develop"));
     assertThat(envVars,
-        IsMapContaining.hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_LINK,
+        hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_LINK,
             "https://bitbucket.org/some-repo-namespace/some-repo/pull-requests/198"));
-    assertThat(envVars, IsMapContaining
-        .hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_ID, "198"));
+    assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_ID, "198"));
   }
 
   @Test
   public void buildEnvironmentForCloudPullRequestApprovedTest() {
-    BitBucketPPRPayload payload = getPayload("./cloud/pr_approved.json");
-
-    BitBucketPPREnvironmentContributor envContributor = new BitBucketPPREnvironmentContributor();
-    Run run = mock(Run.class);
-    EnvVars envVars = spy(EnvVars.class);
-    TaskListener taskListener = mock(TaskListener.class);
+    BitBucketPPRPayload payload = getCloudPayload("./cloud/pr_approved.json");
 
     BitBucketPPRPullRequestCause cause = mock(BitBucketPPRPullRequestCause.class);
-    List<Cause> causes = new ArrayList<>();
-    causes.add(cause);
-    when(run.getCauses()).thenReturn(causes);
     when(cause.getPullRequestPayLoad()).thenReturn(new BitBucketPPRPullRequestAction(payload));
 
-    try {
-      envContributor.buildEnvironmentFor(run, envVars, taskListener);
-    } catch (Exception e) {
-      e.printStackTrace();
-      fail("Excetion thrown");
-    }
+    // do
+    runEnvironmentContributorForCause(cause);
 
-    assertThat(envVars, IsMapContaining.hasEntry(
+    // assert
+    assertThat(envVars, hasEntry(
         BitBucketPPREnvironmentContributor.BITBUCKET_SOURCE_BRANCH, "feature/do-not-merge"));
-    assertThat(envVars, IsMapContaining
-        .hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_TARGET_BRANCH, "develop"));
+    assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_TARGET_BRANCH, "develop"));
     assertThat(envVars,
-        IsMapContaining.hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_LINK,
+        hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_LINK,
             "https://bitbucket.org/some-repo-namespace/some-repo/pull-requests/198"));
-    assertThat(envVars, IsMapContaining
-        .hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_ID, "198"));
+    assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_ID, "198"));
   }
 
-  private BitBucketPPRPayload getPayload(String res) {
+  @Test
+  public void buildEnvironmentForServerPullRequestOpenedTest() {
+    BitBucketPPRServerPayload payload = getServerPayload("./server/pr_opened.json");
+
+    BitBucketPPRPullRequestServerCause cause = mock(BitBucketPPRPullRequestServerCause.class);
+    when(cause.getPullRequestPayLoad()).thenReturn(new BitBucketPPRPullRequestServerAction(payload));
+
+    // do
+    runEnvironmentContributorForCause(cause);
+
+    // assert
+    assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_SOURCE_BRANCH, "develop"));
+    assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_TARGET_BRANCH, "master"));
+    assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_ID, "61"));
+    assertThat(envVars, hasEntry(
+        BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_LINK,
+        "http://example.org/projects/ABC/repos/some-repo/pull-requests/61"
+    ));
+  }
+
+  @Test
+  public void buildEnvironmentForServerPullRequestModifiedTest() {
+    BitBucketPPRServerPayload payload = getServerPayload("./server/pr_modified.json");
+
+    BitBucketPPRPullRequestServerCause cause = mock(BitBucketPPRPullRequestServerCause.class);
+    when(cause.getPullRequestPayLoad()).thenReturn(new BitBucketPPRPullRequestServerAction(payload));
+
+    // do
+    runEnvironmentContributorForCause(cause);
+
+    // assert
+    assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_SOURCE_BRANCH, "develop"));
+    assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_TARGET_BRANCH, "master"));
+    assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_LINK,
+      "http://example.org/projects/ABC/repos/some-repo/pull-requests/13"));
+    assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_ID, "13"));
+  }
+
+  @Test
+  public void buildEnvironmentForServerPullRequestApprovedTest() {
+    BitBucketPPRServerPayload payload = getServerPayload("./server/pr_reviewer_approved.json");
+
+    BitBucketPPRPullRequestServerCause cause = mock(BitBucketPPRPullRequestServerCause.class);
+    when(cause.getPullRequestPayLoad()).thenReturn(new BitBucketPPRPullRequestServerAction(payload));
+
+    // do
+    runEnvironmentContributorForCause(cause);
+
+    // assert
+    assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_SOURCE_BRANCH, "develop"));
+    assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_TARGET_BRANCH, "master"));
+    assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_LINK,
+      "http://example.org/projects/ABC/repos/some-repo/pull-requests/12"));
+    assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_ID, "12"));
+  }
+
+  @Test
+  public void buildEnvironmentForServerPullRequestMergedTest() {
+    BitBucketPPRServerPayload payload = getServerPayload("./server/pr_merged.json");
+
+    BitBucketPPRPullRequestServerCause cause = mock(BitBucketPPRPullRequestServerCause.class);
+    when(cause.getPullRequestPayLoad()).thenReturn(new BitBucketPPRPullRequestServerAction(payload));
+
+    // do
+    runEnvironmentContributorForCause(cause);
+
+    // assert
+    assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_SOURCE_BRANCH, "develop"));
+    assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_TARGET_BRANCH, "master"));
+    assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_LINK,
+      "http://example.org/projects/ABC/repos/some-repo/pull-requests/61"));
+    assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_ID, "61"));
+  }
+
+  @Test
+  public void buildEnvironmentForServerRepoPushTest() {
+    BitBucketPPRServerPayload payload = getServerPayload("./server/repo_refs_changed.json");
+
+    BitBucketPPRServerRepositoryCause cause = mock(BitBucketPPRServerRepositoryCause.class);
+    when(cause.getServerRepositoryPayLoad()).thenReturn(new BitBucketPPRServerRepositoryAction(payload));
+
+    // do
+    runEnvironmentContributorForCause(cause);
+
+    // assert
+    assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.REPOSITORY_NAME, "some-repo"));
+  }
+
+  private BitBucketPPRPayload getCloudPayload(String res) {
+    return (BitBucketPPRPayload) getGenericPayload(
+      res, BitBucketPPRNewPayload.class
+    );
+  }
+
+  private BitBucketPPRServerPayload getServerPayload(String res) {
+    return (BitBucketPPRServerPayload) getGenericPayload(
+      res, BitBucketPPRServerPayload.class
+    );
+  }
+
+  private BitBucketPPRPayload getGenericPayload(String res, Class<?> payloadClass) {
     JsonReader reader = null;
     try {
       ClassLoader classloader = Thread.currentThread().getContextClassLoader();
@@ -230,8 +281,26 @@ public class BitBucketPPREnvironmentContributorTest {
       reader = new JsonReader(isr);
     } catch (Exception e) {
       e.printStackTrace();
+      fail("Failed to parse JSON payload stub.");
     }
 
-    return new Gson().fromJson(reader, BitBucketPPRNewPayload.class);
+    return new Gson().fromJson(reader, payloadClass);
+  }
+
+  private void runEnvironmentContributorForCause(BitBucketPPRTriggerCause cause) {
+    BitBucketPPREnvironmentContributor envContributor = new BitBucketPPREnvironmentContributor();
+
+    Run run = mock(Run.class);
+
+    List<Cause> causes = new ArrayList<>();
+    causes.add(cause);
+    when(run.getCauses()).thenReturn(causes);
+
+    try {
+      envContributor.buildEnvironmentFor(run, envVars, mock(TaskListener.class));
+    } catch (Exception e) {
+      e.printStackTrace();
+      fail("Exception thrown");
+    }
   }
 }
