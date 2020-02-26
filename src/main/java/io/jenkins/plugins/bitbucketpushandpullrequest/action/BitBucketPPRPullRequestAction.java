@@ -43,4 +43,12 @@ public class BitBucketPPRPullRequestAction extends BitBucketPPRAction {
   public String getPullRequestUrl() {
     return payload.getPullRequest().getLinks().getHtml().getHref();
   }
+
+  public String getTitle() {
+    return payload.getPullRequest().getTitle();
+  }
+
+  public String getDescription() {
+    return payload.getPullRequest().getDescription();
+  }
 }

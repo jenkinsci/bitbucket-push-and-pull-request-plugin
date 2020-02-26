@@ -36,7 +36,7 @@
       }
     },
     "type": "pullrequest",
-    "description": "",
+    "description": "Some description for PR",
     "links": {
       "decline": {
         "href": "https://api.bitbucket.org/2.0/repositories/some-repo-namespace/some-repo/pullrequests/198/decline"
@@ -72,7 +72,7 @@
         "href": "https://api.bitbucket.org/2.0/repositories/some-repo-namespace/some-repo/pullrequests/198/statuses"
       }
     },
-    "title": "I have to push the pram a lot.",
+    "title": "I have to push the pram a lot X.",
     "close_source_branch": false,
     "reviewers": [],
     "id": 198,
