@@ -1,17 +1,17 @@
 /*******************************************************************************
  * The MIT License
- * 
+ *
  * Copyright (C) 2018, CloudBees, Inc.
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
  * including without limitation the rights to use, copy, modify, merge, publish, distribute,
  * sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in all copies or
  * substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT
  * NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
@@ -19,31 +19,39 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  ******************************************************************************/
 
-
 package io.jenkins.plugins.bitbucketpushandpullrequest.action;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.annotation.Nonnull;
+
+import hudson.model.InvisibleAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.server.BitBucketPPRServerChange;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.server.BitBucketPPRServerClone;
 
 
-public class BitBucketPPRServerRepositoryAction extends BitBucketPPRAction {
+public class BitBucketPPRServerRepositoryAction extends InvisibleAction implements BitBucketPPRAction {
   private static final Logger LOGGER = Logger.getLogger(BitBucketPPRAction.class.getName());
 
-  public BitBucketPPRServerRepositoryAction(BitBucketPPRPayload payload) {
-    super(payload);
+  private final @Nonnull BitBucketPPRPayload payload;
+  private List<String> scmUrls = new ArrayList<>(2);
+  private String targetBranchName = null;
+  private String type;
 
-    this.scm = payload.getServerRepository().getScmId();
-    this.repositoryName = payload.getServerRepository().getName();
+  public BitBucketPPRServerRepositoryAction(BitBucketPPRPayload payload) {
+    this.payload = payload;
 
     List<BitBucketPPRServerClone> clones =
         payload.getServerRepository().getLinks().getCloneProperty();
 
     for (BitBucketPPRServerClone clone : clones) {
-      if (clone.getName().equalsIgnoreCase("http") || clone.getName().equalsIgnoreCase("ssh")) {
+      if (clone.getName().equalsIgnoreCase("http")
+        || clone.getName().equalsIgnoreCase("https")
+        || clone.getName().equalsIgnoreCase("ssh")) {
         this.scmUrls.add(clone.getHref());
       }
     }
@@ -60,9 +68,69 @@ public class BitBucketPPRServerRepositoryAction extends BitBucketPPRAction {
         () -> "Received commit hook notification from server for destination branch: " + this.targetBranchName);
     LOGGER.log(Level.INFO, () -> "Received commit hook type from server: " + this.type);
   }
-  
+
   @Override
   public String getTargetBranch() {
     return targetBranchName;
+  }
+
+  @Override
+  public BitBucketPPRPayload getPayload() {
+    return payload;
+  }
+
+  @Override
+  public String getScm() {
+    return payload.getServerRepository().getScmId();
+  }
+
+  @Override
+  public String getUser() {
+    return payload.getServerActor().getName();
+  }
+
+  @Override
+  public String getSourceBranch() {
+    return null;
+  }
+
+  @Override
+  public String getType() {
+    return type;
+  }
+
+  @Override
+  public String getRepositoryName() {
+    return payload.getServerRepository().getName();
+  }
+
+  @Override
+  public List<String> getScmUrls() {
+    return scmUrls;
+  }
+
+  @Override
+  public String getPullRequestId() {
+    return null;
+  }
+
+  @Override
+  public String getRepositoryId() {
+    return payload.getServerRepository().getId();
+  }
+
+  @Override
+  public String getPullRequestUrl() {
+    return null;
+  }
+
+  @Override
+  public String getTitle() {
+    return null;
+  }
+
+  @Override
+  public String getDescription() {
+    return null;
   }
 }
