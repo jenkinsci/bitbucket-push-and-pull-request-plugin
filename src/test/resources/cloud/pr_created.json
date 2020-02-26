@@ -1,0 +1,232 @@
+{
+  "pullrequest": {
+    "rendered": {
+      "description": {
+        "raw": "",
+        "markup": "markdown",
+        "html": "",
+        "type": "rendered"
+      },
+      "title": {
+        "raw": "I have to push the pram a lot.",
+        "markup": "markdown",
+        "html": "<p>I have to push the pram a lot.</p>",
+        "type": "rendered"
+      }
+    },
+    "type": "pullrequest",
+    "description": "",
+    "links": {
+      "decline": {
+        "href": "https://api.bitbucket.org/2.0/repositories/some-repo-namespace/some-repo/pullrequests/198/decline"
+      },
+      "diffstat": {
+        "href": "https://api.bitbucket.org/2.0/repositories/some-repo-namespace/some-repo/diffstat/some-repo-namespace/some-repo:09c1234c5eef%0Da421e461dabc?from_pullrequest_id=198"
+      },
+      "commits": {
+        "href": "https://api.bitbucket.org/2.0/repositories/some-repo-namespace/some-repo/pullrequests/198/commits"
+      },
+      "self": {
+        "href": "https://api.bitbucket.org/2.0/repositories/some-repo-namespace/some-repo/pullrequests/198"
+      },
+      "comments": {
+        "href": "https://api.bitbucket.org/2.0/repositories/some-repo-namespace/some-repo/pullrequests/198/comments"
+      },
+      "merge": {
+        "href": "https://api.bitbucket.org/2.0/repositories/some-repo-namespace/some-repo/pullrequests/198/merge"
+      },
+      "html": {
+        "href": "https://bitbucket.org/some-repo-namespace/some-repo/pull-requests/198"
+      },
+      "activity": {
+        "href": "https://api.bitbucket.org/2.0/repositories/some-repo-namespace/some-repo/pullrequests/198/activity"
+      },
+      "diff": {
+        "href": "https://api.bitbucket.org/2.0/repositories/some-repo-namespace/some-repo/diff/some-repo-namespace/some-repo:09c1234c5eef%0Da421e461dabc?from_pullrequest_id=198"
+      },
+      "approve": {
+        "href": "https://api.bitbucket.org/2.0/repositories/some-repo-namespace/some-repo/pullrequests/198/approve"
+      },
+      "statuses": {
+        "href": "https://api.bitbucket.org/2.0/repositories/some-repo-namespace/some-repo/pullrequests/198/statuses"
+      }
+    },
+    "title": "I have to push the pram a lot.",
+    "close_source_branch": false,
+    "reviewers": [],
+    "id": 198,
+    "destination": {
+      "commit": {
+        "hash": "a421e461dabd",
+        "type": "commit",
+        "links": {
+          "self": {
+            "href": "https://api.bitbucket.org/2.0/repositories/some-repo-namespace/some-repo/commit/a421e461dabd"
+          },
+          "html": {
+            "href": "https://bitbucket.org/some-repo-namespace/some-repo/commits/a421e461dabd"
+          }
+        }
+      },
+      "repository": {
+        "links": {
+          "self": {
+            "href": "https://api.bitbucket.org/2.0/repositories/some-repo-namespace/some-repo"
+          },
+          "html": {
+            "href": "https://bitbucket.org/some-repo-namespace/some-repo"
+          },
+          "avatar": {
+            "href": "https://bytebucket.org/ravatar/%236b5a1057-12ee-ddc1-b35e-3c136cce0cd2%1A?ts=default"
+          }
+        },
+        "type": "repository",
+        "name": "some-repo",
+        "full_name": "some-repo-namespace/some-repo",
+        "uuid": "{2c2g914f-14eg-47a3-d35e-dc334cae1db1}"
+      },
+      "branch": {
+        "name": "develop"
+      }
+    },
+    "created_on": "2020-02-10T16:28:23.479817+00:00",
+    "summary": {
+      "raw": "",
+      "markup": "markdown",
+      "html": "",
+      "type": "rendered"
+    },
+    "source": {
+      "commit": {
+        "hash": "01a3337e3abc",
+        "type": "commit",
+        "links": {
+          "self": {
+            "href": "https://api.bitbucket.org/2.0/repositories/some-repo-namespace/some-repo/commit/01a3337e3abc"
+          },
+          "html": {
+            "href": "https://bitbucket.org/some-repo-namespace/some-repo/commits/01a3337e3abc"
+          }
+        }
+      },
+      "repository": {
+        "links": {
+          "self": {
+            "href": "https://api.bitbucket.org/2.0/repositories/some-repo-namespace/some-repo"
+          },
+          "html": {
+            "href": "https://bitbucket.org/some-repo-namespace/some-repo"
+          },
+          "avatar": {
+            "href": "https://bytebucket.org/ravatar/%236b5a1057-12ee-ddc1-b35e-3c136cce0cd2%1A?ts=default"
+          }
+        },
+        "type": "repository",
+        "name": "some-repo",
+        "full_name": "some-repo-namespace/some-repo",
+        "uuid": "{2c2g914f-14eg-47a3-d35e-dc334cae1db1}"
+      },
+      "branch": {
+        "name": "feature/do-not-merge"
+      }
+    },
+    "comment_count": 0,
+    "state": "OPEN",
+    "task_count": 0,
+    "participants": [],
+    "reason": "",
+    "updated_on": "2020-02-10T16:28:23.614155+00:00",
+    "author": {
+      "display_name": "me display name",
+      "account_id": "3d5b55f1ac85d1235d0734ea",
+      "links": {
+        "self": {
+          "href": "https://api.bitbucket.org/2.0/users/%3d5b55d65c-efb5-223d-b067-2de5c338f70e%4A"
+        },
+        "html": {
+          "href": "https://bitbucket.org/%3d5b55d65c-efb5-223d-b067-2de5c338f70e%4A/"
+        },
+        "avatar": {
+          "href": "https://secure.gravatar.com/avatar/3d5b55f1ac85d1235d0734ea?d=https%3A%2F%2Fexample-org%2Fsome-avatar.png"
+        }
+      },
+      "nickname": "me-nickname",
+      "type": "user",
+      "uuid": "{12345d55a-gef5-223e-g047-2ae1f238g70e}"
+    },
+    "merge_commit": null,
+    "closed_by": null
+  },
+  "repository": {
+    "scm": "git",
+    "website": "",
+    "name": "some-repo",
+    "links": {
+      "self": {
+        "href": "https://api.bitbucket.org/2.0/repositories/some-repo-namespace/some-repo"
+      },
+      "html": {
+        "href": "https://bitbucket.org/some-repo-namespace/some-repo"
+      },
+      "avatar": {
+        "href": "https://bytebucket.org/ravatar/%236b5a1057-12ee-ddc1-b35e-3c136cce0cd2%1A?ts=default"
+      }
+    },
+    "project": {
+      "key": "ABC",
+      "type": "project",
+      "uuid": "{ab123f16-dde5-203b-afe9-1ece1a3ab3de}",
+      "links": {
+        "self": {
+          "href": "https://api.bitbucket.org/2.0/teams/some-repo-namespace/projects/ABC"
+        },
+        "html": {
+          "href": "https://bitbucket.org/account/user/some-repo-namespace/projects/ABC"
+        },
+        "avatar": {
+          "href": "https://bitbucket.org/account/user/some-repo-namespace/projects/ABC/avatar/99"
+        }
+      },
+      "name": "some-repo-one"
+    },
+    "full_name": "some-repo-namespace/some-repo",
+    "owner": {
+      "username": "some-repo-namespace",
+      "display_name": "some-repo-namespace-display-name",
+      "type": "team",
+      "uuid": "{a14b313f-3a59-2047-6317-bee38d215012}",
+      "links": {
+        "self": {
+          "href": "https://api.bitbucket.org/2.0/teams/%7Ba14b313f-3a59-2047-6317-bee38d215012%7D"
+        },
+        "html": {
+          "href": "https://bitbucket.org/%7Ba14b313f-3a59-2047-6317-bee38d215012%7D/"
+        },
+        "avatar": {
+          "href": "https://bitbucket.org/account/some-repo-namespace/avatar/"
+        }
+      }
+    },
+    "type": "repository",
+    "is_private": false,
+    "uuid": "{2c2g914f-14eg-47a3-d35e-dc334cae1db1}"
+  },
+  "actor": {
+    "display_name": "me display name",
+    "account_id": "3d5b55f1ac85d1235d0734ea",
+    "links": {
+      "self": {
+        "href": "https://api.bitbucket.org/2.0/users/%3d5b55d65c-efb5-223d-b067-2de5c338f70e%4A"
+      },
+      "html": {
+        "href": "https://bitbucket.org/%3d5b55d65c-efb5-223d-b067-2de5c338f70e%4A/"
+      },
+      "avatar": {
+        "href": "https://secure.gravatar.com/avatar/3d5b55f1ac85d1235d0734ea?d=https%3A%2F%2Fexample-org%2Fsome-avatar.png"
+      }
+    },
+    "nickname": "me-nickname",
+    "type": "user",
+    "uuid": "{12345d55a-gef5-223e-g047-2ae1f238g70e}"
+  }
+}

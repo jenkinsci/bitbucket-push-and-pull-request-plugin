@@ -37,6 +37,7 @@ public class BitBucketPPRServerRepositoryAction extends BitBucketPPRAction {
     super(payload);
 
     this.scm = payload.getServerRepository().getScmId();
+    this.repositoryName = payload.getServerRepository().getName();
 
     List<BitBucketPPRServerClone> clones =
         payload.getServerRepository().getLinks().getCloneProperty();

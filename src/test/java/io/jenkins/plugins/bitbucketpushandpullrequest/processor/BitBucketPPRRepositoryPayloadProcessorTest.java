@@ -47,7 +47,7 @@ public class BitBucketPPRRepositoryPayloadProcessorTest {
 
     try {
       ClassLoader classloader = Thread.currentThread().getContextClassLoader();
-      InputStream is = classloader.getResourceAsStream("repo_push.json");
+      InputStream is = classloader.getResourceAsStream("./cloud/repo_push.json");
       InputStreamReader isr = new InputStreamReader(is, StandardCharsets.UTF_8);
       reader = new JsonReader(isr);
     } catch (Exception e) {

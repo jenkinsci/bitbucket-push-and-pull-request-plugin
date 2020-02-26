@@ -1,0 +1,74 @@
+{
+    "actor": {
+        "active": true,
+        "displayName": "me display name",
+        "emailAddress": "me@example.org",
+        "id": 99,
+        "links": {
+            "self": [
+                {
+                    "href": "https://example.org/users/abc123"
+                }
+            ]
+        },
+        "name": "me-name",
+        "slug": "me-slug",
+        "type": "NORMAL"
+    },
+    "changes": [
+        {
+            "fromHash": "12031f4eb93d80126443c0b299d75f755f4c8ff0",
+            "ref": {
+                "displayId": "master",
+                "id": "refs/heads/master",
+                "type": "BRANCH"
+            },
+            "refId": "refs/heads/master",
+            "toHash": "2857aa1131679a1c46d79a1097ebab06a6d6291a3",
+            "type": "UPDATE"
+        }
+    ],
+    "date": "2020-01-28T15:46:24+0100",
+    "eventKey": "repo:refs_changed",
+    "repository": {
+        "forkable": true,
+        "id": 99,
+        "links": {
+            "clone": [
+                {
+                    "href": "https://example.org/scm/some-namespace/some-repo.git",
+                    "name": "https"
+                },
+                {
+                    "href": "ssh://git@example.org/some-namespace/some-repo.git",
+                    "name": "ssh"
+                }
+            ],
+            "self": [
+                {
+                    "href": "http://example.org/projects/ABC/repos/some-repo/browse"
+                }
+            ]
+        },
+        "name": "some-repo",
+        "project": {
+            "id": 11,
+            "key": "ABC",
+            "links": {
+                "self": [
+                    {
+                        "href": "https://example.org/projects/ABC"
+                    }
+                ]
+            },
+            "name": "some-project-name",
+            "public": false,
+            "type": "NORMAL"
+        },
+        "public": false,
+        "scmId": "git",
+        "slug": "some-repo-slug",
+        "state": "AVAILABLE",
+        "statusMessage": "Available"
+    }
+}
