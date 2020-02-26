@@ -1,17 +1,17 @@
 /*******************************************************************************
  * The MIT License
- * 
+ *
  * Copyright (C) 2018, CloudBees, Inc.
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
  * including without limitation the rights to use, copy, modify, merge, publish, distribute,
  * sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in all copies or
  * substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT
  * NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
@@ -22,95 +22,37 @@
 
 package io.jenkins.plugins.bitbucketpushandpullrequest.action;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.annotation.Nonnull;
-import hudson.EnvVars;
+
 import hudson.model.EnvironmentContributingAction;
-import hudson.model.InvisibleAction;
-import hudson.model.Run;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
 
 
-public class BitBucketPPRAction extends InvisibleAction implements EnvironmentContributingAction {
-  private static final Logger LOGGER = Logger.getLogger(BitBucketPPRAction.class.getName());
+public interface BitBucketPPRAction extends EnvironmentContributingAction {
 
-  protected final @Nonnull BitBucketPPRPayload payload;
-  protected String scm;
-  protected String user;
-  protected List<String> scmUrls = new ArrayList<>(2);
-  protected String sourceBranchName = null;
-  protected String targetBranchName = null;
-  protected String type;
-  protected String repositoryName;
-  protected String pullRequestId;
-  protected String repositoryUuid;
+  public BitBucketPPRPayload getPayload();
 
-  public BitBucketPPRAction(@Nonnull BitBucketPPRPayload payload) {
-    this.payload = payload;
+  public String getScm();
 
-    if (payload.getRepository() != null) {
-      user = payload.getActor().getNickname();
-      repositoryName = payload.getRepository().getName();
-      scm = payload.getRepository().getScm() != null ? payload.getRepository().getScm() : "git";
-      scmUrls.add(payload.getRepository().getLinks().getHtml().getHref());
-    }
-  }
+  public String getUser();
 
-  @Nonnull
-  public BitBucketPPRPayload getPayload() {
-    return payload;
-  }
+  public String getSourceBranch();
 
-  public String getScm() {
-    return scm;
-  }
+  public String getTargetBranch();
 
-  public String getUser() {
-    return user;
-  }
+  public String getType();
 
-  public String getSourceBranch() {
-    return sourceBranchName;
-  }
+  public String getRepositoryName();
 
-  public String getTargetBranch() {
-    return targetBranchName;
-  }
+  public List<String> getScmUrls();
 
-  public String getType() {
-    return type;
-  }
+  public String getPullRequestId();
 
-  public String getRepositoryName() {
-    return repositoryName;
-  }
+  public String getRepositoryUuid();
 
-  public List<String> getScmUrls() {
-    return scmUrls;
-  }
+  public String getPullRequestUrl();
 
-  public String getPullRequestId() {
-    return pullRequestId;
-  }
+  public String getTitle();
 
-  public String getRepositoryUuid() {
-    return repositoryUuid;
-  }
-
-  @Override
-  public void buildEnvironment(@Nonnull Run<?, ?> run, @Nonnull EnvVars env) {
-    env.put("BITBUCKET_PAYLOAD", payload.toString());
-    LOGGER.log(Level.FINEST, "Injecting BITBUCKET_PAYLOAD: {0}", payload);
-  }
-
-  @Override
-  public String toString() {
-    return "BitBucketPPRAction [payload=" + payload + ", scm=" + scm + ", user=" + user
-        + ", scmUrls=" + scmUrls + ", sourceBranchName=" + sourceBranchName + ", targetBranchName="
-        + targetBranchName + ", type=" + type + ", repositoryName=" + repositoryName
-        + ", pullRequestId=" + pullRequestId + ", repositoryUuid=" + repositoryUuid + "]";
-  }
+  public String getDescription();
 }

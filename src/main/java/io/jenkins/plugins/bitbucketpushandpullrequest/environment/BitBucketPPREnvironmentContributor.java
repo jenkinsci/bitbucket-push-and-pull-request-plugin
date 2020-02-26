@@ -73,6 +73,9 @@ public class BitBucketPPREnvironmentContributor extends EnvironmentContributor {
 
     String repoName = action.getRepositoryName();
     putEnvVar(envVars, REPOSITORY_NAME, repoName);
+
+    String actor = action.getUser();
+    putEnvVar(envVars, BITBUCKET_ACTOR, actor);
   }
 
   private static void setEnvVarsForCloudRepository(EnvVars envVars,
