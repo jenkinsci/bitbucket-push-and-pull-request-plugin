@@ -125,6 +125,6 @@ public class BitBucketPPREnvironmentContributor extends EnvironmentContributor {
 
   private static void putEnvVar(EnvVars envs, String name, String value) {
     envs.put(name, (value == null ? "" : value));
-    LOGGER.log(Level.FINEST, String.format("Injecting env var: {0}={1}", name, value));
+    LOGGER.log(Level.FINEST, String.format("Injecting env var: %s=%s", name, value));
   }
 }
