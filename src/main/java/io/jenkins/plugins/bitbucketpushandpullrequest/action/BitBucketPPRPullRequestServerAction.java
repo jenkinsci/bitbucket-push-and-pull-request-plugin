@@ -21,6 +21,7 @@
 
 package io.jenkins.plugins.bitbucketpushandpullrequest.action;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 import javax.annotation.Nonnull;
@@ -29,27 +30,16 @@ import hudson.model.InvisibleAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.server.BitBucketPPRServerClone;
 
-
 public class BitBucketPPRPullRequestServerAction extends InvisibleAction implements BitBucketPPRAction {
   private static final Logger logger =
       Logger.getLogger(BitBucketPPRPullRequestServerAction.class.getName());
 
   private final @Nonnull BitBucketPPRPayload payload;
-  private String scm;
-  private String user;
   private List<String> scmUrls = new ArrayList<>(2);
-  private String sourceBranchName = null;
-  private String targetBranchName = null;
-  private String type;
-  private String repositoryName;
-  private String pullRequestId;
   private String repositoryUuid;
 
   public BitBucketPPRPullRequestServerAction(@Nonnull BitBucketPPRPayload payload) {
-    this.pullRequestId = Long.toString(payload.getServerPullRequest().getId());
-
-
-    this.scm = payload.getServerPullRequest().getFromRef().getRepository().getScmId();
+    this.payload = payload;
 
     List<BitBucketPPRServerClone> clones =
         payload.getServerPullRequest().getToRef().getRepository().getLinks().getCloneProperty();
@@ -91,5 +81,40 @@ public class BitBucketPPRPullRequestServerAction extends InvisibleAction impleme
   @Override
   public String getTitle() {
     return payload.getServerPullRequest().getTitle();
+  }
+
+  @Override
+  public BitBucketPPRPayload getPayload() {
+    return payload;
+  }
+
+  @Override
+  public String getType() {
+    return null;
+  }
+
+  @Override
+  public String getRepositoryName() {
+    return payload.getServerRepository().getName();
+  }
+
+  @Override
+  public List<String> getScmUrls() {
+    return scmUrls;
+  }
+
+  @Override
+  public String getPullRequestId() {
+    return Long.toString(payload.getServerPullRequest().getId());
+  }
+
+  @Override
+  public String getRepositoryId() {
+    return repositoryUuid;
+  }
+
+  @Override
+  public String getDescription() {
+    return null;
   }
 }

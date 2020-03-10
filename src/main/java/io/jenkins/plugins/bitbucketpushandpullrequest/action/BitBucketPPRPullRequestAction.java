@@ -107,7 +107,7 @@ public class BitBucketPPRPullRequestAction extends InvisibleAction implements Bi
   }
 
   @Override
-  public String getRepositoryUuid() {
+  public String getRepositoryId() {
     return null;
   }
 

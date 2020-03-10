@@ -41,7 +41,6 @@ public class BitBucketPPRServerRepositoryAction extends InvisibleAction implemen
   private String scm;
   private String user;
   private List<String> scmUrls = new ArrayList<>(2);
-  private String sourceBranchName = null;
   private String targetBranchName = null;
   private String type;
   private String repositoryName;
@@ -49,13 +48,7 @@ public class BitBucketPPRServerRepositoryAction extends InvisibleAction implemen
   private String repositoryUuid;
 
   public BitBucketPPRServerRepositoryAction(BitBucketPPRPayload payload) {
-    user = payload.getServerActor().getName();
-
-    // TODO
-    // scmUrls.add(payload.getRepository().getLinks().getHtml().getHref());
-
-    this.scm = payload.getServerRepository().getScmId();
-    this.repositoryName = payload.getServerRepository().getName();
+    this.payload = payload;
 
     List<BitBucketPPRServerClone> clones =
         payload.getServerRepository().getLinks().getCloneProperty();
@@ -82,5 +75,65 @@ public class BitBucketPPRServerRepositoryAction extends InvisibleAction implemen
   @Override
   public String getTargetBranch() {
     return targetBranchName;
+  }
+
+  @Override
+  public BitBucketPPRPayload getPayload() {
+    return payload;
+  }
+
+  @Override
+  public String getScm() {
+    return payload.getServerRepository().getScmId();
+  }
+
+  @Override
+  public String getUser() {
+    return payload.getServerActor().getName();
+  }
+
+  @Override
+  public String getSourceBranch() {
+    return null;
+  }
+
+  @Override
+  public String getType() {
+    return type;
+  }
+
+  @Override
+  public String getRepositoryName() {
+    return payload.getServerRepository().getName();
+  }
+
+  @Override
+  public List<String> getScmUrls() {
+    return scmUrls;
+  }
+
+  @Override
+  public String getPullRequestId() {
+    return null;
+  }
+
+  @Override
+  public String getRepositoryId() {
+    return payload.getServerRepository().getId();
+  }
+
+  @Override
+  public String getPullRequestUrl() {
+    return null;
+  }
+
+  @Override
+  public String getTitle() {
+    return null;
+  }
+
+  @Override
+  public String getDescription() {
+    return null;
   }
 }

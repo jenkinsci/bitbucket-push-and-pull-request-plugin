@@ -27,6 +27,7 @@ public class BitBucketPPREnvironmentContributor extends EnvironmentContributor {
   static final String BITBUCKET_PULL_REQUEST_LINK = "BITBUCKET_PULL_REQUEST_LINK";
   static final String BITBUCKET_TARGET_BRANCH = "BITBUCKET_TARGET_BRANCH";
   static final String BITBUCKET_REPOSITORY_UUID = "BITBUCKET_REPOSITORY_UUID";
+  static final String BITBUCKET_REPOSITORY_ID = "BITBUCKET_REPOSITORY_ID";
   static final String BITBUCKET_REPOSITORY_URL = "BITBUCKET_REPOSITORY_URL";
   static final String BITBUCKET_SOURCE_BRANCH = "BITBUCKET_SOURCE_BRANCH";
   static final String REPOSITORY_LINK = "REPOSITORY_LINK";
@@ -76,6 +77,9 @@ public class BitBucketPPREnvironmentContributor extends EnvironmentContributor {
 
     String actor = action.getUser();
     putEnvVar(envVars, BITBUCKET_ACTOR, actor);
+
+    String repositoryId = action.getRepositoryId();
+    putEnvVar(envVars, BITBUCKET_REPOSITORY_ID, repositoryId);
   }
 
   private static void setEnvVarsForCloudRepository(EnvVars envVars,
@@ -91,8 +95,9 @@ public class BitBucketPPREnvironmentContributor extends EnvironmentContributor {
     String urlBranch = action.getRepositoryUrl();
     putEnvVar(envVars, BITBUCKET_REPOSITORY_URL, urlBranch);
 
-    String repositoryUuid = action.getRepositoryUuid();
+    String repositoryUuid = action.getRepositoryId();
     putEnvVar(envVars, BITBUCKET_REPOSITORY_UUID, repositoryUuid);
+    putEnvVar(envVars, BITBUCKET_REPOSITORY_ID, repositoryUuid);
 
     String actor = action.getUser();
     putEnvVar(envVars, BITBUCKET_ACTOR, actor);

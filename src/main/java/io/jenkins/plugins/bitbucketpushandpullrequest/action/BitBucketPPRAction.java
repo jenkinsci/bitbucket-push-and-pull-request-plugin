@@ -27,7 +27,6 @@ import java.util.List;
 import hudson.model.EnvironmentContributingAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
 
-
 public interface BitBucketPPRAction extends EnvironmentContributingAction {
 
   public BitBucketPPRPayload getPayload();
@@ -48,7 +47,7 @@ public interface BitBucketPPRAction extends EnvironmentContributingAction {
 
   public String getPullRequestId();
 
-  public String getRepositoryUuid();
+  public String getRepositoryId();
 
   public String getPullRequestUrl();
 

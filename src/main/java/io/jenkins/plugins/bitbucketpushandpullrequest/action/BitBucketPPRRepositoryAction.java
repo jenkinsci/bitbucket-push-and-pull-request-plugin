@@ -21,6 +21,8 @@
 
 package io.jenkins.plugins.bitbucketpushandpullrequest.action;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.Nonnull;
@@ -34,21 +36,18 @@ public class BitBucketPPRRepositoryAction extends InvisibleAction implements Bit
   private static final Logger LOGGER = Logger.getLogger(BitBucketPPRAction.class.getName());
 
   private final @Nonnull BitBucketPPRPayload payload;
-  private String scm;
-  private String user;
+
   private List<String> scmUrls = new ArrayList<>(2);
-  private String sourceBranchName = null;
-  private String targetBranchName = null;
+
+  private String targetBranchName;
+
   private String type;
-  private String repositoryName;
-  private String pullRequestId;
+
   private String repositoryUuid;
 
   public BitBucketPPRRepositoryAction(@Nonnull BitBucketPPRPayload payload) {
-    user = payload.getActor().getNickname();
+    this.payload = payload;
 
-    repositoryName = payload.getRepository().getName();
-    scm = payload.getRepository().getScm() != null ? payload.getRepository().getScm() : "git";
     scmUrls.add(payload.getRepository().getLinks().getHtml().getHref());
 
     for (BitBucketPPRChange change : payload.getPush().getChanges()) {
@@ -72,5 +71,65 @@ public class BitBucketPPRRepositoryAction extends InvisibleAction implements Bit
 
   public String getRepositoryUrl() {
     return payload.getRepository().getLinks().getHtml().getHref();
+  }
+
+  @Override
+  public BitBucketPPRPayload getPayload() {
+    return payload;
+  }
+
+  @Override
+  public String getScm() {
+    return payload.getRepository().getScm() != null ? payload.getRepository().getScm() : "git";
+  }
+
+  @Override
+  public String getUser() {
+    return payload.getActor().getNickname();
+  }
+
+  @Override
+  public String getSourceBranch() {
+    return null;
+  }
+
+  @Override
+  public String getType() {
+    return type;
+  }
+
+  @Override
+  public String getRepositoryName() {
+    return payload.getRepository().getName();
+  }
+
+  @Override
+  public List<String> getScmUrls() {
+    return scmUrls;
+  }
+
+  @Override
+  public String getPullRequestId() {
+    return null;
+  }
+
+  @Override
+  public String getRepositoryId() {
+    return repositoryUuid;
+  }
+
+  @Override
+  public String getPullRequestUrl() {
+    return null;
+  }
+
+  @Override
+  public String getTitle() {
+    return null;
+  }
+
+  @Override
+  public String getDescription() {
+    return null;
   }
 }
