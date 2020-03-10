@@ -38,14 +38,9 @@ public class BitBucketPPRServerRepositoryAction extends InvisibleAction implemen
   private static final Logger LOGGER = Logger.getLogger(BitBucketPPRAction.class.getName());
 
   private final @Nonnull BitBucketPPRPayload payload;
-  private String scm;
-  private String user;
   private List<String> scmUrls = new ArrayList<>(2);
   private String targetBranchName = null;
   private String type;
-  private String repositoryName;
-  private String pullRequestId;
-  private String repositoryUuid;
 
   public BitBucketPPRServerRepositoryAction(BitBucketPPRPayload payload) {
     this.payload = payload;

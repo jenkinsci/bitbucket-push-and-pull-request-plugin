@@ -110,8 +110,4 @@ public class BitBucketPPRPullRequestAction extends InvisibleAction implements Bi
   public String getRepositoryId() {
     return null;
   }
-
-  public void buildEnvironment(@Nonnull Run<?, ?> run, @Nonnull EnvVars env) {
-    env.put("BITBUCKET_PAYLOAD", payload.toString());
-  }
 }

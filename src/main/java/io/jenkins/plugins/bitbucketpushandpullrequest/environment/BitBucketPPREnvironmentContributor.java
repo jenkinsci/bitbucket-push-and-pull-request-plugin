@@ -35,6 +35,7 @@ public class BitBucketPPREnvironmentContributor extends EnvironmentContributor {
   static final String BITBUCKET_ACTOR = "BITBUCKET_ACTOR";
   static final String BITBUCKET_PULL_REQUEST_TITLE = "BITBUCKET_PULL_REQUEST_TITLE";
   static final String BITBUCKET_PULL_REQUEST_DESCRIPTION = "BITBUCKET_PULL_REQUEST_DESCRIPTION";
+  static final String BITBUCKET_PAYLOAD = "BITBUCKET_PAYLOAD";
 
   static final Logger LOGGER = Logger.getLogger(BitBucketPPREnvironmentContributor.class.getName());
 
@@ -80,6 +81,9 @@ public class BitBucketPPREnvironmentContributor extends EnvironmentContributor {
 
     String repositoryId = action.getRepositoryId();
     putEnvVar(envVars, BITBUCKET_REPOSITORY_ID, repositoryId);
+
+    String payload = action.getPayload().toString();
+    putEnvVar(envVars, BITBUCKET_PAYLOAD, payload);
   }
 
   private static void setEnvVarsForCloudRepository(EnvVars envVars,
@@ -101,6 +105,9 @@ public class BitBucketPPREnvironmentContributor extends EnvironmentContributor {
 
     String actor = action.getUser();
     putEnvVar(envVars, BITBUCKET_ACTOR, actor);
+
+    String payload = action.getPayload().toString();
+    putEnvVar(envVars, BITBUCKET_PAYLOAD, payload);
   }
 
   private static void setEnvVarsForCloudPullRequest(EnvVars envVars,
@@ -127,6 +134,9 @@ public class BitBucketPPREnvironmentContributor extends EnvironmentContributor {
 
     String description = action.getDescription();
     putEnvVar(envVars, BITBUCKET_PULL_REQUEST_DESCRIPTION, description);
+
+    String payload = action.getPayload().toString();
+    putEnvVar(envVars, BITBUCKET_PAYLOAD, payload);
   }
 
   private static void setEnvVarsForServerPullRequest(EnvVars envVars,
@@ -153,6 +163,9 @@ public class BitBucketPPREnvironmentContributor extends EnvironmentContributor {
 
     String description = action.getDescription();
     putEnvVar(envVars, BITBUCKET_PULL_REQUEST_DESCRIPTION, description);
+
+    String payload = action.getPayload().toString();
+    putEnvVar(envVars, BITBUCKET_PAYLOAD, payload);
   }
 
   private static void putEnvVar(EnvVars envs, String name, String value) {

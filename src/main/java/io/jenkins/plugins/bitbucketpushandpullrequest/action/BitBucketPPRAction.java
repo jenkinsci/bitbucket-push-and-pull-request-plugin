@@ -19,15 +19,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  ******************************************************************************/
 
-
 package io.jenkins.plugins.bitbucketpushandpullrequest.action;
 
 import java.util.List;
 
-import hudson.model.EnvironmentContributingAction;
+import hudson.model.Action;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
 
-public interface BitBucketPPRAction extends EnvironmentContributingAction {
+public interface BitBucketPPRAction extends Action {
 
   public BitBucketPPRPayload getPayload();
 
