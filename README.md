@@ -69,22 +69,40 @@ If you are using Bitbucket Server, follow these instructions: <https://confluenc
 
 ### Environment variables for Bitbucket Cloud ans Server pull requests
 
-|                        NAME | VALUE                  |
-| --------------------------: | :--------------------- |
-|     BITBUCKET_SOURCE_BRANCH | source branch          |
-|     BITBUCKET_TARGET_BRANCH | target branch          |
-| BITBUCKET_PULL_REQUEST_LINK | link                   |
-|   BITBUCKET_PULL_REQUEST_ID | id                     |
-|           BITBUCKET_PAYLOAD | payload as json string |
+|                               NAME | VALUE                  |
+| ---------------------------------: | :--------------------- |
+|            BITBUCKET_SOURCE_BRANCH | source branch          |
+|            BITBUCKET_TARGET_BRANCH | target branch          |
+|        BITBUCKET_PULL_REQUEST_LINK | link                   |
+|          BITBUCKET_PULL_REQUEST_ID | id                     |
+|                    BITBUCKET_ACTOR | actor name             |
+|       BITBUCKET_PULL_REQUEST_TITLE | PR title               |
+| BITBUCKET_PULL_REQUEST_DESCRIPTION | PR description         |
+|                  BITBUCKET_PAYLOAD | payload as json string |
 
 ### Environment variables for Bitbucket Cloud pushs
 
-|                     NAME | VALUE                                    |
-| -----------------------: | :--------------------------------------- |
-|          REPOSITORY_LINK | branch (Deprecated. It will be removed.) |
-|  BITBUCKET_SOURCE_BRANCH | branch                                   |
-| BITBUCKET_REPOSITORY_URL | repository url                           |
-|        BITBUCKET_PAYLOAD | payload as json string                   |
+|                      NAME | VALUE                                      |
+| ------------------------: | :----------------------------------------  |
+|           REPOSITORY_LINK | branch (Deprecated. It will be removed.)   |
+|   BITBUCKET_SOURCE_BRANCH | branch                                     |
+|   BITBUCKET_TARGET_BRANCH | branch                                     |
+|  BITBUCKET_REPOSITORY_URL | repository url                             |
+| BITBUCKET_REPOSITORY_UUID | repository uuid                            |
+|   BITBUCKET_REPOSITORY_ID | repository uuid (for compat. with server)  |
+|           BITBUCKET_ACTOR | actor name                                 |
+|         BITBUCKET_PAYLOAD | payload as json string                     |
+
+### Environment variables for Bitbucket Server pushs
+
+|                      NAME | VALUE                                      |
+| ------------------------: | :----------------------------------------  |
+|   BITBUCKET_SOURCE_BRANCH | branch                                     |
+|   BITBUCKET_TARGET_BRANCH | branch                                     |
+|           REPOSITORY_NAME | repository name                            |
+|   BITBUCKET_REPOSITORY_ID | repository id                              |
+|           BITBUCKET_ACTOR | actor name                                 |
+|         BITBUCKET_PAYLOAD | payload as json string                     |
 
 ## Roadmap
 
@@ -95,7 +113,7 @@ If you are using Bitbucket Server, follow these instructions: <https://confluenc
 
 ```groovy
 bitbucketTriggers {
-  
+
   // For Bitbucket Cloud
   repositoryPushAction(triggerAlsoIfTagPush: boolean, triggerAlsoIfNothingChanged: boolean, allowedBranches: String)
   pullRequestApprovedAction(onlyIfReviewersApproved: boolean, allowedBranches: String)
@@ -106,7 +124,7 @@ bitbucketTriggers {
   pullRequestUpdatedAction(allowedBranches: String)
   pullRequestMergedAction()
   pullRequestMergedAction(allowedBranches: String)
-  
+
   // For Bitbucket Server
   repositoryServerPushAction(triggerAlsoIfTagPush: boolean, triggerAlsoIfNothingChanged: boolean, allowedBranches: String)
   pullRequestServerApprovedAction(onlyIfReviewersApproved: boolean)
