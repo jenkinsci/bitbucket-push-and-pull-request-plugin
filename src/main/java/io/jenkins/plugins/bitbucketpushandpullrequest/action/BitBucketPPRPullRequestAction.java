@@ -27,13 +27,10 @@ import java.util.logging.Logger;
 
 import javax.annotation.Nonnull;
 
-import hudson.EnvVars;
 import hudson.model.InvisibleAction;
-import hudson.model.Run;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
 
 public class BitBucketPPRPullRequestAction extends InvisibleAction implements BitBucketPPRAction {
-  private static final Logger LOGGER = Logger.getLogger(BitBucketPPRPullRequestAction.class.getName());
 
   private final @Nonnull BitBucketPPRPayload payload;
   private List<String> scmUrls = new ArrayList<>(2);
