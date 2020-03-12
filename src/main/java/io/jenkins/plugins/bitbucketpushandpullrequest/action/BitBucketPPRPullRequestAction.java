@@ -23,7 +23,6 @@ package io.jenkins.plugins.bitbucketpushandpullrequest.action;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 
 import javax.annotation.Nonnull;
 
