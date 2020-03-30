@@ -1,5 +1,22 @@
 # Change Log
 
+## 2.3.1 (2020-03-30)
+
+[Full Changelog](https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/compare/bitbucket-push-and-pull-request-2.3.0...bitbucket-push-and-pull-request-2.3.1)
+
+**Implemented enhancements:**
+
+* Feature: New Environment Variables
+* More tests
+* Code style fixes
+* Refactoring
+* Updated documentation
+
+## Closed tickets
+
+* Doesn't work branch filter for Cloud BitBucket pull requests #86 
+* Webhook does not trigger build on pull request creation #98 
+* Not Working With the Pipeline, Kindly help me on this! #63
 
 ## 2.3.0 (2020-02-10)
 
