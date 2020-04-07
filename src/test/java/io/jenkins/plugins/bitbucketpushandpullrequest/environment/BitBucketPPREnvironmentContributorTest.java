@@ -245,7 +245,7 @@ public class BitBucketPPREnvironmentContributorTest {
 
   @Test
   public void buildEnvironmentForServerSourcePullRequestUpdatedTest() {
-    BitBucketPPRServerPayload payload = getServerPayload("./server/pr_modified.json");
+    BitBucketPPRServerPayload payload = getServerPayload("./server/pr_from_ref_updated.json");
 
     BitBucketPPRPullRequestServerCause cause = mock(BitBucketPPRPullRequestServerCause.class);
     when(cause.getPullRequestPayLoad())
@@ -260,9 +260,9 @@ public class BitBucketPPREnvironmentContributorTest {
     assertThat(envVars,
         hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_TARGET_BRANCH, "master"));
     assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_LINK,
-        "http://example.org/projects/ABC/repos/some-repo/pull-requests/13"));
+        "http://example.org/projects/ABC/repos/some-repo/pull-requests/61"));
     assertThat(envVars,
-        hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_ID, "13"));
+        hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_ID, "1"));
     assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_ACTOR, "me-name"));
     assertThat(envVars,
         hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_TITLE, "test"));
