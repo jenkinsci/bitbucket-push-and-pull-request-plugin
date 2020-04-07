@@ -1,0 +1,156 @@
+{
+  "eventKey": "pr:from_ref_updated",
+  "date": "2020-04-07T15:19:34+0200",
+  "actor": {
+    "name": "me-name",
+    "emailAddress": "me@example.org",
+    "id": 1,
+    "displayName": "me display name",
+    "active": true,
+    "slug": "me-slug",
+    "type": "NORMAL",
+    "links": {
+      "self": [
+        {
+          "href": "https://example.org/users/abc123"
+        }
+      ]
+    }
+  },
+  "pullRequest": {
+    "id": 1,
+    "version": 1,
+    "title": "test",
+    "state": "OPEN",
+    "open": true,
+    "closed": false,
+    "createdDate": 1586265091396,
+    "updatedDate": 1586265574452,
+    "fromRef": {
+      "id": "refs/heads/develop",
+      "displayId": "develop",
+      "latestCommit": "522764f1602ae7d4abcd18197827cafdb3aef11",
+      "repository": {
+        "slug": "some-repo",
+        "id": 1,
+        "name": "some-repo",
+        "hierarchyId": "1a468fa5630f243c3e11",
+        "scmId": "git",
+        "state": "AVAILABLE",
+        "statusMessage": "Available",
+        "forkable": true,
+        "project": {
+          "key": "ABC",
+          "id": 1,
+          "name": "some-project-name",
+          "public": false,
+          "type": "NORMAL",
+          "links": {
+            "self": [
+              {
+                "href": "https://example.org/projects/ABC"
+              }
+            ]
+          }
+        },
+        "public": false,
+        "links": {
+          "clone": [
+            {
+              "href": "https://example.org/scm/some-namespace/some-repo.git",
+              "name": "http"
+            },
+            {
+              "href": "ssh://git@example.org/some-namespace/some-repo.git",
+              "name": "ssh"
+            }
+          ],
+          "self": [
+            {
+              "href": "https://example.org/scm/some-namespace/some-repo.git/browse"
+            }
+          ]
+        }
+      }
+    },
+    "toRef": {
+      "id": "refs/heads/master",
+      "displayId": "master",
+      "latestCommit": "522764f1602ae7d4abcd18197827cafdb3aef11",
+      "repository": {
+        "slug": "some-repo",
+        "id": 1,
+        "name": "some-repo",
+        "hierarchyId": "1a468fa5630f243c3e11",
+        "scmId": "git",
+        "state": "AVAILABLE",
+        "statusMessage": "Available",
+        "forkable": true,
+        "project": {
+          "key": "ABC",
+          "id": 2,
+          "name": "some-repo",
+          "public": false,
+          "type": "NORMAL",
+          "links": {
+            "self": [
+              {
+                "href": "https://example.org/projects/ABC"
+              }
+            ]
+          }
+        },
+        "public": false,
+        "links": {
+          "clone": [
+            {
+              "href": "https://example.org/scm/some-namespace/some-repo.git",
+              "name": "http"
+            },
+            {
+              "href": "ssh://git@example.org/some-namespace/some-repo.git",
+              "name": "ssh"
+            }
+          ],
+          "self": [
+            {
+              "href": "http://example.org/projects/ABC/repos/some-repo/browse"
+            }
+          ]
+        }
+      }
+    },
+    "locked": false,
+    "author": {
+      "user": {
+        "name": "me-name",
+        "emailAddress": "me@example.org",
+        "id": 1,
+        "displayName": "display me name",
+        "active": true,
+        "slug": "me-name",
+        "type": "NORMAL",
+        "links": {
+          "self": [
+            {
+              "href": "https://example.org/users/abc123"
+            }
+          ]
+        }
+      },
+      "role": "AUTHOR",
+      "approved": false,
+      "status": "UNAPPROVED"
+    },
+    "reviewers": [],
+    "participants": [],
+    "links": {
+      "self": [
+        {
+          "href": "http://example.org/projects/ABC/repos/some-repo/pull-requests/61"
+        }
+      ]
+    }
+  },
+  "previousFromHash": "18293a4da33c801264f4c1d099d75f755f4c8ff0"
+}
