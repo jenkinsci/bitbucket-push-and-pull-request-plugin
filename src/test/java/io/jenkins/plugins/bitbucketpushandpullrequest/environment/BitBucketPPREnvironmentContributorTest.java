@@ -242,6 +242,36 @@ public class BitBucketPPREnvironmentContributorTest {
     assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PAYLOAD, payload.toString()));
   }
 
+
+  @Test
+  public void buildEnvironmentForServerSourcePullRequestUpdatedTest() {
+    BitBucketPPRServerPayload payload = getServerPayload("./server/pr_modified.json");
+
+    BitBucketPPRPullRequestServerCause cause = mock(BitBucketPPRPullRequestServerCause.class);
+    when(cause.getPullRequestPayLoad())
+        .thenReturn(new BitBucketPPRPullRequestServerAction(payload));
+
+    // do
+    runEnvironmentContributorForCause(cause);
+
+    // assert
+    assertThat(envVars,
+        hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_SOURCE_BRANCH, "develop"));
+    assertThat(envVars,
+        hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_TARGET_BRANCH, "master"));
+    assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_LINK,
+        "http://example.org/projects/ABC/repos/some-repo/pull-requests/13"));
+    assertThat(envVars,
+        hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_ID, "13"));
+    assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_ACTOR, "me-name"));
+    assertThat(envVars,
+        hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_TITLE, "test"));
+    assertThat(envVars,
+        hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_DESCRIPTION, ""));
+    assertThat(envVars,
+        hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PAYLOAD, payload.toString()));
+  }
+
   @Test
   public void buildEnvironmentForServerPullRequestApprovedTest() {
     BitBucketPPRServerPayload payload = getServerPayload("./server/pr_reviewer_approved.json");
