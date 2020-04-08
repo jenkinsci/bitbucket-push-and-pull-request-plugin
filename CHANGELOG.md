@@ -1,5 +1,18 @@
 # Change Log
 
+## 2.3.2 (2020-04-07)
+
+[Full Changelog](https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/compare/bitbucket-push-and-pull-request-2.3.1...bitbucket-push-and-pull-request-2.3.2)
+
+**Implemented enhancements:**
+
+* Verified compatibility with BitBucket Server 7.0
+* Added trigger for "Source branch updated" event of BitBucket Server >= 7.0
+
+## Closed tickets
+
+* New "Source branch updated" PR Webhook/Event supported in BBS 7.0 #97 
+
 ## 2.3.1 (2020-03-30)
 
 [Full Changelog](https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/compare/bitbucket-push-and-pull-request-2.3.0...bitbucket-push-and-pull-request-2.3.1)
