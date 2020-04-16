@@ -118,14 +118,29 @@ bitbucketTriggers {
 
   // For Bitbucket Cloud
   repositoryPushAction(triggerAlsoIfTagPush: boolean, triggerAlsoIfNothingChanged: boolean, allowedBranches: String)
+  
   pullRequestApprovedAction(onlyIfReviewersApproved: boolean, allowedBranches: String)
   pullRequestApprovedAction(onlyIfReviewersApproved: boolean)
+  
   pullRequestCreatedAction()
   pullRequestCreatedAction(allowedBranches: String)
+  
   pullRequestUpdatedAction()
   pullRequestUpdatedAction(allowedBranches: String)
+  
   pullRequestMergedAction()
   pullRequestMergedAction(allowedBranches: String)
+  
+  pullRequestCommentCreatedAction()
+  pullRequestCommentCreatedAction(allowedBranches: String)
+  pullRequestCommentCreatedAction(allowedBranches: String, commentFilter: String) // CommentFilter is java a regex expression
+  
+  pullRequestCommentUpdatedAction()
+  pullRequestCommentUpdatedAction(allowedBranches: String)
+  pullRequestCommentUpdatedAction(allowedBranches: String, commentFilter: String) // CommentFilter is java a regex expression
+  
+  pullRequestCommentDeleteddAction()
+  pullRequestCommentDeletedAction(allowedBranches: String)
 
   // For Bitbucket Server
   repositoryServerPushAction(triggerAlsoIfTagPush: boolean, triggerAlsoIfNothingChanged: boolean, allowedBranches: String)
