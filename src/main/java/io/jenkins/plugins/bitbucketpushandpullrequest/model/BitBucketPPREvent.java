@@ -33,6 +33,9 @@ import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRCo
 import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.PULL_REQUEST_SERVER_UPDATED;
 import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.PULL_REQUEST_SERVER_SOURCE_UPDATED;
 import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.PULL_REQUEST_UPDATED;
+import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.PULL_REQUEST_COMMENT_CREATED;
+import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.PULL_REQUEST_COMMENT_UPDATED;
+import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.PULL_REQUEST_COMMENT_DELETED;
 import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.REPOSITORY_EVENT;
 import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.REPOSITORY_POST;
 import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.REPOSITORY_PUSH;
@@ -75,6 +78,9 @@ public class BitBucketPPREvent {
           || PULL_REQUEST_CREATED.equalsIgnoreCase(action)
           || PULL_REQUEST_UPDATED.equalsIgnoreCase(action)
           || PULL_REQUEST_MERGED.equalsIgnoreCase(action)
+          || PULL_REQUEST_COMMENT_CREATED.equalsIgnoreCase(action)
+          || PULL_REQUEST_COMMENT_UPDATED.equalsIgnoreCase(action)
+          || PULL_REQUEST_COMMENT_DELETED.equalsIgnoreCase(action)
           || PULL_REQUEST_SERVER_CREATED.equalsIgnoreCase(action)
           || PULL_REQUEST_SERVER_UPDATED.equalsIgnoreCase(action)
           || PULL_REQUEST_SERVER_SOURCE_UPDATED.equalsIgnoreCase(action)

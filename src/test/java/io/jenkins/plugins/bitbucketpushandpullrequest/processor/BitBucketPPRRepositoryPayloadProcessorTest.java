@@ -18,7 +18,7 @@ import io.jenkins.plugins.bitbucketpushandpullrequest.BitBucketPPRJobProbe;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPREvent;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
-import io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud.BitBucketPPRNewPayload;
+import io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud.BitBucketPPRCloudPayload;
 
 
 @RunWith(MockitoJUnitRunner.class)
@@ -55,7 +55,7 @@ public class BitBucketPPRRepositoryPayloadProcessorTest {
     }
 
     Gson gson = new Gson();
-    BitBucketPPRPayload payload = gson.fromJson(reader, BitBucketPPRNewPayload.class);
+    BitBucketPPRPayload payload = gson.fromJson(reader, BitBucketPPRCloudPayload.class);
 
     repositoryPayloadProcessor.processPayload(payload);
 

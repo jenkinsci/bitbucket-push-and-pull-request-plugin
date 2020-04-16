@@ -24,7 +24,7 @@ import com.google.gson.annotations.SerializedName;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
 
 
-public class BitBucketPPRNewPayload implements BitBucketPPRPayload {
+public class BitBucketPPRCloudPayload implements BitBucketPPRPayload {
   private static final long serialVersionUID = -3467640601880230847L;
 
   private BitBucketPPRPush push;
@@ -33,8 +33,9 @@ public class BitBucketPPRNewPayload implements BitBucketPPRPayload {
   private BitBucketPPRActor actor;
   private @SerializedName("pullrequest") BitBucketPPRPullRequest pullRequest;
   private BitBucketPPRApproval approval;
+  private BitBucketPPRComment comment;
 
-
+  @Override
   public BitBucketPPRPush getPush() {
     return push;
   }
@@ -43,6 +44,7 @@ public class BitBucketPPRNewPayload implements BitBucketPPRPayload {
     this.push = push;
   }
 
+  @Override
   public BitBucketPPRRepository getRepository() {
     return repository;
   }
@@ -51,6 +53,7 @@ public class BitBucketPPRNewPayload implements BitBucketPPRPayload {
     this.repository = repository;
   }
 
+  @Override
   public BitBucketPPRActor getActor() {
     return actor;
   }
@@ -59,6 +62,7 @@ public class BitBucketPPRNewPayload implements BitBucketPPRPayload {
     this.actor = actor;
   }
 
+  @Override
   public BitBucketPPRPullRequest getPullRequest() {
     return pullRequest;
   }
@@ -67,12 +71,22 @@ public class BitBucketPPRNewPayload implements BitBucketPPRPayload {
     this.pullRequest = pullRequest;
   }
 
+  @Override
   public BitBucketPPRApproval getApproval() {
     return approval;
   }
 
   public void setApproval(final BitBucketPPRApproval approval) {
     this.approval = approval;
+  }
+
+  @Override
+  public BitBucketPPRComment getComment() {
+    return null;
+  }
+
+  public void setComment(BitBucketPPRComment comment) {
+    this.comment = comment;
   }
 
   @Override

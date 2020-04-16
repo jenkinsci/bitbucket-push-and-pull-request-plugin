@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 import hudson.EnvVars;
 import hudson.plugins.git.BranchSpec;
 
@@ -65,5 +66,12 @@ public class BitBucketPPRUtils {
     nonEmpty.forEach((String s) -> LOGGER.info("Matching branch: " + s));
 
     return nonEmpty.size() > 0;
+  }
+
+  public static boolean findInComment(String commentFilter, String comment) {
+    if (commentFilter == null)
+      return true;
+    Pattern pattern = Pattern.compile(commentFilter);
+    return pattern.matcher(comment).find();
   }
 }

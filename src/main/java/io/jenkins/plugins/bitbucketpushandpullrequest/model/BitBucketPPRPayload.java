@@ -25,11 +25,13 @@ import java.util.ArrayList;
 import java.util.List;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud.BitBucketPPRActor;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud.BitBucketPPRApproval;
+import io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud.BitBucketPPRComment;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud.BitBucketPPRPullRequest;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud.BitBucketPPRPush;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud.BitBucketPPRRepository;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.server.BitBucketPPRServerActor;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.server.BitBucketPPRServerChange;
+import io.jenkins.plugins.bitbucketpushandpullrequest.model.server.BitBucketPPRServerComment;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.server.BitBucketPPRServerPullRequest;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.server.BitBucketPPRServerRepository;
 
@@ -52,6 +54,10 @@ public interface BitBucketPPRPayload extends Serializable {
   }
 
   default BitBucketPPRApproval getApproval() {
+    return null;
+  }
+  
+  default BitBucketPPRComment getComment() {
     return null;
   }
 
@@ -77,5 +83,9 @@ public interface BitBucketPPRPayload extends Serializable {
 
   default List<BitBucketPPRServerChange> getServerChanges() {
     return new ArrayList<>();
+  }
+
+  default BitBucketPPRServerComment getServerComment() {
+    return null;
   }
 }

@@ -94,41 +94,47 @@ public class BitBucketPPRJobProbe {
   private void triggerScm(Job<?, ?> job, List<URIish> remotes, BitBucketPPRAction bitbucketAction) {
     LOGGER.log(Level.FINE, "Considering to poke {0}", job.getFullDisplayName());
     Optional<BitBucketPPRTrigger> bitbucketTrigger = getBitBucketTrigger(job);
-    List<SCM> scmTriggered = new ArrayList<>();
-    Optional<SCMTriggerItem> item =
-        Optional.ofNullable(SCMTriggerItem.SCMTriggerItems.asSCMTriggerItem(job));
 
-    bitbucketTrigger
-        .ifPresent(trigger -> item.ifPresent(i -> i.getSCMs().stream().forEach(scmTrigger -> {
-          if (isMultiBranchPipeline(job) && mPJobShouldNotBeTriggered(job, bitbucketAction)) {
-            LOGGER.log(Level.FINE, "Skipping for job:" + job.getDisplayName());
-            return;
-          }
+    if (bitbucketTrigger.isPresent()) {
+      List<SCM> scmTriggered = new ArrayList<>();
+      Optional<SCMTriggerItem> item =
+          Optional.ofNullable(SCMTriggerItem.SCMTriggerItems.asSCMTriggerItem(job));
 
-          LOGGER.log(Level.FINE, "Scheduling for job:" + job.getDisplayName());
-
-          boolean isRemoteSet = false;
-          for (URIish remote : remotes) {
-            if (match(scmTrigger, remote)) {
-              isRemoteSet = true;
-              break;
+      LOGGER.log(Level.FINE, "Considering to use trigger {0}", bitbucketTrigger.toString());
+      bitbucketTrigger
+          .ifPresent(trigger -> item.ifPresent(i -> i.getSCMs().stream().forEach(scmTrigger -> {
+            if (isMultiBranchPipeline(job) && mPJobShouldNotBeTriggered(job, bitbucketAction)) {
+              LOGGER.log(Level.FINE, "Skipping for job:" + job.getDisplayName());
+              return;
             }
-          }
 
-          if (isRemoteSet && !hasBeenTriggered(scmTriggered, scmTrigger)) {
-            scmTriggered.add(scmTrigger);
-            LOGGER.log(Level.FINE, "Triggering trigger {0} for job {1}",
-                new Object[] {trigger.getClass().getName(), job.getFullDisplayName()});
-            try {
-              trigger.onPost(bitbucketEvent, this.bitbucketAction);
-            } catch (Exception e) {
-              LOGGER.log(Level.WARNING, "Error: {0}", e.getMessage());
+            LOGGER.log(Level.FINE, "Scheduling for job:" + job.getDisplayName());
+
+            boolean isRemoteSet = false;
+            for (URIish remote : remotes) {
+              if (match(scmTrigger, remote)) {
+                isRemoteSet = true;
+                break;
+              }
             }
-          } else {
-            LOGGER.log(Level.FINE, "{0} SCM doesn't match remote repo {1}",
-                new Object[] {job.getName(), remotes});
-          }
-        })));
+
+            if (isRemoteSet && !hasBeenTriggered(scmTriggered, scmTrigger)) {
+              scmTriggered.add(scmTrigger);
+              LOGGER.log(Level.FINE, "Triggering trigger {0} for job {1}",
+                  new Object[] {trigger.getClass().getName(), job.getFullDisplayName()});
+              try {
+                trigger.onPost(bitbucketEvent, this.bitbucketAction);
+              } catch (Exception e) {
+                LOGGER.log(Level.WARNING, "Error: {0}", e.getMessage());
+              }
+            } else {
+              LOGGER.log(Level.FINE, "{0} SCM doesn't match remote repo {1}",
+                  new Object[] {job.getName(), remotes});
+            }
+          })));
+    } else {
+      LOGGER.log(Level.FINE, "Bitbucket Trigger for job: {0} is not present. ", job.getFullDisplayName());
+    } ;
   }
 
   private boolean isMultiBranchPipeline(Job<?, ?> job) {

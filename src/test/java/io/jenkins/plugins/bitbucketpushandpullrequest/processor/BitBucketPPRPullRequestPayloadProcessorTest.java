@@ -47,7 +47,7 @@ import io.jenkins.plugins.bitbucketpushandpullrequest.BitBucketPPRJobProbe;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPREvent;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
-import io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud.BitBucketPPRNewPayload;
+import io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud.BitBucketPPRCloudPayload;
 import net.sf.json.JSONObject;
 
 
@@ -85,7 +85,7 @@ public class BitBucketPPRPullRequestPayloadProcessorTest {
         .element("links", new JSONObject().element("html", new JSONObject().element("href", url)));
 
     BitBucketPPRPayload payload =
-        gson.fromJson(inputStream.toString(), BitBucketPPRNewPayload.class);
+        gson.fromJson(inputStream.toString(), BitBucketPPRCloudPayload.class);
 
 
     pullRequestPayloadProcessor.processPayload(payload);
@@ -123,7 +123,7 @@ public class BitBucketPPRPullRequestPayloadProcessorTest {
     
     BitBucketPPRPayload payload = null;
     try {
-      payload = gson.fromJson(reader, BitBucketPPRNewPayload.class);
+      payload = gson.fromJson(reader, BitBucketPPRCloudPayload.class);
     } catch (JsonIOException e) {
       e.printStackTrace();
     } catch (JsonSyntaxException e) {
