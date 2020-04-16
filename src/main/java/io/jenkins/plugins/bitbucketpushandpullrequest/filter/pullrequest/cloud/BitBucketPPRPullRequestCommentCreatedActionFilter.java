@@ -34,7 +34,7 @@ public class BitBucketPPRPullRequestCommentCreatedActionFilter
     extends BitBucketPPRPullRequestActionFilter {
 
   public String allowedBranches;
-  private String commentFilter;
+  public String commentFilter;
 
   @DataBoundConstructor
   public BitBucketPPRPullRequestCommentCreatedActionFilter() {}

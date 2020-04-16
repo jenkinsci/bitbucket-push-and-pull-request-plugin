@@ -82,7 +82,7 @@ public class BitBucketPPRCloudPayload implements BitBucketPPRPayload {
 
   @Override
   public BitBucketPPRComment getComment() {
-    return null;
+    return comment;
   }
 
   public void setComment(BitBucketPPRComment comment) {

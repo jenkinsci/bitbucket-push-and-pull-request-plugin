@@ -3,7 +3,4 @@
     <f:entry title="Allowed Branches" field="allowed">
   		<f:textbox field="allowedBranches" />
 	  </f:entry>
-    <f:entry title="Filter Comment" field="filter">
-  		<f:textbox field="commentFilter" />
-	  </f:entry>
 </j:jelly>

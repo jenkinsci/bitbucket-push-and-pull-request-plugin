@@ -34,7 +34,6 @@ public class BitBucketPPRPullRequestCommentDeletedActionFilter
     extends BitBucketPPRPullRequestActionFilter {
 
   public String allowedBranches;
-  private String commentFilter;
 
   @DataBoundConstructor
   public BitBucketPPRPullRequestCommentDeletedActionFilter() {}
@@ -48,19 +47,9 @@ public class BitBucketPPRPullRequestCommentDeletedActionFilter
     }
   }
 
-  @DataBoundSetter
-  public void setCommentFilter(String commentFilter) {
-    if (commentFilter == null || "".equals(commentFilter)) {
-      this.commentFilter = "";
-    } else {
-      this.commentFilter = commentFilter;
-    }
-  }
-
   @Override
   public boolean shouldTriggerBuild(BitBucketPPRAction bitbucketAction) {
-    return matches(allowedBranches, bitbucketAction.getTargetBranch(), null)
-        && findInComment(commentFilter, bitbucketAction.getComment());
+    return matches(allowedBranches, bitbucketAction.getTargetBranch(), null);
   }
 
   @Override

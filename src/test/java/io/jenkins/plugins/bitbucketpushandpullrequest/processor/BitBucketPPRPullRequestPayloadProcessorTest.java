@@ -63,73 +63,34 @@ public class BitBucketPPRPullRequestPayloadProcessorTest {
 
   BitBucketPPRPullRequestPayloadProcessor pullRequestPayloadProcessor;
 
-  @Test
-  @Ignore
-  public void testProcessPullRequestApprovalWebhookHg() {
-    Gson gson = new Gson();
-    String user = "test_user";
-    String url = "https://bitbucket.org/test_user/test_repo";
-
-    BitBucketPPREvent bitbucketEvent = null;
-    try {
-      bitbucketEvent = new BitBucketPPREvent("pullrequest:approved");
-    } catch (OperationNotSupportedException e) {
-      e.printStackTrace();
-    }
-
-    pullRequestPayloadProcessor =
-        new BitBucketPPRPullRequestPayloadProcessor(probe, bitbucketEvent);
-
-    JSONObject inputStream = new JSONObject().element("scm", "hg")
-        .element("owner", new JSONObject().element("username", user))
-        .element("links", new JSONObject().element("html", new JSONObject().element("href", url)));
-
-    BitBucketPPRPayload payload =
-        gson.fromJson(inputStream.toString(), BitBucketPPRCloudPayload.class);
-
-
-    pullRequestPayloadProcessor.processPayload(payload);
-
-    verify(probe).triggerMatchingJobs(eventCaptor.capture(), actionCaptor.capture());
-
-    assertEquals(bitbucketEvent, eventCaptor.getValue());
-    assertEquals(payload, actionCaptor.getValue().getPayload());
-  }
-
 
   @Test
+
   public void testProcessPullRequestApprovalWebhookGit() {
-    Gson gson = new Gson();
-    BitBucketPPREvent bitbucketEvent = null;
-    try {
-      bitbucketEvent = new BitBucketPPREvent("pullrequest:approved");
-    } catch (OperationNotSupportedException e) {
-      e.printStackTrace();
-    }
-
-    pullRequestPayloadProcessor =
-        new BitBucketPPRPullRequestPayloadProcessor(probe, bitbucketEvent);
-
     JsonReader reader = null;
 
     try {
       ClassLoader classloader = Thread.currentThread().getContextClassLoader();
-      InputStream is = classloader.getResourceAsStream("pullrequest_approved.json");
+      InputStream is = classloader.getResourceAsStream("./cloud/pr_approved.json");
       InputStreamReader isr = new InputStreamReader(is, StandardCharsets.UTF_8);
       reader = new JsonReader(isr);
     } catch (Exception e) {
       e.printStackTrace();
     }
-    
-    BitBucketPPRPayload payload = null;
+
+    Gson gson = new Gson();
+    BitBucketPPRPayload payload = gson.fromJson(reader, BitBucketPPRCloudPayload.class);
+
+    BitBucketPPREvent bitbucketEvent = null;
     try {
-      payload = gson.fromJson(reader, BitBucketPPRCloudPayload.class);
-    } catch (JsonIOException e) {
-      e.printStackTrace();
-    } catch (JsonSyntaxException e) {
+      bitbucketEvent = new BitBucketPPREvent("pullrequest:approved");
+    } catch (OperationNotSupportedException e) {
       e.printStackTrace();
     }
-    
+
+    pullRequestPayloadProcessor =
+        new BitBucketPPRPullRequestPayloadProcessor(probe, bitbucketEvent);
+
     try {
       pullRequestPayloadProcessor.processPayload(payload);
     } catch (Exception e) {

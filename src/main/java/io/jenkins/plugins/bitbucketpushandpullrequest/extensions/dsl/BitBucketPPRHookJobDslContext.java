@@ -142,6 +142,16 @@ public class BitBucketPPRHookJobDslContext implements Context {
     triggers.add(pullRequestTriggerFilter);
   }
 
+  public void pullRequestCommentCreatedAction(String allowedBranches, String commentFilter) {
+    BitBucketPPRPullRequestCommentCreatedActionFilter pullRequestCommentCreatedActionFilter =
+        new BitBucketPPRPullRequestCommentCreatedActionFilter();
+    pullRequestCommentCreatedActionFilter.setAllowedBranches(allowedBranches);
+    pullRequestCommentCreatedActionFilter.setCommentFilter(commentFilter);
+    BitBucketPPRPullRequestTriggerFilter pullRequestTriggerFilter =
+        new BitBucketPPRPullRequestTriggerFilter(pullRequestCommentCreatedActionFilter);
+    triggers.add(pullRequestTriggerFilter);
+  }
+
   public void pullRequestCommentUpdatedAction() {
     BitBucketPPRPullRequestCommentUpdatedActionFilter pullRequestCommentUpdatedActionFilter =
         new BitBucketPPRPullRequestCommentUpdatedActionFilter();
@@ -154,6 +164,16 @@ public class BitBucketPPRHookJobDslContext implements Context {
     BitBucketPPRPullRequestCommentUpdatedActionFilter pullRequestCommentUpdatedActionFilter =
         new BitBucketPPRPullRequestCommentUpdatedActionFilter();
     pullRequestCommentUpdatedActionFilter.setAllowedBranches(allowedBranches);
+    BitBucketPPRPullRequestTriggerFilter pullRequestTriggerFilter =
+        new BitBucketPPRPullRequestTriggerFilter(pullRequestCommentUpdatedActionFilter);
+    triggers.add(pullRequestTriggerFilter);
+  }
+
+  public void pullRequestCommentUpdatedAction(String allowedBranches, String commentFilter) {
+    BitBucketPPRPullRequestCommentUpdatedActionFilter pullRequestCommentUpdatedActionFilter =
+        new BitBucketPPRPullRequestCommentUpdatedActionFilter();
+    pullRequestCommentUpdatedActionFilter.setAllowedBranches(allowedBranches);
+    pullRequestCommentUpdatedActionFilter.setCommentFilter(commentFilter);
     BitBucketPPRPullRequestTriggerFilter pullRequestTriggerFilter =
         new BitBucketPPRPullRequestTriggerFilter(pullRequestCommentUpdatedActionFilter);
     triggers.add(pullRequestTriggerFilter);
