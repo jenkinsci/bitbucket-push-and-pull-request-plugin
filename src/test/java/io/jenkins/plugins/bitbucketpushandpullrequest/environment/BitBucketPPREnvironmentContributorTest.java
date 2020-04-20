@@ -56,7 +56,7 @@ import io.jenkins.plugins.bitbucketpushandpullrequest.cause.pullrequest.server.B
 import io.jenkins.plugins.bitbucketpushandpullrequest.cause.repository.BitBucketPPRRepositoryCause;
 import io.jenkins.plugins.bitbucketpushandpullrequest.cause.repository.BitBucketPPRServerRepositoryCause;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
-import io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud.BitBucketPPRNewPayload;
+import io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud.BitBucketPPRCloudPayload;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.server.BitBucketPPRServerPayload;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -188,6 +188,36 @@ public class BitBucketPPREnvironmentContributorTest {
     assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_TITLE, "I have to push the pram a lot X."));
     assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_DESCRIPTION, "Some description for PR"));
     assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PAYLOAD, payload.toString()));
+  }
+
+  @Test
+  public void buildEnvironmentForCloudPullRequestCommentCreatedTest() {
+    BitBucketPPRPayload payload = getCloudPayload("./cloud/pr_comment_created.json");
+
+    BitBucketPPRPullRequestCause cause = mock(BitBucketPPRPullRequestCause.class);
+    when(cause.getPullRequestPayLoad()).thenReturn(new BitBucketPPRPullRequestAction(payload));
+
+    // do
+    runEnvironmentContributorForCause(cause);
+
+    // assert
+    assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_SOURCE_BRANCH,
+        "feature/do-not-merge"));
+    assertThat(envVars,
+        hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_TARGET_BRANCH, "destination-branch"));
+    assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_LINK,
+        "https://bitbucket.org/some-repo-namespace/some-repo/pull-requests/198"));
+    assertThat(envVars,
+        hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_ID, "198"));
+    assertThat(envVars,
+        hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_ACTOR, "me-nickname"));
+    assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_TITLE,
+        "I have to push the pram a lot X."));
+    assertThat(envVars,
+        hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_DESCRIPTION,
+            "Some description for PR"));
+    assertThat(envVars,
+        hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PAYLOAD, payload.toString()));
   }
 
   @Test
@@ -335,7 +365,7 @@ public class BitBucketPPREnvironmentContributorTest {
 
   private BitBucketPPRPayload getCloudPayload(String res) {
     return (BitBucketPPRPayload) getGenericPayload(
-      res, BitBucketPPRNewPayload.class
+      res, BitBucketPPRCloudPayload.class
     );
   }
 

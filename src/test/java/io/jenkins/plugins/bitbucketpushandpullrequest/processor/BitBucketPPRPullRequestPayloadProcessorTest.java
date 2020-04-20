@@ -23,32 +23,23 @@ package io.jenkins.plugins.bitbucketpushandpullrequest.processor;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.verify;
-
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-
 import javax.naming.OperationNotSupportedException;
-
-import org.junit.Ignore;
+import com.google.gson.Gson;
+import com.google.gson.stream.JsonReader;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-
-import com.google.gson.Gson;
-import com.google.gson.JsonIOException;
-import com.google.gson.JsonSyntaxException;
-import com.google.gson.stream.JsonReader;
-
 import io.jenkins.plugins.bitbucketpushandpullrequest.BitBucketPPRJobProbe;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPREvent;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
-import io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud.BitBucketPPRNewPayload;
-import net.sf.json.JSONObject;
+import io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud.BitBucketPPRCloudPayload;
 
 
 @RunWith(MockitoJUnitRunner.class)
@@ -63,73 +54,34 @@ public class BitBucketPPRPullRequestPayloadProcessorTest {
 
   BitBucketPPRPullRequestPayloadProcessor pullRequestPayloadProcessor;
 
-  @Test
-  @Ignore
-  public void testProcessPullRequestApprovalWebhookHg() {
-    Gson gson = new Gson();
-    String user = "test_user";
-    String url = "https://bitbucket.org/test_user/test_repo";
-
-    BitBucketPPREvent bitbucketEvent = null;
-    try {
-      bitbucketEvent = new BitBucketPPREvent("pullrequest:approved");
-    } catch (OperationNotSupportedException e) {
-      e.printStackTrace();
-    }
-
-    pullRequestPayloadProcessor =
-        new BitBucketPPRPullRequestPayloadProcessor(probe, bitbucketEvent);
-
-    JSONObject inputStream = new JSONObject().element("scm", "hg")
-        .element("owner", new JSONObject().element("username", user))
-        .element("links", new JSONObject().element("html", new JSONObject().element("href", url)));
-
-    BitBucketPPRPayload payload =
-        gson.fromJson(inputStream.toString(), BitBucketPPRNewPayload.class);
-
-
-    pullRequestPayloadProcessor.processPayload(payload);
-
-    verify(probe).triggerMatchingJobs(eventCaptor.capture(), actionCaptor.capture());
-
-    assertEquals(bitbucketEvent, eventCaptor.getValue());
-    assertEquals(payload, actionCaptor.getValue().getPayload());
-  }
-
 
   @Test
+
   public void testProcessPullRequestApprovalWebhookGit() {
-    Gson gson = new Gson();
-    BitBucketPPREvent bitbucketEvent = null;
-    try {
-      bitbucketEvent = new BitBucketPPREvent("pullrequest:approved");
-    } catch (OperationNotSupportedException e) {
-      e.printStackTrace();
-    }
-
-    pullRequestPayloadProcessor =
-        new BitBucketPPRPullRequestPayloadProcessor(probe, bitbucketEvent);
-
     JsonReader reader = null;
 
     try {
       ClassLoader classloader = Thread.currentThread().getContextClassLoader();
-      InputStream is = classloader.getResourceAsStream("pullrequest_approved.json");
+      InputStream is = classloader.getResourceAsStream("./cloud/pr_approved.json");
       InputStreamReader isr = new InputStreamReader(is, StandardCharsets.UTF_8);
       reader = new JsonReader(isr);
     } catch (Exception e) {
       e.printStackTrace();
     }
-    
-    BitBucketPPRPayload payload = null;
+
+    Gson gson = new Gson();
+    BitBucketPPRPayload payload = gson.fromJson(reader, BitBucketPPRCloudPayload.class);
+
+    BitBucketPPREvent bitbucketEvent = null;
     try {
-      payload = gson.fromJson(reader, BitBucketPPRNewPayload.class);
-    } catch (JsonIOException e) {
-      e.printStackTrace();
-    } catch (JsonSyntaxException e) {
+      bitbucketEvent = new BitBucketPPREvent("pullrequest:approved");
+    } catch (OperationNotSupportedException e) {
       e.printStackTrace();
     }
-    
+
+    pullRequestPayloadProcessor =
+        new BitBucketPPRPullRequestPayloadProcessor(probe, bitbucketEvent);
+
     try {
       pullRequestPayloadProcessor.processPayload(payload);
     } catch (Exception e) {

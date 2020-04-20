@@ -38,7 +38,9 @@ public final class BitBucketPPRConstsUtils {
   public static final String PULL_REQUEST_APPROVED = "approved";
   public static final String PULL_REQUEST_UPDATED = "updated";
   public static final String PULL_REQUEST_MERGED = "fulfilled";
-
+  public static final String PULL_REQUEST_COMMENT_CREATED = "comment_created";
+  public static final String PULL_REQUEST_COMMENT_UPDATED = "comment_updated";
+  public static final String PULL_REQUEST_COMMENT_DELETED = "comment_deleted";
 
   public static final String PULL_REQUEST_SERVER_EVENT = "pr";
   public static final String PULL_REQUEST_SERVER_CREATED = "opened";

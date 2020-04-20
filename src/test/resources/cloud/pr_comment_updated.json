@@ -1,4 +1,66 @@
 {
+  "comment": {
+    "links": {
+      "self": {
+        "href": "https://api.bitbucket.org/2.0/repositories/some-repo-namespace/some-repo/pullrequests/1/comments/123456789"
+      },
+      "code": {
+        "href": "https://api.bitbucket.org/2.0/repositories/some-repo-namespace/some-repo/diff/some-repo-namespace/some-repo/:aabbccddeeff..aabbddcceeff?path=text.txt"
+      },
+      "html": {
+        "href": "https://api.bitbucket.org/2.0/repositories/some-repo-namespace/some-repo/pull-requests/001/_/diff#comment-123456789"
+      }
+    },
+    "deleted": false,
+    "pullrequest": {
+      "type": "pullrequest",
+      "id": 1001,
+      "links": {
+        "self": {
+          "href": "https://api.bitbucket.org/2.0/repositories/some-repo-namespace/some-repo/pullrequests/001"
+        },
+        "html": {
+          "href": "https://api.bitbucket.org/2.0/repositories/some-repo-namespace/some-repo/pull-requests/207"
+        }
+      },
+      "title": "Test-me"
+    },
+    "content": {
+      "raw": "this is a test",
+      "markup": "markdown",
+      "html": "<p>this is a test</p>",
+      "type": "rendered"
+    },
+    "created_on": "2020-04-16T12:29:45.819810+00:00",
+    "user": {
+      "display_name": "me display name",
+      "account_id": "aabbccddeeff",
+      "links": {
+        "self": {
+          "href": "https://api.bitbucket.org/2.0/users/%aabbccddeeff/"
+        },
+        "html": {
+          "href": "https://bitbucket.org/%aabbccddeeff/"
+        },
+        "avatar": {
+          "href": "https://bytebucket.org/ravatar/%236b5a1057-12ee-ddc1-b35e-3c136cce0cd2%1A?ts=default"
+        }
+      },
+      "nickname": "me-nickname",
+      "type": "user",
+      "uuid": "{1545d65c-ffa5-443d-a067-3af2c338f70d}"
+    },
+    "inline": {
+      "context_lines": "--- a/text.txt\n+++ b/text.txt\n@@ -236,3 +269,7 @@\n+Hello world!\n",
+      "to": 272,
+      "path": "text.txt",
+      "outdated": false,
+      "from": null
+    },
+    "updated_on": "2020-04-16T15:12:33.970146+00:00",
+    "type": "pullrequest_comment",
+    "id": 1002
+  },
   "pullrequest": {
     "rendered": {
       "description": {
@@ -86,10 +148,10 @@
         "uuid": "{2c2g914f-14eg-47a3-d35e-dc334cae1db1}"
       },
       "branch": {
-        "name": "develop"
+        "name": "destination-branch"
       }
     },
-    "created_on": "2020-02-10T16:28:23.479817+00:00",
+    "created_on": "2020-04-08T15:19:03.517722+00:00",
     "summary": {
       "raw": "",
       "markup": "markdown",
@@ -130,12 +192,37 @@
         "name": "feature/do-not-merge"
       }
     },
-    "comment_count": 0,
+    "comment_count": 1,
     "state": "OPEN",
     "task_count": 0,
-    "participants": [],
+    "participants": [
+      {
+        "role": "PARTICIPANT",
+        "participated_on": "2020-04-08T15:19:20.459708+00:00",
+        "type": "participant",
+        "user": {
+          "display_name": "me display name",
+          "account_id": "aabbccddeeffaabbccddeeff",
+          "links": {
+            "self": {
+              "href": "https://api.bitbucket.org/2.0/users/%3d5b55d65c-efb5-223d-b067-2de5c338f70e%4A"
+            },
+            "html": {
+              "href": "https://bitbucket.org/%3d5b55d65c-efb5-223d-b067-2de5c338f70e%4A/"
+            },
+            "avatar": {
+              "href": "https://secure.gravatar.com/avatar/3d5b55f1ac85d1235d0734ea?d=https%3A%2F%2Fexample-org%2Fsome-avatar.png"
+            }
+          },
+          "nickname": "me-nickname",
+          "type": "user",
+          "uuid": "{12345d55a-gef5-223e-g047-2ae1f238g70e}"
+        },
+        "approved": false
+      }
+    ],
     "reason": "",
-    "updated_on": "2020-02-10T16:28:23.614155+00:00",
+    "updated_on": "2020-04-08T15:19:20.459708+00:00",
     "author": {
       "display_name": "me display name",
       "account_id": "3d5b55f1ac85d1235d0734ea",

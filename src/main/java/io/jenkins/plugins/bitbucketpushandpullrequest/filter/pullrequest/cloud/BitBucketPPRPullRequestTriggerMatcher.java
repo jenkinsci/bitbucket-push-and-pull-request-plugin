@@ -1,7 +1,7 @@
 /*******************************************************************************
  * The MIT License
  * 
- * Copyright (C) 2018, CloudBees, Inc.
+ * Copyright (C) 2020, CloudBees, Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -26,6 +26,9 @@ import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRCo
 import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.PULL_REQUEST_CREATED;
 import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.PULL_REQUEST_MERGED;
 import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.PULL_REQUEST_UPDATED;
+import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.PULL_REQUEST_COMMENT_CREATED;
+import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.PULL_REQUEST_COMMENT_UPDATED;
+import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.PULL_REQUEST_COMMENT_DELETED;
 import io.jenkins.plugins.bitbucketpushandpullrequest.filter.BitBucketPPREventTriggerMatcher;
 import io.jenkins.plugins.bitbucketpushandpullrequest.filter.BitBucketPPRTriggerFilter;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPREvent;
@@ -37,12 +40,18 @@ public class BitBucketPPRPullRequestTriggerMatcher implements BitBucketPPREventT
       BitBucketPPRTriggerFilter triggerFilter) {
 
     return PULL_REQUEST_APPROVED.equals(bitbucketEvent.getAction())
-            && triggerFilter.getActionFilter() instanceof BitBucketPPRPullRequestApprovedActionFilter
+        && triggerFilter.getActionFilter() instanceof BitBucketPPRPullRequestApprovedActionFilter
         || PULL_REQUEST_UPDATED.equals(bitbucketEvent.getAction())
             && triggerFilter.getActionFilter() instanceof BitBucketPPRPullRequestUpdatedActionFilter
         || PULL_REQUEST_CREATED.equals(bitbucketEvent.getAction())
             && triggerFilter.getActionFilter() instanceof BitBucketPPRPullRequestCreatedActionFilter
-        || PULL_REQUEST_MERGED.equals(bitbucketEvent.getAction()) 
+        || PULL_REQUEST_COMMENT_CREATED.equals(bitbucketEvent.getAction()) && triggerFilter
+            .getActionFilter() instanceof BitBucketPPRPullRequestCommentCreatedActionFilter
+        || PULL_REQUEST_COMMENT_UPDATED.equals(bitbucketEvent.getAction()) && triggerFilter
+            .getActionFilter() instanceof BitBucketPPRPullRequestCommentUpdatedActionFilter
+        || PULL_REQUEST_COMMENT_DELETED.equals(bitbucketEvent.getAction()) && triggerFilter
+            .getActionFilter() instanceof BitBucketPPRPullRequestCommentDeletedActionFilter
+        || PULL_REQUEST_MERGED.equals(bitbucketEvent.getAction())
             && triggerFilter.getActionFilter() instanceof BitBucketPPRPullRequestMergedActionFilter;
   }
 }

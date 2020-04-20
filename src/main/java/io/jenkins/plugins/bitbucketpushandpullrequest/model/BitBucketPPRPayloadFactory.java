@@ -31,7 +31,7 @@ import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRCo
 import java.util.logging.Logger;
 
 import javax.naming.OperationNotSupportedException;
-import io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud.BitBucketPPRNewPayload;
+import io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud.BitBucketPPRCloudPayload;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.server.BitBucketPPRServerPayload;
 
 public class BitBucketPPRPayloadFactory {
@@ -46,14 +46,14 @@ public class BitBucketPPRPayloadFactory {
 
     if (REPOSITORY_EVENT.equalsIgnoreCase(bitbucketEvent.getEvent())) {
       if (REPOSITORY_PUSH.equalsIgnoreCase(bitbucketEvent.getAction())) {
-        payload = new BitBucketPPRNewPayload();
+        payload = new BitBucketPPRCloudPayload();
       } else if (REPOSITORY_POST.equalsIgnoreCase(bitbucketEvent.getAction())) {
         LOGGER.warning("Got unexpected old post event, ignored!");
       } else if (REPOSITORY_SERVER_PUSH.equalsIgnoreCase(bitbucketEvent.getAction())) {
         payload = new BitBucketPPRServerPayload();
       }
     } else if (PULL_REQUEST_EVENT.equals(bitbucketEvent.getEvent())) {
-      payload = new BitBucketPPRNewPayload();
+      payload = new BitBucketPPRCloudPayload();
     } else if (PULL_REQUEST_SERVER_EVENT.equals(bitbucketEvent.getEvent())) {
       payload = new BitBucketPPRServerPayload();
     }

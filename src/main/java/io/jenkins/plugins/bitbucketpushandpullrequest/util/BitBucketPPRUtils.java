@@ -25,7 +25,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
+import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
+import javax.annotation.Nonnull;
 import hudson.EnvVars;
 import hudson.plugins.git.BranchSpec;
 
@@ -65,5 +68,23 @@ public class BitBucketPPRUtils {
     nonEmpty.forEach((String s) -> LOGGER.info("Matching branch: " + s));
 
     return nonEmpty.size() > 0;
+  }
+
+  public static boolean matchWithRegex(@Nonnull String haystack, @Nonnull String patternStr,
+      EnvVars env) {
+    if (haystack == null || haystack.trim().isEmpty()) {
+      LOGGER.fine("The comment from BB is null or it is empty");
+      return false;
+    }
+
+    if (patternStr == null || patternStr.trim().isEmpty()) {
+      LOGGER.fine("The regex filter on the comment from BB is null or it is empty");
+      return true;
+    }
+
+    LOGGER.log(Level.FINE, "Applying the pattern {0} to the comment {1}",
+        new Object[] {patternStr, haystack});
+    Pattern pattern = Pattern.compile(patternStr.trim(), Pattern.CASE_INSENSITIVE);
+    return pattern.matcher(haystack.trim()).find();
   }
 }
