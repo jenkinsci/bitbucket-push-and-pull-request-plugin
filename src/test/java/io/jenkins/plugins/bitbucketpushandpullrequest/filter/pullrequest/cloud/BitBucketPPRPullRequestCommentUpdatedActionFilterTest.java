@@ -23,7 +23,7 @@ public class BitBucketPPRPullRequestCommentUpdatedActionFilterTest {
     c.setAllowedBranches(allowedBranches);
     c.setCommentFilter(pattern);
 
-    assertFalse(c.findInComment(haystack, pattern, env));
+    assertFalse(c.hasInComment(haystack, env));
   }
 
   @Test
@@ -39,7 +39,7 @@ public class BitBucketPPRPullRequestCommentUpdatedActionFilterTest {
     c.setAllowedBranches(allowedBranches);
     c.setCommentFilter(pattern);
 
-    assertTrue(c.findInComment(haystack, pattern, env));
+    assertTrue(c.hasInComment(haystack, env));
   }
 
   @Test
@@ -55,7 +55,7 @@ public class BitBucketPPRPullRequestCommentUpdatedActionFilterTest {
     c.setAllowedBranches(allowedBranches);
     c.setCommentFilter(pattern);
 
-    assertFalse(c.findInComment(haystack, pattern, env));
+    assertFalse(c.hasInComment(haystack, env));
   }
 
   @Test
@@ -71,7 +71,7 @@ public class BitBucketPPRPullRequestCommentUpdatedActionFilterTest {
     c.setAllowedBranches(allowedBranches);
     c.setCommentFilter(pattern);
 
-    assertTrue(c.findInComment(haystack, pattern, env));
+    assertTrue(c.hasInComment(haystack, env));
   }
 
   @Test
@@ -87,7 +87,7 @@ public class BitBucketPPRPullRequestCommentUpdatedActionFilterTest {
     c.setAllowedBranches(allowedBranches);
     c.setCommentFilter(pattern);
 
-    assertFalse(c.findInComment(haystack, pattern, env));
+    assertFalse(c.hasInComment(haystack, env));
   }
 
   @Test
@@ -103,7 +103,7 @@ public class BitBucketPPRPullRequestCommentUpdatedActionFilterTest {
     c.setAllowedBranches(allowedBranches);
     c.setCommentFilter(pattern);
 
-    assertFalse(c.findInComment(haystack, pattern, env));
+    assertFalse(c.hasInComment(haystack, env));
   }
 
   @Test
@@ -119,7 +119,7 @@ public class BitBucketPPRPullRequestCommentUpdatedActionFilterTest {
     c.setAllowedBranches(allowedBranches);
     c.setCommentFilter(pattern);
 
-    assertTrue(c.findInComment(haystack, pattern, env));
+    assertTrue(c.hasInComment(haystack, env));
   }
 
   @Test
@@ -135,6 +135,6 @@ public class BitBucketPPRPullRequestCommentUpdatedActionFilterTest {
     c.setAllowedBranches(allowedBranches);
     c.setCommentFilter(pattern);
 
-    assertTrue(c.findInComment(haystack, pattern, env));
+    assertTrue(c.hasInComment(haystack, env));
   }
 }

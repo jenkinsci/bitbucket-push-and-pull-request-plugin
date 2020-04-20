@@ -25,10 +25,12 @@ import java.io.File;
 import java.io.IOException;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
+import hudson.EnvVars;
 import hudson.Extension;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.cause.BitBucketPPRTriggerCause;
 import io.jenkins.plugins.bitbucketpushandpullrequest.cause.pullrequest.cloud.BitBucketPPRPullRequestCommentUpdatedCause;
+import io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRUtils;
 
 public class BitBucketPPRPullRequestCommentUpdatedActionFilter 
     extends BitBucketPPRPullRequestActionFilter {
@@ -60,13 +62,17 @@ public class BitBucketPPRPullRequestCommentUpdatedActionFilter
   @Override
   public boolean shouldTriggerBuild(BitBucketPPRAction bitbucketAction) {
     return matches(allowedBranches, bitbucketAction.getTargetBranch(), null)
-        && findInComment(bitbucketAction.getComment(), commentFilter, null);
+        && hasInComment(bitbucketAction.getComment(), null);
   }
 
   @Override
   public BitBucketPPRTriggerCause getCause(File pollingLog, BitBucketPPRAction pullRequestAction)
       throws IOException {
     return new BitBucketPPRPullRequestCommentUpdatedCause(pollingLog, pullRequestAction);
+  }
+
+  public boolean hasInComment(String comment, EnvVars vars) {
+    return BitBucketPPRUtils.matchWithRegex(comment, commentFilter, vars);
   }
 
   @Extension

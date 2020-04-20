@@ -38,10 +38,6 @@ public abstract class BitBucketPPRPullRequestActionFilter
     return BitBucketPPRUtils.matches(allowedBranches, branchName, env);
   }
 
-  public boolean findInComment(String comment, String commentFilter, EnvVars env) {
-    return BitBucketPPRUtils.matchWithRegex(comment, commentFilter, env);
-  }
-
   public abstract boolean shouldTriggerBuild(BitBucketPPRAction bitbucketAction);
 
   public abstract BitBucketPPRTriggerCause getCause(File pollingLog,
