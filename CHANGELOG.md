@@ -1,5 +1,17 @@
 # Change Log
 
+## 2.3.3 (2020-04-19)
+
+[Full Changelog](https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/compare/bitbucket-push-and-pull-request-2.3.2...bitbucket-push-and-pull-request-2.3.3)
+
+**Implemented enhancements:**
+
+* Added triggers for Comments on pull requests from BB Cloud 
+
+## Closed tickets
+
+* Create a BucketPPRPullRequestCommentCreatedFilter #64 
+
 ## 2.3.2 (2020-04-07)
 
 [Full Changelog](https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/compare/bitbucket-push-and-pull-request-2.3.1...bitbucket-push-and-pull-request-2.3.2)
