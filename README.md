@@ -139,7 +139,7 @@ bitbucketTriggers {
   pullRequestCommentUpdatedAction(allowedBranches: String)
   pullRequestCommentUpdatedAction(allowedBranches: String, commentFilter: String) // CommentFilter is java a regex expression
   
-  pullRequestCommentDeleteddAction()
+  pullRequestCommentDeletedAction()
   pullRequestCommentDeletedAction(allowedBranches: String)
 
   // For Bitbucket Server
