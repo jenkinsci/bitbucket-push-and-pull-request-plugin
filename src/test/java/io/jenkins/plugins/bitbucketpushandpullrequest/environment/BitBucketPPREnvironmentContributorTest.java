@@ -220,7 +220,6 @@ public class BitBucketPPREnvironmentContributorTest {
         hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PAYLOAD, payload.toString()));
   }
 
-
   @Test
   public void buildEnvironmentForServerPullRequestOpenedTest() {
     BitBucketPPRServerPayload payload = getServerPayload("./server/pr_opened.json");

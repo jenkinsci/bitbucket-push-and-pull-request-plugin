@@ -60,7 +60,7 @@ public class BitBucketPPRPullRequestCommentCreatedActionFilter
   @Override
   public boolean shouldTriggerBuild(BitBucketPPRAction bitbucketAction) {
     return matches(allowedBranches, bitbucketAction.getTargetBranch(), null) && findInComment(
-        commentFilter, bitbucketAction.getComment());
+        bitbucketAction.getComment(), commentFilter, null);
   }
 
   @Override

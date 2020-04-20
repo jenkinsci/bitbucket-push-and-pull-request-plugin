@@ -3,18 +3,13 @@ package io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.cloud;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import java.util.HashMap;
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.jvnet.hudson.test.JenkinsRule;
 import org.mockito.junit.MockitoJUnitRunner;
 import hudson.EnvVars;
 
 @RunWith(MockitoJUnitRunner.class)
 public class BitBucketPPRPullRequestApprovedActionFilterTest {
-
-  @Rule
-  public JenkinsRule jenkins = new JenkinsRule();
 
   @Test
   public void testMatches() {
