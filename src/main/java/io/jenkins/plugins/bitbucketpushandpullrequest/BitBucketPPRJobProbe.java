@@ -134,7 +134,7 @@ public class BitBucketPPRJobProbe {
           })));
     } else {
       LOGGER.log(Level.FINE, "Bitbucket Trigger for job: {0} is not present. ", job.getFullDisplayName());
-    } ;
+    }
   }
 
   private boolean isMultiBranchPipeline(Job<?, ?> job) {
