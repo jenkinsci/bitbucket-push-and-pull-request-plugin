@@ -117,7 +117,7 @@ public class BitBucketPPRHookReceiver implements UnprotectedRootAction {
         logger.warning("the BitbucketEvent is null.");
       }
 
-      logger.log(Level.INFO, "Sending response.");
+      logger.log(Level.FINE, "Sending response.");
       try {
         response.setContentType("text/html");
         response.setCharacterEncoding("UTF-8");

@@ -43,7 +43,7 @@ public class BitBucketPPRPullRequestCommentCreatedActionFilter
 
   @DataBoundSetter
   public void setAllowedBranches(String allowedBranches) {
-    if (allowedBranches == null || "".equals(allowedBranches)) {
+    if (allowedBranches == null) {
       this.allowedBranches = "";
     } else {
       this.allowedBranches = allowedBranches;
@@ -52,7 +52,7 @@ public class BitBucketPPRPullRequestCommentCreatedActionFilter
 
   @DataBoundSetter
   public void setCommentFilter(String commentFilter) {
-    if (commentFilter == null || "".equals(commentFilter)) {
+    if (commentFilter == null) {
       this.commentFilter = "";
     } else {
       this.commentFilter = commentFilter;

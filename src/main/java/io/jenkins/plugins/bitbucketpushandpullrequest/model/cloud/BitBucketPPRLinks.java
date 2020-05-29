@@ -26,16 +26,98 @@ import com.google.gson.annotations.SerializedName;
 public class BitBucketPPRLinks implements Serializable {
   private static final long serialVersionUID = 8607244117530188175L;
 
-  private BitBucketPPRHtml html;
+  private BitBucketPPRLinkHtml html;
 
   @SerializedName("self")
   private BitBucketPPRSelf selfProperty;
+  
+  private BitBucketPPRLinkDecline decline;
+  private BitBucketPPRLinkDiffStat diffstat;
+  private BitBucketPPRLinkCommits commits;
+  private BitBucketPPRLinkComments comments;
+  private BitBucketPPRLinkMerge merge;
+  private BitBucketPPRLinkActivity activity;
+  private BitBucketPPRLinkDiff diff;
+  private BitBucketPPRLinkApprove approve;
+  private BitBucketPPRLinkStatuses statuses;
 
-  public BitBucketPPRHtml getHtml() {
+  public BitBucketPPRLinkHtml getHtml() {
     return html;
   }
 
-  public void setHtml(final BitBucketPPRHtml html) {
+  public BitBucketPPRLinkStatuses getStatuses() {
+    return statuses;
+  }
+
+  public void setStatuses(BitBucketPPRLinkStatuses statuses) {
+    this.statuses = statuses;
+  }
+
+  public BitBucketPPRLinkApprove getApprove() {
+    return approve;
+  }
+
+  public void setApprove(BitBucketPPRLinkApprove approve) {
+    this.approve = approve;
+  }
+
+  public BitBucketPPRLinkDiff getDiff() {
+    return diff;
+  }
+
+  public void setDiff(BitBucketPPRLinkDiff diff) {
+    this.diff = diff;
+  }
+
+  public BitBucketPPRLinkActivity getActivity() {
+    return activity;
+  }
+
+  public void setActivity(BitBucketPPRLinkActivity activity) {
+    this.activity = activity;
+  }
+
+  public BitBucketPPRLinkMerge getMerge() {
+    return merge;
+  }
+
+  public void setMerge(BitBucketPPRLinkMerge merge) {
+    this.merge = merge;
+  }
+
+  public BitBucketPPRLinkComments getComments() {
+    return comments;
+  }
+
+  public void setComments(BitBucketPPRLinkComments comments) {
+    this.comments = comments;
+  }
+
+  public BitBucketPPRLinkCommits getCommits() {
+    return commits;
+  }
+
+  public void setCommits(BitBucketPPRLinkCommits commits) {
+    this.commits = commits;
+  }
+
+  public BitBucketPPRLinkDiffStat getDiffstat() {
+    return diffstat;
+  }
+
+  public void setDiffstat(BitBucketPPRLinkDiffStat diffstat) {
+    this.diffstat = diffstat;
+  }
+
+  public BitBucketPPRLinkDecline getDecline() {
+    return decline;
+  }
+
+  public void setDecline(BitBucketPPRLinkDecline decline) {
+    this.decline = decline;
+  }
+
+  public void setHtml(final BitBucketPPRLinkHtml html) {
     this.html = html;
   }
 

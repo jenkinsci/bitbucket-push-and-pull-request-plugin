@@ -37,6 +37,7 @@ public class BitBucketPPRPullRequestAction extends InvisibleAction implements Bi
   public BitBucketPPRPullRequestAction(@Nonnull BitBucketPPRPayload payload) {
     this.payload = payload;
 
+    // TODO Why??
     scmUrls.add(payload.getRepository().getLinks().getHtml().getHref());
   }
 
@@ -108,5 +109,30 @@ public class BitBucketPPRPullRequestAction extends InvisibleAction implements Bi
   @Override
   public String getComment() {
     return payload.getComment().getContent().getRaw();
+  }
+
+  @Override
+  public String getLinkHtml() {
+    return payload.getPullRequest().getLinks().getHtml().getHref();
+  }
+
+  @Override
+  public String getLinkSelf() {
+    return payload.getPullRequest().getLinks().getSelf().getHref();
+  }
+
+  @Override
+  public String getLinkApprove() {
+    return payload.getPullRequest().getLinks().getApprove().getHref();
+  }
+
+  @Override
+  public String getLinkDecline() {
+    return payload.getPullRequest().getLinks().getDecline().getHref();
+  }
+
+  @Override
+  public String getLinkStatuses() {
+    return payload.getPullRequest().getLinks().getStatuses().getHref();
   }
 }

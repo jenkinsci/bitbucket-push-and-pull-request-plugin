@@ -40,9 +40,9 @@ public class BitBucketPPRUtils {
   public static boolean matches(String allBranches, String branchName, EnvVars env) {
     String allowedBranches = allBranches != null ? allBranches : "";
 
-    LOGGER.info("Following allowed branches patterns are set: " + allowedBranches);
-    LOGGER.info("The branchName in action is: " + branchName);
-    LOGGER.info("The environment variables are: " + env);
+    LOGGER.finest("Following allowed branches patterns are set: " + allowedBranches);
+    LOGGER.finest("The branchName in action is: " + branchName);
+    LOGGER.finest("The environment variables are: " + env);
 
     BiFunction<List<String>, BiPredicate<String, EnvVars>, List<String>> filter =
         (List<String> list, BiPredicate<String, EnvVars> p) -> {
@@ -65,7 +65,7 @@ public class BitBucketPPRUtils {
           }
         });
 
-    nonEmpty.forEach((String s) -> LOGGER.info("Matching branch: " + s));
+    nonEmpty.forEach((String s) -> LOGGER.finest("Matching branch: " + s));
 
     return nonEmpty.size() > 0;
   }

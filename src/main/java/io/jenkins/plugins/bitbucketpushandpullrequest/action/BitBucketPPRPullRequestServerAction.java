@@ -41,6 +41,8 @@ public class BitBucketPPRPullRequestServerAction extends InvisibleAction impleme
   public BitBucketPPRPullRequestServerAction(@Nonnull BitBucketPPRPayload payload) {
     this.payload = payload;
 
+    
+    // TODO: do we need link clones or link self is enough??
     List<BitBucketPPRServerClone> clones =
         payload.getServerPullRequest().getToRef().getRepository().getLinks().getCloneProperty();
 
@@ -122,6 +124,36 @@ public class BitBucketPPRPullRequestServerAction extends InvisibleAction impleme
 
   @Override
   public String getComment() {
+    return null;
+  }
+
+  @Override
+  public String getLinkHtml() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public String getLinkSelf() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public String getLinkApprove() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public String getLinkDecline() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public String getLinkStatuses() {
+    // TODO Auto-generated method stub
     return null;
   }
 }

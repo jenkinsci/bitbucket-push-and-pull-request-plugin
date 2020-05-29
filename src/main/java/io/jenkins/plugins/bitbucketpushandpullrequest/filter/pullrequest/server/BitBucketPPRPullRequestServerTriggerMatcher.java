@@ -35,26 +35,25 @@ import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPREvent;
 
 
 public class BitBucketPPRPullRequestServerTriggerMatcher
-        implements BitBucketPPREventTriggerMatcher {
-    @Override
-    public boolean matchesAction(final BitBucketPPREvent bitbucketEvent,
-            final BitBucketPPRTriggerFilter triggerFilter) {
-        return (PULL_REQUEST_SERVER_APPROVED.equalsIgnoreCase(bitbucketEvent.getAction())
-                        && triggerFilter
-                                .getActionFilter() instanceof BitBucketPPRPullRequestServerApprovedActionFilter)
-                || (PULL_REQUEST_SERVER_UPDATED.equalsIgnoreCase(bitbucketEvent.getAction())
-                        && triggerFilter
-                                .getActionFilter() instanceof BitBucketPPRPullRequestServerUpdatedActionFilter)
-                || (PULL_REQUEST_SERVER_SOURCE_UPDATED.equalsIgnoreCase(bitbucketEvent.getAction())
-                        && triggerFilter
-                                .getActionFilter() instanceof BitBucketPPRPullRequestServerSourceUpdatedActionFilter)
-                || (PULL_REQUEST_SERVER_CREATED.equalsIgnoreCase(bitbucketEvent.getAction())
-                        && triggerFilter
-                                .getActionFilter() instanceof BitBucketPPRPullRequestServerCreatedActionFilter)
-                || (PULL_REQUEST_SERVER_MERGED.equalsIgnoreCase(bitbucketEvent.getAction())
-                        && triggerFilter
-                                .getActionFilter() instanceof BitBucketPPRPullRequestServerMergedActionFilter);
-    }
+    implements BitBucketPPREventTriggerMatcher {
+  @Override
+  public boolean matchesAction(final BitBucketPPREvent bitbucketEvent,
+      final BitBucketPPRTriggerFilter triggerFilter) {
+    return (PULL_REQUEST_SERVER_APPROVED.equalsIgnoreCase(bitbucketEvent.getAction())
+        && triggerFilter
+            .getActionFilter() instanceof BitBucketPPRPullRequestServerApprovedActionFilter)
+        || (PULL_REQUEST_SERVER_UPDATED.equalsIgnoreCase(bitbucketEvent.getAction())
+            && triggerFilter
+                .getActionFilter() instanceof BitBucketPPRPullRequestServerUpdatedActionFilter)
+        || (PULL_REQUEST_SERVER_SOURCE_UPDATED.equalsIgnoreCase(bitbucketEvent.getAction())
+            && triggerFilter
+                .getActionFilter() instanceof BitBucketPPRPullRequestServerSourceUpdatedActionFilter)
+        || (PULL_REQUEST_SERVER_CREATED.equalsIgnoreCase(bitbucketEvent.getAction())
+            && triggerFilter
+                .getActionFilter() instanceof BitBucketPPRPullRequestServerCreatedActionFilter)
+        || (PULL_REQUEST_SERVER_MERGED.equalsIgnoreCase(bitbucketEvent.getAction()) && triggerFilter
+            .getActionFilter() instanceof BitBucketPPRPullRequestServerMergedActionFilter);
+  }
 }
 
 

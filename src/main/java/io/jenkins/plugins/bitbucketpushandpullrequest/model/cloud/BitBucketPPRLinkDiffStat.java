@@ -1,17 +1,17 @@
 /*******************************************************************************
  * The MIT License
- *
+ * 
  * Copyright (C) 2020, CloudBees, Inc.
- *
+ * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
  * including without limitation the rights to use, copy, modify, merge, publish, distribute,
  * sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * 
  * The above copyright notice and this permission notice shall be included in all copies or
  * substantial portions of the Software.
- *
+ * 
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT
  * NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
@@ -19,51 +19,24 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  ******************************************************************************/
 
-package io.jenkins.plugins.bitbucketpushandpullrequest.action;
+package io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud;
 
-import java.util.List;
+import java.io.Serializable;
 
-import hudson.model.Action;
-import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
+public class BitBucketPPRLinkDiffStat implements Serializable {
+  private static final long serialVersionUID = 1L;
+  private String href;
 
-public interface BitBucketPPRAction extends Action {
+  public String getHref() {
+    return href;
+  }
 
-  public BitBucketPPRPayload getPayload();
+  public void setHref(String href) {
+    this.href = href;
+  }
 
-  public String getScm();
-
-  public String getLinkHtml();
-
-  public String getLinkSelf();
-
-  public String getLinkApprove();
-
-  public String getLinkDecline();
-
-  public String getLinkStatuses();
-
-  public String getUser();
-
-  public String getSourceBranch();
-
-  public String getTargetBranch();
-
-  public String getType();
-
-  public String getRepositoryName();
-
-  // TODO: do we really neeed it?
-  public List<String> getScmUrls();
-
-  public String getPullRequestId();
-
-  public String getRepositoryId();
-
-  public String getPullRequestUrl();
-
-  public String getTitle();
-
-  public String getDescription();
-
-  public String getComment();
+  @Override
+  public String toString() {
+    return "BitBucketPPRLinkDiffStat [href=" + href + "]";
+  }
 }
