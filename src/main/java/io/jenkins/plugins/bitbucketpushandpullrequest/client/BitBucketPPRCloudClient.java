@@ -77,22 +77,36 @@ public class BitBucketPPRCloudClient implements BitBucketPPRClient {
       final String result = EntityUtils.toString(response.getEntity());
       LOGGER.info("Result is: " + result + " Status Code: " + statusCode);
     } catch (final Exception e) {
-      LOGGER.info("Error: " + e.getMessage());
+      LOGGER.warning("Error: " + e.getMessage());
     }
   }
 
   private String createPreemptiveHeadersForDefautlCredentialsProvider() {
     final String auth = getStandardUsernamePasswordCredentials().getUsername() + ":"
         + getStandardUsernamePasswordCredentials().getPassword().getPlainText();
-    final byte[] encodedAuth = Base64.encodeBase64(auth.getBytes(StandardCharsets.ISO_8859_1));
-    final String authHeader = "Basic " + new String(encodedAuth);
+
+    byte[] encodedAuth = Base64.encodeBase64(auth.getBytes(StandardCharsets.ISO_8859_1));
+    String authHeader = "Basic " + new String(encodedAuth, StandardCharsets.ISO_8859_1);
 
     return authHeader;
   }
 
   private StandardUsernamePasswordCredentials getStandardUsernamePasswordCredentials() {
-    return config.getCredentialsId() != null ? CredentialsProvider.findCredentialById(
-        config.getCredentialsId(), StandardUsernamePasswordCredentials.class, run,
-        URIRequirementBuilder.fromUri(config.getUrl()).build()) : null;
+    String credentialsId = config.getCredentialsId();
+    String url = config.getUrl();
+
+    if (credentialsId == null) {
+      LOGGER.info("Credentials ID not found");
+      return null;
+    }
+
+    if (url == null) {
+      LOGGER.info("Cannot find Url in config");
+      return null;
+    }
+
+    return CredentialsProvider.findCredentialById(credentialsId,
+        StandardUsernamePasswordCredentials.class, run,
+        URIRequirementBuilder.fromUri(url).build());
   }
 }
