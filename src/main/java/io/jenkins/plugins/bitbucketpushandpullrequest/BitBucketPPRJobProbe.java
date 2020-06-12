@@ -100,46 +100,57 @@ public class BitBucketPPRJobProbe {
     Optional<BitBucketPPRTrigger> bitbucketTrigger = getBitBucketTrigger(job);
 
     if (bitbucketTrigger.isPresent()) {
+      BitBucketPPRTrigger trigger = bitbucketTrigger.get();
+
+      for (BitBucketPPRObserver observer : observers) {
+        try {
+          trigger.addObserver(observer);
+        } catch (Exception e) {
+          LOGGER.log(Level.INFO, "Cannot add observer: " + observer.toString());
+        }
+      }
+
       List<SCM> scmTriggered = new ArrayList<>();
       Optional<SCMTriggerItem> item =
           Optional.ofNullable(SCMTriggerItem.SCMTriggerItems.asSCMTriggerItem(job));
 
-      LOGGER.log(Level.FINE, "Considering to use trigger {0}", bitbucketTrigger.toString());
-      bitbucketTrigger
-          .ifPresent(trigger -> item.ifPresent(i -> i.getSCMs().stream().forEach(scmTrigger -> {
-            if (isMultiBranchPipeline(job) && mPJobShouldNotBeTriggered(job, bitbucketAction)) {
-              LOGGER.log(Level.FINE, "Skipping for job:" + job.getDisplayName());
-              return;
-            }
+      item.ifPresent(i -> i.getSCMs().stream().forEach(scmTrigger -> {
+        LOGGER.log(Level.FINE, "Considering to use trigger {0}", scmTrigger.toString());
+        if (isMultiBranchPipeline(job) && mPJobShouldNotBeTriggered(job, bitbucketAction)) {
+          LOGGER.log(Level.FINE, "Skipping for job:" + job.getDisplayName());
+          return;
+        }
 
-            LOGGER.log(Level.FINE, "Scheduling for job:" + job.getDisplayName());
+        LOGGER.log(Level.FINE, "Scheduling for job:" + job.getDisplayName());
 
 
-            // TODO: is it needed? There is only a remote, the HTML one, that is used the do the
-            // match
-            boolean isRemoteSet = false;
-            for (URIish remote : remotes) {
-              if (match(scmTrigger, remote)) {
-                isRemoteSet = true;
-                break;
-              }
-            }
+        // TODO: is it needed? There is only a remote, the HTML one, that is used the do the
+        // match
+        boolean isRemoteSet = false;
+        for (URIish remote : remotes) {
+          if (match(scmTrigger, remote)) {
+            isRemoteSet = true;
+            break;
+          }
+        }
 
-            if (isRemoteSet && !hasBeenTriggered(scmTriggered, scmTrigger)) {
-              scmTriggered.add(scmTrigger);
-              LOGGER.log(Level.FINE, "Triggering trigger {0} for job {1}",
-                  new Object[] {trigger.getClass().getName(), job.getFullDisplayName()});
-              try {
-                observers.forEach((observer) -> trigger.addObserver(observer));
-                trigger.onPost(bitbucketEvent, this.bitbucketAction, scmTrigger);
-              } catch (Exception e) {
-                LOGGER.log(Level.WARNING, "Error: {0}", e.getMessage());
-              }
-            } else {
-              LOGGER.log(Level.FINE, "{0} SCM doesn't match remote repo {1}",
-                  new Object[] {job.getName(), remotes});
-            }
-          })));
+        if (isRemoteSet && !hasBeenTriggered(scmTriggered, scmTrigger)) {
+          scmTriggered.add(scmTrigger);
+          LOGGER.log(Level.FINE, "Triggering trigger {0} for job {1}",
+              new Object[] {trigger.getClass().getName(), job.getFullDisplayName()});
+
+          try {
+            trigger.onPost(this.bitbucketEvent, this.bitbucketAction, scmTrigger);
+          } catch (Exception e) {
+            LOGGER.log(Level.WARNING, "Error: {0}", e.getMessage());
+            e.printStackTrace();
+          }
+
+        } else {
+          LOGGER.log(Level.FINE, "{0} SCM doesn't match remote repo {1}",
+              new Object[] {job.getName(), remotes});
+        }
+      }));
     } else {
       LOGGER.log(Level.FINE, "Bitbucket Trigger for job: {0} is not present. ",
           job.getFullDisplayName());

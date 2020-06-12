@@ -113,7 +113,7 @@ public class BitBucketPPRHookReceiver implements UnprotectedRootAction {
 
           final BitBucketPPRPayloadProcessor bitbucketPayloadProcessor =
               BitBucketPPRPayloadProcessorFactory.createProcessor(bitbucketEvent);
-          final List<BitBucketPPRObserver> observers = BitBucketPPRObserverFactory.createObservers(
+          List<BitBucketPPRObserver> observers = BitBucketPPRObserverFactory.createObservers(
               bitbucketEvent);
 
           logger.log(Level.FINEST, "the selected payload processor is: {0}",

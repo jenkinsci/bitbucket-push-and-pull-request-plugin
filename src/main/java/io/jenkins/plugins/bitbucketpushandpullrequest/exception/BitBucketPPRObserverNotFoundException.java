@@ -23,4 +23,7 @@ package io.jenkins.plugins.bitbucketpushandpullrequest.exception;
 public class BitBucketPPRObserverNotFoundException extends Exception {
   private static final long serialVersionUID = 1L;
 
+  public BitBucketPPRObserverNotFoundException(String msg) {
+    super(msg);
+  }
 }

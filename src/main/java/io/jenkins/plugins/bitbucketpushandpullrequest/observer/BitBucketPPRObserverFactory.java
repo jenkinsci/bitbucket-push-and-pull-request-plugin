@@ -61,6 +61,8 @@ public class BitBucketPPRObserverFactory {
       return observers;
     }
 
-    throw new BitBucketPPRObserverNotFoundException();
+    LOGGER.info("no observer found for BitBucketPPRHookEvent: " + bitbucketEvent.toString());
+
+    throw new BitBucketPPRObserverNotFoundException("something went wrong");
   }
 }
