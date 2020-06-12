@@ -47,14 +47,14 @@ public class BitBucketPPRRepositoryTriggerMatcher implements BitBucketPPREventTr
             + "AND does it equal BitBucketPPRConsts.REPOSITORY_SERVER_PUSH {5} to bitbucketEvent.getAction() {6}? <<{7}>> ",
         new Object[] {
             triggerFilter.getActionFilter() instanceof BitBucketPPRRepositoryPushActionFilter,
-            BitBucketPPRConstsUtils.REPOSITORY_PUSH, bitbucketEvent.getAction(),
-            BitBucketPPRConstsUtils.REPOSITORY_PUSH.equals(bitbucketEvent.getAction()),
+            BitBucketPPRConstsUtils.REPOSITORY_CLOUD_PUSH, bitbucketEvent.getAction(),
+            BitBucketPPRConstsUtils.REPOSITORY_CLOUD_PUSH.equals(bitbucketEvent.getAction()),
             triggerFilter.getActionFilter() instanceof BitBucketPPRServerRepositoryPushActionFilter,
             BitBucketPPRConstsUtils.REPOSITORY_SERVER_PUSH, bitbucketEvent.getAction(),
             BitBucketPPRConstsUtils.REPOSITORY_SERVER_PUSH.equals(bitbucketEvent.getAction())});
 
     return ((triggerFilter.getActionFilter() instanceof BitBucketPPRRepositoryPushActionFilter
-        && BitBucketPPRConstsUtils.REPOSITORY_PUSH.equals(bitbucketEvent.getAction()))
+        && BitBucketPPRConstsUtils.REPOSITORY_CLOUD_PUSH.equals(bitbucketEvent.getAction()))
         || (triggerFilter.getActionFilter() instanceof BitBucketPPRServerRepositoryPushActionFilter
             && BitBucketPPRConstsUtils.REPOSITORY_SERVER_PUSH.equals(bitbucketEvent.getAction())));
   }

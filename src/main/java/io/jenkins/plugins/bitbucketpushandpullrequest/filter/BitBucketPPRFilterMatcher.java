@@ -60,7 +60,7 @@ public class BitBucketPPRFilterMatcher {
 
   private boolean matchesEventAndAction(BitBucketPPREvent event,
       BitBucketPPRTriggerFilter triggerFilter) {
-    if (BitBucketPPRConstsUtils.PULL_REQUEST_EVENT.equalsIgnoreCase(event.getEvent())
+    if (BitBucketPPRConstsUtils.PULL_REQUEST_CLOUD_EVENT.equalsIgnoreCase(event.getEvent())
         && triggerFilter instanceof BitBucketPPRPullRequestTriggerFilter) {
       return new BitBucketPPRPullRequestTriggerMatcher().matchesAction(event, triggerFilter);
     } else if (BitBucketPPRConstsUtils.PULL_REQUEST_SERVER_EVENT.equalsIgnoreCase(event.getEvent())

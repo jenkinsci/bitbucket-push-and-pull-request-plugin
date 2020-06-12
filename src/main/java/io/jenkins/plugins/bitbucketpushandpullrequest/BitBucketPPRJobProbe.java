@@ -45,6 +45,7 @@ import hudson.security.ACLContext;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.cause.BitBucketPPRTriggerCause;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPREvent;
+import io.jenkins.plugins.bitbucketpushandpullrequest.observer.BitBucketPPRObserver;
 import jenkins.branch.MultiBranchProject;
 import jenkins.model.Jenkins;
 import jenkins.model.ParameterizedJobMixIn;
@@ -57,7 +58,7 @@ public class BitBucketPPRJobProbe {
   private BitBucketPPRAction bitbucketAction;
 
   public void triggerMatchingJobs(BitBucketPPREvent bitbucketEvent,
-      BitBucketPPRAction bitbucketAction) {
+      BitBucketPPRAction bitbucketAction, List<BitBucketPPRObserver> observers) {
     this.bitbucketEvent = bitbucketEvent;
     this.bitbucketAction = bitbucketAction;
 
@@ -74,7 +75,7 @@ public class BitBucketPPRJobProbe {
       Jenkins.get().getAllItems(Job.class).stream().forEach(job -> {
         LOGGER.log(Level.FINE, "Considering candidate job {0}", job.getName());
 
-        triggerScm(job, remotes, bitbucketAction);
+        triggerScm(job, remotes, bitbucketAction, observers);
       });
     } catch (Exception e) {
       LOGGER.log(Level.WARNING, "Invalid repository URLs {0}\n{1}",
@@ -93,7 +94,8 @@ public class BitBucketPPRJobProbe {
     }).collect(Collectors.toList());
   }
 
-  private void triggerScm(Job<?, ?> job, List<URIish> remotes, BitBucketPPRAction bitbucketAction) {
+  private void triggerScm(Job<?, ?> job, List<URIish> remotes, BitBucketPPRAction bitbucketAction,
+      List<BitBucketPPRObserver> observers) {
     LOGGER.log(Level.FINE, "Considering to poke {0}", job.getFullDisplayName());
     Optional<BitBucketPPRTrigger> bitbucketTrigger = getBitBucketTrigger(job);
 
@@ -128,6 +130,7 @@ public class BitBucketPPRJobProbe {
               LOGGER.log(Level.FINE, "Triggering trigger {0} for job {1}",
                   new Object[] {trigger.getClass().getName(), job.getFullDisplayName()});
               try {
+                observers.forEach((observer) -> trigger.addObserver(observer));
                 trigger.onPost(bitbucketEvent, this.bitbucketAction, scmTrigger);
               } catch (Exception e) {
                 LOGGER.log(Level.WARNING, "Error: {0}", e.getMessage());

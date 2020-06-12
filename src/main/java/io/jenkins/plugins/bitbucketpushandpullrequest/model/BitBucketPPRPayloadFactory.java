@@ -21,11 +21,11 @@
 
 package io.jenkins.plugins.bitbucketpushandpullrequest.model;
 
-import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.PULL_REQUEST_EVENT;
+import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.PULL_REQUEST_CLOUD_EVENT;
 import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.PULL_REQUEST_SERVER_EVENT;
 import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.REPOSITORY_EVENT;
 import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.REPOSITORY_POST;
-import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.REPOSITORY_PUSH;
+import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.REPOSITORY_CLOUD_PUSH;
 import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.REPOSITORY_SERVER_PUSH;
 
 import java.util.logging.Logger;
@@ -45,14 +45,14 @@ public class BitBucketPPRPayloadFactory {
     BitBucketPPRPayload payload = null;
 
     if (REPOSITORY_EVENT.equalsIgnoreCase(bitbucketEvent.getEvent())) {
-      if (REPOSITORY_PUSH.equalsIgnoreCase(bitbucketEvent.getAction())) {
+      if (REPOSITORY_CLOUD_PUSH.equalsIgnoreCase(bitbucketEvent.getAction())) {
         payload = new BitBucketPPRCloudPayload();
       } else if (REPOSITORY_POST.equalsIgnoreCase(bitbucketEvent.getAction())) {
         LOGGER.warning("Got unexpected old post event, ignored!");
       } else if (REPOSITORY_SERVER_PUSH.equalsIgnoreCase(bitbucketEvent.getAction())) {
         payload = new BitBucketPPRServerPayload();
       }
-    } else if (PULL_REQUEST_EVENT.equals(bitbucketEvent.getEvent())) {
+    } else if (PULL_REQUEST_CLOUD_EVENT.equals(bitbucketEvent.getEvent())) {
       payload = new BitBucketPPRCloudPayload();
     } else if (PULL_REQUEST_SERVER_EVENT.equals(bitbucketEvent.getEvent())) {
       payload = new BitBucketPPRServerPayload();

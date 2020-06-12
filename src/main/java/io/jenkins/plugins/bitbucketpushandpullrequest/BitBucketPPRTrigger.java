@@ -62,13 +62,18 @@ import io.jenkins.plugins.bitbucketpushandpullrequest.filter.repository.BitBucke
 import io.jenkins.plugins.bitbucketpushandpullrequest.filter.repository.BitBucketPPRRepositoryTriggerFilter;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPREvent;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud.BitBucketPPRProject;
+import io.jenkins.plugins.bitbucketpushandpullrequest.observer.BitBucketPPREventObject;
+import io.jenkins.plugins.bitbucketpushandpullrequest.observer.BitBucketPPRObservable;
+import io.jenkins.plugins.bitbucketpushandpullrequest.observer.BitBucketPPRObserver;
 import jenkins.model.Jenkins;
 import jenkins.model.ParameterizedJobMixIn;
 import jenkins.triggers.SCMTriggerItem;
 
-public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
+public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> implements BitBucketPPRObservable {
   private static final Logger LOGGER = Logger.getLogger(BitBucketPPRTrigger.class.getName());
   private List<BitBucketPPRTriggerFilter> triggers;
+  private List<BitBucketPPRObserver> observers = new ArrayList<>();  
+
 
   @DataBoundConstructor
   public BitBucketPPRTrigger(List<BitBucketPPRTriggerFilter> triggers) {
@@ -195,7 +200,7 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
       UserRemoteConfig config = gitSCM.getUserRemoteConfigs().get(0);
       String url = run.getResult() == Result.SUCCESS ? bitbucketAction.getLinkApprove()
           : bitbucketAction.getLinkDecline();
-      
+
       if (url != null) {
         String payload = run.getResult() == Result.SUCCESS ? "{ \"approved\": true }"
             : "{ \"approved\": false }";
@@ -302,6 +307,25 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
       // you may want to filter this list of descriptors here, if you are being very
       // fancy
       return Jenkins.get().getDescriptorList(BitBucketPPRTriggerFilter.class);
+    }
+  }
+
+  @Override
+  public void addObserver(BitBucketPPRObserver observer) {
+    observers.add(observer);
+
+  }
+
+  @Override
+  public void removeObserver(BitBucketPPRObserver observer) {
+    observers.remove(observer);
+
+  }
+
+  @Override
+  public void notifyObserver(BitBucketPPREventObject event) {
+    for (BitBucketPPRObserver observer : observers) {
+      observer.getNotification(event);
     }
   }
 }

@@ -26,6 +26,8 @@ import static org.mockito.Mockito.verify;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 import javax.naming.OperationNotSupportedException;
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
@@ -40,6 +42,8 @@ import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPREvent;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud.BitBucketPPRCloudPayload;
+import io.jenkins.plugins.bitbucketpushandpullrequest.observer.BitBucketPPRObserver;
+import io.jenkins.plugins.bitbucketpushandpullrequest.observer.BitBucketPPRObserverFactory;
 
 
 @RunWith(MockitoJUnitRunner.class)
@@ -49,14 +53,17 @@ public class BitBucketPPRPullRequestPayloadProcessorTest {
 
   @Captor
   private ArgumentCaptor<BitBucketPPREvent> eventCaptor;
+
   @Captor
   private ArgumentCaptor<BitBucketPPRAction> actionCaptor;
 
-  BitBucketPPRPullRequestPayloadProcessor pullRequestPayloadProcessor;
+  @Captor
+  private ArgumentCaptor<List<BitBucketPPRObserver>> observersCaptor;
+
+  BitBucketPPRPullRequestCloudPayloadProcessor pullRequestPayloadProcessor;
 
 
   @Test
-
   public void testProcessPullRequestApprovalWebhookGit() {
     JsonReader reader = null;
 
@@ -80,17 +87,23 @@ public class BitBucketPPRPullRequestPayloadProcessorTest {
     }
 
     pullRequestPayloadProcessor =
-        new BitBucketPPRPullRequestPayloadProcessor(probe, bitbucketEvent);
+        new BitBucketPPRPullRequestCloudPayloadProcessor(probe, bitbucketEvent);
 
+
+    List<BitBucketPPRObserver> observers = new ArrayList<>();
     try {
-      pullRequestPayloadProcessor.processPayload(payload);
+      observers = BitBucketPPRObserverFactory.createObservers(bitbucketEvent);
     } catch (Exception e) {
       e.printStackTrace();
     }
 
-    verify(probe).triggerMatchingJobs(eventCaptor.capture(), actionCaptor.capture());
+    pullRequestPayloadProcessor.processPayload(payload, observers);
+
+    verify(probe).triggerMatchingJobs(eventCaptor.capture(), actionCaptor.capture(),
+        observersCaptor.capture());
 
     assertEquals(bitbucketEvent, eventCaptor.getValue());
     assertEquals(payload, actionCaptor.getValue().getPayload());
+    assertEquals(observers, observersCaptor.getValue());
   }
 }

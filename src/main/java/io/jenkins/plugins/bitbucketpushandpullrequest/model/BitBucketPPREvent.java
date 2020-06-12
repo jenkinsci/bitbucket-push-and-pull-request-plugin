@@ -24,7 +24,7 @@ import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRCo
 import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.PING;
 import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.PULL_REQUEST_APPROVED;
 import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.PULL_REQUEST_CREATED;
-import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.PULL_REQUEST_EVENT;
+import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.PULL_REQUEST_CLOUD_EVENT;
 import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.PULL_REQUEST_MERGED;
 import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.PULL_REQUEST_SERVER_APPROVED;
 import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.PULL_REQUEST_SERVER_CREATED;
@@ -38,7 +38,7 @@ import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRCo
 import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.PULL_REQUEST_COMMENT_DELETED;
 import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.REPOSITORY_EVENT;
 import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.REPOSITORY_POST;
-import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.REPOSITORY_PUSH;
+import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.REPOSITORY_CLOUD_PUSH;
 import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.REPOSITORY_SERVER_PUSH;
 import javax.naming.OperationNotSupportedException;
 
@@ -68,11 +68,11 @@ public class BitBucketPPREvent {
     boolean error = false;
 
     if (REPOSITORY_EVENT.equalsIgnoreCase(event)) {
-      if (!(REPOSITORY_PUSH.equalsIgnoreCase(action) || REPOSITORY_POST.equalsIgnoreCase(action)
+      if (!(REPOSITORY_CLOUD_PUSH.equalsIgnoreCase(action) || REPOSITORY_POST.equalsIgnoreCase(action)
           || REPOSITORY_SERVER_PUSH.equalsIgnoreCase(action))) {
         error = true;
       }
-    } else if (PULL_REQUEST_EVENT.equalsIgnoreCase(event)
+    } else if (PULL_REQUEST_CLOUD_EVENT.equalsIgnoreCase(event)
         || PULL_REQUEST_SERVER_EVENT.equalsIgnoreCase(event)) {
       if (!(PULL_REQUEST_APPROVED.equalsIgnoreCase(action)
           || PULL_REQUEST_CREATED.equalsIgnoreCase(action)

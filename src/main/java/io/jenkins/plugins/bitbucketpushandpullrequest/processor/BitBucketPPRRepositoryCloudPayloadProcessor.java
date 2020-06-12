@@ -23,21 +23,26 @@ package io.jenkins.plugins.bitbucketpushandpullrequest.processor;
 import java.util.List;
 import javax.annotation.Nonnull;
 import io.jenkins.plugins.bitbucketpushandpullrequest.BitBucketPPRJobProbe;
+import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
+import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRRepositoryAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPREvent;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
 import io.jenkins.plugins.bitbucketpushandpullrequest.observer.BitBucketPPRObserver;
 
 
-public abstract class BitBucketPPRPayloadProcessor {
-  protected final BitBucketPPRJobProbe jobProbe;
-  protected final BitBucketPPREvent bitbucketEvent;
-
-
-  public BitBucketPPRPayloadProcessor(@Nonnull BitBucketPPRJobProbe jobProbe,
+public class BitBucketPPRRepositoryCloudPayloadProcessor extends BitBucketPPRPayloadProcessor {
+  public BitBucketPPRRepositoryCloudPayloadProcessor(@Nonnull BitBucketPPRJobProbe jobProbe,
       @Nonnull BitBucketPPREvent bitbucketEvent) {
-    this.jobProbe = jobProbe;
-    this.bitbucketEvent = bitbucketEvent;
+    super(jobProbe, bitbucketEvent);
   }
 
-  public abstract void processPayload(@Nonnull BitBucketPPRPayload payload, List<BitBucketPPRObserver> observers);
+  private BitBucketPPRAction buildActionForJobs(@Nonnull BitBucketPPRPayload payload) {
+    return new BitBucketPPRRepositoryAction(payload);
+  }
+
+  @Override
+  public void processPayload(@Nonnull BitBucketPPRPayload payload, List<BitBucketPPRObserver> observers) {
+    BitBucketPPRAction action = buildActionForJobs(payload);
+    jobProbe.triggerMatchingJobs(bitbucketEvent, action, observers);
+  }
 }
