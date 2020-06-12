@@ -1,7 +1,7 @@
 /*******************************************************************************
  * The MIT License
  * 
- * Copyright (C) 2018, CloudBees, Inc.
+ * Copyright (C) 2020, CloudBees, Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -41,11 +41,7 @@ import hudson.console.AnnotatedLargeText;
 import hudson.model.CauseAction;
 import hudson.model.Item;
 import hudson.model.Job;
-import hudson.model.Result;
-import hudson.model.Run;
 import hudson.model.queue.QueueTaskFuture;
-import hudson.plugins.git.GitSCM;
-import hudson.plugins.git.UserRemoteConfig;
 import hudson.scm.PollingResult;
 import hudson.scm.SCM;
 import hudson.triggers.Trigger;
@@ -53,9 +49,12 @@ import hudson.triggers.TriggerDescriptor;
 import hudson.util.SequentialExecutionQueue;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.cause.BitBucketPPRTriggerCause;
-import io.jenkins.plugins.bitbucketpushandpullrequest.client.BitBucketPPRClientFactory;
 import io.jenkins.plugins.bitbucketpushandpullrequest.event.BitBucketPPRBuildFinished;
+import io.jenkins.plugins.bitbucketpushandpullrequest.event.BitBucketPPRBuildStarted;
 import io.jenkins.plugins.bitbucketpushandpullrequest.event.BitBucketPPREvent;
+import io.jenkins.plugins.bitbucketpushandpullrequest.event.BitBucketPPREventContext;
+import io.jenkins.plugins.bitbucketpushandpullrequest.event.BitBucketPPREventFactory;
+import io.jenkins.plugins.bitbucketpushandpullrequest.event.BitBucketPPREventType;
 import io.jenkins.plugins.bitbucketpushandpullrequest.exception.JobNotStartedException;
 import io.jenkins.plugins.bitbucketpushandpullrequest.filter.BitBucketPPRFilterMatcher;
 import io.jenkins.plugins.bitbucketpushandpullrequest.filter.BitBucketPPRTriggerFilter;
@@ -73,7 +72,7 @@ import jenkins.triggers.SCMTriggerItem;
 public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> implements BitBucketPPRObservable {
   private static final Logger LOGGER = Logger.getLogger(BitBucketPPRTrigger.class.getName());
   private List<BitBucketPPRTriggerFilter> triggers;
-  private List<BitBucketPPRObserver> observers = new ArrayList<>();  
+  private List<BitBucketPPRObserver> observers = new ArrayList<>();
 
 
   @DataBoundConstructor
@@ -182,12 +181,22 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> implements BitBucket
     LOGGER.info(() -> "SCM changes detected in " + job.getName() + ". Triggering " + " #"
         + job.getNextBuildNumber());
 
+    try {
+      notifyObservers(BitBucketPPREventFactory.createEvent(BitBucketPPREventType.BUILD_STARTED,
+          new BitBucketPPREventContext(bitbucketAction, scmTrigger, future)));
+    } catch (Exception e) {
+      LOGGER.info(e.getMessage());
+    }
+
     if (future != null) {
-      BitBucketPPREvent eventObject = new BitBucketPPRBuildFinished(bitbucketAction, scmTrigger, future);
-      notifyObserver(eventObject);
+      try {
+        notifyObservers(BitBucketPPREventFactory.createEvent(BitBucketPPREventType.BUILD_FINISHED,
+            new BitBucketPPREventContext(bitbucketAction, scmTrigger, future)));
+      } catch (Exception e) {
+        LOGGER.info(e.getMessage());
+      }
     } else {
-      LOGGER
-          .info(() -> "SCM changes detected in " + job.getName() + ". Job is already in the queue");
+      LOGGER.info(() -> "SCM changes detected in " + job.getName() + ", but no Future.");
     }
   }
 
@@ -298,7 +307,7 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> implements BitBucket
   }
 
   @Override
-  public void notifyObserver(BitBucketPPREvent event) {
+  public void notifyObservers(BitBucketPPREvent event) {
     for (BitBucketPPRObserver observer : observers) {
       observer.getNotification(event);
     }

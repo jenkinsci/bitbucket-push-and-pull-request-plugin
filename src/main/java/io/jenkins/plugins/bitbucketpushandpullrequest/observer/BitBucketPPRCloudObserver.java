@@ -29,39 +29,30 @@ import hudson.plugins.git.UserRemoteConfig;
 import hudson.scm.SCM;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.client.BitBucketPPRClientFactory;
-import io.jenkins.plugins.bitbucketpushandpullrequest.event.BitBucketPPRBuildFinished;
-import io.jenkins.plugins.bitbucketpushandpullrequest.event.BitBucketPPRBuildStarted;
+import io.jenkins.plugins.bitbucketpushandpullrequest.client.BitBucketPPRClientType;
 import io.jenkins.plugins.bitbucketpushandpullrequest.event.BitBucketPPREvent;
+import io.jenkins.plugins.bitbucketpushandpullrequest.event.BitBucketPPREventContext;
 
 
-public class BitBucketPPRCloudObserver implements BitBucketPPRObserver {
-  private static final String BUILD_FINISHED = "finished";
-  private static final String BUILD_IN_PROGRESS = "in_progress";
+public class BitBucketPPRCloudObserver extends BitBucketPPRHandlerTemplate
+    implements BitBucketPPRObserver {
   static final Logger LOGGER = Logger.getLogger(BitBucketPPRCloudObserver.class.getName());
+
+  BitBucketPPREventContext context;
 
   @Override
   public void getNotification(BitBucketPPREvent event) {
-    if (event instanceof BitBucketPPRBuildStarted) {
-      setBuildStatus(BUILD_IN_PROGRESS);
-      return;
-    }
-
-    if (event instanceof BitBucketPPRBuildFinished) {
-      setBuildStatus(BUILD_FINISHED);
-      handleFuture(event);
-      return;
-    }
+    context = event.getContext();
+    event.setEventHandler(this);
+    event.runHandler();
   }
 
-  private void setBuildStatus(String string) {
-    return;
-  }
+  @Override
+  protected void setApproved() {
+    BitBucketPPRAction bitbucketAction = context.getAction();
+    SCM scmTrigger = context.getScmTrigger();
+    QueueTaskFuture<?> future = context.getFuture();
 
-  private void handleFuture(BitBucketPPREvent event) {
-    BitBucketPPRAction bitbucketAction = event.getAction();
-    SCM scmTrigger = event.getScmTrigger();
-    QueueTaskFuture<?> future = event.getFuture();
-    
     try {
       Run<?, ?> run = (Run<?, ?>) future.get();
       Result result = run.getResult();
@@ -75,7 +66,7 @@ public class BitBucketPPRCloudObserver implements BitBucketPPRObserver {
       if (url != null) {
         String payload = run.getResult() == Result.SUCCESS ? "{ \"approved\": true }"
             : "{ \"approved\": false }";
-        BitBucketPPRClientFactory.createCloudClient(config, run)
+        BitBucketPPRClientFactory.createClient(BitBucketPPRClientType.CLOUD, config, run)
             .sendWithUsernamePasswordCredentials(url, payload);
       }
     } catch (NullPointerException e) {
@@ -85,5 +76,18 @@ public class BitBucketPPRCloudObserver implements BitBucketPPRObserver {
     } catch (Exception e) {
       LOGGER.warning(e.getMessage());
     }
+
+  }
+
+  @Override
+  protected void setBuildStatusOnFinished() {
+    // TODO Auto-generated method stub
+
+  }
+
+  @Override
+  protected void setBuildStatusInProgress() {
+    // TODO Auto-generated method stub
+
   }
 }

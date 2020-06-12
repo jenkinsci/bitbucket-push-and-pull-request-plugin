@@ -20,16 +20,11 @@
  ******************************************************************************/
 package io.jenkins.plugins.bitbucketpushandpullrequest.event;
 
-import hudson.model.queue.QueueTaskFuture;
-import hudson.scm.SCM;
-import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
+import io.jenkins.plugins.bitbucketpushandpullrequest.observer.BitBucketPPRHandlerTemplate;
 
 public interface BitBucketPPREvent {
-
-  SCM getScmTrigger();
-
-  QueueTaskFuture<?> getFuture();
-
-  BitBucketPPRAction getAction();
-
+  public void setContext(BitBucketPPREventContext context);
+  public BitBucketPPREventContext getContext();
+  public void setEventHandler(BitBucketPPRHandlerTemplate handler);
+  public void runHandler();
 }

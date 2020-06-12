@@ -20,27 +20,35 @@
  ******************************************************************************/
 package io.jenkins.plugins.bitbucketpushandpullrequest.event;
 
-import hudson.model.queue.QueueTaskFuture;
-import hudson.scm.SCM;
-import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
+import io.jenkins.plugins.bitbucketpushandpullrequest.observer.BitBucketPPRHandlerTemplate;
 
 public class BitBucketPPRBuildStarted implements BitBucketPPREvent {
+  BitBucketPPREventContext context;
+  BitBucketPPRHandlerTemplate handler;
 
   @Override
-  public SCM getScmTrigger() {
-    return null;
+  public void setContext(BitBucketPPREventContext context) {
+    this.context = context;
   }
 
   @Override
-  public QueueTaskFuture<?> getFuture() {
-    // TODO Auto-generated method stub
-    return null;
+  public void setEventHandler(BitBucketPPRHandlerTemplate handler) {
+    this.handler = handler;
+
   }
 
   @Override
-  public BitBucketPPRAction getAction() {
-    // TODO Auto-generated method stub
-    return null;
+  public void runHandler() {
+    try {
+      handler.run(BitBucketPPREventType.BUILD_STARTED);
+    } catch (Exception e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
   }
 
+  @Override
+  public BitBucketPPREventContext getContext() {
+    return context;
+  }
 }
