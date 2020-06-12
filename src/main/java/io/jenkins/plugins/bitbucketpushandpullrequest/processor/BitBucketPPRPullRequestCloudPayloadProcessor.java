@@ -25,14 +25,14 @@ import javax.annotation.Nonnull;
 import io.jenkins.plugins.bitbucketpushandpullrequest.BitBucketPPRJobProbe;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRPullRequestAction;
-import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPREvent;
+import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRHookEvent;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
 import io.jenkins.plugins.bitbucketpushandpullrequest.observer.BitBucketPPRObserver;
 
 
 public class BitBucketPPRPullRequestCloudPayloadProcessor extends BitBucketPPRPayloadProcessor {
   public BitBucketPPRPullRequestCloudPayloadProcessor(@Nonnull BitBucketPPRJobProbe jobProbe,
-      @Nonnull BitBucketPPREvent bitbucketEvent) {
+      @Nonnull BitBucketPPRHookEvent bitbucketEvent) {
     super(jobProbe, bitbucketEvent);
   }
 

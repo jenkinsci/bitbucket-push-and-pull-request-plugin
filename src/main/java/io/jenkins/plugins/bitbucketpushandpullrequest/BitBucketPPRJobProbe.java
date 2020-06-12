@@ -44,7 +44,7 @@ import hudson.security.ACL;
 import hudson.security.ACLContext;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.cause.BitBucketPPRTriggerCause;
-import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPREvent;
+import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRHookEvent;
 import io.jenkins.plugins.bitbucketpushandpullrequest.observer.BitBucketPPRObserver;
 import jenkins.branch.MultiBranchProject;
 import jenkins.model.Jenkins;
@@ -54,10 +54,10 @@ import jenkins.triggers.SCMTriggerItem;
 
 public class BitBucketPPRJobProbe {
   private static final Logger LOGGER = Logger.getLogger(BitBucketPPRJobProbe.class.getName());
-  private BitBucketPPREvent bitbucketEvent;
+  private BitBucketPPRHookEvent bitbucketEvent;
   private BitBucketPPRAction bitbucketAction;
 
-  public void triggerMatchingJobs(BitBucketPPREvent bitbucketEvent,
+  public void triggerMatchingJobs(BitBucketPPRHookEvent bitbucketEvent,
       BitBucketPPRAction bitbucketAction, List<BitBucketPPRObserver> observers) {
     this.bitbucketEvent = bitbucketEvent;
     this.bitbucketAction = bitbucketAction;

@@ -20,8 +20,10 @@
  ******************************************************************************/
 package io.jenkins.plugins.bitbucketpushandpullrequest.observer;
 
+import io.jenkins.plugins.bitbucketpushandpullrequest.event.BitBucketPPREvent;
+
 public interface BitBucketPPRObserver {
 
-  void getNotification(BitBucketPPREventObject event);
+  void getNotification(BitBucketPPREvent event);
 
 }

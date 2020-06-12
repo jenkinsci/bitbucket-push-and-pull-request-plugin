@@ -20,10 +20,12 @@
  ******************************************************************************/
 package io.jenkins.plugins.bitbucketpushandpullrequest.observer;
 
+import io.jenkins.plugins.bitbucketpushandpullrequest.event.BitBucketPPREvent;
+
 public class BitBucketPPRServerObserver implements BitBucketPPRObserver {
 
   @Override
-  public void getNotification(BitBucketPPREventObject event) {
+  public void getNotification(BitBucketPPREvent event) {
     // TODO Auto-generated method stub
 
   }

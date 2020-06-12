@@ -18,9 +18,29 @@
  * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  ******************************************************************************/
-package io.jenkins.plugins.bitbucketpushandpullrequest.observer;
+package io.jenkins.plugins.bitbucketpushandpullrequest.event;
 
-public class BitBucketPPRObserverNotFoundException extends Exception {
-  private static final long serialVersionUID = 1L;
+import hudson.model.queue.QueueTaskFuture;
+import hudson.scm.SCM;
+import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
+
+public class BitBucketPPRBuildStarted implements BitBucketPPREvent {
+
+  @Override
+  public SCM getScmTrigger() {
+    return null;
+  }
+
+  @Override
+  public QueueTaskFuture<?> getFuture() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public BitBucketPPRAction getAction() {
+    // TODO Auto-generated method stub
+    return null;
+  }
 
 }

@@ -31,13 +31,13 @@ import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRCo
 
 import io.jenkins.plugins.bitbucketpushandpullrequest.filter.BitBucketPPREventTriggerMatcher;
 import io.jenkins.plugins.bitbucketpushandpullrequest.filter.BitBucketPPRTriggerFilter;
-import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPREvent;
+import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRHookEvent;
 
 
 public class BitBucketPPRPullRequestServerTriggerMatcher
     implements BitBucketPPREventTriggerMatcher {
   @Override
-  public boolean matchesAction(final BitBucketPPREvent bitbucketEvent,
+  public boolean matchesAction(final BitBucketPPRHookEvent bitbucketEvent,
       final BitBucketPPRTriggerFilter triggerFilter) {
     return (PULL_REQUEST_SERVER_APPROVED.equalsIgnoreCase(bitbucketEvent.getAction())
         && triggerFilter

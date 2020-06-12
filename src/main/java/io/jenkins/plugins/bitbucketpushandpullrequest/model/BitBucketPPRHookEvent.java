@@ -43,12 +43,12 @@ import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRCo
 import javax.naming.OperationNotSupportedException;
 
 
-public class BitBucketPPREvent {
+public class BitBucketPPRHookEvent {
   private String event;
   private String action;
 
 
-  public BitBucketPPREvent(String eventAction) throws OperationNotSupportedException {
+  public BitBucketPPRHookEvent(String eventAction) throws OperationNotSupportedException {
     String[] eventActionPair = eventAction.split(":");
 
     event = eventActionPair[0];

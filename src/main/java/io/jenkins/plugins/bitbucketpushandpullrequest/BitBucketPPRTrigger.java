@@ -54,15 +54,16 @@ import hudson.util.SequentialExecutionQueue;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.cause.BitBucketPPRTriggerCause;
 import io.jenkins.plugins.bitbucketpushandpullrequest.client.BitBucketPPRClientFactory;
+import io.jenkins.plugins.bitbucketpushandpullrequest.event.BitBucketPPRBuildFinished;
+import io.jenkins.plugins.bitbucketpushandpullrequest.event.BitBucketPPREvent;
 import io.jenkins.plugins.bitbucketpushandpullrequest.exception.JobNotStartedException;
 import io.jenkins.plugins.bitbucketpushandpullrequest.filter.BitBucketPPRFilterMatcher;
 import io.jenkins.plugins.bitbucketpushandpullrequest.filter.BitBucketPPRTriggerFilter;
 import io.jenkins.plugins.bitbucketpushandpullrequest.filter.BitBucketPPRTriggerFilterDescriptor;
 import io.jenkins.plugins.bitbucketpushandpullrequest.filter.repository.BitBucketPPRRepositoryPushActionFilter;
 import io.jenkins.plugins.bitbucketpushandpullrequest.filter.repository.BitBucketPPRRepositoryTriggerFilter;
-import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPREvent;
+import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRHookEvent;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud.BitBucketPPRProject;
-import io.jenkins.plugins.bitbucketpushandpullrequest.observer.BitBucketPPREventObject;
 import io.jenkins.plugins.bitbucketpushandpullrequest.observer.BitBucketPPRObservable;
 import io.jenkins.plugins.bitbucketpushandpullrequest.observer.BitBucketPPRObserver;
 import jenkins.model.Jenkins;
@@ -104,7 +105,7 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> implements BitBucket
    * 
    * @throws IOException
    */
-  public void onPost(final BitBucketPPREvent bitbucketEvent,
+  public void onPost(final BitBucketPPRHookEvent bitbucketEvent,
       final BitBucketPPRAction bitbucketAction, SCM scmTrigger) throws Exception {
     LOGGER.log(Level.INFO, "Called onPost");
 
@@ -182,37 +183,11 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> implements BitBucket
         + job.getNextBuildNumber());
 
     if (future != null) {
-      handleFuture(bitbucketAction, scmTrigger, future);
+      BitBucketPPREvent eventObject = new BitBucketPPRBuildFinished(bitbucketAction, scmTrigger, future);
+      notifyObserver(eventObject);
     } else {
       LOGGER
           .info(() -> "SCM changes detected in " + job.getName() + ". Job is already in the queue");
-    }
-  }
-
-  private void handleFuture(BitBucketPPRAction bitbucketAction, SCM scmTrigger,
-      QueueTaskFuture<?> future) {
-    try {
-      Run<?, ?> run = (Run<?, ?>) future.get();
-      Result result = run.getResult();
-      LOGGER.info(() -> "Result is " + result);
-
-      GitSCM gitSCM = (GitSCM) scmTrigger;
-      UserRemoteConfig config = gitSCM.getUserRemoteConfigs().get(0);
-      String url = run.getResult() == Result.SUCCESS ? bitbucketAction.getLinkApprove()
-          : bitbucketAction.getLinkDecline();
-
-      if (url != null) {
-        String payload = run.getResult() == Result.SUCCESS ? "{ \"approved\": true }"
-            : "{ \"approved\": false }";
-        BitBucketPPRClientFactory.createCloudClient(config, run)
-            .sendWithUsernamePasswordCredentials(url, payload);
-      }
-    } catch (NullPointerException e) {
-      LOGGER.warning(e.getMessage());
-    } catch (InterruptedException e) {
-      LOGGER.warning(e.getMessage());
-    } catch (Exception e) {
-      LOGGER.warning(e.getMessage());
     }
   }
 
@@ -323,7 +298,7 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> implements BitBucket
   }
 
   @Override
-  public void notifyObserver(BitBucketPPREventObject event) {
+  public void notifyObserver(BitBucketPPREvent event) {
     for (BitBucketPPRObserver observer : observers) {
       observer.getNotification(event);
     }

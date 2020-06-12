@@ -18,32 +18,39 @@
  * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  ******************************************************************************/
-package io.jenkins.plugins.bitbucketpushandpullrequest.processor;
+package io.jenkins.plugins.bitbucketpushandpullrequest.event;
 
-import java.util.List;
-import javax.annotation.Nonnull;
-import io.jenkins.plugins.bitbucketpushandpullrequest.BitBucketPPRJobProbe;
+import hudson.model.queue.QueueTaskFuture;
+import hudson.scm.SCM;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
-import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRServerRepositoryAction;
-import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRHookEvent;
-import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
-import io.jenkins.plugins.bitbucketpushandpullrequest.observer.BitBucketPPRObserver;
 
+public class BitBucketPPRBuildFinished implements BitBucketPPREvent {
 
-public class BitBucketPPRRepositoryServerPayloadProcessor extends BitBucketPPRPayloadProcessor {
+  private BitBucketPPRAction action;
+  private SCM scmTrigger;
+  private QueueTaskFuture<?> future;
 
-  public BitBucketPPRRepositoryServerPayloadProcessor(@Nonnull BitBucketPPRJobProbe jobProbe,
-      @Nonnull BitBucketPPRHookEvent bitbucketEvent) {
-    super(jobProbe, bitbucketEvent);
-  }
+  public BitBucketPPRBuildFinished(BitBucketPPRAction action, SCM scmTrigger,
+      QueueTaskFuture<?> future) {
+    this.action = action;
+    this.scmTrigger = scmTrigger;
+    this.future = future;
 
-  private BitBucketPPRAction buildActionForJobs(@Nonnull BitBucketPPRPayload payload) {
-    return new BitBucketPPRServerRepositoryAction(payload);
   }
 
   @Override
-  public void processPayload(@Nonnull BitBucketPPRPayload payload, List<BitBucketPPRObserver> observers) {
-    BitBucketPPRAction action = buildActionForJobs(payload);
-    jobProbe.triggerMatchingJobs(bitbucketEvent, action, observers);
+  public SCM getScmTrigger() {
+    return scmTrigger;
   }
+
+  @Override
+  public QueueTaskFuture<?> getFuture() {
+    return future;
+  }
+
+  @Override
+  public BitBucketPPRAction getAction() {
+    return action;
+  }
+
 }

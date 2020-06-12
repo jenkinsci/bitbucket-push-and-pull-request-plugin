@@ -18,7 +18,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import io.jenkins.plugins.bitbucketpushandpullrequest.BitBucketPPRJobProbe;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
-import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPREvent;
+import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRHookEvent;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud.BitBucketPPRCloudPayload;
 import io.jenkins.plugins.bitbucketpushandpullrequest.observer.BitBucketPPRObserver;
@@ -31,7 +31,7 @@ public class BitBucketPPRRepositoryPayloadProcessorTest {
   private BitBucketPPRJobProbe probe;
 
   @Captor
-  private ArgumentCaptor<BitBucketPPREvent> eventCaptor;
+  private ArgumentCaptor<BitBucketPPRHookEvent> eventCaptor;
 
   @Captor
   private ArgumentCaptor<BitBucketPPRAction> actionCaptor;
@@ -41,9 +41,9 @@ public class BitBucketPPRRepositoryPayloadProcessorTest {
 
   @Test
   public void testRepositoryPushWebhookGit() {
-    BitBucketPPREvent bitbucketEvent = null;
+    BitBucketPPRHookEvent bitbucketEvent = null;
     try {
-      bitbucketEvent = new BitBucketPPREvent("repo:push");
+      bitbucketEvent = new BitBucketPPRHookEvent("repo:push");
     } catch (OperationNotSupportedException e) {
       e.printStackTrace();
     }

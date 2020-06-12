@@ -28,13 +28,14 @@ import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRCo
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
-import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPREvent;
+import io.jenkins.plugins.bitbucketpushandpullrequest.exception.BitBucketPPRObserverNotFoundException;
+import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRHookEvent;
 
 
 public class BitBucketPPRObserverFactory {
   static final Logger LOGGER = Logger.getLogger(BitBucketPPRObserverFactory.class.getName());
 
-  public static List<BitBucketPPRObserver> createObservers(BitBucketPPREvent bitbucketEvent)
+  public static List<BitBucketPPRObserver> createObservers(BitBucketPPRHookEvent bitbucketEvent)
       throws Exception {
 
     List<BitBucketPPRObserver> observers = new ArrayList<>();

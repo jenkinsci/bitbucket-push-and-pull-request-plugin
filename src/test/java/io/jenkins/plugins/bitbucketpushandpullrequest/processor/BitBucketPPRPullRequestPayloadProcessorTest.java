@@ -39,7 +39,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import io.jenkins.plugins.bitbucketpushandpullrequest.BitBucketPPRJobProbe;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
-import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPREvent;
+import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRHookEvent;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud.BitBucketPPRCloudPayload;
 import io.jenkins.plugins.bitbucketpushandpullrequest.observer.BitBucketPPRObserver;
@@ -52,7 +52,7 @@ public class BitBucketPPRPullRequestPayloadProcessorTest {
   private BitBucketPPRJobProbe probe;
 
   @Captor
-  private ArgumentCaptor<BitBucketPPREvent> eventCaptor;
+  private ArgumentCaptor<BitBucketPPRHookEvent> eventCaptor;
 
   @Captor
   private ArgumentCaptor<BitBucketPPRAction> actionCaptor;
@@ -79,9 +79,9 @@ public class BitBucketPPRPullRequestPayloadProcessorTest {
     Gson gson = new Gson();
     BitBucketPPRPayload payload = gson.fromJson(reader, BitBucketPPRCloudPayload.class);
 
-    BitBucketPPREvent bitbucketEvent = null;
+    BitBucketPPRHookEvent bitbucketEvent = null;
     try {
-      bitbucketEvent = new BitBucketPPREvent("pullrequest:approved");
+      bitbucketEvent = new BitBucketPPRHookEvent("pullrequest:approved");
     } catch (OperationNotSupportedException e) {
       e.printStackTrace();
     }

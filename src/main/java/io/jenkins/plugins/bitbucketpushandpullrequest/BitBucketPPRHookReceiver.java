@@ -38,7 +38,7 @@ import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
 import hudson.Extension;
 import hudson.model.UnprotectedRootAction;
-import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPREvent;
+import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRHookEvent;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayloadFactory;
 import io.jenkins.plugins.bitbucketpushandpullrequest.observer.BitBucketPPRObserver;
@@ -86,10 +86,10 @@ public class BitBucketPPRHookReceiver implements UnprotectedRootAction {
 
       inputStream = decodeInputStream(inputStream, request.getContentType());
 
-      BitBucketPPREvent bitbucketEvent = null;
+      BitBucketPPRHookEvent bitbucketEvent = null;
       if (request.getHeader("x-event-key") != null) {
         try {
-          bitbucketEvent = new BitBucketPPREvent(request.getHeader("x-event-key"));
+          bitbucketEvent = new BitBucketPPRHookEvent(request.getHeader("x-event-key"));
           logger.log(Level.INFO,
               () -> "Received x-event-key " + request.getHeader("x-event-key") + " from Bitbucket");
         } catch (final OperationNotSupportedException e) {
@@ -98,7 +98,7 @@ public class BitBucketPPRHookReceiver implements UnprotectedRootAction {
       } else {
         logger.log(Level.WARNING, "Received old POST payload. (Deprecated, it will be removed.)");
         try {
-          bitbucketEvent = new BitBucketPPREvent("repo:post");
+          bitbucketEvent = new BitBucketPPRHookEvent("repo:post");
         } catch (final OperationNotSupportedException e) {
           logger.log(Level.WARNING, e.getMessage());
         }

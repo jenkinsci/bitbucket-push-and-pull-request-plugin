@@ -31,13 +31,13 @@ import io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.server.
 import io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.server.BitBucketPPRPullRequestServerTriggerMatcher;
 import io.jenkins.plugins.bitbucketpushandpullrequest.filter.repository.BitBucketPPRRepositoryTriggerFilter;
 import io.jenkins.plugins.bitbucketpushandpullrequest.filter.repository.BitBucketPPRRepositoryTriggerMatcher;
-import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPREvent;
+import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRHookEvent;
 import io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils;
 
 public class BitBucketPPRFilterMatcher {
   private static final Logger LOGGER = Logger.getLogger(BitBucketPPRFilterMatcher.class.getName());
 
-  public List<BitBucketPPRTriggerFilter> getMatchingFilters(BitBucketPPREvent event,
+  public List<BitBucketPPRTriggerFilter> getMatchingFilters(BitBucketPPRHookEvent event,
       List<BitBucketPPRTriggerFilter> triggerFilterList) {
     List<BitBucketPPRTriggerFilter> filteredList = new ArrayList<>();
 
@@ -58,7 +58,7 @@ public class BitBucketPPRFilterMatcher {
     return filteredList;
   }
 
-  private boolean matchesEventAndAction(BitBucketPPREvent event,
+  private boolean matchesEventAndAction(BitBucketPPRHookEvent event,
       BitBucketPPRTriggerFilter triggerFilter) {
     if (BitBucketPPRConstsUtils.PULL_REQUEST_CLOUD_EVENT.equalsIgnoreCase(event.getEvent())
         && triggerFilter instanceof BitBucketPPRPullRequestTriggerFilter) {

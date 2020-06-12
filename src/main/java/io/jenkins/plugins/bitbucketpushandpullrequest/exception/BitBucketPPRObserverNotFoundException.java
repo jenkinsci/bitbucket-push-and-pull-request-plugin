@@ -18,26 +18,9 @@
  * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  ******************************************************************************/
-package io.jenkins.plugins.bitbucketpushandpullrequest.processor;
+package io.jenkins.plugins.bitbucketpushandpullrequest.exception;
 
-import java.util.List;
-import javax.annotation.Nonnull;
-import io.jenkins.plugins.bitbucketpushandpullrequest.BitBucketPPRJobProbe;
-import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRHookEvent;
-import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
-import io.jenkins.plugins.bitbucketpushandpullrequest.observer.BitBucketPPRObserver;
+public class BitBucketPPRObserverNotFoundException extends Exception {
+  private static final long serialVersionUID = 1L;
 
-
-public abstract class BitBucketPPRPayloadProcessor {
-  protected final BitBucketPPRJobProbe jobProbe;
-  protected final BitBucketPPRHookEvent bitbucketEvent;
-
-
-  public BitBucketPPRPayloadProcessor(@Nonnull BitBucketPPRJobProbe jobProbe,
-      @Nonnull BitBucketPPRHookEvent bitbucketEvent) {
-    this.jobProbe = jobProbe;
-    this.bitbucketEvent = bitbucketEvent;
-  }
-
-  public abstract void processPayload(@Nonnull BitBucketPPRPayload payload, List<BitBucketPPRObserver> observers);
 }

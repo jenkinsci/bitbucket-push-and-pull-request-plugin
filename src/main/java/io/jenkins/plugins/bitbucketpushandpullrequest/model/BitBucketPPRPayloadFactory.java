@@ -40,7 +40,7 @@ public class BitBucketPPRPayloadFactory {
 
   private BitBucketPPRPayloadFactory() {}
 
-  public static BitBucketPPRPayload getInstance(BitBucketPPREvent bitbucketEvent)
+  public static BitBucketPPRPayload getInstance(BitBucketPPRHookEvent bitbucketEvent)
       throws OperationNotSupportedException {
     BitBucketPPRPayload payload = null;
 

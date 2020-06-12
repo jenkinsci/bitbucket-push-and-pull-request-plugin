@@ -28,7 +28,7 @@ import javax.annotation.Nonnull;
 import io.jenkins.plugins.bitbucketpushandpullrequest.BitBucketPPRJobProbe;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRPullRequestServerAction;
-import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPREvent;
+import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRHookEvent;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
 import io.jenkins.plugins.bitbucketpushandpullrequest.observer.BitBucketPPRObserver;
 
@@ -39,7 +39,7 @@ public class BitBucketPPRPullRequestServerPayloadProcessor extends BitBucketPPRP
       Logger.getLogger(BitBucketPPRPullRequestServerPayloadProcessor.class.getName());
 
   public BitBucketPPRPullRequestServerPayloadProcessor(@Nonnull BitBucketPPRJobProbe jobProbe,
-      @Nonnull BitBucketPPREvent bitbucketEvent) {
+      @Nonnull BitBucketPPRHookEvent bitbucketEvent) {
     super(jobProbe, bitbucketEvent);
     logger.fine(() -> "Processing " + bitbucketEvent.toString());
 

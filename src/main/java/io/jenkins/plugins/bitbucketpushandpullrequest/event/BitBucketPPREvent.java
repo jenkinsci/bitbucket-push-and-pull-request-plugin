@@ -18,32 +18,18 @@
  * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  ******************************************************************************/
-package io.jenkins.plugins.bitbucketpushandpullrequest.processor;
+package io.jenkins.plugins.bitbucketpushandpullrequest.event;
 
-import java.util.List;
-import javax.annotation.Nonnull;
-import io.jenkins.plugins.bitbucketpushandpullrequest.BitBucketPPRJobProbe;
+import hudson.model.queue.QueueTaskFuture;
+import hudson.scm.SCM;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
-import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRServerRepositoryAction;
-import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRHookEvent;
-import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
-import io.jenkins.plugins.bitbucketpushandpullrequest.observer.BitBucketPPRObserver;
 
+public interface BitBucketPPREvent {
 
-public class BitBucketPPRRepositoryServerPayloadProcessor extends BitBucketPPRPayloadProcessor {
+  SCM getScmTrigger();
 
-  public BitBucketPPRRepositoryServerPayloadProcessor(@Nonnull BitBucketPPRJobProbe jobProbe,
-      @Nonnull BitBucketPPRHookEvent bitbucketEvent) {
-    super(jobProbe, bitbucketEvent);
-  }
+  QueueTaskFuture<?> getFuture();
 
-  private BitBucketPPRAction buildActionForJobs(@Nonnull BitBucketPPRPayload payload) {
-    return new BitBucketPPRServerRepositoryAction(payload);
-  }
+  BitBucketPPRAction getAction();
 
-  @Override
-  public void processPayload(@Nonnull BitBucketPPRPayload payload, List<BitBucketPPRObserver> observers) {
-    BitBucketPPRAction action = buildActionForJobs(payload);
-    jobProbe.triggerMatchingJobs(bitbucketEvent, action, observers);
-  }
 }
