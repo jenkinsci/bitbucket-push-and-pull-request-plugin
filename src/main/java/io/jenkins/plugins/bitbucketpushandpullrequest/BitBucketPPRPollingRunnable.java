@@ -51,7 +51,7 @@ public class BitBucketPPRPollingRunnable implements Runnable {
   }
 
   public void run() {
-    LOGGER.log(Level.INFO, "Run method called.");
+    LOGGER.log(Level.FINE, "Run method called.");
 
     try (StreamTaskListener streamListener = new StreamTaskListener(logFile)) {
       exec(streamListener);

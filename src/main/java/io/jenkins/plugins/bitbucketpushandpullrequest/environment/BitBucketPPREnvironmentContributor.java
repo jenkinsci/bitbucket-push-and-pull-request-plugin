@@ -43,7 +43,7 @@ public class BitBucketPPREnvironmentContributor extends EnvironmentContributor {
   public void buildEnvironmentFor(@Nonnull Run run, EnvVars envVars, TaskListener taskListener)
       throws IOException, InterruptedException {
 
-    LOGGER.log(Level.INFO, "Injecting env vars because of pull request cause.");
+    LOGGER.log(Level.FINEST, "Injecting env vars because of pull request cause.");
 
     List<Cause> causes = run.getCauses();
 

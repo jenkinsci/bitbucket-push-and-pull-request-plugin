@@ -41,12 +41,19 @@ import hudson.console.AnnotatedLargeText;
 import hudson.model.CauseAction;
 import hudson.model.Item;
 import hudson.model.Job;
+import hudson.model.Result;
+import hudson.model.Run;
+import hudson.model.queue.QueueTaskFuture;
+import hudson.plugins.git.GitSCM;
+import hudson.plugins.git.UserRemoteConfig;
 import hudson.scm.PollingResult;
+import hudson.scm.SCM;
 import hudson.triggers.Trigger;
 import hudson.triggers.TriggerDescriptor;
 import hudson.util.SequentialExecutionQueue;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.cause.BitBucketPPRTriggerCause;
+import io.jenkins.plugins.bitbucketpushandpullrequest.client.BitBucketPPRClientFactory;
 import io.jenkins.plugins.bitbucketpushandpullrequest.exception.JobNotStartedException;
 import io.jenkins.plugins.bitbucketpushandpullrequest.filter.BitBucketPPRFilterMatcher;
 import io.jenkins.plugins.bitbucketpushandpullrequest.filter.BitBucketPPRTriggerFilter;
@@ -71,6 +78,8 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
   @Override
   public Object readResolve() throws ObjectStreamException {
     super.readResolve();
+
+    // TODO: is this he place for that? And why only for push?
     if (triggers == null) {
       BitBucketPPRRepositoryPushActionFilter repositoryPushActionFilter =
           new BitBucketPPRRepositoryPushActionFilter(false, false, spec);
@@ -86,10 +95,12 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
   /**
    * Called when a POST is made.
    * 
+   * @param scmTrigger
+   * 
    * @throws IOException
    */
   public void onPost(final BitBucketPPREvent bitbucketEvent,
-      final BitBucketPPRAction bitbucketAction) throws Exception {
+      final BitBucketPPRAction bitbucketAction, SCM scmTrigger) throws Exception {
     LOGGER.log(Level.INFO, "Called onPost");
 
     BitBucketPPRFilterMatcher filterMatcher = new BitBucketPPRFilterMatcher();
@@ -113,7 +124,7 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
                   LOGGER.log(Level.INFO, () -> "On Poll Success, get cause: " + cause.toString());
 
                   if (shouldScheduleJob(filter, pollingResult, bitbucketAction)) {
-                    scheduleJob(cause, bitbucketAction);
+                    scheduleJob(cause, bitbucketAction, scmTrigger);
                     return;
                   }
                 } catch (Exception e) {
@@ -151,7 +162,8 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
         && (pollingResult.hasChanges() || filter.shouldTriggerAlsoIfNothingChanged());
   }
 
-  private void scheduleJob(BitBucketPPRTriggerCause cause, BitBucketPPRAction bitbucketAction) {
+  private void scheduleJob(BitBucketPPRTriggerCause cause, BitBucketPPRAction bitbucketAction,
+      SCM scmTrigger) {
     ParameterizedJobMixIn<?, ?> pJob = new ParameterizedJobMixIn() {
       @Override
       protected Job<?, ?> asJob() {
@@ -160,16 +172,42 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
     };
     LOGGER.info("Check if job should be triggered due to changes in SCM");
 
-    if (pJob.scheduleBuild2(5, new CauseAction(cause), bitbucketAction) != null) {
-      try {
-        String name = " #" + job.getNextBuildNumber();
-        LOGGER.info(() -> "SCM changes detected in " + job.getName() + ". Triggering " + name);
-      } catch (NullPointerException e) {
-        LOGGER.info(e.getMessage());
-      }
+    QueueTaskFuture<?> future = pJob.scheduleBuild2(5, new CauseAction(cause), bitbucketAction);
+    LOGGER.info(() -> "SCM changes detected in " + job.getName() + ". Triggering " + " #"
+        + job.getNextBuildNumber());
+
+    if (future != null) {
+      handleFuture(bitbucketAction, scmTrigger, future);
     } else {
       LOGGER
           .info(() -> "SCM changes detected in " + job.getName() + ". Job is already in the queue");
+    }
+  }
+
+  private void handleFuture(BitBucketPPRAction bitbucketAction, SCM scmTrigger,
+      QueueTaskFuture<?> future) {
+    try {
+      Run<?, ?> run = (Run<?, ?>) future.get();
+      Result result = run.getResult();
+      LOGGER.info(() -> "Result is " + result);
+
+      GitSCM gitSCM = (GitSCM) scmTrigger;
+      UserRemoteConfig config = gitSCM.getUserRemoteConfigs().get(0);
+      String url = run.getResult() == Result.SUCCESS ? bitbucketAction.getLinkApprove()
+          : bitbucketAction.getLinkDecline();
+      
+      if (url != null) {
+        String payload = run.getResult() == Result.SUCCESS ? "{ \"approved\": true }"
+            : "{ \"approved\": false }";
+        BitBucketPPRClientFactory.createCloudClient(config, run)
+            .sendWithUsernamePasswordCredentials(url, payload);
+      }
+    } catch (NullPointerException e) {
+      LOGGER.warning(e.getMessage());
+    } catch (InterruptedException e) {
+      LOGGER.warning(e.getMessage());
+    } catch (Exception e) {
+      LOGGER.warning(e.getMessage());
     }
   }
 

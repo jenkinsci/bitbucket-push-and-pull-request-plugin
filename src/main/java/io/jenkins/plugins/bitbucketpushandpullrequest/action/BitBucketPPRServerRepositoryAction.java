@@ -45,6 +45,7 @@ public class BitBucketPPRServerRepositoryAction extends InvisibleAction implemen
   public BitBucketPPRServerRepositoryAction(BitBucketPPRPayload payload) {
     this.payload = payload;
 
+    // TODO: do we need link clones or link self is enough??    
     List<BitBucketPPRServerClone> clones =
         payload.getServerRepository().getLinks().getCloneProperty();
 
@@ -136,6 +137,36 @@ public class BitBucketPPRServerRepositoryAction extends InvisibleAction implemen
 
   @Override
   public String getComment() {
+    return null;
+  }
+
+  @Override
+  public String getLinkHtml() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public String getLinkSelf() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public String getLinkApprove() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public String getLinkDecline() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public String getLinkStatuses() {
+    // TODO Auto-generated method stub
     return null;
   }
 }

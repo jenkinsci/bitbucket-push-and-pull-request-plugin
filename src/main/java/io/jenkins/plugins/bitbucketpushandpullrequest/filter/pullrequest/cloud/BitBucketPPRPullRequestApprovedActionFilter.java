@@ -50,7 +50,7 @@ public class BitBucketPPRPullRequestApprovedActionFilter
 
   @DataBoundSetter
   public void setAllowedBranches(String allowedBranches) {
-    if (allowedBranches == null || "".equals(allowedBranches)) {
+    if (allowedBranches == null) {
       this.allowedBranches = "";
     } else {
       this.allowedBranches = allowedBranches;

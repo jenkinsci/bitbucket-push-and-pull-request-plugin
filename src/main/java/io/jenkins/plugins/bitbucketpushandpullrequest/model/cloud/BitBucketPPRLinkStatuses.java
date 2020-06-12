@@ -1,7 +1,7 @@
 /*******************************************************************************
  * The MIT License
  * 
- * Copyright (C) 2018, CloudBees, Inc.
+ * Copyright (C) 2020, CloudBees, Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -19,14 +19,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  ******************************************************************************/
 
-
 package io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud;
 
 import java.io.Serializable;
 
-
-public class BitBucketPPRHtml implements Serializable {
-  private static final long serialVersionUID = -6887496731660740096L;
+public class BitBucketPPRLinkStatuses implements Serializable {
+  private static final long serialVersionUID = 1L;
   private String href;
 
   public String getHref() {
@@ -39,6 +37,6 @@ public class BitBucketPPRHtml implements Serializable {
 
   @Override
   public String toString() {
-    return "BitBucketPPRHtml [href=" + href + "]";
+    return "BitBucketPPRLinkStatuses [href=" + href + "]";
   }
 }

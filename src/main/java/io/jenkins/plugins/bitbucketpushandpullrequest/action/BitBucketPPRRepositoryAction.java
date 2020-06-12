@@ -48,6 +48,7 @@ public class BitBucketPPRRepositoryAction extends InvisibleAction implements Bit
   public BitBucketPPRRepositoryAction(@Nonnull BitBucketPPRPayload payload) {
     this.payload = payload;
 
+    // TODO: why??
     scmUrls.add(payload.getRepository().getLinks().getHtml().getHref());
 
     for (BitBucketPPRChange change : payload.getPush().getChanges()) {
@@ -135,6 +136,36 @@ public class BitBucketPPRRepositoryAction extends InvisibleAction implements Bit
 
   @Override
   public String getComment() {
+    return null;
+  }
+
+  @Override
+  public String getLinkHtml() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public String getLinkSelf() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public String getLinkApprove() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public String getLinkDecline() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public String getLinkStatuses() {
+    // TODO Auto-generated method stub
     return null;
   }
 }

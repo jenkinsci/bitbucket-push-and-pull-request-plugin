@@ -24,6 +24,7 @@ package io.jenkins.plugins.bitbucketpushandpullrequest.filter.repository;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.kohsuke.stapler.DataBoundConstructor;
 import hudson.Extension;
@@ -64,6 +65,8 @@ public class BitBucketPPRServerRepositoryPushActionFilter
       return false;
     }
 
+    LOGGER.log(Level.FINEST, "the target branch is: {0}.", bitbucketAction.getTargetBranch());
+    LOGGER.log(Level.FINEST, "The allowed branches are: {0}.", allowedBranches);
     return matches(allowedBranches, bitbucketAction.getTargetBranch(), null);
   }
 

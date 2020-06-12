@@ -35,6 +35,7 @@ import org.apache.commons.lang.StringUtils;
 import org.eclipse.jgit.transport.RemoteConfig;
 import org.eclipse.jgit.transport.URIish;
 import hudson.model.Job;
+import hudson.model.Result;
 import hudson.plugins.git.GitSCM;
 import hudson.plugins.git.GitStatus;
 import hudson.plugins.mercurial.MercurialSCM;
@@ -42,6 +43,7 @@ import hudson.scm.SCM;
 import hudson.security.ACL;
 import hudson.security.ACLContext;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
+import io.jenkins.plugins.bitbucketpushandpullrequest.cause.BitBucketPPRTriggerCause;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPREvent;
 import jenkins.branch.MultiBranchProject;
 import jenkins.model.Jenkins;
@@ -110,6 +112,9 @@ public class BitBucketPPRJobProbe {
 
             LOGGER.log(Level.FINE, "Scheduling for job:" + job.getDisplayName());
 
+
+            // TODO: is it needed? There is only a remote, the HTML one, that is used the do the
+            // match
             boolean isRemoteSet = false;
             for (URIish remote : remotes) {
               if (match(scmTrigger, remote)) {
@@ -123,7 +128,7 @@ public class BitBucketPPRJobProbe {
               LOGGER.log(Level.FINE, "Triggering trigger {0} for job {1}",
                   new Object[] {trigger.getClass().getName(), job.getFullDisplayName()});
               try {
-                trigger.onPost(bitbucketEvent, this.bitbucketAction);
+                trigger.onPost(bitbucketEvent, this.bitbucketAction, scmTrigger);
               } catch (Exception e) {
                 LOGGER.log(Level.WARNING, "Error: {0}", e.getMessage());
               }
@@ -133,7 +138,8 @@ public class BitBucketPPRJobProbe {
             }
           })));
     } else {
-      LOGGER.log(Level.FINE, "Bitbucket Trigger for job: {0} is not present. ", job.getFullDisplayName());
+      LOGGER.log(Level.FINE, "Bitbucket Trigger for job: {0} is not present. ",
+          job.getFullDisplayName());
     }
   }
 
@@ -223,18 +229,14 @@ public class BitBucketPPRJobProbe {
   }
 
   private boolean matchGitScm(SCM scm, URIish remote) {
-
     GitSCM gitSCM = (GitSCM) scm;
-
-    gitSCM.getBranches().stream().forEach(b -> LOGGER.info(() -> "GIT BRANCHES" + b.toString()));
-
-    LOGGER.info(() -> "GIT BRANCH VARIABLE " + GitSCM.GIT_BRANCH);
-    LOGGER.info(() -> "GIT LOCAL BRANCH VARIABLE " + GitSCM.GIT_LOCAL_BRANCH);
 
     for (RemoteConfig remoteConfig : gitSCM.getRepositories()) {
       for (URIish urIish : remoteConfig.getURIs()) {
         LOGGER.log(Level.INFO, "Trying to match {0} ",
             urIish.toString() + "<-->" + remote.toString());
+
+        // TODO: Should we implement the method or continue using the GitStatus one?
         if (GitStatus.looselyMatches(urIish, remote)) {
           LOGGER.info("Matched scm");
           return true;
@@ -269,5 +271,11 @@ public class BitBucketPPRJobProbe {
 
   public boolean testMatchMercurialScm(SCM scm, URIish remote) {
     return matchMercurialScm(scm, remote);
+  }
+
+  void onCompleted(BitBucketPPRTriggerCause cause, Result result, String buildUrl) {
+    if (cause == null) {
+      return;
+    }
   }
 }

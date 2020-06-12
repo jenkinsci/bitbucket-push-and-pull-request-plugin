@@ -40,7 +40,7 @@ public class BitBucketPPRRepositoryTriggerMatcher implements BitBucketPPREventTr
     logger.log(Level.INFO, () -> "" + bitbucketEvent.toString());
 
 
-    logger.log(Level.INFO,
+    logger.log(Level.FINE,
         "1. (Is the trigger filter instance of BitBucketPPRRepositoryPushActionFilter? <<{0}>> "
             + "AND does it equal BitBucketPPRConsts.REPOSITORY_PUSH {1} to bitbucketEvent.getAction() {2}? <<{3}>>) OR "
             + "2. (Is the trigger filter instance of BitBucketPPRServerRepositoryPushActionFilter? <<{4}>>"
