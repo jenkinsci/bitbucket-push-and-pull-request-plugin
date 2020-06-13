@@ -1,19 +1,19 @@
 package io.jenkins.plugins.bitbucketpushandpullrequest.event;
 
-import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
-import hudson.model.queue.QueueTaskFuture;
+import hudson.model.Run;
 import hudson.scm.SCM;
+import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
 
 
 public class BitBucketPPREventContext {
   private SCM scmTrigger;
-  private QueueTaskFuture<?> future;
+  private Run<?, ?> run;
   private BitBucketPPRAction action;
 
-  public BitBucketPPREventContext(BitBucketPPRAction action, SCM scmTrigger, QueueTaskFuture<?> future) {
+  public BitBucketPPREventContext(BitBucketPPRAction action, SCM scmTrigger, Run<?, ?> run) {
     this.action = action;
     this.scmTrigger = scmTrigger;
-    this.future = future;
+    this.run = run;
   }
 
   public SCM getScmTrigger() {
@@ -24,7 +24,7 @@ public class BitBucketPPREventContext {
     return action;
   }
 
-  public QueueTaskFuture<?> getFuture() {
-    return future;
+  public Run<?, ?> getRun() {
+    return run;
   }
 }

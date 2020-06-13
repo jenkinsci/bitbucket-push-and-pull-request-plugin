@@ -20,6 +20,7 @@
  ******************************************************************************/
 package io.jenkins.plugins.bitbucketpushandpullrequest.observer;
 
+import java.util.concurrent.ExecutionException;
 import java.util.logging.Logger;
 import hudson.model.Result;
 import hudson.model.Run;
@@ -49,26 +50,29 @@ public class BitBucketPPRCloudObserver extends BitBucketPPRHandlerTemplate
 
   @Override
   protected void setApproved() {
-    BitBucketPPRAction bitbucketAction = context.getAction();
-    SCM scmTrigger = context.getScmTrigger();
-    QueueTaskFuture<?> future = context.getFuture();
-
     try {
-      Run<?, ?> run = (Run<?, ?>) future.get();
-      Result result = run.getResult();
-      LOGGER.info(() -> "Result is " + result);
+      Result result = context.getRun().getResult();
+      LOGGER.info(() -> "The result is " + result);
 
-      GitSCM gitSCM = (GitSCM) scmTrigger;
-      UserRemoteConfig config = gitSCM.getUserRemoteConfigs().get(0);
-      String url = run.getResult() == Result.SUCCESS ? bitbucketAction.getLinkApprove()
-          : bitbucketAction.getLinkDecline();
-
-      if (url != null) {
-        String payload = run.getResult() == Result.SUCCESS ? "{ \"approved\": true }"
-            : "{ \"approved\": false }";
-        BitBucketPPRClientFactory.createClient(BitBucketPPRClientType.CLOUD, config, run)
-            .sendWithUsernamePasswordCredentials(url, payload);
+      BitBucketPPRAction bitbucketAction = context.getAction();
+      String url = null;
+      String payload = null;
+      if (result == Result.SUCCESS) {
+        url = bitbucketAction.getLinkApprove();
+        payload = "{ \"approved\": true }";
+      } else if (result == Result.FAILURE) {
+        url = bitbucketAction.getLinkDecline();
+        payload = "{ \"approved\": false }";
       }
+      if (url == null) {
+        LOGGER.info(() -> "Cannot set URL for approved.");
+        return;
+      }
+
+      BitBucketPPRClientFactory
+          .createClient(BitBucketPPRClientType.CLOUD, getUserRemoreConfigs(), context.getRun())
+          .sendWithUsernamePasswordCredentials(url, payload);
+
     } catch (NullPointerException e) {
       LOGGER.warning(e.getMessage());
     } catch (InterruptedException e) {
@@ -76,18 +80,48 @@ public class BitBucketPPRCloudObserver extends BitBucketPPRHandlerTemplate
     } catch (Exception e) {
       LOGGER.warning(e.getMessage());
     }
+  }
 
+  private UserRemoteConfig getUserRemoreConfigs() {
+    GitSCM gitSCM = (GitSCM) context.getScmTrigger();
+    UserRemoteConfig config = gitSCM.getUserRemoteConfigs().get(0);
+    return config;
   }
 
   @Override
   protected void setBuildStatusOnFinished() {
-    // TODO Auto-generated method stub
+    BitBucketPPRAction bitbucketAction = context.getAction();
+    String url = bitbucketAction.getCommitLink() + "/statuses/build";
+    Result result = context.getRun().getResult();
 
+    String payload = "{\"key\": \"" + context.getRun().getNumber() + "\", \"url\": \""
+        + context.getRun().getAbsoluteUrl() + "\", ";
+    payload += result == Result.SUCCESS ? "\"state\": \"SUCCESSFUL\""
+        : result == Result.ABORTED ? "\"state\": \"STOPPED\"" : "\"state\": \"FAILED\"";
+    payload += " }";
+
+    try {
+      BitBucketPPRClientFactory
+          .createClient(BitBucketPPRClientType.CLOUD, getUserRemoreConfigs(), context.getRun())
+          .sendWithUsernamePasswordCredentials(url, payload);
+    } catch (Exception e) {
+      LOGGER.warning(e.getMessage());
+    }
   }
 
   @Override
   protected void setBuildStatusInProgress() {
-    // TODO Auto-generated method stub
-
+    BitBucketPPRAction bitbucketAction = context.getAction();
+    String url = bitbucketAction.getCommitLink() + "/statuses/build";
+    String payload = "{\"key\": \"" + context.getRun().getNumber() + "\", \"url\": \""
+        + context.getRun().getAbsoluteUrl() + "\", \"state\": \"INPROGRESS\" }";
+        
+    try {
+      BitBucketPPRClientFactory
+          .createClient(BitBucketPPRClientType.CLOUD, getUserRemoreConfigs(), context.getRun())
+          .sendWithUsernamePasswordCredentials(url, payload);
+    } catch (Exception e) {
+      LOGGER.warning(e.getMessage());
+    }
   }
 }

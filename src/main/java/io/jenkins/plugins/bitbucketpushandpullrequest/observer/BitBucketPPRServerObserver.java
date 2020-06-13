@@ -21,15 +21,6 @@
 package io.jenkins.plugins.bitbucketpushandpullrequest.observer;
 
 import java.util.logging.Logger;
-import hudson.model.Result;
-import hudson.model.Run;
-import hudson.model.queue.QueueTaskFuture;
-import hudson.plugins.git.GitSCM;
-import hudson.plugins.git.UserRemoteConfig;
-import hudson.scm.SCM;
-import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
-import io.jenkins.plugins.bitbucketpushandpullrequest.client.BitBucketPPRClientFactory;
-import io.jenkins.plugins.bitbucketpushandpullrequest.client.BitBucketPPRClientType;
 import io.jenkins.plugins.bitbucketpushandpullrequest.event.BitBucketPPREvent;
 import io.jenkins.plugins.bitbucketpushandpullrequest.event.BitBucketPPREventContext;
 
@@ -49,33 +40,7 @@ public class BitBucketPPRServerObserver extends BitBucketPPRHandlerTemplate
 
   @Override
   protected void setApproved() {
-    BitBucketPPRAction bitbucketAction = context.getAction();
-    SCM scmTrigger = context.getScmTrigger();
-    QueueTaskFuture<?> future = context.getFuture();
-
-    try {
-      Run<?, ?> run = (Run<?, ?>) future.get();
-      Result result = run.getResult();
-      LOGGER.info(() -> "Result is " + result);
-
-      GitSCM gitSCM = (GitSCM) scmTrigger;
-      UserRemoteConfig config = gitSCM.getUserRemoteConfigs().get(0);
-      String url = run.getResult() == Result.SUCCESS ? bitbucketAction.getLinkApprove()
-          : bitbucketAction.getLinkDecline();
-
-      if (url != null) {
-        String payload = run.getResult() == Result.SUCCESS ? "{ \"approved\": true }"
-            : "{ \"approved\": false }";
-        BitBucketPPRClientFactory.createClient(BitBucketPPRClientType.SERVER, config, run)
-            .sendWithUsernamePasswordCredentials(url, payload);
-      }
-    } catch (NullPointerException e) {
-      LOGGER.warning(e.getMessage());
-    } catch (InterruptedException e) {
-      LOGGER.warning(e.getMessage());
-    } catch (Exception e) {
-      LOGGER.warning(e.getMessage());
-    }
+    return;
   }
 
   @Override

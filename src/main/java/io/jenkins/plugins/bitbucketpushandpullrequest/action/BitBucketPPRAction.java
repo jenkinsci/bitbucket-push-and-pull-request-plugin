@@ -66,4 +66,8 @@ public interface BitBucketPPRAction extends Action {
   public String getDescription();
 
   public String getComment();
+
+  public default String getCommitLink() {
+    return null;
+  };
 }

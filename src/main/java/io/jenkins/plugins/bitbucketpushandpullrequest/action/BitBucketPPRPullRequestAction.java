@@ -135,4 +135,9 @@ public class BitBucketPPRPullRequestAction extends InvisibleAction implements Bi
   public String getLinkStatuses() {
     return payload.getPullRequest().getLinks().getStatuses().getHref();
   }
+
+  @Override
+  public String getCommitLink() {
+    return payload.getPullRequest().getSource().getCommit().getLinks().getSelf().getHref();
+  }
 }

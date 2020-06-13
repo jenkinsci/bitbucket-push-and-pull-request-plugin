@@ -18,6 +18,7 @@ public abstract class BitBucketPPRHandlerTemplate {
     }
   }
 
+
   protected abstract void setApproved();
 
   protected abstract void setBuildStatusOnFinished();

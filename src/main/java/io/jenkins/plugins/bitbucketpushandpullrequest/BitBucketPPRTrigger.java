@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.commons.jelly.XMLOutput;
@@ -41,6 +42,7 @@ import hudson.console.AnnotatedLargeText;
 import hudson.model.CauseAction;
 import hudson.model.Item;
 import hudson.model.Job;
+import hudson.model.Run;
 import hudson.model.queue.QueueTaskFuture;
 import hudson.scm.PollingResult;
 import hudson.scm.SCM;
@@ -179,22 +181,29 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> implements BitBucket
     LOGGER.info(() -> "SCM changes detected in " + job.getName() + ". Triggering " + " #"
         + job.getNextBuildNumber());
 
-    try {
-      notifyObservers(BitBucketPPREventFactory.createEvent(BitBucketPPREventType.BUILD_STARTED,
-          new BitBucketPPREventContext(bitbucketAction, scmTrigger, future)));
-    } catch (Exception e) {
-      LOGGER.info(e.getMessage());
-    }
-
     if (future != null) {
       try {
-        notifyObservers(BitBucketPPREventFactory.createEvent(BitBucketPPREventType.BUILD_FINISHED,
-            new BitBucketPPREventContext(bitbucketAction, scmTrigger, future)));
-      } catch (Exception e) {
-        LOGGER.info(e.getMessage());
+        future.waitForStart();
+      } catch (InterruptedException | ExecutionException e) {
+        LOGGER.info(e.getLocalizedMessage());
       }
-    } else {
-      LOGGER.info(() -> "SCM changes detected in " + job.getName() + ", but no Future.");
+
+      try {
+        notifyObservers(BitBucketPPREventFactory.createEvent(BitBucketPPREventType.BUILD_STARTED,
+            new BitBucketPPREventContext(bitbucketAction, scmTrigger, (Run<?, ?>) future.get())));
+      } catch (Exception e) {
+        LOGGER.info(e.getLocalizedMessage());
+      }
+
+      if (future.isDone()) {
+        try {
+          notifyObservers(BitBucketPPREventFactory.createEvent(BitBucketPPREventType.BUILD_FINISHED,
+              new BitBucketPPREventContext(bitbucketAction, scmTrigger, (Run<?, ?>) future.get())));
+        } catch (Exception e) {
+          LOGGER.info(e.getLocalizedMessage());
+        }
+      }
+      
     }
   }
 
