@@ -39,11 +39,10 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
 import hudson.model.Run;
 import hudson.plugins.git.UserRemoteConfig;
-import io.jenkins.plugins.bitbucketpushandpullrequest.BitBucketPPRTrigger;
 
 
 public class BitBucketPPRCloudClient implements BitBucketPPRClient {
-  private static final Logger LOGGER = Logger.getLogger(BitBucketPPRTrigger.class.getName());
+  private static final Logger LOGGER = Logger.getLogger(BitBucketPPRCloudClient.class.getName());
   private final UserRemoteConfig config;
   private Run<?, ?> run;
 
@@ -75,7 +74,7 @@ public class BitBucketPPRCloudClient implements BitBucketPPRClient {
       final int statusCode = response.getStatusLine().getStatusCode();
       final String result = EntityUtils.toString(response.getEntity());
       LOGGER.info("Result is: " + result + " Status Code: " + statusCode);
-    } catch (final Exception e) {
+    } catch (Exception e) {
       LOGGER.warning("Error: " + e.getMessage());
     }
   }

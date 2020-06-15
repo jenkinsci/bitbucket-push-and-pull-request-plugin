@@ -37,6 +37,7 @@ public class BitBucketPPRPullRequestCommentCreatedActionFilter
 
   public String allowedBranches;
   public String commentFilter;
+  public boolean isToApprove;
 
   @DataBoundConstructor
   public BitBucketPPRPullRequestCommentCreatedActionFilter() {}
@@ -59,6 +60,11 @@ public class BitBucketPPRPullRequestCommentCreatedActionFilter
     }
   }
 
+  @DataBoundSetter
+  public void setIsToApprove(boolean isToApprove) {
+    this.isToApprove = isToApprove;
+  }
+
   @Override
   public boolean shouldTriggerBuild(BitBucketPPRAction bitbucketAction) {
     return matches(allowedBranches, bitbucketAction.getTargetBranch(), null) && 
@@ -69,6 +75,11 @@ public class BitBucketPPRPullRequestCommentCreatedActionFilter
   public BitBucketPPRTriggerCause getCause(File pollingLog, BitBucketPPRAction pullRequestAction)
       throws IOException {
     return new BitBucketPPRPullRequestCommentCreatedCause(pollingLog, pullRequestAction);
+  }
+
+  @Override
+  public boolean shouldSendApprove() {
+    return isToApprove;
   }
 
   public boolean hasInComment(String comment, EnvVars vars) {

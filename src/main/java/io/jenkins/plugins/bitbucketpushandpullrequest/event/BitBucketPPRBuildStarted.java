@@ -20,9 +20,13 @@
  ******************************************************************************/
 package io.jenkins.plugins.bitbucketpushandpullrequest.event;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import io.jenkins.plugins.bitbucketpushandpullrequest.observer.BitBucketPPRHandlerTemplate;
 
 public class BitBucketPPRBuildStarted implements BitBucketPPREvent {
+  private static final Logger LOGGER = Logger.getLogger(BitBucketPPRBuildStarted.class.getName());
+
   BitBucketPPREventContext context;
   BitBucketPPRHandlerTemplate handler;
 
@@ -42,13 +46,17 @@ public class BitBucketPPRBuildStarted implements BitBucketPPREvent {
     try {
       handler.run(BitBucketPPREventType.BUILD_STARTED);
     } catch (Exception e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
+      LOGGER.log(Level.INFO, e.getMessage());
     }
   }
 
   @Override
   public BitBucketPPREventContext getContext() {
     return context;
+  }
+
+  @Override
+  public String toString() {
+    return "BitBucketPPRBuildStarted [context=" + context + ", handler=" + handler + "]";
   }
 }

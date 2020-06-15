@@ -53,10 +53,12 @@ public final class BitBucketPPRPayloadProcessorFactory {
 
     if (REPOSITORY_EVENT.equalsIgnoreCase(bitbucketEvent.getEvent())
         && REPOSITORY_CLOUD_PUSH.equalsIgnoreCase(bitbucketEvent.getAction())) {
+          LOGGER.info("Create BitBucketPPRRepositoryCloudPayloadProcessor");
       return new BitBucketPPRRepositoryCloudPayloadProcessor(probe, bitbucketEvent);
     }
     if (REPOSITORY_EVENT.equalsIgnoreCase(bitbucketEvent.getEvent())
         && REPOSITORY_SERVER_PUSH.equalsIgnoreCase(bitbucketEvent.getAction())) {
+          LOGGER.info("Create BitBucketPPRRepositoryServerPayloadProcessor");
       return new BitBucketPPRRepositoryServerPayloadProcessor(probe, bitbucketEvent);
     }
     if (REPOSITORY_EVENT.equalsIgnoreCase(bitbucketEvent.getEvent())
@@ -65,10 +67,12 @@ public final class BitBucketPPRPayloadProcessorFactory {
     }
 
     if (PULL_REQUEST_CLOUD_EVENT.equals(bitbucketEvent.getEvent())) {
+      LOGGER.info("Create BitBucketPPRPullRequestCloudPayloadProcessor");
       return new BitBucketPPRPullRequestCloudPayloadProcessor(probe, bitbucketEvent);
     }
 
     if (PULL_REQUEST_SERVER_EVENT.equals(bitbucketEvent.getEvent())) {
+      LOGGER.info("Create BitBucketPPRPullRequestServerPayloadProcessor");
       return new BitBucketPPRPullRequestServerPayloadProcessor(probe, bitbucketEvent);
     }
 

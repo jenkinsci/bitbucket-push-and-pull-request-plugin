@@ -27,6 +27,16 @@ public class BitBucketPPRNew implements Serializable {
   private static final long serialVersionUID = -1128832514571843255L;
   private String type;
   private String name;
+  private BitBucketPPRTarget target;
+
+  
+  public BitBucketPPRTarget getTarget() {
+    return target;
+  }
+
+  public void setTarget(BitBucketPPRTarget target) {
+    this.target = target;
+  }
 
   public String getType() {
     return type;

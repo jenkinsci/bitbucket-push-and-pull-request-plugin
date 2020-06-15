@@ -1,7 +1,7 @@
 /*******************************************************************************
  * The MIT License
  * 
- * Copyright (C) 2018, CloudBees, Inc.
+ * Copyright (C) 2020, CloudBees, Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -18,27 +18,30 @@
  * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  ******************************************************************************/
+package io.jenkins.plugins.bitbucketpushandpullrequest.observer;
 
+import org.apache.commons.lang.NotImplementedException;
+import io.jenkins.plugins.bitbucketpushandpullrequest.event.BitBucketPPREvent;
 
-package io.jenkins.plugins.bitbucketpushandpullrequest.filter;
+public class BitBucketPPRPushServerObserver extends BitBucketPPRHandlerTemplate
+    implements BitBucketPPRObserver {
 
-import java.io.File;
-import java.io.IOException;
-import hudson.model.AbstractDescribableImpl;
-import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
-import io.jenkins.plugins.bitbucketpushandpullrequest.cause.BitBucketPPRTriggerCause;
+  
+  @Override
+  public void getNotification(BitBucketPPREvent event) {
+    event.setEventHandler(this);
+    event.runHandler();
+  }
 
+  
+  @Override
+  public void setBuildStatusOnFinished() {
+    throw new NotImplementedException();
 
-public abstract class BitBucketPPRTriggerFilter
-    extends AbstractDescribableImpl<BitBucketPPRTriggerFilter> {
-  public abstract boolean shouldScheduleJob(BitBucketPPRAction bitbucketAction);
+  }
 
-  public abstract BitBucketPPRTriggerCause getCause(File pollingLog, BitBucketPPRAction action)
-      throws IOException;
-
-  public abstract AbstractDescribableImpl<?> getActionFilter();
-
-  public abstract boolean shouldTriggerAlsoIfNothingChanged();
-
-  public abstract boolean shouldSendApprove();
+  @Override
+  public void setBuildStatusInProgress() {
+    throw new NotImplementedException();
+  }
 }

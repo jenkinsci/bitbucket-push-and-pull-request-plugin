@@ -42,6 +42,7 @@ public class BitBucketPPRPullRequestServerApprovedActionFilter
 
   public String allowedBranches;
   public boolean triggerOnlyIfAllReviewersApproved;
+  public boolean isToApprove;
 
   @DataBoundConstructor
   public BitBucketPPRPullRequestServerApprovedActionFilter(
@@ -56,6 +57,11 @@ public class BitBucketPPRPullRequestServerApprovedActionFilter
     } else {
       this.allowedBranches = allowedBranches;
     }
+  }
+
+  @DataBoundSetter
+  public void setIsToApprove(boolean isToApprove) {
+    this.isToApprove = isToApprove;
   }
 
   @Override
@@ -97,5 +103,10 @@ public class BitBucketPPRPullRequestServerApprovedActionFilter
     String role = pullRequestParticipant.getRole();
 
     return PULL_REQUEST_REVIEWER.equals(role);
+  }
+
+  @Override
+  public boolean shouldSendApprove() {
+    return isToApprove;
   }
 }

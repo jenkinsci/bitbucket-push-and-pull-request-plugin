@@ -1,7 +1,7 @@
 /*******************************************************************************
  * The MIT License
  * 
- * Copyright (C) 2020, CloudBees, Inc.
+ * Copyright (C) 2018, CloudBees, Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -18,41 +18,20 @@
  * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  ******************************************************************************/
-package io.jenkins.plugins.bitbucketpushandpullrequest.observer;
+package io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud;
 
-import java.util.logging.Logger;
-import io.jenkins.plugins.bitbucketpushandpullrequest.event.BitBucketPPREvent;
-import io.jenkins.plugins.bitbucketpushandpullrequest.event.BitBucketPPREventContext;
+import java.io.Serializable;
 
-public class BitBucketPPRServerObserver extends BitBucketPPRHandlerTemplate
-    implements BitBucketPPRObserver {
-  static final Logger LOGGER = Logger.getLogger(BitBucketPPRServerObserver.class.getName());
+public class BitBucketPPRTarget implements Serializable {
+  private static final long serialVersionUID = 1L;
 
-  BitBucketPPREventContext context;
+  private BitBucketPPRLinks links;
 
-  @Override
-  public void getNotification(BitBucketPPREvent event) {
-    context = event.getContext();
-    event.setEventHandler(this);
-    event.runHandler();
+  public BitBucketPPRLinks getLinks() {
+    return links;
   }
 
-
-  @Override
-  protected void setApproved() {
-    return;
+  public void setLinks(BitBucketPPRLinks links) {
+    this.links = links;
   }
-
-  @Override
-  protected void setBuildStatusOnFinished() {
-    // TODO Auto-generated method stub
-
-  }
-
-  @Override
-  protected void setBuildStatusInProgress() {
-    // TODO Auto-generated method stub
-
-  }
-
 }

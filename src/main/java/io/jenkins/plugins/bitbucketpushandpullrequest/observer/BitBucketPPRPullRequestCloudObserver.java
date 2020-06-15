@@ -20,14 +20,10 @@
  ******************************************************************************/
 package io.jenkins.plugins.bitbucketpushandpullrequest.observer;
 
-import java.util.concurrent.ExecutionException;
 import java.util.logging.Logger;
+import javax.annotation.Nonnull;
 import hudson.model.Result;
-import hudson.model.Run;
-import hudson.model.queue.QueueTaskFuture;
 import hudson.plugins.git.GitSCM;
-import hudson.plugins.git.UserRemoteConfig;
-import hudson.scm.SCM;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.client.BitBucketPPRClientFactory;
 import io.jenkins.plugins.bitbucketpushandpullrequest.client.BitBucketPPRClientType;
@@ -35,9 +31,10 @@ import io.jenkins.plugins.bitbucketpushandpullrequest.event.BitBucketPPREvent;
 import io.jenkins.plugins.bitbucketpushandpullrequest.event.BitBucketPPREventContext;
 
 
-public class BitBucketPPRCloudObserver extends BitBucketPPRHandlerTemplate
+public class BitBucketPPRPullRequestCloudObserver extends BitBucketPPRHandlerTemplate
     implements BitBucketPPRObserver {
-  static final Logger LOGGER = Logger.getLogger(BitBucketPPRCloudObserver.class.getName());
+  static final Logger LOGGER =
+      Logger.getLogger(BitBucketPPRPullRequestCloudObserver.class.getName());
 
   BitBucketPPREventContext context;
 
@@ -49,7 +46,11 @@ public class BitBucketPPRCloudObserver extends BitBucketPPRHandlerTemplate
   }
 
   @Override
-  protected void setApproved() {
+  public void setApproved() {
+    if(!context.getFilter().shouldSendApprove()){
+      return;
+    }
+    
     try {
       Result result = context.getRun().getResult();
       LOGGER.info(() -> "The result is " + result);
@@ -70,7 +71,8 @@ public class BitBucketPPRCloudObserver extends BitBucketPPRHandlerTemplate
       }
 
       BitBucketPPRClientFactory
-          .createClient(BitBucketPPRClientType.CLOUD, getUserRemoreConfigs(), context.getRun())
+          .createClient(BitBucketPPRClientType.CLOUD,
+              getUserRemoteConfigs((GitSCM) context.getScmTrigger()), context.getRun())
           .sendWithUsernamePasswordCredentials(url, payload);
 
     } catch (NullPointerException e) {
@@ -82,43 +84,35 @@ public class BitBucketPPRCloudObserver extends BitBucketPPRHandlerTemplate
     }
   }
 
-  private UserRemoteConfig getUserRemoreConfigs() {
-    GitSCM gitSCM = (GitSCM) context.getScmTrigger();
-    UserRemoteConfig config = gitSCM.getUserRemoteConfigs().get(0);
-    return config;
-  }
-
   @Override
-  protected void setBuildStatusOnFinished() {
+  public void setBuildStatusOnFinished() {
     BitBucketPPRAction bitbucketAction = context.getAction();
     String url = bitbucketAction.getCommitLink() + "/statuses/build";
     Result result = context.getRun().getResult();
 
     String payload = "{\"key\": \"" + context.getRun().getNumber() + "\", \"url\": \""
-        + context.getRun().getAbsoluteUrl() + "\", ";
+        + context.getAbsoluteUrl() + "\", ";
     payload += result == Result.SUCCESS ? "\"state\": \"SUCCESSFUL\""
         : result == Result.ABORTED ? "\"state\": \"STOPPED\"" : "\"state\": \"FAILED\"";
     payload += " }";
 
-    try {
-      BitBucketPPRClientFactory
-          .createClient(BitBucketPPRClientType.CLOUD, getUserRemoreConfigs(), context.getRun())
-          .sendWithUsernamePasswordCredentials(url, payload);
-    } catch (Exception e) {
-      LOGGER.warning(e.getMessage());
-    }
+    callClient(url, payload);
   }
 
   @Override
-  protected void setBuildStatusInProgress() {
+  public void setBuildStatusInProgress() {
     BitBucketPPRAction bitbucketAction = context.getAction();
     String url = bitbucketAction.getCommitLink() + "/statuses/build";
     String payload = "{\"key\": \"" + context.getRun().getNumber() + "\", \"url\": \""
-        + context.getRun().getAbsoluteUrl() + "\", \"state\": \"INPROGRESS\" }";
-        
+        + context.getAbsoluteUrl() + "\", \"state\": \"INPROGRESS\" }";
+
+    callClient(url, payload);
+  }
+
+  private void callClient(@Nonnull String url, @Nonnull String payload) {
     try {
-      BitBucketPPRClientFactory
-          .createClient(BitBucketPPRClientType.CLOUD, getUserRemoreConfigs(), context.getRun())
+      BitBucketPPRClientFactory.createClient(BitBucketPPRClientType.CLOUD,
+          getUserRemoteConfigs(context.getScmTrigger()), context.getRun())
           .sendWithUsernamePasswordCredentials(url, payload);
     } catch (Exception e) {
       LOGGER.warning(e.getMessage());

@@ -1,7 +1,7 @@
 /*******************************************************************************
  * The MIT License
  * 
- * Copyright (C) 2018, CloudBees, Inc.
+ * Copyright (C) 2020, CloudBees, Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -18,27 +18,35 @@
  * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  ******************************************************************************/
+package io.jenkins.plugins.bitbucketpushandpullrequest.observer;
 
+import java.util.logging.Logger;
+import org.apache.commons.lang.NotImplementedException;
+import io.jenkins.plugins.bitbucketpushandpullrequest.event.BitBucketPPREvent;
+import io.jenkins.plugins.bitbucketpushandpullrequest.event.BitBucketPPREventContext;
 
-package io.jenkins.plugins.bitbucketpushandpullrequest.filter;
+public class BitBucketPPRPullRequestServerObserver extends BitBucketPPRHandlerTemplate
+    implements BitBucketPPRObserver {
+  static final Logger LOGGER =
+      Logger.getLogger(BitBucketPPRPullRequestServerObserver.class.getName());
 
-import java.io.File;
-import java.io.IOException;
-import hudson.model.AbstractDescribableImpl;
-import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
-import io.jenkins.plugins.bitbucketpushandpullrequest.cause.BitBucketPPRTriggerCause;
+  BitBucketPPREventContext context;
 
+  @Override
+  public void getNotification(BitBucketPPREvent event) {
+    context = event.getContext();
+    event.setEventHandler(this);
+    event.runHandler();
+  }
 
-public abstract class BitBucketPPRTriggerFilter
-    extends AbstractDescribableImpl<BitBucketPPRTriggerFilter> {
-  public abstract boolean shouldScheduleJob(BitBucketPPRAction bitbucketAction);
+  @Override
+  public void setBuildStatusOnFinished() {
+    throw new NotImplementedException();
 
-  public abstract BitBucketPPRTriggerCause getCause(File pollingLog, BitBucketPPRAction action)
-      throws IOException;
+  }
 
-  public abstract AbstractDescribableImpl<?> getActionFilter();
-
-  public abstract boolean shouldTriggerAlsoIfNothingChanged();
-
-  public abstract boolean shouldSendApprove();
+  @Override
+  public void setBuildStatusInProgress() {
+    throw new NotImplementedException();
+  }
 }

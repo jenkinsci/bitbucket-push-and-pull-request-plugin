@@ -48,6 +48,11 @@ public class BitBucketPPRRepositoryTriggerFilter extends BitBucketPPRTriggerFilt
   }
 
   @Override
+  public boolean shouldSendApprove() {
+    return actionFilter.shouldSendApprove();
+  }
+
+  @Override
   public BitBucketPPRTriggerCause getCause(File pollingLog, BitBucketPPRAction action)
       throws IOException {
     return actionFilter.getCause(pollingLog, action);

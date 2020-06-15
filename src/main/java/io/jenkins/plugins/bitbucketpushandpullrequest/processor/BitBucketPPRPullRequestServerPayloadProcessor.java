@@ -22,7 +22,6 @@
 
 package io.jenkins.plugins.bitbucketpushandpullrequest.processor;
 
-import java.util.List;
 import java.util.logging.Logger;
 import javax.annotation.Nonnull;
 import io.jenkins.plugins.bitbucketpushandpullrequest.BitBucketPPRJobProbe;
@@ -30,7 +29,7 @@ import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRPullRequestServerAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRHookEvent;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
-import io.jenkins.plugins.bitbucketpushandpullrequest.observer.BitBucketPPRObserver;
+import io.jenkins.plugins.bitbucketpushandpullrequest.observer.BitBucketPPRObservable;
 
 
 public class BitBucketPPRPullRequestServerPayloadProcessor extends BitBucketPPRPayloadProcessor {
@@ -50,8 +49,9 @@ public class BitBucketPPRPullRequestServerPayloadProcessor extends BitBucketPPRP
   }
 
   @Override
-  public void processPayload(@Nonnull BitBucketPPRPayload payload, List<BitBucketPPRObserver> observers) {
+  public void processPayload(@Nonnull BitBucketPPRPayload payload, 
+      BitBucketPPRObservable observable) {
     BitBucketPPRAction action = buildActionForJobs(payload);
-    jobProbe.triggerMatchingJobs(bitbucketEvent, action, observers);
+    jobProbe.triggerMatchingJobs(bitbucketEvent, action, observable);
   }
 }

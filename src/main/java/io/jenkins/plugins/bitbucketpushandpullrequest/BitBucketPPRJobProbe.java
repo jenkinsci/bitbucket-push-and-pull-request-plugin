@@ -22,6 +22,7 @@
 package io.jenkins.plugins.bitbucketpushandpullrequest;
 
 import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.PULL_REQUEST_MERGED;
+import java.io.PrintStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -42,25 +43,39 @@ import hudson.plugins.mercurial.MercurialSCM;
 import hudson.scm.SCM;
 import hudson.security.ACL;
 import hudson.security.ACLContext;
+import hudson.triggers.Trigger;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.cause.BitBucketPPRTriggerCause;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRHookEvent;
-import io.jenkins.plugins.bitbucketpushandpullrequest.observer.BitBucketPPRObserver;
+import io.jenkins.plugins.bitbucketpushandpullrequest.observer.BitBucketPPRObservable;
 import jenkins.branch.MultiBranchProject;
 import jenkins.model.Jenkins;
 import jenkins.model.ParameterizedJobMixIn;
-import jenkins.model.ParameterizedJobMixIn.ParameterizedJob;
 import jenkins.triggers.SCMTriggerItem;
 
 public class BitBucketPPRJobProbe {
   private static final Logger LOGGER = Logger.getLogger(BitBucketPPRJobProbe.class.getName());
   private BitBucketPPRHookEvent bitbucketEvent;
-  private BitBucketPPRAction bitbucketAction;
+
+  {
+    System.setErr(createLoggingProxy(System.err));
+  }
+
+  public static PrintStream createLoggingProxy(final PrintStream realPrintStream) {
+    return new PrintStream(realPrintStream) {
+      public void print(final String string) {
+        LOGGER.info(string);
+      }
+
+      public void println(final String string) {
+        LOGGER.info(string);
+      }
+    };
+  }
 
   public void triggerMatchingJobs(BitBucketPPRHookEvent bitbucketEvent,
-      BitBucketPPRAction bitbucketAction, List<BitBucketPPRObserver> observers) {
+      BitBucketPPRAction bitbucketAction, BitBucketPPRObservable observable) {
     this.bitbucketEvent = bitbucketEvent;
-    this.bitbucketAction = bitbucketAction;
 
     if (!("git".equals(bitbucketAction.getScm()) || "hg".equals(bitbucketAction.getScm()))) {
       throw new UnsupportedOperationException("Unsupported SCM type " + bitbucketAction.getScm());
@@ -75,7 +90,7 @@ public class BitBucketPPRJobProbe {
       Jenkins.get().getAllItems(Job.class).stream().forEach(job -> {
         LOGGER.log(Level.FINE, "Considering candidate job {0}", job.getName());
 
-        triggerScm(job, remotes, bitbucketAction, observers);
+        triggerScm(job, remotes, bitbucketAction, observable);
       });
     } catch (Exception e) {
       LOGGER.log(Level.WARNING, "Invalid repository URLs {0}\n{1}",
@@ -95,21 +110,11 @@ public class BitBucketPPRJobProbe {
   }
 
   private void triggerScm(Job<?, ?> job, List<URIish> remotes, BitBucketPPRAction bitbucketAction,
-      List<BitBucketPPRObserver> observers) {
+      BitBucketPPRObservable observable) {
     LOGGER.log(Level.FINE, "Considering to poke {0}", job.getFullDisplayName());
-    Optional<BitBucketPPRTrigger> bitbucketTrigger = getBitBucketTrigger(job);
+    BitBucketPPRTrigger bitbucketTrigger = getBitBucketTrigger(job);
 
-    if (bitbucketTrigger.isPresent()) {
-      BitBucketPPRTrigger trigger = bitbucketTrigger.get();
-
-      for (BitBucketPPRObserver observer : observers) {
-        try {
-          trigger.addObserver(observer);
-        } catch (Exception e) {
-          LOGGER.log(Level.INFO, "Cannot add observer: " + observer.toString());
-        }
-      }
-
+    if (bitbucketTrigger != null) {
       List<SCM> scmTriggered = new ArrayList<>();
       Optional<SCMTriggerItem> item =
           Optional.ofNullable(SCMTriggerItem.SCMTriggerItems.asSCMTriggerItem(job));
@@ -122,7 +127,6 @@ public class BitBucketPPRJobProbe {
         }
 
         LOGGER.log(Level.FINE, "Scheduling for job:" + job.getDisplayName());
-
 
         // TODO: is it needed? There is only a remote, the HTML one, that is used the do the
         // match
@@ -137,11 +141,11 @@ public class BitBucketPPRJobProbe {
         if (isRemoteSet && !hasBeenTriggered(scmTriggered, scmTrigger)) {
           scmTriggered.add(scmTrigger);
           LOGGER.log(Level.FINE, "Triggering trigger {0} for job {1}",
-              new Object[] {trigger.getClass().getName(), job.getFullDisplayName()});
+              new Object[] {bitbucketTrigger.getClass().getName(), job.getFullDisplayName()});
 
           try {
-            trigger.onPost(this.bitbucketEvent, this.bitbucketAction, scmTrigger);
-          } catch (Exception e) {
+            bitbucketTrigger.onPost(this.bitbucketEvent, bitbucketAction, scmTrigger, observable);
+          } catch (Throwable e) {
             LOGGER.log(Level.WARNING, "Error: {0}", e.getMessage());
             e.printStackTrace();
           }
@@ -165,9 +169,9 @@ public class BitBucketPPRJobProbe {
 
   private boolean mPJobShouldNotBeTriggered(Job<?, ?> job, BitBucketPPRAction bitbucketAction) {
     if (job.getDisplayName() != null) {
-      final String displayName = job.getDisplayName();
-      final String sourceBranchName = bitbucketAction.getSourceBranch();
-      final String targetBranchName = bitbucketAction.getTargetBranch();
+      String displayName = job.getDisplayName();
+      String sourceBranchName = bitbucketAction.getSourceBranch();
+      String targetBranchName = bitbucketAction.getTargetBranch();
 
       LOGGER.log(Level.FINE, "Bitbucket event is : {0}", bitbucketEvent.getAction());
       LOGGER.log(Level.FINE, "Job Name : {0}", displayName);
@@ -184,20 +188,20 @@ public class BitBucketPPRJobProbe {
     return true;
   }
 
-  private Optional<BitBucketPPRTrigger> getBitBucketTrigger(Job<?, ?> job) {
+  private BitBucketPPRTrigger getBitBucketTrigger(Job<?, ?> job) {
+    BitBucketPPRTrigger trigger = null;
+
     if (job instanceof ParameterizedJobMixIn.ParameterizedJob) {
       ParameterizedJobMixIn.ParameterizedJob<?, ?> pJob =
           (ParameterizedJobMixIn.ParameterizedJob<?, ?>) job;
 
-      return getBitBucketTrigger(pJob);
+      for (Trigger<?> t : pJob.getTriggers().values()) {
+        if (t instanceof BitBucketPPRTrigger) {
+          trigger = (BitBucketPPRTrigger) t;
+        }
+      }
     }
-
-    return Optional.empty();
-  }
-
-  private Optional<BitBucketPPRTrigger> getBitBucketTrigger(ParameterizedJob<?, ?> job) {
-    return job.getTriggers().values().stream().filter(e -> e instanceof BitBucketPPRTrigger)
-        .findFirst().map(p -> (BitBucketPPRTrigger) p);
+    return trigger;
   }
 
   private boolean hasBeenTriggered(List<SCM> scmTriggered, SCM scmTrigger) {

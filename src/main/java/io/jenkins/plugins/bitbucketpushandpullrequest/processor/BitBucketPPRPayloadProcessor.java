@@ -20,12 +20,11 @@
  ******************************************************************************/
 package io.jenkins.plugins.bitbucketpushandpullrequest.processor;
 
-import java.util.List;
 import javax.annotation.Nonnull;
 import io.jenkins.plugins.bitbucketpushandpullrequest.BitBucketPPRJobProbe;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRHookEvent;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
-import io.jenkins.plugins.bitbucketpushandpullrequest.observer.BitBucketPPRObserver;
+import io.jenkins.plugins.bitbucketpushandpullrequest.observer.BitBucketPPRObservable;
 
 
 public abstract class BitBucketPPRPayloadProcessor {
@@ -39,5 +38,5 @@ public abstract class BitBucketPPRPayloadProcessor {
     this.bitbucketEvent = bitbucketEvent;
   }
 
-  public abstract void processPayload(@Nonnull BitBucketPPRPayload payload, List<BitBucketPPRObserver> observers);
+  public abstract void processPayload(@Nonnull BitBucketPPRPayload payload, BitBucketPPRObservable observable);
 }

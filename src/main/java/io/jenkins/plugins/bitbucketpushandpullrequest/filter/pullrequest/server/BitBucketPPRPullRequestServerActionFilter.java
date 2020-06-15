@@ -42,4 +42,6 @@ public abstract class BitBucketPPRPullRequestServerActionFilter
 
   public abstract BitBucketPPRTriggerCause getCause(File pollingLog,
       BitBucketPPRAction pullRequestAction) throws IOException;
+
+  public abstract boolean shouldSendApprove();
 }

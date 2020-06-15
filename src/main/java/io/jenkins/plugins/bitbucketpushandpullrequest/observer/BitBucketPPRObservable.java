@@ -20,10 +20,40 @@
  ******************************************************************************/
 package io.jenkins.plugins.bitbucketpushandpullrequest.observer;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import io.jenkins.plugins.bitbucketpushandpullrequest.event.BitBucketPPREvent;
 
-public interface BitBucketPPRObservable {
-  public void addObserver(BitBucketPPRObserver observer);
-  public void removeObserver(BitBucketPPRObserver observer);
-  public void notifyObservers(BitBucketPPREvent event);
+public class BitBucketPPRObservable {
+  private static final Logger LOGGER = Logger.getLogger(BitBucketPPRObservable.class.getName());
+
+  private List<BitBucketPPRObserver> observers = new ArrayList<>();
+
+  public void addObserver(BitBucketPPRObserver observer) {
+      this.observers.add(observer);
+  }
+
+  public void removeObserver(BitBucketPPRObserver observer) {
+    this.observers.remove(observer);
+
+  }
+
+  public void notifyObservers(BitBucketPPREvent event) {
+    if (observers == null) {
+      return;
+    }
+
+    for (BitBucketPPRObserver observer : this.observers) {
+      if (observer != null && event != null) {
+        LOGGER.log(Level.INFO, "Event: {0} for observer {1}",
+            new String[] {event.toString(), observer.toString()});
+        observer.getNotification(event);
+      } else {
+        LOGGER.log(Level.INFO, "observer or event are null");
+      }
+    }
+  }
+
 }

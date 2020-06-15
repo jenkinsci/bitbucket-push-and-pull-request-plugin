@@ -21,6 +21,7 @@
 package io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud;
 
 import java.io.Serializable;
+import java.util.List;
 import com.google.gson.annotations.SerializedName;
 
 
@@ -32,12 +33,22 @@ public class BitBucketPPRChange implements Serializable {
   private boolean truncated;
   private boolean created;
   private boolean closed;
+  private List<BitBucketPPRCommit> commits;
+
 
   @SerializedName("new")
   private BitBucketPPRNew newChange;
 
   public boolean isForced() {
     return forced;
+  }
+
+  public List<BitBucketPPRCommit> getCommits() {
+    return commits;
+  }
+
+  public void setCommits(List<BitBucketPPRCommit> commits) {
+    this.commits = commits;
   }
 
   public void setForced(final boolean forced) {

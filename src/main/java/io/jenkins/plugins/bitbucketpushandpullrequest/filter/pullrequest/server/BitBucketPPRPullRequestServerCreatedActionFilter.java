@@ -36,6 +36,7 @@ public class BitBucketPPRPullRequestServerCreatedActionFilter
     extends BitBucketPPRPullRequestServerActionFilter {
 
   public String allowedBranches;
+  public boolean isToApprove;
 
   @DataBoundConstructor
   public BitBucketPPRPullRequestServerCreatedActionFilter() {}
@@ -47,6 +48,11 @@ public class BitBucketPPRPullRequestServerCreatedActionFilter
     } else {
       this.allowedBranches = allowedBranches;
     }
+  }
+
+  @DataBoundSetter
+  public void setIsToApprove(boolean isToApprove) {
+    this.isToApprove = isToApprove;
   }
 
   @Override
@@ -68,5 +74,10 @@ public class BitBucketPPRPullRequestServerCreatedActionFilter
     public String getDisplayName() {
       return "Created";
     }
+  }
+
+  @Override
+  public boolean shouldSendApprove() {
+    return isToApprove;
   }
 }

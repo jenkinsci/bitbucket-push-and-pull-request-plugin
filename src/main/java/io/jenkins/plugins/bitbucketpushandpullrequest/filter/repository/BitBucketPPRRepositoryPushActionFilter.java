@@ -26,6 +26,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.logging.Logger;
 import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.DataBoundSetter;
 import hudson.Extension;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.cause.BitBucketPPRTriggerCause;
@@ -39,6 +40,7 @@ public class BitBucketPPRRepositoryPushActionFilter extends BitBucketPPRReposito
   public boolean triggerAlsoIfTagPush;
   public boolean triggerAlsoIfNothingChanged;
   public String allowedBranches;
+  public boolean isToApprove;
 
   @DataBoundConstructor
   public BitBucketPPRRepositoryPushActionFilter(boolean triggerAlsoIfTagPush,
@@ -46,6 +48,11 @@ public class BitBucketPPRRepositoryPushActionFilter extends BitBucketPPRReposito
     this.triggerAlsoIfTagPush = triggerAlsoIfTagPush;
     this.triggerAlsoIfNothingChanged = triggerAlsoIfNothingChanged;
     this.allowedBranches = allowedBranches;
+  }
+
+  @DataBoundSetter
+  public void setIsToApprove(boolean isToApprove) {
+    this.isToApprove = isToApprove;
   }
 
   @Override
@@ -92,5 +99,10 @@ public class BitBucketPPRRepositoryPushActionFilter extends BitBucketPPRReposito
     public String getDisplayName() {
       return "Bitbucket Cloud Push";
     }
+  }
+
+  @Override
+  public boolean shouldSendApprove() {
+    return isToApprove;
   }
 }

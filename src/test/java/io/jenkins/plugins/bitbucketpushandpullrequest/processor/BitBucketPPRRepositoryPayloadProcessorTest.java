@@ -5,11 +5,10 @@ import static org.mockito.Mockito.verify;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
 import javax.naming.OperationNotSupportedException;
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
@@ -21,12 +20,13 @@ import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRHookEvent;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud.BitBucketPPRCloudPayload;
-import io.jenkins.plugins.bitbucketpushandpullrequest.observer.BitBucketPPRObserver;
+import io.jenkins.plugins.bitbucketpushandpullrequest.observer.BitBucketPPRObservable;
 import io.jenkins.plugins.bitbucketpushandpullrequest.observer.BitBucketPPRObserverFactory;
 
 
 @RunWith(MockitoJUnitRunner.class)
 public class BitBucketPPRRepositoryPayloadProcessorTest {
+
   @Mock
   private BitBucketPPRJobProbe probe;
 
@@ -37,20 +37,14 @@ public class BitBucketPPRRepositoryPayloadProcessorTest {
   private ArgumentCaptor<BitBucketPPRAction> actionCaptor;
 
   @Captor
-  private ArgumentCaptor<List<BitBucketPPRObserver>> observersCaptor;
+  private ArgumentCaptor<BitBucketPPRObservable> observableCaptor;
 
-  @Test
-  public void testRepositoryPushWebhookGit() {
-    BitBucketPPRHookEvent bitbucketEvent = null;
-    try {
-      bitbucketEvent = new BitBucketPPRHookEvent("repo:push");
-    } catch (OperationNotSupportedException e) {
-      e.printStackTrace();
-    }
 
-    BitBucketPPRRepositoryCloudPayloadProcessor repositoryPayloadProcessor =
-        new BitBucketPPRRepositoryCloudPayloadProcessor(probe, bitbucketEvent);
+  public BitBucketPPRPayload payload;
+  public BitBucketPPRHookEvent bitbucketEvent;
 
+  @Before
+  public void readPayload() {
     JsonReader reader = null;
 
     try {
@@ -63,22 +57,35 @@ public class BitBucketPPRRepositoryPayloadProcessorTest {
     }
 
     Gson gson = new Gson();
-    BitBucketPPRPayload payload = gson.fromJson(reader, BitBucketPPRCloudPayload.class);
+    this.payload = gson.fromJson(reader, BitBucketPPRCloudPayload.class);
 
-    List<BitBucketPPRObserver> observers = new ArrayList<>();
     try {
-      observers = BitBucketPPRObserverFactory.createObservers(bitbucketEvent);
+      this.bitbucketEvent = new BitBucketPPRHookEvent("repo:push");
+    } catch (OperationNotSupportedException e) {
+      e.printStackTrace();
+    }
+  }
+
+  @Test
+  public void testRepositoryPushWebhookGit() {
+    BitBucketPPRRepositoryCloudPayloadProcessor repositoryPayloadProcessor =
+        new BitBucketPPRRepositoryCloudPayloadProcessor(probe, this.bitbucketEvent);
+
+
+    BitBucketPPRObservable observable = null;
+    try {
+      observable = BitBucketPPRObserverFactory.createObservable(bitbucketEvent);
     } catch (Exception e) {
       e.printStackTrace();
     }
 
-    repositoryPayloadProcessor.processPayload(payload, observers);
+    repositoryPayloadProcessor.processPayload(payload, observable);
 
     verify(probe).triggerMatchingJobs(eventCaptor.capture(), actionCaptor.capture(),
-        observersCaptor.capture());
+        observableCaptor.capture());
 
     assertEquals(bitbucketEvent, eventCaptor.getValue());
     assertEquals(payload, actionCaptor.getValue().getPayload());
-    assertEquals(observers, observersCaptor.getValue());
+    assertEquals(observable, observableCaptor.getValue());
   }
 }

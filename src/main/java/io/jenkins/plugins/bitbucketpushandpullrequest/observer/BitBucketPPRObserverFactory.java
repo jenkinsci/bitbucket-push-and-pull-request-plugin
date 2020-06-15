@@ -25,8 +25,7 @@ import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRCo
 import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.REPOSITORY_CLOUD_PUSH;
 import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.REPOSITORY_EVENT;
 import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.REPOSITORY_SERVER_PUSH;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import io.jenkins.plugins.bitbucketpushandpullrequest.exception.BitBucketPPRObserverNotFoundException;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRHookEvent;
@@ -35,34 +34,31 @@ import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRHookEven
 public class BitBucketPPRObserverFactory {
   static final Logger LOGGER = Logger.getLogger(BitBucketPPRObserverFactory.class.getName());
 
-  public static List<BitBucketPPRObserver> createObservers(BitBucketPPRHookEvent bitbucketEvent)
-      throws Exception {
+  public static BitBucketPPRObservable createObservable(BitBucketPPRHookEvent bitbucketEvent)
+      throws BitBucketPPRObserverNotFoundException {
 
-    List<BitBucketPPRObserver> observers = new ArrayList<>();
+    BitBucketPPRObservable observable = new BitBucketPPRObservable();
 
     if (REPOSITORY_EVENT.equalsIgnoreCase(bitbucketEvent.getEvent())
         && REPOSITORY_CLOUD_PUSH.equalsIgnoreCase(bitbucketEvent.getAction())) {
-      observers.add(new BitBucketPPRCloudObserver());
-      return observers;
-    }
-    if (REPOSITORY_EVENT.equalsIgnoreCase(bitbucketEvent.getEvent())
+      LOGGER.log(Level.INFO, "Add BitBucketPPRPushCloudObserver for {0}",
+          bitbucketEvent.toString());
+      observable.addObserver(new BitBucketPPRPushCloudObserver());
+    } else if (REPOSITORY_EVENT.equalsIgnoreCase(bitbucketEvent.getEvent())
         && REPOSITORY_SERVER_PUSH.equalsIgnoreCase(bitbucketEvent.getAction())) {
-      observers.add(new BitBucketPPRServerObserver());
-      return observers;
+      LOGGER.log(Level.INFO, "Add BitBucketPPRPushServerObserver for {0}",
+          bitbucketEvent.toString());
+      observable.addObserver(new BitBucketPPRPushServerObserver());
+    } else if (PULL_REQUEST_CLOUD_EVENT.equals(bitbucketEvent.getEvent())) {
+      LOGGER.log(Level.INFO, "Add BitBucketPPRPullRequestCloudObserver for {0}",
+          bitbucketEvent.toString());
+      observable.addObserver(new BitBucketPPRPullRequestCloudObserver());
+    } else if (PULL_REQUEST_SERVER_EVENT.equals(bitbucketEvent.getEvent())) {
+      LOGGER.log(Level.INFO, "Add BitBucketPPRPullRequestServerObserver for {0}",
+          bitbucketEvent.toString());
+      observable.addObserver(new BitBucketPPRPullRequestServerObserver());
     }
 
-    if (PULL_REQUEST_CLOUD_EVENT.equals(bitbucketEvent.getEvent())) {
-      observers.add(new BitBucketPPRCloudObserver());
-      return observers;
-    }
-
-    if (PULL_REQUEST_SERVER_EVENT.equals(bitbucketEvent.getEvent())) {
-      observers.add(new BitBucketPPRServerObserver());
-      return observers;
-    }
-
-    LOGGER.info("no observer found for BitBucketPPRHookEvent: " + bitbucketEvent.toString());
-
-    throw new BitBucketPPRObserverNotFoundException("something went wrong");
+    return observable;
   }
 }
