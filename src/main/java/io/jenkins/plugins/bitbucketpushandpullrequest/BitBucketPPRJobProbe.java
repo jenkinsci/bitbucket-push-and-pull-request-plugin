@@ -22,7 +22,6 @@
 package io.jenkins.plugins.bitbucketpushandpullrequest;
 
 import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.PULL_REQUEST_MERGED;
-import java.io.PrintStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -48,6 +47,7 @@ import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.cause.BitBucketPPRTriggerCause;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRHookEvent;
 import io.jenkins.plugins.bitbucketpushandpullrequest.observer.BitBucketPPRObservable;
+import io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRUtils;
 import jenkins.branch.MultiBranchProject;
 import jenkins.model.Jenkins;
 import jenkins.model.ParameterizedJobMixIn;
@@ -58,19 +58,7 @@ public class BitBucketPPRJobProbe {
   private BitBucketPPRHookEvent bitbucketEvent;
 
   {
-    System.setErr(createLoggingProxy(System.err));
-  }
-
-  public static PrintStream createLoggingProxy(final PrintStream realPrintStream) {
-    return new PrintStream(realPrintStream) {
-      public void print(final String string) {
-        LOGGER.info(string);
-      }
-
-      public void println(final String string) {
-        LOGGER.info(string);
-      }
-    };
+    System.setErr(BitBucketPPRUtils.createLoggingProxy(System.err));
   }
 
   public void triggerMatchingJobs(BitBucketPPRHookEvent bitbucketEvent,

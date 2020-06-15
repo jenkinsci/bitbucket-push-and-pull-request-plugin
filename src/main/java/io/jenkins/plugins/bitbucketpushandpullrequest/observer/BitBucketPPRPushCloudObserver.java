@@ -20,7 +20,6 @@
  ******************************************************************************/
 package io.jenkins.plugins.bitbucketpushandpullrequest.observer;
 
-import java.io.PrintStream;
 import java.util.List;
 import java.util.logging.Logger;
 import javax.annotation.Nonnull;
@@ -30,6 +29,7 @@ import io.jenkins.plugins.bitbucketpushandpullrequest.client.BitBucketPPRClientF
 import io.jenkins.plugins.bitbucketpushandpullrequest.client.BitBucketPPRClientType;
 import io.jenkins.plugins.bitbucketpushandpullrequest.event.BitBucketPPREvent;
 import io.jenkins.plugins.bitbucketpushandpullrequest.event.BitBucketPPREventContext;
+import io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRUtils;
 
 public class BitBucketPPRPushCloudObserver extends BitBucketPPRHandlerTemplate
     implements BitBucketPPRObserver {
@@ -37,6 +37,10 @@ public class BitBucketPPRPushCloudObserver extends BitBucketPPRHandlerTemplate
 
   private BitBucketPPREventContext context;
 
+  {
+    System.setErr(BitBucketPPRUtils.createLoggingProxy(System.err));
+  }
+  
   @Override
   public void getNotification(BitBucketPPREvent event) {
     context = event.getContext();
@@ -87,7 +91,6 @@ public class BitBucketPPRPushCloudObserver extends BitBucketPPRHandlerTemplate
         callClient(url, payload);
       }
     } catch (Throwable e) {
-      System.setErr(createLoggingProxy(System.err));
       LOGGER.info("Set build status in progress for push called but something went wrong.");
       e.printStackTrace();
     }
@@ -98,17 +101,4 @@ public class BitBucketPPRPushCloudObserver extends BitBucketPPRHandlerTemplate
         getUserRemoteConfigs(context.getScmTrigger()), context.getRun())
         .sendWithUsernamePasswordCredentials(url, payload);
   }
-
-  public static PrintStream createLoggingProxy(final PrintStream realPrintStream) {
-    return new PrintStream(realPrintStream) {
-      public void print(final String string) {
-        LOGGER.info(string);
-      }
-
-      public void println(final String string) {
-        LOGGER.info(string);
-      }
-    };
-  }
-
 }

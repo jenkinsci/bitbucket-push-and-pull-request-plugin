@@ -24,7 +24,6 @@ package io.jenkins.plugins.bitbucketpushandpullrequest;
 import java.io.File;
 import java.io.IOException;
 import java.io.ObjectStreamException;
-import java.io.PrintStream;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -64,6 +63,7 @@ import io.jenkins.plugins.bitbucketpushandpullrequest.filter.repository.BitBucke
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRHookEvent;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud.BitBucketPPRProject;
 import io.jenkins.plugins.bitbucketpushandpullrequest.observer.BitBucketPPRObservable;
+import io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRUtils;
 import jenkins.model.Jenkins;
 import jenkins.model.ParameterizedJobMixIn;
 import jenkins.triggers.SCMTriggerItem;
@@ -74,21 +74,8 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
 
 
   {
-    System.setErr(createLoggingProxy(System.err));
+    System.setErr(BitBucketPPRUtils.createLoggingProxy(System.err));
   }
-
-  public static PrintStream createLoggingProxy(final PrintStream realPrintStream) {
-    return new PrintStream(realPrintStream) {
-      public void print(final String string) {
-        LOGGER.info(string);
-      }
-
-      public void println(final String string) {
-        LOGGER.info(string);
-      }
-    };
-  }
-
 
   @DataBoundConstructor
   public BitBucketPPRTrigger(List<BitBucketPPRTriggerFilter> triggers) {

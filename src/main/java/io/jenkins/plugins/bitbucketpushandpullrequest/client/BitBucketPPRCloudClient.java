@@ -39,12 +39,17 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
 import hudson.model.Run;
 import hudson.plugins.git.UserRemoteConfig;
+import io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRUtils;
 
 
 public class BitBucketPPRCloudClient implements BitBucketPPRClient {
   private static final Logger LOGGER = Logger.getLogger(BitBucketPPRCloudClient.class.getName());
   private final UserRemoteConfig config;
   private Run<?, ?> run;
+
+  {
+    System.setErr(BitBucketPPRUtils.createLoggingProxy(System.err));
+  }
 
   public BitBucketPPRCloudClient(final UserRemoteConfig config, Run<?, ?> run) {
     this.run = run;
@@ -54,10 +59,15 @@ public class BitBucketPPRCloudClient implements BitBucketPPRClient {
   public void sendWithUsernamePasswordCredentials(final String url, String payload) {
     LOGGER.info("Set BB Credentials");
     final org.apache.http.client.CredentialsProvider provider = new BasicCredentialsProvider();
-    final UsernamePasswordCredentials credentials =
-        new UsernamePasswordCredentials(getStandardUsernamePasswordCredentials().getUsername(),
-            getStandardUsernamePasswordCredentials().getPassword().getPlainText());
-    provider.setCredentials(AuthScope.ANY, credentials);
+
+    try {
+      final UsernamePasswordCredentials credentials =
+          new UsernamePasswordCredentials(getStandardUsernamePasswordCredentials().getUsername(),
+              getStandardUsernamePasswordCredentials().getPassword().getPlainText());
+      provider.setCredentials(AuthScope.ANY, credentials);
+    } catch (Throwable t) {
+      t.printStackTrace();
+    }
 
     final String authHeader = createPreemptiveHeadersForDefautlCredentialsProvider();
 
@@ -104,7 +114,6 @@ public class BitBucketPPRCloudClient implements BitBucketPPRClient {
     }
 
     return CredentialsProvider.findCredentialById(credentialsId,
-        StandardUsernamePasswordCredentials.class, run,
-        URIRequirementBuilder.fromUri(url).build());
+        StandardUsernamePasswordCredentials.class, run, URIRequirementBuilder.fromUri(url).build());
   }
 }
