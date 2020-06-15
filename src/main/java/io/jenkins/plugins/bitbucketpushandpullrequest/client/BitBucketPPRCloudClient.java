@@ -22,9 +22,6 @@ package io.jenkins.plugins.bitbucketpushandpullrequest.client;
 
 import java.nio.charset.StandardCharsets;
 import java.util.logging.Logger;
-import com.cloudbees.plugins.credentials.CredentialsProvider;
-import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials;
-import com.cloudbees.plugins.credentials.domains.URIRequirementBuilder;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpResponse;
@@ -37,83 +34,55 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
-import hudson.model.Run;
-import hudson.plugins.git.UserRemoteConfig;
+import io.jenkins.plugins.bitbucketpushandpullrequest.event.BitBucketPPREventContext;
 import io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRUtils;
 
 
 public class BitBucketPPRCloudClient implements BitBucketPPRClient {
   private static final Logger LOGGER = Logger.getLogger(BitBucketPPRCloudClient.class.getName());
-  private final UserRemoteConfig config;
-  private Run<?, ?> run;
+  private BitBucketPPREventContext context;
 
   {
     System.setErr(BitBucketPPRUtils.createLoggingProxy(System.err));
   }
 
-  public BitBucketPPRCloudClient(final UserRemoteConfig config, Run<?, ?> run) {
-    this.run = run;
-    this.config = config;
+  public BitBucketPPRCloudClient(BitBucketPPREventContext context) {
+    this.context = context;
   }
 
   public void sendWithUsernamePasswordCredentials(final String url, String payload) {
     LOGGER.info("Set BB Credentials");
     final org.apache.http.client.CredentialsProvider provider = new BasicCredentialsProvider();
 
+    String username = context.getStandardUsernamePasswordCredentials().getUsername();
+    String password = context.getStandardUsernamePasswordCredentials().getPassword().getPlainText();
+
     try {
       final UsernamePasswordCredentials credentials =
-          new UsernamePasswordCredentials(getStandardUsernamePasswordCredentials().getUsername(),
-              getStandardUsernamePasswordCredentials().getPassword().getPlainText());
+          new UsernamePasswordCredentials(username, password);
       provider.setCredentials(AuthScope.ANY, credentials);
-    } catch (Throwable t) {
-      t.printStackTrace();
-    }
-
-    final String authHeader = createPreemptiveHeadersForDefautlCredentialsProvider();
-
-    final HttpClient client =
-        HttpClientBuilder.create().setDefaultCredentialsProvider(provider).build();
-
-    final HttpPost request = new HttpPost(url);
-    request.setHeader(HttpHeaders.AUTHORIZATION, authHeader);
-
-    request.setEntity(new StringEntity(payload, ContentType.APPLICATION_JSON));
-
-    try {
+      final String authHeader = createPreemptiveHeadersForDefautlCredentialsProvider();
+      final HttpClient client =
+          HttpClientBuilder.create().setDefaultCredentialsProvider(provider).build();
+      final HttpPost request = new HttpPost(url);
+      request.setHeader(HttpHeaders.AUTHORIZATION, authHeader);
+      request.setEntity(new StringEntity(payload, ContentType.APPLICATION_JSON));
       final HttpResponse response = client.execute(request);
       final int statusCode = response.getStatusLine().getStatusCode();
       final String result = EntityUtils.toString(response.getEntity());
       LOGGER.info("Result is: " + result + " Status Code: " + statusCode);
-    } catch (Exception e) {
-      LOGGER.warning("Error: " + e.getMessage());
+    } catch (Throwable t) {
+      LOGGER.warning("Error: " + t.getMessage());
     }
   }
 
   private String createPreemptiveHeadersForDefautlCredentialsProvider() {
-    final String auth = getStandardUsernamePasswordCredentials().getUsername() + ":"
-        + getStandardUsernamePasswordCredentials().getPassword().getPlainText();
+    final String auth = context.getStandardUsernamePasswordCredentials().getUsername() + ":"
+        + context.getStandardUsernamePasswordCredentials().getPassword().getPlainText();
 
     byte[] encodedAuth = Base64.encodeBase64(auth.getBytes(StandardCharsets.ISO_8859_1));
     String authHeader = "Basic " + new String(encodedAuth, StandardCharsets.ISO_8859_1);
 
     return authHeader;
-  }
-
-  private StandardUsernamePasswordCredentials getStandardUsernamePasswordCredentials() {
-    String credentialsId = config.getCredentialsId();
-    String url = config.getUrl();
-
-    if (credentialsId == null) {
-      LOGGER.info("Credentials ID not found");
-      return null;
-    }
-
-    if (url == null) {
-      LOGGER.info("Cannot find Url in config");
-      return null;
-    }
-
-    return CredentialsProvider.findCredentialById(credentialsId,
-        StandardUsernamePasswordCredentials.class, run, URIRequirementBuilder.fromUri(url).build());
   }
 }

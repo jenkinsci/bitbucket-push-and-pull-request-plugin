@@ -20,7 +20,12 @@
  ******************************************************************************/
 package io.jenkins.plugins.bitbucketpushandpullrequest.event;
 
+import com.cloudbees.plugins.credentials.CredentialsProvider;
+import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials;
+import com.cloudbees.plugins.credentials.domains.URIRequirementBuilder;
 import hudson.model.Run;
+import hudson.plugins.git.GitSCM;
+import hudson.plugins.git.UserRemoteConfig;
 import hudson.scm.SCM;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.filter.BitBucketPPRTriggerFilter;
@@ -31,13 +36,49 @@ public class BitBucketPPREventContext {
   private Run<?, ?> run;
   private BitBucketPPRAction action;
   private BitBucketPPRTriggerFilter filter;
+  private UserRemoteConfig userRemoteConfig;
+  private String credentialsId;
+  private String url;
+  private StandardUsernamePasswordCredentials credentials;
 
   public BitBucketPPREventContext(BitBucketPPRAction action, SCM scmTrigger, Run<?, ?> run,
-      BitBucketPPRTriggerFilter filter) {
+      BitBucketPPRTriggerFilter filter) throws Exception {
     this.action = action;
     this.scmTrigger = scmTrigger;
     this.run = run;
     this.filter = filter;
+    this.userRemoteConfig = getUserRemoteConfigs(scmTrigger);
+    this.credentialsId = userRemoteConfig.getCredentialsId();
+    this.url = userRemoteConfig.getUrl();
+    this.credentials = geCredentials(run);
+  }
+
+  private StandardUsernamePasswordCredentials geCredentials(Run<?, ?> run) throws Exception {
+    if (CredentialsProvider.findCredentialById(credentialsId,
+        StandardUsernamePasswordCredentials.class, run,
+        URIRequirementBuilder.fromUri(url).build()) != null)
+      return CredentialsProvider.findCredentialById(credentialsId,
+          StandardUsernamePasswordCredentials.class, run,
+          URIRequirementBuilder.fromUri(url).build());
+    else
+      throw new Exception("No Credentials found for run: " + run.getNumber() + " - url: " + url
+          + " - credentialsId: " + credentialsId + " - absolute url : " + run.getAbsoluteUrl());
+  }
+
+  public StandardUsernamePasswordCredentials getStandardUsernamePasswordCredentials() {
+    return this.credentials;
+  }
+
+  public String getUrl() {
+    return url;
+  }
+
+  public String getCredentialsId() {
+    return credentialsId;
+  }
+
+  public UserRemoteConfig getUserRemoteConfig() {
+    return userRemoteConfig;
   }
 
   public SCM getScmTrigger() {
@@ -60,9 +101,16 @@ public class BitBucketPPREventContext {
     return this.filter;
   }
 
+  public UserRemoteConfig getUserRemoteConfigs(SCM scm) {
+    GitSCM gitSCM = (GitSCM) scm;
+    UserRemoteConfig config = gitSCM.getUserRemoteConfigs().get(0);
+    return config;
+  }
+
   @Override
   public String toString() {
-    return "BitBucketPPREventContext [action=" + action + ", filter=" + filter + ", run=" + run
-        + ", scmTrigger=" + scmTrigger + "]";
+    return "BitBucketPPREventContext [action=" + action + ", credentialsId=" + credentialsId
+        + ", filter=" + filter + ", run=" + run + ", scmTrigger=" + scmTrigger + ", url=" + url
+        + ", userRemoteConfig=" + userRemoteConfig + "]";
   }
 }

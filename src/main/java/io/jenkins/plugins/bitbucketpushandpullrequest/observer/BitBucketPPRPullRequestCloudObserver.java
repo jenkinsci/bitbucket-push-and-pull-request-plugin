@@ -23,7 +23,6 @@ package io.jenkins.plugins.bitbucketpushandpullrequest.observer;
 import java.util.logging.Logger;
 import javax.annotation.Nonnull;
 import hudson.model.Result;
-import hudson.plugins.git.GitSCM;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.client.BitBucketPPRClientFactory;
 import io.jenkins.plugins.bitbucketpushandpullrequest.client.BitBucketPPRClientType;
@@ -71,8 +70,7 @@ public class BitBucketPPRPullRequestCloudObserver extends BitBucketPPRHandlerTem
       }
 
       BitBucketPPRClientFactory
-          .createClient(BitBucketPPRClientType.CLOUD,
-              getUserRemoteConfigs((GitSCM) context.getScmTrigger()), context.getRun())
+          .createClient(BitBucketPPRClientType.CLOUD,context)
           .sendWithUsernamePasswordCredentials(url, payload);
 
     } catch (NullPointerException e) {
@@ -111,8 +109,7 @@ public class BitBucketPPRPullRequestCloudObserver extends BitBucketPPRHandlerTem
 
   private void callClient(@Nonnull String url, @Nonnull String payload) {
     try {
-      BitBucketPPRClientFactory.createClient(BitBucketPPRClientType.CLOUD,
-          getUserRemoteConfigs(context.getScmTrigger()), context.getRun())
+      BitBucketPPRClientFactory.createClient(BitBucketPPRClientType.CLOUD, context)
           .sendWithUsernamePasswordCredentials(url, payload);
     } catch (Exception e) {
       LOGGER.warning(e.getMessage());

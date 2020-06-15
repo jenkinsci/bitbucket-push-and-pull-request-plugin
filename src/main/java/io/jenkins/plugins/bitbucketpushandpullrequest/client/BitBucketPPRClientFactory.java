@@ -20,17 +20,16 @@
  ******************************************************************************/
 package io.jenkins.plugins.bitbucketpushandpullrequest.client;
 
-import hudson.model.Run;
-import hudson.plugins.git.UserRemoteConfig;
+import io.jenkins.plugins.bitbucketpushandpullrequest.event.BitBucketPPREventContext;
 
 public class BitBucketPPRClientFactory {
   public static BitBucketPPRClient createClient(BitBucketPPRClientType type,
-      UserRemoteConfig config, Run<?, ?> run) throws Exception {
+      BitBucketPPREventContext context) throws Exception {
     switch (type) {
       case CLOUD:
-        return new BitBucketPPRCloudClient(config, run);
+        return new BitBucketPPRCloudClient(context);
       case SERVER:
-        return new BitBucketPPRServerClient(config, run);
+        return new BitBucketPPRServerClient(context);
       default:
         throw new Exception();
     }

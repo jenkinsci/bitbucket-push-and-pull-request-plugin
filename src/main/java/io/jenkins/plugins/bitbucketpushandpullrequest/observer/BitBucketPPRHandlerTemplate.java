@@ -1,8 +1,5 @@
 package io.jenkins.plugins.bitbucketpushandpullrequest.observer;
 
-import hudson.plugins.git.GitSCM;
-import hudson.plugins.git.UserRemoteConfig;
-import hudson.scm.SCM;
 import io.jenkins.plugins.bitbucketpushandpullrequest.event.BitBucketPPREventType;
 
 public abstract class BitBucketPPRHandlerTemplate {
@@ -19,12 +16,6 @@ public abstract class BitBucketPPRHandlerTemplate {
       default:
         throw new Exception();
     }
-  }
-
-  public UserRemoteConfig getUserRemoteConfigs(SCM scm) {
-    GitSCM gitSCM = (GitSCM) scm;
-    UserRemoteConfig config = gitSCM.getUserRemoteConfigs().get(0);
-    return config;
   }
 
   public void setApproved() {
