@@ -98,6 +98,6 @@ public class BitBucketPPRPushCloudObserver extends BitBucketPPRHandlerTemplate
 
   public void callClient(@Nonnull String url, @Nonnull String payload) throws Throwable {
     BitBucketPPRClientFactory.createClient(BitBucketPPRClientType.CLOUD,context)
-        .sendWithUsernamePasswordCredentials(url, payload);
+        .send(url, payload);
   }
 }

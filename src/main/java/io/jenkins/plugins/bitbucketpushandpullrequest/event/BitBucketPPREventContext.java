@@ -21,7 +21,7 @@
 package io.jenkins.plugins.bitbucketpushandpullrequest.event;
 
 import com.cloudbees.plugins.credentials.CredentialsProvider;
-import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials;
+import com.cloudbees.plugins.credentials.common.StandardCredentials;
 import com.cloudbees.plugins.credentials.domains.URIRequirementBuilder;
 import hudson.model.Run;
 import hudson.plugins.git.GitSCM;
@@ -39,7 +39,6 @@ public class BitBucketPPREventContext {
   private UserRemoteConfig userRemoteConfig;
   private String credentialsId;
   private String url;
-  private StandardUsernamePasswordCredentials credentials;
 
   public BitBucketPPREventContext(BitBucketPPRAction action, SCM scmTrigger, Run<?, ?> run,
       BitBucketPPRTriggerFilter filter) throws Exception {
@@ -50,23 +49,18 @@ public class BitBucketPPREventContext {
     this.userRemoteConfig = getUserRemoteConfigs(scmTrigger);
     this.credentialsId = userRemoteConfig.getCredentialsId();
     this.url = userRemoteConfig.getUrl();
-    this.credentials = geCredentials(run);
   }
 
-  private StandardUsernamePasswordCredentials geCredentials(Run<?, ?> run) throws Exception {
-    if (CredentialsProvider.findCredentialById(credentialsId,
-        StandardUsernamePasswordCredentials.class, run,
-        URIRequirementBuilder.fromUri(url).build()) != null)
-      return CredentialsProvider.findCredentialById(credentialsId,
-          StandardUsernamePasswordCredentials.class, run,
-          URIRequirementBuilder.fromUri(url).build());
-    else
-      throw new Exception("No Credentials found for run: " + run.getNumber() + " - url: " + url
-          + " - credentialsId: " + credentialsId + " - absolute url : " + run.getAbsoluteUrl());
-  }
+  public StandardCredentials getStandardCredentials() throws Exception {
+    final StandardCredentials credentials = CredentialsProvider.findCredentialById(credentialsId,
+        StandardCredentials.class, run, URIRequirementBuilder.fromUri(url).build());
 
-  public StandardUsernamePasswordCredentials getStandardUsernamePasswordCredentials() {
-    return this.credentials;
+    if (credentials != null) {
+      return credentials;
+    }
+
+    throw new Exception("No Credentials found for run: " + run.getNumber() + " - url: " + url
+        + " - credentialsId: " + credentialsId + " - absolute url : " + run.getAbsoluteUrl());
   }
 
   public String getUrl() {

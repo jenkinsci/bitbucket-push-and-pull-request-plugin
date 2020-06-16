@@ -71,7 +71,7 @@ public class BitBucketPPRPullRequestCloudObserver extends BitBucketPPRHandlerTem
 
       BitBucketPPRClientFactory
           .createClient(BitBucketPPRClientType.CLOUD,context)
-          .sendWithUsernamePasswordCredentials(url, payload);
+          .send(url, payload);
 
     } catch (NullPointerException e) {
       LOGGER.warning(e.getMessage());
@@ -110,7 +110,7 @@ public class BitBucketPPRPullRequestCloudObserver extends BitBucketPPRHandlerTem
   private void callClient(@Nonnull String url, @Nonnull String payload) {
     try {
       BitBucketPPRClientFactory.createClient(BitBucketPPRClientType.CLOUD, context)
-          .sendWithUsernamePasswordCredentials(url, payload);
+          .send(url, payload);
     } catch (Exception e) {
       LOGGER.warning(e.getMessage());
     }

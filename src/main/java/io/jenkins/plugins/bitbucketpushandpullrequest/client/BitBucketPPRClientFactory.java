@@ -25,11 +25,18 @@ import io.jenkins.plugins.bitbucketpushandpullrequest.event.BitBucketPPREventCon
 public class BitBucketPPRClientFactory {
   public static BitBucketPPRClient createClient(BitBucketPPRClientType type,
       BitBucketPPREventContext context) throws Exception {
+
+    BitBucketPPRClient client = null;
+
     switch (type) {
       case CLOUD:
-        return new BitBucketPPRCloudClient(context);
+        client = new BitBucketPPRCloudClient(context);
+        client.accept(new BitBucketPPRClientCloudVisitor());
+        return client;
       case SERVER:
-        return new BitBucketPPRServerClient(context);
+        client = new BitBucketPPRServerClient(context);
+        client.accept(new BitBucketPPRClientServerVisitor());
+        return client;
       default:
         throw new Exception();
     }

@@ -20,8 +20,9 @@
  ******************************************************************************/
 package io.jenkins.plugins.bitbucketpushandpullrequest.client;
 
-public interface BitBucketPPRClient {
-  public void send(String url, String payload) throws Exception;
+import com.cloudbees.plugins.credentials.common.StandardCredentials;
 
-  public void accept(BitBucketPPRClientVisitor visitor);
+public interface BitBucketPPRClientVisitor {
+  public void send(StandardCredentials standardCredentials, String url, String payload);
+
 }

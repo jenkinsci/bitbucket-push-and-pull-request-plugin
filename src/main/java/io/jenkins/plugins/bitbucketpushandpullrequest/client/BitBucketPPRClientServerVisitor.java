@@ -20,8 +20,13 @@
  ******************************************************************************/
 package io.jenkins.plugins.bitbucketpushandpullrequest.client;
 
-public interface BitBucketPPRClient {
-  public void send(String url, String payload) throws Exception;
+import com.cloudbees.plugins.credentials.common.StandardCredentials;
+import org.apache.commons.lang.NotImplementedException;
 
-  public void accept(BitBucketPPRClientVisitor visitor);
+public class BitBucketPPRClientServerVisitor implements BitBucketPPRClientVisitor {
+
+  @Override
+  public void send(StandardCredentials standardCredentials, String url, String payload) {
+    throw new NotImplementedException();
+  }
 }
