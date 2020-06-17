@@ -22,7 +22,7 @@ package io.jenkins.plugins.bitbucketpushandpullrequest.client;
 
 import java.nio.charset.StandardCharsets;
 import java.util.logging.Logger;
-import com.cloudbees.plugins.credentials.common.StandardCertificateCredentials;
+import com.cloudbees.jenkins.plugins.sshcredentials.SSHUserPrivateKey;
 import com.cloudbees.plugins.credentials.common.StandardCredentials;
 import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials;
 import org.apache.commons.codec.binary.Base64;
@@ -47,12 +47,11 @@ public class BitBucketPPRClientCloudVisitor implements BitBucketPPRClientVisitor
   public void send(StandardCredentials standardCredentials, String url, String payload) {
     if (standardCredentials instanceof StandardUsernamePasswordCredentials)
       this.send((StandardUsernamePasswordCredentials) standardCredentials, url, payload);
-    else if (standardCredentials instanceof StandardCertificateCredentials) {
-      this.send((StandardCertificateCredentials) standardCredentials, url, payload);
+    else if (standardCredentials instanceof SSHUserPrivateKey) {
+      this.send((SSHUserPrivateKey) standardCredentials, url, payload);
     } else
       throw new NotImplementedException("No credentials provider found");
   }
-
 
   private void send(StandardUsernamePasswordCredentials standardCredentials, String url,
       String payload) {
@@ -84,7 +83,9 @@ public class BitBucketPPRClientCloudVisitor implements BitBucketPPRClientVisitor
     }
   }
 
-  private void send(StandardCertificateCredentials standardCredentials, String url, String payload) {
-    throw new NotImplementedException();
+  private void send(SSHUserPrivateKey standardCredentials, String url, String payload) {
+
+    throw new NotImplementedException(
+        "This authentication method is not suported by the BitBucket Cloud Rest API.");
   }
 }
