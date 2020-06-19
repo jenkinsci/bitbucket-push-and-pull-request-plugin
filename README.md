@@ -124,6 +124,7 @@ bitbucketTriggers {
   
   pullRequestCreatedAction()
   pullRequestCreatedAction(allowedBranches: String)
+  pullRequestCreatedAction(allowedBranches: String, isToApprove: String)
   
   pullRequestUpdatedAction()
   pullRequestUpdatedAction(allowedBranches: String)
@@ -182,6 +183,25 @@ job('example-pull-request-created-with-filter-on-branches') {
   triggers{
     bitbucketTriggers {
       pullRequestCreatedAction("master")
+    }
+  }
+  scm {
+    git {
+      remote {
+        url("https://git.company.domain/scm/~username/telegram.git")
+      }
+    }
+  }
+  steps {
+    shell('echo START pull request created with filter on branches')
+  }
+}
+
+// pullRequestCreatedAction() with filter on branches
+job('example-pull-request-created-with-filter-on-branches-and-is-to-approve') {
+  triggers{
+    bitbucketTriggers {
+      pullRequestCreatedAction("master", true)
     }
   }
   scm {

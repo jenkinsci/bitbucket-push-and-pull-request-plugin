@@ -91,6 +91,16 @@ public class BitBucketPPRHookJobDslContext implements Context {
     triggers.add(pullRequestTriggerFilter);
   }
 
+  public void pullRequestCreatedAction(String allowedBranches, boolean isToApprove) {
+    BitBucketPPRPullRequestCreatedActionFilter pullRequestCreatedActionFilter =
+        new BitBucketPPRPullRequestCreatedActionFilter();
+    pullRequestCreatedActionFilter.setAllowedBranches(allowedBranches);
+    pullRequestCreatedActionFilter.setIsToApprove(isToApprove);
+    BitBucketPPRPullRequestTriggerFilter pullRequestTriggerFilter =
+        new BitBucketPPRPullRequestTriggerFilter(pullRequestCreatedActionFilter);
+    triggers.add(pullRequestTriggerFilter);
+  }
+
   public void pullRequestUpdatedAction() {
     BitBucketPPRPullRequestUpdatedActionFilter pullRequestUpdatedActionFilter =
         new BitBucketPPRPullRequestUpdatedActionFilter();
