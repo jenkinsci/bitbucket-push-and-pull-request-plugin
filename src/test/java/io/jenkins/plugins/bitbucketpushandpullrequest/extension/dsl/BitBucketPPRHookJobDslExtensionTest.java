@@ -344,6 +344,27 @@ public class BitBucketPPRHookJobDslExtensionTest {
     assertEquals(dispNames.get(0), "BitBucketPPRPullRequestCreatedActionFilter");
   }
 
+  @Test
+  public void testDslTriggerPRAllowBranchesWithApproveCreated() throws Exception {
+    /* Create seed job which will process DSL */
+    createSeedJob(
+        "freeStyleJob('test-job') { triggers { bitbucketTriggers { pullRequestCreatedAction(\"**\", true) } } }");
+    /* Fetch the newly created job and check its trigger configuration */
+    FreeStyleProject createdJob = (FreeStyleProject) j.getInstance().getItem("test-job");
+    /* Go through all triggers to validate DSL */
+    Map<TriggerDescriptor, Trigger<?>> triggers = createdJob.getTriggers();
+    assertEquals(1, triggers.size());
+    List<String> dispNames = new ArrayList<>();
+    for (Trigger<?> entry : triggers.values()) {
+      BitBucketPPRTrigger tmp2 = (BitBucketPPRTrigger) entry;
+      assertEquals(1, tmp2.getTriggers().size());
+      String tmpNname = tmp2.getTriggers().get(0).getActionFilter().getClass().getName();
+      String dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      dispNames.add(dispName);
+    }
+    assertEquals(1, dispNames.size());
+    assertEquals(dispNames.get(0), "BitBucketPPRPullRequestCreatedActionFilter");
+  }
 
   @Test
   public void testDslTriggerPRUpdated() throws Exception {

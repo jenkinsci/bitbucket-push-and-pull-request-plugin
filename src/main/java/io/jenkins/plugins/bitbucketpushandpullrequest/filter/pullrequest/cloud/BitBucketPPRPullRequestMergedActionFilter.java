@@ -32,6 +32,7 @@ import io.jenkins.plugins.bitbucketpushandpullrequest.cause.pullrequest.cloud.Bi
 
 public class BitBucketPPRPullRequestMergedActionFilter extends BitBucketPPRPullRequestActionFilter {
   public String allowedBranches;
+  public boolean isToApprove;
 
   @DataBoundConstructor
   public BitBucketPPRPullRequestMergedActionFilter() {}
@@ -44,6 +45,11 @@ public class BitBucketPPRPullRequestMergedActionFilter extends BitBucketPPRPullR
       this.allowedBranches = allowedBranches;
     }
   }
+
+  @DataBoundSetter
+  public void setIsToApprove(boolean isToApprove) {
+    this.isToApprove = isToApprove;
+  }
   
   @Override
   public boolean shouldTriggerBuild(BitBucketPPRAction bitbucketAction) {
@@ -54,6 +60,11 @@ public class BitBucketPPRPullRequestMergedActionFilter extends BitBucketPPRPullR
   public BitBucketPPRTriggerCause getCause(File pollingLog, BitBucketPPRAction pullRequestAction)
       throws IOException {
     return new BitBucketPPRPullRequestUpdatedCause(pollingLog, pullRequestAction);
+  }
+
+  @Override
+  public boolean shouldSendApprove() {
+    return isToApprove;
   }
 
   @Extension

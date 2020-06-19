@@ -26,6 +26,24 @@ import java.io.Serializable;
 public class BitBucketPPRCommit implements Serializable {
   private static final long serialVersionUID = 795153370768402207L;
   private String hash;
+  private String type;
+  private BitBucketPPRLinks links;
+
+  public BitBucketPPRLinks getLinks() {
+    return links;
+  }
+
+  public void setLinks(BitBucketPPRLinks links) {
+    this.links = links;
+  }
+
+  public String getType() {
+    return type;
+  }
+
+  public void setType(String type) {
+    this.type = type;
+  }
 
   public String getHash() {
     return hash;
@@ -37,6 +55,6 @@ public class BitBucketPPRCommit implements Serializable {
 
   @Override
   public String toString() {
-    return "BitBucketPPRCommit [hash=" + hash + "]";
+    return "BitBucketPPRCommit [hash=" + hash + ", links=" + links + ", type=" + type + "]";
   }
 }

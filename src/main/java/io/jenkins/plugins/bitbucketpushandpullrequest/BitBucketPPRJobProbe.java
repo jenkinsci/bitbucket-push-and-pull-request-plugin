@@ -42,24 +42,28 @@ import hudson.plugins.mercurial.MercurialSCM;
 import hudson.scm.SCM;
 import hudson.security.ACL;
 import hudson.security.ACLContext;
+import hudson.triggers.Trigger;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.cause.BitBucketPPRTriggerCause;
-import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPREvent;
+import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRHookEvent;
+import io.jenkins.plugins.bitbucketpushandpullrequest.observer.BitBucketPPRObservable;
+import io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRUtils;
 import jenkins.branch.MultiBranchProject;
 import jenkins.model.Jenkins;
 import jenkins.model.ParameterizedJobMixIn;
-import jenkins.model.ParameterizedJobMixIn.ParameterizedJob;
 import jenkins.triggers.SCMTriggerItem;
 
 public class BitBucketPPRJobProbe {
   private static final Logger LOGGER = Logger.getLogger(BitBucketPPRJobProbe.class.getName());
-  private BitBucketPPREvent bitbucketEvent;
-  private BitBucketPPRAction bitbucketAction;
+  private BitBucketPPRHookEvent bitbucketEvent;
 
-  public void triggerMatchingJobs(BitBucketPPREvent bitbucketEvent,
-      BitBucketPPRAction bitbucketAction) {
+  {
+    System.setErr(BitBucketPPRUtils.createLoggingProxy(System.err));
+  }
+
+  public void triggerMatchingJobs(BitBucketPPRHookEvent bitbucketEvent,
+      BitBucketPPRAction bitbucketAction, BitBucketPPRObservable observable) {
     this.bitbucketEvent = bitbucketEvent;
-    this.bitbucketAction = bitbucketAction;
 
     if (!("git".equals(bitbucketAction.getScm()) || "hg".equals(bitbucketAction.getScm()))) {
       throw new UnsupportedOperationException("Unsupported SCM type " + bitbucketAction.getScm());
@@ -74,7 +78,7 @@ public class BitBucketPPRJobProbe {
       Jenkins.get().getAllItems(Job.class).stream().forEach(job -> {
         LOGGER.log(Level.FINE, "Considering candidate job {0}", job.getName());
 
-        triggerScm(job, remotes, bitbucketAction);
+        triggerScm(job, remotes, bitbucketAction, observable);
       });
     } catch (Exception e) {
       LOGGER.log(Level.WARNING, "Invalid repository URLs {0}\n{1}",
@@ -93,50 +97,52 @@ public class BitBucketPPRJobProbe {
     }).collect(Collectors.toList());
   }
 
-  private void triggerScm(Job<?, ?> job, List<URIish> remotes, BitBucketPPRAction bitbucketAction) {
+  private void triggerScm(Job<?, ?> job, List<URIish> remotes, BitBucketPPRAction bitbucketAction,
+      BitBucketPPRObservable observable) {
     LOGGER.log(Level.FINE, "Considering to poke {0}", job.getFullDisplayName());
-    Optional<BitBucketPPRTrigger> bitbucketTrigger = getBitBucketTrigger(job);
+    BitBucketPPRTrigger bitbucketTrigger = getBitBucketTrigger(job);
 
-    if (bitbucketTrigger.isPresent()) {
+    if (bitbucketTrigger != null) {
       List<SCM> scmTriggered = new ArrayList<>();
       Optional<SCMTriggerItem> item =
           Optional.ofNullable(SCMTriggerItem.SCMTriggerItems.asSCMTriggerItem(job));
 
-      LOGGER.log(Level.FINE, "Considering to use trigger {0}", bitbucketTrigger.toString());
-      bitbucketTrigger
-          .ifPresent(trigger -> item.ifPresent(i -> i.getSCMs().stream().forEach(scmTrigger -> {
-            if (isMultiBranchPipeline(job) && mPJobShouldNotBeTriggered(job, bitbucketAction)) {
-              LOGGER.log(Level.FINE, "Skipping for job:" + job.getDisplayName());
-              return;
-            }
+      item.ifPresent(i -> i.getSCMs().stream().forEach(scmTrigger -> {
+        LOGGER.log(Level.FINE, "Considering to use trigger {0}", scmTrigger.toString());
+        if (isMultiBranchPipeline(job) && mPJobShouldNotBeTriggered(job, bitbucketAction)) {
+          LOGGER.log(Level.FINE, "Skipping for job:" + job.getDisplayName());
+          return;
+        }
 
-            LOGGER.log(Level.FINE, "Scheduling for job:" + job.getDisplayName());
+        LOGGER.log(Level.FINE, "Scheduling for job:" + job.getDisplayName());
 
+        // TODO: is it needed? There is only a remote, the HTML one, that is used the do the
+        // match
+        boolean isRemoteSet = false;
+        for (URIish remote : remotes) {
+          if (match(scmTrigger, remote)) {
+            isRemoteSet = true;
+            break;
+          }
+        }
 
-            // TODO: is it needed? There is only a remote, the HTML one, that is used the do the
-            // match
-            boolean isRemoteSet = false;
-            for (URIish remote : remotes) {
-              if (match(scmTrigger, remote)) {
-                isRemoteSet = true;
-                break;
-              }
-            }
+        if (isRemoteSet && !hasBeenTriggered(scmTriggered, scmTrigger)) {
+          scmTriggered.add(scmTrigger);
+          LOGGER.log(Level.FINE, "Triggering trigger {0} for job {1}",
+              new Object[] {bitbucketTrigger.getClass().getName(), job.getFullDisplayName()});
 
-            if (isRemoteSet && !hasBeenTriggered(scmTriggered, scmTrigger)) {
-              scmTriggered.add(scmTrigger);
-              LOGGER.log(Level.FINE, "Triggering trigger {0} for job {1}",
-                  new Object[] {trigger.getClass().getName(), job.getFullDisplayName()});
-              try {
-                trigger.onPost(bitbucketEvent, this.bitbucketAction, scmTrigger);
-              } catch (Exception e) {
-                LOGGER.log(Level.WARNING, "Error: {0}", e.getMessage());
-              }
-            } else {
-              LOGGER.log(Level.FINE, "{0} SCM doesn't match remote repo {1}",
-                  new Object[] {job.getName(), remotes});
-            }
-          })));
+          try {
+            bitbucketTrigger.onPost(this.bitbucketEvent, bitbucketAction, scmTrigger, observable);
+          } catch (Throwable e) {
+            LOGGER.log(Level.WARNING, "Error: {0}", e.getMessage());
+            e.printStackTrace();
+          }
+
+        } else {
+          LOGGER.log(Level.FINE, "{0} SCM doesn't match remote repo {1}",
+              new Object[] {job.getName(), remotes});
+        }
+      }));
     } else {
       LOGGER.log(Level.FINE, "Bitbucket Trigger for job: {0} is not present. ",
           job.getFullDisplayName());
@@ -151,9 +157,9 @@ public class BitBucketPPRJobProbe {
 
   private boolean mPJobShouldNotBeTriggered(Job<?, ?> job, BitBucketPPRAction bitbucketAction) {
     if (job.getDisplayName() != null) {
-      final String displayName = job.getDisplayName();
-      final String sourceBranchName = bitbucketAction.getSourceBranch();
-      final String targetBranchName = bitbucketAction.getTargetBranch();
+      String displayName = job.getDisplayName();
+      String sourceBranchName = bitbucketAction.getSourceBranch();
+      String targetBranchName = bitbucketAction.getTargetBranch();
 
       LOGGER.log(Level.FINE, "Bitbucket event is : {0}", bitbucketEvent.getAction());
       LOGGER.log(Level.FINE, "Job Name : {0}", displayName);
@@ -170,20 +176,20 @@ public class BitBucketPPRJobProbe {
     return true;
   }
 
-  private Optional<BitBucketPPRTrigger> getBitBucketTrigger(Job<?, ?> job) {
+  private BitBucketPPRTrigger getBitBucketTrigger(Job<?, ?> job) {
+    BitBucketPPRTrigger trigger = null;
+
     if (job instanceof ParameterizedJobMixIn.ParameterizedJob) {
       ParameterizedJobMixIn.ParameterizedJob<?, ?> pJob =
           (ParameterizedJobMixIn.ParameterizedJob<?, ?>) job;
 
-      return getBitBucketTrigger(pJob);
+      for (Trigger<?> t : pJob.getTriggers().values()) {
+        if (t instanceof BitBucketPPRTrigger) {
+          trigger = (BitBucketPPRTrigger) t;
+        }
+      }
     }
-
-    return Optional.empty();
-  }
-
-  private Optional<BitBucketPPRTrigger> getBitBucketTrigger(ParameterizedJob<?, ?> job) {
-    return job.getTriggers().values().stream().filter(e -> e instanceof BitBucketPPRTrigger)
-        .findFirst().map(p -> (BitBucketPPRTrigger) p);
+    return trigger;
   }
 
   private boolean hasBeenTriggered(List<SCM> scmTriggered, SCM scmTrigger) {

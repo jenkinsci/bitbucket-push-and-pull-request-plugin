@@ -32,38 +32,79 @@ public interface BitBucketPPRAction extends Action {
 
   public String getScm();
 
-  public String getLinkHtml();
+  public default String getLinkHtml() {
+    return null;
+  }
 
-  public String getLinkSelf();
+  public default String getLinkSelf() {
+    return null;
+  }
 
-  public String getLinkApprove();
+  public default String getLinkApprove() {
+    return null;
+  }
 
-  public String getLinkDecline();
+  public default String getLinkDecline() {
+    return null;
+  }
 
-  public String getLinkStatuses();
+  public default String getLinkStatuses() {
+    return null;
+  }
 
-  public String getUser();
+  public default String getUser() {
+    return null;
+  }
 
-  public String getSourceBranch();
+  public default String getSourceBranch() {
+    return null;
+  }
 
-  public String getTargetBranch();
+  public default String getTargetBranch() {
+    return null;
+  }
 
-  public String getType();
+  public default String getType() {
+    return null;
+  }
 
-  public String getRepositoryName();
-
+  public default String getRepositoryName() {
+    return null;
+  }
   // TODO: do we really neeed it?
-  public List<String> getScmUrls();
+  public default List<String> getScmUrls() {
+    return null;
+  }
 
-  public String getPullRequestId();
+  public default String getPullRequestId() {
+    return null;
+  }
 
-  public String getRepositoryId();
+  public default String getRepositoryId(){
+    return null;
+  }
 
-  public String getPullRequestUrl();
+  public default String getPullRequestUrl(){
+    return null;
+  }
 
-  public String getTitle();
+  public default String getTitle(){
+    return null;
+  }
 
-  public String getDescription();
+  public default String getDescription(){
+    return null;
+  }
 
-  public String getComment();
+  public default String getComment(){
+    return null;
+  }
+
+  public default String getCommitLink() {
+    return null;
+  }
+
+  public default List<String> getCommitLinks() {
+    return null;
+  }
 }

@@ -31,12 +31,12 @@ import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRCo
 import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.PULL_REQUEST_COMMENT_DELETED;
 import io.jenkins.plugins.bitbucketpushandpullrequest.filter.BitBucketPPREventTriggerMatcher;
 import io.jenkins.plugins.bitbucketpushandpullrequest.filter.BitBucketPPRTriggerFilter;
-import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPREvent;
+import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRHookEvent;
 
 
 public class BitBucketPPRPullRequestTriggerMatcher implements BitBucketPPREventTriggerMatcher {
   @Override
-  public boolean matchesAction(BitBucketPPREvent bitbucketEvent,
+  public boolean matchesAction(BitBucketPPRHookEvent bitbucketEvent,
       BitBucketPPRTriggerFilter triggerFilter) {
 
     return PULL_REQUEST_APPROVED.equals(bitbucketEvent.getAction())

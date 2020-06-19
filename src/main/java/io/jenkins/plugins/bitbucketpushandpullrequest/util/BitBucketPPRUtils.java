@@ -20,6 +20,7 @@
  ******************************************************************************/
 package io.jenkins.plugins.bitbucketpushandpullrequest.util;
 
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -86,5 +87,17 @@ public class BitBucketPPRUtils {
         new Object[] {patternStr, haystack});
     Pattern pattern = Pattern.compile(patternStr.trim(), Pattern.CASE_INSENSITIVE);
     return pattern.matcher(haystack.trim()).find();
+  }
+
+  public static PrintStream createLoggingProxy(final PrintStream realPrintStream) {
+    return new PrintStream(realPrintStream) {
+      public void print(final String string) {
+        LOGGER.info(string);
+      }
+
+      public void println(final String string) {
+        LOGGER.info(string);
+      }
+    };
   }
 }

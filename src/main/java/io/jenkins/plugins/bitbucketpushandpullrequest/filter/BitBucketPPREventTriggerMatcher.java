@@ -22,10 +22,10 @@
 
 package io.jenkins.plugins.bitbucketpushandpullrequest.filter;
 
-import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPREvent;
+import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRHookEvent;
 
 
 public interface BitBucketPPREventTriggerMatcher {
 
-  boolean matchesAction(BitBucketPPREvent bitbucketEvent, BitBucketPPRTriggerFilter triggerFilter);
+  boolean matchesAction(BitBucketPPRHookEvent bitbucketEvent, BitBucketPPRTriggerFilter triggerFilter);
 }

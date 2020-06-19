@@ -18,10 +18,10 @@
  * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  ******************************************************************************/
-
 package io.jenkins.plugins.bitbucketpushandpullrequest.client;
 
 public interface BitBucketPPRClient {
-  public void sendWithUsernamePasswordCredentials(String url, String payload);
+  public void send(String url, String payload) throws Exception;
 
+  public void accept(BitBucketPPRClientVisitor visitor);
 }

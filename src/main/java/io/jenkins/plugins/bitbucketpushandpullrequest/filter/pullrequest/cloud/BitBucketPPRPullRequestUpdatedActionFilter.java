@@ -34,6 +34,7 @@ public class BitBucketPPRPullRequestUpdatedActionFilter
     extends BitBucketPPRPullRequestActionFilter {
 
   public String allowedBranches;
+  public boolean isToApprove;
 
   @DataBoundConstructor
   public BitBucketPPRPullRequestUpdatedActionFilter() {}
@@ -45,6 +46,15 @@ public class BitBucketPPRPullRequestUpdatedActionFilter
     } else {
       this.allowedBranches = allowedBranches;
     }
+  }
+
+  @DataBoundSetter
+  public void setIsToApprove(boolean isToApprove) {
+    this.isToApprove = isToApprove;
+  }
+
+  public boolean shouldSendApprove() {
+    return isToApprove;
   }
 
   @Override

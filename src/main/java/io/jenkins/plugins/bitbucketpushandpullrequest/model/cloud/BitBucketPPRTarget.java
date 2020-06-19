@@ -18,29 +18,20 @@
  * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  ******************************************************************************/
-package io.jenkins.plugins.bitbucketpushandpullrequest.processor;
+package io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud;
 
-import javax.annotation.Nonnull;
-import io.jenkins.plugins.bitbucketpushandpullrequest.BitBucketPPRJobProbe;
-import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
-import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRRepositoryAction;
-import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPREvent;
-import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
+import java.io.Serializable;
 
+public class BitBucketPPRTarget implements Serializable {
+  private static final long serialVersionUID = 1L;
 
-public class BitBucketPPRRepositoryPayloadProcessor extends BitBucketPPRPayloadProcessor {
-  public BitBucketPPRRepositoryPayloadProcessor(BitBucketPPRJobProbe jobProbe,
-      BitBucketPPREvent bitbucketEvent) {
-    super(jobProbe, bitbucketEvent);
+  private BitBucketPPRLinks links;
+
+  public BitBucketPPRLinks getLinks() {
+    return links;
   }
 
-  @Override
-  public void processPayload(BitBucketPPRPayload payload) {
-    BitBucketPPRAction action = buildActionForJobs(payload);
-    jobProbe.triggerMatchingJobs(bitbucketEvent, action);
-  }
-
-  private BitBucketPPRAction buildActionForJobs(@Nonnull BitBucketPPRPayload payload) {
-    return new BitBucketPPRRepositoryAction(payload);
+  public void setLinks(BitBucketPPRLinks links) {
+    this.links = links;
   }
 }

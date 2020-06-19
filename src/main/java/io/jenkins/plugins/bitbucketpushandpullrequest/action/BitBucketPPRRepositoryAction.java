@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.Nonnull;
-
 import hudson.model.InvisibleAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud.BitBucketPPRChange;
@@ -90,11 +89,6 @@ public class BitBucketPPRRepositoryAction extends InvisibleAction implements Bit
   }
 
   @Override
-  public String getSourceBranch() {
-    return null;
-  }
-
-  @Override
   public String getType() {
     return type;
   }
@@ -110,62 +104,24 @@ public class BitBucketPPRRepositoryAction extends InvisibleAction implements Bit
   }
 
   @Override
-  public String getPullRequestId() {
-    return null;
-  }
-
-  @Override
   public String getRepositoryId() {
     return repositoryUuid;
   }
 
   @Override
-  public String getPullRequestUrl() {
-    return null;
+  public List<String> getCommitLinks() {
+    List<BitBucketPPRChange> changes = payload.getPush().getChanges();
+    List<String> links = new ArrayList<>();
+
+    for (BitBucketPPRChange change : changes) {
+      links.add(change.getNewChange().getTarget().getLinks().getSelf().getHref());
+    }
+
+    return links;
   }
 
-  @Override
-  public String getTitle() {
-    return null;
-  }
-
-  @Override
-  public String getDescription() {
-    return null;
-  }
-
-  @Override
-  public String getComment() {
-    return null;
-  }
-
-  @Override
-  public String getLinkHtml() {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public String getLinkSelf() {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public String getLinkApprove() {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public String getLinkDecline() {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public String getLinkStatuses() {
-    // TODO Auto-generated method stub
-    return null;
+  @Override 
+  public String toString() {
+    return "BitBucketPPRRepositoryAction";
   }
 }

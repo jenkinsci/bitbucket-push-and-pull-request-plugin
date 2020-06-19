@@ -37,9 +37,11 @@ import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
 import hudson.Extension;
 import hudson.model.UnprotectedRootAction;
-import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPREvent;
+import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRHookEvent;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayloadFactory;
+import io.jenkins.plugins.bitbucketpushandpullrequest.observer.BitBucketPPRObservable;
+import io.jenkins.plugins.bitbucketpushandpullrequest.observer.BitBucketPPRObserverFactory;
 import io.jenkins.plugins.bitbucketpushandpullrequest.processor.BitBucketPPRPayloadProcessor;
 import io.jenkins.plugins.bitbucketpushandpullrequest.processor.BitBucketPPRPayloadProcessorFactory;
 
@@ -69,65 +71,73 @@ public class BitBucketPPRHookReceiver implements UnprotectedRootAction {
     return HOOK_URL;
   }
 
-  public void doIndex(final StaplerRequest request, final StaplerResponse response)
-      throws IOException {
+  public void doIndex(StaplerRequest request, StaplerResponse response) throws IOException {
     String inputStream = IOUtils.toString(request.getInputStream());
 
     if (inputStream.isEmpty()) {
       logger.warning("The Jenkins job cannot be triggered. The input stream is empty.");
-    } else if (request.getRequestURI().contains("/" + HOOK_URL + "/")) {
+      return;
+    }
+
+    if (request.getRequestURI().contains("/" + HOOK_URL + "/")) {
       logger.log(Level.FINE, "Received commit hook notification : {0}", inputStream);
 
       inputStream = decodeInputStream(inputStream, request.getContentType());
-      BitBucketPPREvent bitbucketEvent = null;
+
+      BitBucketPPRHookEvent bitbucketEvent = null;
       if (request.getHeader("x-event-key") != null) {
         try {
-          bitbucketEvent = new BitBucketPPREvent(request.getHeader("x-event-key"));
+          bitbucketEvent = new BitBucketPPRHookEvent(request.getHeader("x-event-key"));
           logger.log(Level.INFO,
               () -> "Received x-event-key " + request.getHeader("x-event-key") + " from Bitbucket");
-        } catch (final OperationNotSupportedException e) {
-          logger.warning(e.getMessage());
+        } catch (OperationNotSupportedException e) {
+          logger.log(Level.WARNING, e.getMessage());
         }
       } else {
-        logger.log(Level.INFO, "Received old POST payload. (Deprecated, it will be removed.)");
+        logger.log(Level.WARNING, "Received old POST payload. (Deprecated, it will be removed.)");
         try {
-          bitbucketEvent = new BitBucketPPREvent("repo:post");
-        } catch (final OperationNotSupportedException e) {
-          logger.warning(e.getMessage());
+          bitbucketEvent = new BitBucketPPRHookEvent("repo:post");
+        } catch (OperationNotSupportedException e) {
+          logger.log(Level.WARNING, e.getMessage());
         }
       }
 
       if (bitbucketEvent != null) {
-        final Gson gson = new Gson();
+        Gson gson = new Gson();
         try {
-          final BitBucketPPRPayload payload = gson.fromJson(inputStream,
+          BitBucketPPRPayload payload = gson.fromJson(inputStream,
               BitBucketPPRPayloadFactory.getInstance(bitbucketEvent).getClass());
-          logger.fine(() -> "the payload is: " + payload.toString());
+          logger.log(Level.FINEST, "the payload is: {0}", payload.toString());
 
-          final BitBucketPPRPayloadProcessor bitbucketPayloadProcessor =
+          BitBucketPPRPayloadProcessor bitbucketPayloadProcessor =
               BitBucketPPRPayloadProcessorFactory.createProcessor(bitbucketEvent);
-          logger.fine(
-              () -> "the selected payload processor is: " + bitbucketPayloadProcessor.toString());
+          BitBucketPPRObservable observable =
+              BitBucketPPRObserverFactory.createObservable(bitbucketEvent);
 
-          bitbucketPayloadProcessor.processPayload(payload);
-        } catch (final Exception e) {
+            
+
+          logger.log(Level.FINEST, "the selected payload processor is: {0}",
+              bitbucketPayloadProcessor.toString());
+
+          bitbucketPayloadProcessor.processPayload(payload, observable);
+        } catch (Exception e) {
           logger.warning(e.getMessage());
         }
       } else {
-        logger.warning("the BitbucketEvent is null.");
+        logger.log(Level.WARNING, "the BitbucketEvent is null.");
       }
 
-      logger.log(Level.FINE, "Sending response.");
+      logger.log(Level.FINEST, "Sending response.");
       try {
         response.setContentType("text/html");
         response.setCharacterEncoding("UTF-8");
         response.setStatus(HttpServletResponse.SC_OK);
-        final PrintWriter out = response.getWriter();
+        PrintWriter out = response.getWriter();
         out.write("ok");
         out.flush();
         out.close();
         logger.log(Level.INFO, "Response sent.");
-      } catch (final Exception e) {
+      } catch (Exception e) {
         logger.warning(e.getMessage());
       }
     } else {
@@ -138,13 +148,13 @@ public class BitBucketPPRHookReceiver implements UnprotectedRootAction {
     }
   }
 
-  private String decodeInputStream(final String inputStream, final String contentType) {
+  private String decodeInputStream(String inputStream, String contentType) {
     String input = inputStream;
 
     if (contentType != null && contentType.startsWith("application/x-www-form-urlencoded")) {
       try {
         input = URLDecoder.decode(input, "UTF-8");
-      } catch (final UnsupportedEncodingException e) {
+      } catch (UnsupportedEncodingException e) {
         logger.warning(e.getMessage());
       }
     }

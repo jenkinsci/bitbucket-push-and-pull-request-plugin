@@ -1,7 +1,7 @@
 /*******************************************************************************
  * The MIT License
  * 
- * Copyright (C) 2019, CloudBees, Inc.
+ * Copyright (C) 2020, CloudBees, Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -18,29 +18,45 @@
  * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  ******************************************************************************/
-package io.jenkins.plugins.bitbucketpushandpullrequest.processor;
+package io.jenkins.plugins.bitbucketpushandpullrequest.event;
 
-import javax.annotation.Nonnull;
-import io.jenkins.plugins.bitbucketpushandpullrequest.BitBucketPPRJobProbe;
-import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
-import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRPullRequestAction;
-import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPREvent;
-import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import io.jenkins.plugins.bitbucketpushandpullrequest.observer.BitBucketPPRHandlerTemplate;
 
+public class BitBucketPPRBuildStarted implements BitBucketPPREvent {
+  private static final Logger LOGGER = Logger.getLogger(BitBucketPPRBuildStarted.class.getName());
 
-public class BitBucketPPRPullRequestPayloadProcessor extends BitBucketPPRPayloadProcessor {
-  public BitBucketPPRPullRequestPayloadProcessor(BitBucketPPRJobProbe jobProbe,
-      BitBucketPPREvent bitbucketEvent) {
-    super(jobProbe, bitbucketEvent);
+  BitBucketPPREventContext context;
+  BitBucketPPRHandlerTemplate handler;
+
+  @Override
+  public void setContext(BitBucketPPREventContext context) {
+    this.context = context;
   }
 
   @Override
-  public void processPayload(BitBucketPPRPayload payload) {
-    BitBucketPPRAction action = buildActionForJobs(payload);
-    jobProbe.triggerMatchingJobs(bitbucketEvent, action);
+  public void setEventHandler(BitBucketPPRHandlerTemplate handler) {
+    this.handler = handler;
+
   }
 
-  private BitBucketPPRAction buildActionForJobs(@Nonnull BitBucketPPRPayload payload) {
-    return new BitBucketPPRPullRequestAction(payload);
+  @Override
+  public void runHandler() {
+    try {
+      handler.run(BitBucketPPREventType.BUILD_STARTED);
+    } catch (Exception e) {
+      LOGGER.log(Level.INFO, e.getMessage());
+    }
+  }
+
+  @Override
+  public BitBucketPPREventContext getContext() {
+    return context;
+  }
+
+  @Override
+  public String toString() {
+    return "BitBucketPPRBuildStarted [context=" + context + ", handler=" + handler + "]";
   }
 }

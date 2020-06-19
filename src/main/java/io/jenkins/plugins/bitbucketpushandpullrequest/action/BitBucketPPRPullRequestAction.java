@@ -82,11 +82,6 @@ public class BitBucketPPRPullRequestAction extends InvisibleAction implements Bi
   }
 
   @Override
-  public String getType() {
-    return null;
-  }
-
-  @Override
   public String getRepositoryName() {
     return payload.getRepository().getName();
   }
@@ -99,11 +94,6 @@ public class BitBucketPPRPullRequestAction extends InvisibleAction implements Bi
   @Override
   public String getPullRequestId() {
     return payload.getPullRequest().getId();
-  }
-
-  @Override
-  public String getRepositoryId() {
-    return null;
   }
 
   @Override
@@ -134,5 +124,15 @@ public class BitBucketPPRPullRequestAction extends InvisibleAction implements Bi
   @Override
   public String getLinkStatuses() {
     return payload.getPullRequest().getLinks().getStatuses().getHref();
+  }
+
+  @Override
+  public String getCommitLink() {
+    return payload.getPullRequest().getSource().getCommit().getLinks().getSelf().getHref();
+  }
+
+  @Override
+  public String toString() {
+    return "BitBucketPPRPullRequestAction";
   }
 }

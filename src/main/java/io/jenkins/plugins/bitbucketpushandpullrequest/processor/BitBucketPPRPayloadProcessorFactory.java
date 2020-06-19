@@ -1,7 +1,7 @@
 /*******************************************************************************
  * The MIT License
  *
- * Copyright (C) 2018, CloudBees, Inc.
+ * Copyright (C) 2020, CloudBees, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -20,58 +20,63 @@
  ******************************************************************************/
 package io.jenkins.plugins.bitbucketpushandpullrequest.processor;
 
-import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.PULL_REQUEST_EVENT;
+import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.PULL_REQUEST_CLOUD_EVENT;
 import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.PULL_REQUEST_SERVER_EVENT;
 import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.REPOSITORY_EVENT;
 import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.REPOSITORY_POST;
-import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.REPOSITORY_PUSH;
+import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.REPOSITORY_CLOUD_PUSH;
 import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.REPOSITORY_SERVER_PUSH;
 
 import java.util.logging.Logger;
 
 import javax.naming.OperationNotSupportedException;
 import io.jenkins.plugins.bitbucketpushandpullrequest.BitBucketPPRJobProbe;
-import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPREvent;
+import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRHookEvent;
 
 
 public final class BitBucketPPRPayloadProcessorFactory {
 
-  static final Logger LOGGER = Logger.getLogger(BitBucketPPRPayloadProcessorFactory.class.getName());
+  static final Logger LOGGER =
+      Logger.getLogger(BitBucketPPRPayloadProcessorFactory.class.getName());
 
   private BitBucketPPRPayloadProcessorFactory() {
     throw new AssertionError();
   }
 
-  public static BitBucketPPRPayloadProcessor createProcessor(final BitBucketPPREvent bitbucketEvent)
+  public static BitBucketPPRPayloadProcessor createProcessor(final BitBucketPPRHookEvent bitbucketEvent)
       throws OperationNotSupportedException {
     return createProcessor(new BitBucketPPRJobProbe(), bitbucketEvent);
   }
 
-
   public static BitBucketPPRPayloadProcessor createProcessor(final BitBucketPPRJobProbe probe,
-      final BitBucketPPREvent bitbucketEvent) throws OperationNotSupportedException {
+      final BitBucketPPRHookEvent bitbucketEvent) throws OperationNotSupportedException {
 
-    BitBucketPPRPayloadProcessor processor = null;
-
-    if (REPOSITORY_EVENT.equalsIgnoreCase(bitbucketEvent.getEvent())) {
-      if (REPOSITORY_PUSH.equalsIgnoreCase(bitbucketEvent.getAction())) {
-        processor = new BitBucketPPRRepositoryPayloadProcessor(probe, bitbucketEvent);
-      } else if (REPOSITORY_POST.equalsIgnoreCase(bitbucketEvent.getAction())) {
-        LOGGER.warning("Got unexpected old post action, ignored!");
-      } else if (REPOSITORY_SERVER_PUSH.equalsIgnoreCase(bitbucketEvent.getAction())) {
-        processor = new BitBucketPPRRepositoryServerPayloadProcessor(probe, bitbucketEvent);
-      }
-    } else if (PULL_REQUEST_EVENT.equals(bitbucketEvent.getEvent())) {
-      processor = new BitBucketPPRPullRequestPayloadProcessor(probe, bitbucketEvent);
-    } else if (PULL_REQUEST_SERVER_EVENT.equals(bitbucketEvent.getEvent())) {
-      processor = new BitBucketPPRPullRequestServerPayloadProcessor(probe, bitbucketEvent);
+    if (REPOSITORY_EVENT.equalsIgnoreCase(bitbucketEvent.getEvent())
+        && REPOSITORY_CLOUD_PUSH.equalsIgnoreCase(bitbucketEvent.getAction())) {
+          LOGGER.info("Create BitBucketPPRRepositoryCloudPayloadProcessor");
+      return new BitBucketPPRRepositoryCloudPayloadProcessor(probe, bitbucketEvent);
+    }
+    if (REPOSITORY_EVENT.equalsIgnoreCase(bitbucketEvent.getEvent())
+        && REPOSITORY_SERVER_PUSH.equalsIgnoreCase(bitbucketEvent.getAction())) {
+          LOGGER.info("Create BitBucketPPRRepositoryServerPayloadProcessor");
+      return new BitBucketPPRRepositoryServerPayloadProcessor(probe, bitbucketEvent);
+    }
+    if (REPOSITORY_EVENT.equalsIgnoreCase(bitbucketEvent.getEvent())
+        && REPOSITORY_POST.equalsIgnoreCase(bitbucketEvent.getAction())) {
+      LOGGER.warning("Got unexpected old post action, ignored!");
     }
 
-    if (processor == null) {
-      throw new OperationNotSupportedException(
-          "No processor found for bitbucket event " + bitbucketEvent.getEvent());
+    if (PULL_REQUEST_CLOUD_EVENT.equals(bitbucketEvent.getEvent())) {
+      LOGGER.info("Create BitBucketPPRPullRequestCloudPayloadProcessor");
+      return new BitBucketPPRPullRequestCloudPayloadProcessor(probe, bitbucketEvent);
     }
 
-    return processor;
+    if (PULL_REQUEST_SERVER_EVENT.equals(bitbucketEvent.getEvent())) {
+      LOGGER.info("Create BitBucketPPRPullRequestServerPayloadProcessor");
+      return new BitBucketPPRPullRequestServerPayloadProcessor(probe, bitbucketEvent);
+    }
+
+    throw new OperationNotSupportedException(
+        "No processor found for bitbucket event " + bitbucketEvent.getEvent());
   }
 }

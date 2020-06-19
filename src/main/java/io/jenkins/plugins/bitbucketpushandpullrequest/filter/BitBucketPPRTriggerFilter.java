@@ -39,4 +39,6 @@ public abstract class BitBucketPPRTriggerFilter
   public abstract AbstractDescribableImpl<?> getActionFilter();
 
   public abstract boolean shouldTriggerAlsoIfNothingChanged();
+
+  public abstract boolean shouldSendApprove();
 }

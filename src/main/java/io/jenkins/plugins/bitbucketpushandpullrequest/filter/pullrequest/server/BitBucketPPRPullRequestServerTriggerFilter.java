@@ -77,4 +77,10 @@ public class BitBucketPPRPullRequestServerTriggerFilter extends BitBucketPPRTrig
   public boolean shouldTriggerAlsoIfNothingChanged() {
     return true;
   }
+
+
+  @Override
+  public boolean shouldSendApprove() {
+    return actionFilter.shouldSendApprove();
+  }
 }

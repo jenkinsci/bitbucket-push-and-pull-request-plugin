@@ -1,7 +1,7 @@
 /*******************************************************************************
  * The MIT License
  * 
- * Copyright (C) 2019, CloudBees, Inc.
+ * Copyright (C) 2020, CloudBees, Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -27,8 +27,9 @@ import javax.annotation.Nonnull;
 import io.jenkins.plugins.bitbucketpushandpullrequest.BitBucketPPRJobProbe;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRPullRequestServerAction;
-import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPREvent;
+import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRHookEvent;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
+import io.jenkins.plugins.bitbucketpushandpullrequest.observer.BitBucketPPRObservable;
 
 
 public class BitBucketPPRPullRequestServerPayloadProcessor extends BitBucketPPRPayloadProcessor {
@@ -36,20 +37,21 @@ public class BitBucketPPRPullRequestServerPayloadProcessor extends BitBucketPPRP
   private static final Logger logger =
       Logger.getLogger(BitBucketPPRPullRequestServerPayloadProcessor.class.getName());
 
-  public BitBucketPPRPullRequestServerPayloadProcessor(BitBucketPPRJobProbe jobProbe,
-      BitBucketPPREvent bitbucketEvent) {
+  public BitBucketPPRPullRequestServerPayloadProcessor(@Nonnull BitBucketPPRJobProbe jobProbe,
+      @Nonnull BitBucketPPRHookEvent bitbucketEvent) {
     super(jobProbe, bitbucketEvent);
     logger.fine(() -> "Processing " + bitbucketEvent.toString());
 
   }
 
-  @Override
-  public void processPayload(BitBucketPPRPayload payload) {
-    BitBucketPPRAction action = buildActionForJobs(payload);
-    jobProbe.triggerMatchingJobs(bitbucketEvent, action);
-  }
-
   private BitBucketPPRAction buildActionForJobs(@Nonnull BitBucketPPRPayload payload) {
     return new BitBucketPPRPullRequestServerAction(payload);
+  }
+
+  @Override
+  public void processPayload(@Nonnull BitBucketPPRPayload payload, 
+      BitBucketPPRObservable observable) {
+    BitBucketPPRAction action = buildActionForJobs(payload);
+    jobProbe.triggerMatchingJobs(bitbucketEvent, action, observable);
   }
 }

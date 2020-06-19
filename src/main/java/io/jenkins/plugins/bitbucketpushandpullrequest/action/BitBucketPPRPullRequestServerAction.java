@@ -93,11 +93,6 @@ public class BitBucketPPRPullRequestServerAction extends InvisibleAction impleme
   }
 
   @Override
-  public String getType() {
-    return null;
-  }
-
-  @Override
   public String getRepositoryName() {
     return payload.getServerRepository().getName();
   }
@@ -118,42 +113,7 @@ public class BitBucketPPRPullRequestServerAction extends InvisibleAction impleme
   }
 
   @Override
-  public String getDescription() {
-    return null;
-  }
-
-  @Override
-  public String getComment() {
-    return null;
-  }
-
-  @Override
-  public String getLinkHtml() {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public String getLinkSelf() {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public String getLinkApprove() {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public String getLinkDecline() {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public String getLinkStatuses() {
-    // TODO Auto-generated method stub
-    return null;
+  public String toString() {
+    return "BitBucketPPRPullRequestServerAction";
   }
 }

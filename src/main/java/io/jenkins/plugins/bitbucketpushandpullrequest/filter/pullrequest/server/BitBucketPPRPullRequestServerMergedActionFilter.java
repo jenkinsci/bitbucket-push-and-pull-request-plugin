@@ -36,6 +36,7 @@ public class BitBucketPPRPullRequestServerMergedActionFilter
     extends BitBucketPPRPullRequestServerActionFilter {
 
   public String allowedBranches;
+  public boolean isToApprove;
 
   @DataBoundConstructor
   public BitBucketPPRPullRequestServerMergedActionFilter() {}
@@ -47,6 +48,11 @@ public class BitBucketPPRPullRequestServerMergedActionFilter
     } else {
       this.allowedBranches = allowedBranches;
     }
+  }
+
+  @DataBoundSetter
+  public void setIsToApprove(boolean isToApprove) {
+    this.isToApprove = isToApprove;
   }
 
   @Override
@@ -68,5 +74,10 @@ public class BitBucketPPRPullRequestServerMergedActionFilter
     public String getDisplayName() {
       return "Merged";
     }
+  }
+
+  @Override
+  public boolean shouldSendApprove() {
+    return isToApprove;
   }
 }

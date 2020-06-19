@@ -25,7 +25,7 @@ public final class BitBucketPPRConstsUtils {
   public static final String USER_AGENT = "Bitbucket-Webhooks/2.0";
 
   public static final String REPOSITORY_EVENT = "repo";
-  public static final String REPOSITORY_PUSH = "push";
+  public static final String REPOSITORY_CLOUD_PUSH = "push";
   public static final String REPOSITORY_POST = "post";
 
   public static final String DIAGNOSTICS = "diagnostics";
@@ -33,7 +33,7 @@ public final class BitBucketPPRConstsUtils {
 
   public static final String REPOSITORY_SERVER_PUSH = "refs_changed";
 
-  public static final String PULL_REQUEST_EVENT = "pullrequest";
+  public static final String PULL_REQUEST_CLOUD_EVENT = "pullrequest";
   public static final String PULL_REQUEST_CREATED = "created";
   public static final String PULL_REQUEST_APPROVED = "approved";
   public static final String PULL_REQUEST_UPDATED = "updated";

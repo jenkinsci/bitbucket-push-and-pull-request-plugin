@@ -1,7 +1,7 @@
 /*******************************************************************************
  * The MIT License
  * 
- * Copyright (C) 2018, CloudBees, Inc.
+ * Copyright (C) 2020, CloudBees, Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -22,20 +22,21 @@ package io.jenkins.plugins.bitbucketpushandpullrequest.processor;
 
 import javax.annotation.Nonnull;
 import io.jenkins.plugins.bitbucketpushandpullrequest.BitBucketPPRJobProbe;
-import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPREvent;
+import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRHookEvent;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
+import io.jenkins.plugins.bitbucketpushandpullrequest.observer.BitBucketPPRObservable;
 
 
 public abstract class BitBucketPPRPayloadProcessor {
   protected final BitBucketPPRJobProbe jobProbe;
-  protected final BitBucketPPREvent bitbucketEvent;
+  protected final BitBucketPPRHookEvent bitbucketEvent;
 
 
-  public BitBucketPPRPayloadProcessor(BitBucketPPRJobProbe jobProbe,
-      BitBucketPPREvent bitbucketEvent) {
+  public BitBucketPPRPayloadProcessor(@Nonnull BitBucketPPRJobProbe jobProbe,
+      @Nonnull BitBucketPPRHookEvent bitbucketEvent) {
     this.jobProbe = jobProbe;
     this.bitbucketEvent = bitbucketEvent;
   }
 
-  public abstract void processPayload(@Nonnull BitBucketPPRPayload payload);
+  public abstract void processPayload(@Nonnull BitBucketPPRPayload payload, BitBucketPPRObservable observable);
 }

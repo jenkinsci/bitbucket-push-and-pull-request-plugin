@@ -91,11 +91,6 @@ public class BitBucketPPRServerRepositoryAction extends InvisibleAction implemen
   }
 
   @Override
-  public String getSourceBranch() {
-    return null;
-  }
-
-  @Override
   public String getType() {
     return type;
   }
@@ -121,52 +116,7 @@ public class BitBucketPPRServerRepositoryAction extends InvisibleAction implemen
   }
 
   @Override
-  public String getPullRequestUrl() {
-    return null;
-  }
-
-  @Override
-  public String getTitle() {
-    return null;
-  }
-
-  @Override
-  public String getDescription() {
-    return null;
-  }
-
-  @Override
-  public String getComment() {
-    return null;
-  }
-
-  @Override
-  public String getLinkHtml() {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public String getLinkSelf() {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public String getLinkApprove() {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public String getLinkDecline() {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public String getLinkStatuses() {
-    // TODO Auto-generated method stub
-    return null;
+  public String toString() {
+    return "BitBucketPPRServerRepositoryAction";
   }
 }

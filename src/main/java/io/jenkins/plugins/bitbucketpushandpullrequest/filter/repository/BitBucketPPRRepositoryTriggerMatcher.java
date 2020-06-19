@@ -26,7 +26,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import io.jenkins.plugins.bitbucketpushandpullrequest.filter.BitBucketPPREventTriggerMatcher;
 import io.jenkins.plugins.bitbucketpushandpullrequest.filter.BitBucketPPRTriggerFilter;
-import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPREvent;
+import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRHookEvent;
 import io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils;
 
 
@@ -35,7 +35,7 @@ public class BitBucketPPRRepositoryTriggerMatcher implements BitBucketPPREventTr
       Logger.getLogger(BitBucketPPRRepositoryTriggerMatcher.class.getName());
 
   @Override
-  public boolean matchesAction(BitBucketPPREvent bitbucketEvent,
+  public boolean matchesAction(BitBucketPPRHookEvent bitbucketEvent,
       BitBucketPPRTriggerFilter triggerFilter) {
     logger.log(Level.INFO, () -> "" + bitbucketEvent.toString());
 
@@ -47,14 +47,14 @@ public class BitBucketPPRRepositoryTriggerMatcher implements BitBucketPPREventTr
             + "AND does it equal BitBucketPPRConsts.REPOSITORY_SERVER_PUSH {5} to bitbucketEvent.getAction() {6}? <<{7}>> ",
         new Object[] {
             triggerFilter.getActionFilter() instanceof BitBucketPPRRepositoryPushActionFilter,
-            BitBucketPPRConstsUtils.REPOSITORY_PUSH, bitbucketEvent.getAction(),
-            BitBucketPPRConstsUtils.REPOSITORY_PUSH.equals(bitbucketEvent.getAction()),
+            BitBucketPPRConstsUtils.REPOSITORY_CLOUD_PUSH, bitbucketEvent.getAction(),
+            BitBucketPPRConstsUtils.REPOSITORY_CLOUD_PUSH.equals(bitbucketEvent.getAction()),
             triggerFilter.getActionFilter() instanceof BitBucketPPRServerRepositoryPushActionFilter,
             BitBucketPPRConstsUtils.REPOSITORY_SERVER_PUSH, bitbucketEvent.getAction(),
             BitBucketPPRConstsUtils.REPOSITORY_SERVER_PUSH.equals(bitbucketEvent.getAction())});
 
     return ((triggerFilter.getActionFilter() instanceof BitBucketPPRRepositoryPushActionFilter
-        && BitBucketPPRConstsUtils.REPOSITORY_PUSH.equals(bitbucketEvent.getAction()))
+        && BitBucketPPRConstsUtils.REPOSITORY_CLOUD_PUSH.equals(bitbucketEvent.getAction()))
         || (triggerFilter.getActionFilter() instanceof BitBucketPPRServerRepositoryPushActionFilter
             && BitBucketPPRConstsUtils.REPOSITORY_SERVER_PUSH.equals(bitbucketEvent.getAction())));
   }

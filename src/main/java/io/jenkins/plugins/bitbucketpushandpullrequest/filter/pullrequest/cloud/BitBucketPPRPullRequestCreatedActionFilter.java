@@ -34,6 +34,7 @@ public class BitBucketPPRPullRequestCreatedActionFilter
     extends BitBucketPPRPullRequestActionFilter {
 
   public String allowedBranches;
+  public boolean isToApprove;
 
   @DataBoundConstructor
   public BitBucketPPRPullRequestCreatedActionFilter() {}
@@ -47,6 +48,11 @@ public class BitBucketPPRPullRequestCreatedActionFilter
     }
   }
 
+  @DataBoundSetter
+  public void setIsToApprove(boolean isToApprove) {
+    this.isToApprove = isToApprove;
+  }
+
   @Override
   public boolean shouldTriggerBuild(BitBucketPPRAction bitbucketAction) {
     return matches(allowedBranches, bitbucketAction.getTargetBranch(), null);
@@ -56,6 +62,11 @@ public class BitBucketPPRPullRequestCreatedActionFilter
   public BitBucketPPRTriggerCause getCause(File pollingLog, BitBucketPPRAction pullRequestAction)
       throws IOException {
     return new BitBucketPPRPullRequestCreatedCause(pollingLog, pullRequestAction);
+  }
+
+  @Override
+  public boolean shouldSendApprove() {
+    return isToApprove;
   }
 
   @Extension

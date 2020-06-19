@@ -18,14 +18,27 @@
  * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  ******************************************************************************/
-
 package io.jenkins.plugins.bitbucketpushandpullrequest.client;
 
-import hudson.model.Run;
-import hudson.plugins.git.UserRemoteConfig;
+import io.jenkins.plugins.bitbucketpushandpullrequest.event.BitBucketPPREventContext;
 
 public class BitBucketPPRClientFactory {
-  public static BitBucketPPRClient createCloudClient(UserRemoteConfig config, Run<?, ?> run) { 
-    return new BitBucketPPRCloudClient(config, run);
+  public static BitBucketPPRClient createClient(BitBucketPPRClientType type,
+      BitBucketPPREventContext context) throws Exception {
+
+    BitBucketPPRClient client = null;
+
+    switch (type) {
+      case CLOUD:
+        client = new BitBucketPPRCloudClient(context);
+        client.accept(new BitBucketPPRClientCloudVisitor());
+        return client;
+      case SERVER:
+        client = new BitBucketPPRServerClient(context);
+        client.accept(new BitBucketPPRClientServerVisitor());
+        return client;
+      default:
+        throw new Exception();
+    }
   }
 }
