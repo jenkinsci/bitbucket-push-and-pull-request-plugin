@@ -39,9 +39,9 @@ Bitbucket Push And Pull Request Plugin will not work if the Bitbucket plugin (<h
 
 ### Configure the webhook
 
-Configure your Bitbucket repository adding a webhook in the settings page. In the URL field (see image, at point A) add your JENKINS_URL followed by "/bitbucket-hook/" (for example <https://my-jenkins.on-my-planet-far-away.com/bitbucket-hook/>) Credentials for the webhook endpoint are not required, the trailing slash is mandatory. 
+Configure your Bitbucket repository adding a webhook in the settings page. In the URL field (see image, at point A) add your JENKINS_URL followed by "/bitbucket-hook/" (for example <https://my-jenkins.on-my-planet-far-away.com/bitbucket-hook/>) Credentials for the webhook endpoint are not required, the trailing slash is mandatory.
 
-For more specific infos about managing webhooks please consult: 
+For more specific infos about managing webhooks please consult:
 - <https://confluence.atlassian.com/bitbucket/manage-webhooks-735643732.html>. (Bitbucket Cloud)
 - <https://confluence.atlassian.com/bitbucketserver/managing-webhooks-in-bitbucket-server-938025878.html>. (Bitbucket Server)
 
@@ -118,41 +118,55 @@ bitbucketTriggers {
 
   // For Bitbucket Cloud
   repositoryPushAction(triggerAlsoIfTagPush: boolean, triggerAlsoIfNothingChanged: boolean, allowedBranches: String)
-  
-  pullRequestApprovedAction(onlyIfReviewersApproved: boolean, allowedBranches: String)
+  repositoryPushAction(triggerAlsoIfTagPush: boolean, triggerAlsoIfNothingChanged: boolean, allowedBranches: String, isToApprove: boolean)
+
   pullRequestApprovedAction(onlyIfReviewersApproved: boolean)
-  
+  pullRequestApprovedAction(onlyIfReviewersApproved: boolean, allowedBranches: String)
+  pullRequestApprovedAction(onlyIfReviewersApproved: boolean, allowedBranches: String, isToApprove: boolean)
+
   pullRequestCreatedAction()
   pullRequestCreatedAction(allowedBranches: String)
   pullRequestCreatedAction(allowedBranches: String, isToApprove: String)
-  
+
   pullRequestUpdatedAction()
   pullRequestUpdatedAction(allowedBranches: String)
-  
+  pullRequestUpdatedAction(allowedBranches: String, isToApprove: String)
+
   pullRequestMergedAction()
   pullRequestMergedAction(allowedBranches: String)
-  
+  pullRequestMergedAction(allowedBranches: String, isToApprove: String)
+
   pullRequestCommentCreatedAction()
   pullRequestCommentCreatedAction(allowedBranches: String)
   pullRequestCommentCreatedAction(allowedBranches: String, commentFilter: String) // CommentFilter is java a regex expression
-  
+
   pullRequestCommentUpdatedAction()
   pullRequestCommentUpdatedAction(allowedBranches: String)
   pullRequestCommentUpdatedAction(allowedBranches: String, commentFilter: String) // CommentFilter is java a regex expression
-  
+
   pullRequestCommentDeletedAction()
   pullRequestCommentDeletedAction(allowedBranches: String)
 
   // For Bitbucket Server
+  // note: flag `isToApprove` has no effect yet
   repositoryServerPushAction(triggerAlsoIfTagPush: boolean, triggerAlsoIfNothingChanged: boolean, allowedBranches: String)
+  repositoryServerPushAction(triggerAlsoIfTagPush: boolean, triggerAlsoIfNothingChanged: boolean, allowedBranches: String, isToApprove: boolean)
+
   pullRequestServerApprovedAction(onlyIfReviewersApproved: boolean)
   pullRequestServerApprovedAction(onlyIfReviewersApproved: boolean, allowedBranches: String)
+  pullRequestServerApprovedAction(onlyIfReviewersApproved: boolean, allowedBranches: String, isToApprove: boolean)
+
   pullRequestServerCreatedAction()
   pullRequestServerCreatedAction(allowedBranches: String)
+  pullRequestServerCreatedAction(allowedBranches: String, isToApprove: boolean)
+
   pullRequestServerUpdatedAction()
   pullRequestServerUpdatedAction(allowedBranches: String)
+  pullRequestServerUpdatedAction(allowedBranches: String, isToApprove: boolean)
+
   pullRequestServerMergedAction()
   pullRequestServerMergedAction(allowedBranches: String)
+  pullRequestServerMergedAction(allowedBranches: String, isToApprove: boolean)
 }
 ```
 
