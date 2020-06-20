@@ -1,5 +1,19 @@
 # Change Log
 
+## 2.4.0 (2020-06-20)
+
+[Full Changelog](https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/compare/bitbucket-push-and-pull-request-2.3.3...bitbucket-push-and-pull-request-2.4.0)
+
+**Implemented enhancements:**
+
+* Added build state propagation (for Bitbucket Cloud)
+* Added Approve push and pull request by Jenkins on successful build (for Bitbucket Cloud)
+
+## Relevant tickets closed
+
+* [Feature] Propagate build status to Bitbucket #23 
+* [Feature] Approve pull request on successful build #29
+
 ## 2.3.3 (2020-04-19)
 
 [Full Changelog](https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/compare/bitbucket-push-and-pull-request-2.3.2...bitbucket-push-and-pull-request-2.3.3)
