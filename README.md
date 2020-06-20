@@ -8,7 +8,7 @@
 [![Jenkins Plugin Installs](https://img.shields.io/jenkins/plugin/i/bitbucket-push-and-pull-request.svg?color=blue)](https://plugins.jenkins.io/bitbucket-push-and-pull-request)
 [![Gitter](https://badges.gitter.im/jenkinsci/bitbucket-push-and-pull-request-plugin.svg)](https://gitter.im/jenkinsci/bitbucket-push-and-pull-request-plugin)
 
-<img src="docs/img/logo-head.svg" width="192">
+![jenkins logo](docs/img/logo-head.svg)
 
 Plugin for Jenkins **v2.138.2 or later**, that triggers builds on Bitbucket's push and pull requests events.
 
@@ -76,6 +76,7 @@ Bitbucket Push And Pull Request Plugin will not work if the Bitbucket plugin (<h
 Configure your Bitbucket repository adding a webhook in the settings page. In the URL field (see image, at point A) add your JENKINS_URL followed by "/bitbucket-hook/" (for example <https://my-jenkins.on-my-planet-far-away.com/bitbucket-hook/>) Credentials for the webhook endpoint are not required, the trailing slash is mandatory.
 
 For more specific infos about managing webhooks please consult:
+
 - <https://confluence.atlassian.com/bitbucket/manage-webhooks-735643732.html>. (Bitbucket Cloud)
 - <https://confluence.atlassian.com/bitbucketserver/managing-webhooks-in-bitbucket-server-938025878.html>. (Bitbucket Server)
 
@@ -95,11 +96,11 @@ For more specific infos about managing webhooks please consult:
 
    ![example_config_jenkins_bb_ppr_1](docs/img/example_config_jenkins_bb_ppr_1.png)
 
-   <img src="docs/img/example_config_jenkins_bb_ppr_2.png" width="580">
+   ![example_config_jenkins_bb_ppr_2](docs/img/example_config_jenkins_bb_ppr_2.png)
 
-   <img src="docs/img/example_config_jenkins_bb_ppr_3.png" width="580">
+   ![example_config_jenkins_bb_ppr_3](docs/img/example_config_jenkins_bb_ppr_3.png)
 
-   <img src="docs/img/example_config_jenkins_bb_ppr_4.png" width="580">
+   ![example_config_jenkins_bb_ppr_4](docs/img/example_config_jenkins_bb_ppr_4.png)
 
 ## Environment variables
 
