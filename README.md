@@ -8,7 +8,7 @@
 [![Jenkins Plugin Installs](https://img.shields.io/jenkins/plugin/i/bitbucket-push-and-pull-request.svg?color=blue)](https://plugins.jenkins.io/bitbucket-push-and-pull-request)
 [![Gitter](https://badges.gitter.im/jenkinsci/bitbucket-push-and-pull-request-plugin.svg)](https://gitter.im/jenkinsci/bitbucket-push-and-pull-request-plugin)
 
-![jenkins logo](docs/img/logo-head.svg)
+<img src="docs/img/logo-head.svg" width="192">
 
 Plugin for Jenkins **v2.138.2 or later**, that triggers builds on Bitbucket's push and pull requests events.
 
@@ -83,24 +83,16 @@ For more specific infos about managing webhooks please consult:
 ### Configure your Jenkins job
 
 1. Configure the Bitbucket Repository under the Source Code Management with your credentials. For git:
-
-   <img src="docs/img/conf_git.png" width="580">
-
-   In case you are using Mercurial instead of git, configure it as follows:
-
-   <img src="docs/img/conf_mercurial.png" width="580">
-
-   _Please note: the branch, related to the events which trigger the builds, must be specified in the field Revision._
+![example config git](docs/img/conf_git.png)
+In case you are using Mercurial instead of git, configure it as follows:
+![exampel config mercurial](docs/img/conf_mercurial.png)
+_Please note: the branch, related to the events which trigger the builds, must be specified in the field Revision._
 
 2. Now activate the plugin in your job selecting the "Build with Bitbucket Push and Pull Request Plugin" option in the Build Triggers pane.
-
-   ![example_config_jenkins_bb_ppr_1](docs/img/example_config_jenkins_bb_ppr_1.png)
-
-   ![example_config_jenkins_bb_ppr_2](docs/img/example_config_jenkins_bb_ppr_2.png)
-
-   ![example_config_jenkins_bb_ppr_3](docs/img/example_config_jenkins_bb_ppr_3.png)
-
-   ![example_config_jenkins_bb_ppr_4](docs/img/example_config_jenkins_bb_ppr_4.png)
+![example config jenkins bb ppr 1](docs/img/example_config_jenkins_bb_ppr_1.png)
+![example config jenkins bb ppr 2](docs/img/example_config_jenkins_bb_ppr_2.png)
+![example config jenkins bb ppr 3](docs/img/example_config_jenkins_bb_ppr_3.png)
+![example config jenkins bb ppr 4](docs/img/example_config_jenkins_bb_ppr_4.png)
 
 ## Environment variables
 
