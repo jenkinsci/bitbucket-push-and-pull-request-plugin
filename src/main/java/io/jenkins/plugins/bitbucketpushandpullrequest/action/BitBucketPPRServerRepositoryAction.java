@@ -39,7 +39,7 @@ public class BitBucketPPRServerRepositoryAction extends InvisibleAction implemen
 
   private final @Nonnull BitBucketPPRPayload payload;
   private List<String> scmUrls = new ArrayList<>(2);
-  private String targetBranchName = null;
+  private String targetBranch = null;
   private String type;
 
   public BitBucketPPRServerRepositoryAction(BitBucketPPRPayload payload) {
@@ -59,20 +59,20 @@ public class BitBucketPPRServerRepositoryAction extends InvisibleAction implemen
 
     for (BitBucketPPRServerChange change : payload.getServerChanges()) {
       if (change.getRefId() != null) {
-        this.targetBranchName = change.getRef().getDisplayId();
+        this.targetBranch = change.getRefId();
         this.type = change.getType();
         break;
       }
     }
 
     LOGGER.log(Level.INFO,
-        () -> "Received commit hook notification from server for destination branch: " + this.targetBranchName);
+        () -> "Received commit hook notification from server for destination branch: " + this.targetBranch);
     LOGGER.log(Level.INFO, () -> "Received commit hook type from server: " + this.type);
   }
 
   @Override
   public String getTargetBranch() {
-    return targetBranchName;
+    return targetBranch;
   }
 
   @Override
