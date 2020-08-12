@@ -32,6 +32,7 @@ import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRCo
 import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.PULL_REQUEST_SERVER_MERGED;
 import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.PULL_REQUEST_SERVER_UPDATED;
 import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.PULL_REQUEST_SERVER_SOURCE_UPDATED;
+import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.PULL_REQUEST_SERVER_COMMENT_CREATED;
 import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.PULL_REQUEST_UPDATED;
 import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.PULL_REQUEST_COMMENT_CREATED;
 import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.PULL_REQUEST_COMMENT_UPDATED;
@@ -47,7 +48,6 @@ public class BitBucketPPRHookEvent {
   private String event;
   private String action;
 
-
   public BitBucketPPRHookEvent(String eventAction) throws OperationNotSupportedException {
     String[] eventActionPair = eventAction.split(":");
 
@@ -55,6 +55,8 @@ public class BitBucketPPRHookEvent {
 
     if (eventActionPair.length == 3 && eventActionPair[1].equalsIgnoreCase("reviewer")) {
       action = eventActionPair[2];
+    } else if (eventActionPair.length == 3 && eventActionPair[1].equalsIgnoreCase("comment")) {
+      action = eventActionPair[1] + ":" + eventActionPair[2];
     } else {
       action = eventActionPair[1];
     }
@@ -85,7 +87,8 @@ public class BitBucketPPRHookEvent {
           || PULL_REQUEST_SERVER_UPDATED.equalsIgnoreCase(action)
           || PULL_REQUEST_SERVER_SOURCE_UPDATED.equalsIgnoreCase(action)
           || PULL_REQUEST_SERVER_APPROVED.equalsIgnoreCase(action)
-          || PULL_REQUEST_SERVER_MERGED.equalsIgnoreCase(action))) {
+          || PULL_REQUEST_SERVER_MERGED.equalsIgnoreCase(action)
+          || PULL_REQUEST_SERVER_COMMENT_CREATED.equalsIgnoreCase(action))) {
         error = true;
       }
     } else if (DIAGNOSTICS.equalsIgnoreCase(event)) {

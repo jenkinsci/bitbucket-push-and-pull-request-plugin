@@ -98,6 +98,11 @@ public class BitBucketPPRPullRequestServerAction extends InvisibleAction impleme
   }
 
   @Override
+  public String getServerComment() {
+    return payload.getServerComment().getText();
+  }
+
+  @Override
   public List<String> getScmUrls() {
     return scmUrls;
   }
