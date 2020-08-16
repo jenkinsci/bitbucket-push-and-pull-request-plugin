@@ -30,6 +30,7 @@ public class BitBucketPPREnvironmentContributor extends EnvironmentContributor {
   static final String BITBUCKET_REPOSITORY_ID = "BITBUCKET_REPOSITORY_ID";
   static final String BITBUCKET_REPOSITORY_URL = "BITBUCKET_REPOSITORY_URL";
   static final String BITBUCKET_SOURCE_BRANCH = "BITBUCKET_SOURCE_BRANCH";
+  static final String BITBUCKET_PULL_REQUEST_COMMENT_TEXT = "BITBUCKET_PULL_REQUEST_COMMENT_TEXT";
   static final String REPOSITORY_LINK = "REPOSITORY_LINK";
   static final String REPOSITORY_NAME = "REPOSITORY_NAME";
   static final String BITBUCKET_ACTOR = "BITBUCKET_ACTOR";
@@ -171,6 +172,9 @@ public class BitBucketPPREnvironmentContributor extends EnvironmentContributor {
 
     String payload = action.getPayload().toString();
     putEnvVar(envVars, BITBUCKET_PAYLOAD, payload);
+
+    String pullRequestCommentText = action.getServerComment();
+    putEnvVar(envVars, BITBUCKET_PULL_REQUEST_COMMENT_TEXT, pullRequestCommentText);
   }
 
   private static void putEnvVar(EnvVars envs, String name, String value) {

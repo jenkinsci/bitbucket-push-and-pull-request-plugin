@@ -12,6 +12,7 @@ public class BitBucketPPRServerPayload implements BitBucketPPRPayload {
   private BitBucketPPRServerPullRequest pullRequest;
   private BitBucketPPRServerRepository repository;
   private final List<BitBucketPPRServerChange> changes = new ArrayList<>();
+  private BitBucketPPRServerComment comment;
 
   @SuppressFBWarnings
   @Override
@@ -34,6 +35,11 @@ public class BitBucketPPRServerPayload implements BitBucketPPRPayload {
   @Override
   public List<BitBucketPPRServerChange> getServerChanges() {
     return new ArrayList<>(changes);
+  }
+
+  @Override
+  public BitBucketPPRServerComment getServerComment() {
+    return comment;
   }
 
   @Override

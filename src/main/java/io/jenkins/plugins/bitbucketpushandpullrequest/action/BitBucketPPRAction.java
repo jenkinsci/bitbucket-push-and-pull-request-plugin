@@ -100,6 +100,10 @@ public interface BitBucketPPRAction extends Action {
     return null;
   }
 
+  public default String getServerComment(){
+    return null;
+  }
+
   public default String getCommitLink() {
     return null;
   }

@@ -48,6 +48,7 @@ public final class BitBucketPPRConstsUtils {
   public static final String PULL_REQUEST_SERVER_UPDATED = "modified";
   public static final String PULL_REQUEST_SERVER_SOURCE_UPDATED = "from_ref_updated";
   public static final String PULL_REQUEST_SERVER_MERGED = "merged";
+  public static final String PULL_REQUEST_SERVER_COMMENT_CREATED = "comment:added";
 
   public static final String PULL_REQUEST_REVIEWER = "REVIEWER";
   public static final String PULL_REQUEST_PARTICIPANT = "PARTICIPANT";

@@ -23,6 +23,7 @@
 package io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.server;
 
 import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.PULL_REQUEST_SERVER_APPROVED;
+import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.PULL_REQUEST_SERVER_COMMENT_CREATED;
 import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.PULL_REQUEST_SERVER_CREATED;
 import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.PULL_REQUEST_SERVER_MERGED;
 import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.PULL_REQUEST_SERVER_UPDATED;
@@ -52,7 +53,9 @@ public class BitBucketPPRPullRequestServerTriggerMatcher
             && triggerFilter
                 .getActionFilter() instanceof BitBucketPPRPullRequestServerCreatedActionFilter)
         || (PULL_REQUEST_SERVER_MERGED.equalsIgnoreCase(bitbucketEvent.getAction()) && triggerFilter
-            .getActionFilter() instanceof BitBucketPPRPullRequestServerMergedActionFilter);
+            .getActionFilter() instanceof BitBucketPPRPullRequestServerMergedActionFilter)
+        || (PULL_REQUEST_SERVER_COMMENT_CREATED.equals(bitbucketEvent.getAction()) && triggerFilter
+            .getActionFilter() instanceof BitBucketPPRPullRequestServerCommentCreatedActionFilter);
   }
 }
 

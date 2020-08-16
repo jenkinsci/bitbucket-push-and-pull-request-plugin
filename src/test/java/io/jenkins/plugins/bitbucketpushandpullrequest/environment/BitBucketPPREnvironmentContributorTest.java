@@ -363,6 +363,30 @@ public class BitBucketPPREnvironmentContributorTest {
     assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PAYLOAD, payload.toString()));
   }
 
+  @Test
+  public void buildEnvironmentForServerCommentCreatedTest() {
+    BitBucketPPRServerPayload payload = getServerPayload("./server/pr_comment_created.json");
+
+    BitBucketPPRPullRequestServerCause cause = mock(BitBucketPPRPullRequestServerCause.class);
+    when(cause.getPullRequestPayLoad()).thenReturn(new BitBucketPPRPullRequestServerAction(payload));
+
+    // do
+    runEnvironmentContributorForCause(cause);
+
+    // assert
+    assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_SOURCE_BRANCH, "test-pr2"));
+    assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_TARGET_BRANCH, "master"));
+    assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_LINK,
+      "https://bitbucket.company.com/bitbucket/users/username/repos/test-repo/pull-requests/2"));
+    assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_ID, "2"));
+    assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_ACTOR, "username"));
+    assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_TITLE, "Test pr2"));
+    assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_DESCRIPTION, ""));
+    assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PAYLOAD, payload.toString()));
+    assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_COMMENT_TEXT, "Comment content"));
+  }
+
+
   private BitBucketPPRPayload getCloudPayload(String res) {
     return (BitBucketPPRPayload) getGenericPayload(
       res, BitBucketPPRCloudPayload.class
