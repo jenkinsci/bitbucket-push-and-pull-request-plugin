@@ -64,6 +64,10 @@ public interface BitBucketPPRAction extends Action {
     return null;
   }
 
+  public default String getTargetBranchRefId() {
+    return null;
+  }
+
   public default String getType() {
     return null;
   }
