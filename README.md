@@ -146,6 +146,7 @@ bitbucketTriggers {
   // For Bitbucket Cloud
   repositoryPushAction(triggerAlsoIfTagPush: boolean, triggerAlsoIfNothingChanged: boolean, allowedBranches: String)
   repositoryPushAction(triggerAlsoIfTagPush: boolean, triggerAlsoIfNothingChanged: boolean, allowedBranches: String, isToApprove: boolean)
+  repositoryPushAction(triggerAlsoIfTagPush: boolean, triggerAlsoIfNothingChanged: boolean, allowedBranches: String, isToApprove: boolean, triggerOnlyIfTagPush: boolean)
 
   pullRequestApprovedAction(onlyIfReviewersApproved: boolean)
   pullRequestApprovedAction(onlyIfReviewersApproved: boolean, allowedBranches: String)
@@ -178,6 +179,7 @@ bitbucketTriggers {
   // note: flag `isToApprove` has no effect yet
   repositoryServerPushAction(triggerAlsoIfTagPush: boolean, triggerAlsoIfNothingChanged: boolean, allowedBranches: String)
   repositoryServerPushAction(triggerAlsoIfTagPush: boolean, triggerAlsoIfNothingChanged: boolean, allowedBranches: String, isToApprove: boolean)
+  repositoryServerPushAction(triggerAlsoIfTagPush: boolean, triggerAlsoIfNothingChanged: boolean, allowedBranches: String, isToApprove: boolean, triggerOnlyIfTagPush: boolean)
 
   pullRequestServerApprovedAction(onlyIfReviewersApproved: boolean)
   pullRequestServerApprovedAction(onlyIfReviewersApproved: boolean, allowedBranches: String)

@@ -1,17 +1,17 @@
 /*******************************************************************************
  * The MIT License
- * 
+ *
  * Copyright (C) 2019, CloudBees, Inc.
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
  * including without limitation the rights to use, copy, modify, merge, publish, distribute,
  * sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in all copies or
  * substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT
  * NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
@@ -39,6 +39,7 @@ public class BitBucketPPRRepositoryPushActionFilter extends BitBucketPPRReposito
 
   public boolean triggerAlsoIfTagPush;
   public boolean triggerAlsoIfNothingChanged;
+  public boolean triggerOnlyIfTagPush;
   public String allowedBranches;
   public boolean isToApprove;
 
@@ -48,6 +49,11 @@ public class BitBucketPPRRepositoryPushActionFilter extends BitBucketPPRReposito
     this.triggerAlsoIfTagPush = triggerAlsoIfTagPush;
     this.triggerAlsoIfNothingChanged = triggerAlsoIfNothingChanged;
     this.allowedBranches = allowedBranches;
+  }
+
+  @DataBoundSetter
+  public void setTriggerOnlyIfTagPush(boolean triggerOnlyIfTagPush) {
+    this.triggerOnlyIfTagPush = triggerOnlyIfTagPush;
   }
 
   @DataBoundSetter
@@ -62,12 +68,18 @@ public class BitBucketPPRRepositoryPushActionFilter extends BitBucketPPRReposito
 
     if (!bitbucketAction.getType().equalsIgnoreCase("BRANCH")
         && !bitbucketAction.getType().equalsIgnoreCase("named_branch")
-        && !bitbucketAction.getType().equalsIgnoreCase("UPDATE") && !this.triggerAlsoIfTagPush) {
+        && !bitbucketAction.getType().equalsIgnoreCase("UPDATE")
+        && !bitbucketAction.getType().equalsIgnoreCase("TAG")
+        && !this.triggerAlsoIfTagPush) {
       logger.info(
           "Neither bitbucketAction type is BRANCH, nor UPDATE, nor trigger on tag push is set: "
               + bitbucketAction.getType());
 
       return false;
+    }
+
+    if (this.triggerOnlyIfTagPush && !bitbucketAction.getType().equalsIgnoreCase("TAG")) {
+        return false;
     }
 
     return matches(allowedBranches, bitbucketAction.getTargetBranch(), null);
