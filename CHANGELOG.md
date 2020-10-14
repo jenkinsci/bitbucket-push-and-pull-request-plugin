@@ -1,5 +1,19 @@
 # Change Log
 
+## 2.5.0 (2020-10-14)
+
+[Full Changelog](https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/compare/bitbucket-push-and-pull-request-2.4.0...bitbucket-push-and-pull-request-2.5)
+
+**Implemented enhancements:**
+
+* Add possibility to trigger jobs only on tag pushes (for Bitbucket Cloud and Bitbucket Server)
+* Add trigger for PR comment created (for Bitbucket Server)
+
+## Relevant tickets closed
+
+* [Feature] Triggering a job only when tags are pushed #119 
+* [Feature] Trigger builds on new tag only #106 
+
 ## 2.4.0 (2020-06-20)
 
 [Full Changelog](https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/compare/bitbucket-push-and-pull-request-2.3.3...bitbucket-push-and-pull-request-2.4.0)
