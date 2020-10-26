@@ -21,6 +21,7 @@
 
 package io.jenkins.plugins.bitbucketpushandpullrequest;
 
+import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.REPOSITORY_CLOUD_PUSH;
 import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.PULL_REQUEST_MERGED;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -170,6 +171,9 @@ public class BitBucketPPRJobProbe {
         return !displayName.equals(targetBranchName);
       } else if (sourceBranchName != null) {
         return !displayName.equals(sourceBranchName);
+      } else if (REPOSITORY_CLOUD_PUSH.equals(bitbucketEvent.getAction())
+        && targetBranchName != null) {
+        return !displayName.equals(targetBranchName);
       }
     }
 
