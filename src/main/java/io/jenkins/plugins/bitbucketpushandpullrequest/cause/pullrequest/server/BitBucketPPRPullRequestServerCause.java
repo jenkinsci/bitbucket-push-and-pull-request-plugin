@@ -1,7 +1,7 @@
 /*******************************************************************************
  * The MIT License
  * 
- * Copyright (C) 2018, CloudBees, Inc.
+ * Copyright (C) 2020, CloudBees, Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -24,16 +24,19 @@ package io.jenkins.plugins.bitbucketpushandpullrequest.cause.pullrequest.server;
 
 import java.io.File;
 import java.io.IOException;
+
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRPullRequestServerAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.cause.BitBucketPPRTriggerCause;
+import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRHookEvent;
 
 
 public class BitBucketPPRPullRequestServerCause extends BitBucketPPRTriggerCause {
 
-  public BitBucketPPRPullRequestServerCause(File pollingLog, BitBucketPPRAction bitbucketAction)
+  public BitBucketPPRPullRequestServerCause(File pollingLog, BitBucketPPRAction bitbucketAction, 
+      BitBucketPPRHookEvent bitBucketHookEvent)
       throws IOException {
-    super(pollingLog, bitbucketAction);
+    super(pollingLog, bitbucketAction, bitBucketHookEvent);
   }
 
   public BitBucketPPRPullRequestServerAction getPullRequestPayLoad() {

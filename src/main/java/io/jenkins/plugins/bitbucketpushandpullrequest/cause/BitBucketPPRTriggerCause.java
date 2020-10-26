@@ -1,7 +1,7 @@
 /*******************************************************************************
  * The MIT License
  * 
- * Copyright (C) 2018, CloudBees, Inc.
+ * Copyright (C) 2020, CloudBees, Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -24,17 +24,26 @@ package io.jenkins.plugins.bitbucketpushandpullrequest.cause;
 
 import java.io.File;
 import java.io.IOException;
+
 import hudson.triggers.SCMTrigger;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
+import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRHookEvent;
 
 
 public class BitBucketPPRTriggerCause extends SCMTrigger.SCMTriggerCause {
   protected BitBucketPPRAction bitbucketAction;
+  protected BitBucketPPRHookEvent bitBucketHookEvent;
 
-  public BitBucketPPRTriggerCause(File pollingLog, BitBucketPPRAction bitbucketAction)
+  public BitBucketPPRTriggerCause(File pollingLog, BitBucketPPRAction bitbucketAction, 
+      BitBucketPPRHookEvent bitBucketHookEvent)
       throws IOException {
     super(pollingLog);
     this.bitbucketAction = bitbucketAction;
+    this.bitBucketHookEvent = bitBucketHookEvent;
+  }
+
+  public String getHookEvent() {
+    return this.bitBucketHookEvent.getEvent();
   }
 
   public BitBucketPPRAction getAction() {

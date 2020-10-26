@@ -26,12 +26,15 @@ import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
+
 import hudson.Extension;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.cause.BitBucketPPRTriggerCause;
 import io.jenkins.plugins.bitbucketpushandpullrequest.cause.repository.BitBucketPPRServerRepositoryCause;
+import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRHookEvent;
 
 
 public class BitBucketPPRServerRepositoryPushActionFilter
@@ -97,9 +100,10 @@ public class BitBucketPPRServerRepositoryPushActionFilter
   }
 
   @Override
-  public BitBucketPPRTriggerCause getCause(File pollingLog, BitBucketPPRAction bitbucketAction)
+  public BitBucketPPRTriggerCause getCause(File pollingLog, BitBucketPPRAction bitbucketAction, 
+      BitBucketPPRHookEvent bitBucketEvent)
       throws IOException {
-    return new BitBucketPPRServerRepositoryCause(pollingLog, bitbucketAction);
+    return new BitBucketPPRServerRepositoryCause(pollingLog, bitbucketAction, bitBucketEvent);
   }
 
   public String getAllowedBranches() {

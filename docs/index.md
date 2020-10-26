@@ -98,16 +98,17 @@ _Please note: the branch, related to the events which trigger the builds, must b
 
 ### Environment variables for Bitbucket Cloud ans Server pull requests
 
-|                               NAME | VALUE                  |
-| ---------------------------------: | :--------------------- |
-|            BITBUCKET_SOURCE_BRANCH | source branch          |
-|            BITBUCKET_TARGET_BRANCH | target branch          |
-|        BITBUCKET_PULL_REQUEST_LINK | link                   |
-|          BITBUCKET_PULL_REQUEST_ID | id                     |
-|                    BITBUCKET_ACTOR | actor name             |
-|       BITBUCKET_PULL_REQUEST_TITLE | PR title               |
-| BITBUCKET_PULL_REQUEST_DESCRIPTION | PR description         |
-|                  BITBUCKET_PAYLOAD | payload as json string |
+|                               NAME | VALUE                              |
+| ---------------------------------: | :--------------------------------- |
+|            BITBUCKET_SOURCE_BRANCH | source branch                      |
+|            BITBUCKET_TARGET_BRANCH | target branch                      |
+|        BITBUCKET_PULL_REQUEST_LINK | link                               |
+|          BITBUCKET_PULL_REQUEST_ID | id                                 |
+|                    BITBUCKET_ACTOR | actor name                         |
+|       BITBUCKET_PULL_REQUEST_TITLE | PR title                           |
+| BITBUCKET_PULL_REQUEST_DESCRIPTION | PR description                     |
+|                  BITBUCKET_PAYLOAD | payload as json string             |
+|                  BITBUCKET_X_EVENT | x-event which triggered the plugin |
 
 ### Environment variables for Bitbucket Cloud pushs
 
@@ -121,6 +122,7 @@ _Please note: the branch, related to the events which trigger the builds, must b
 |   BITBUCKET_REPOSITORY_ID | repository uuid (for compat. with server)  |
 |           BITBUCKET_ACTOR | actor name                                 |
 |         BITBUCKET_PAYLOAD | payload as json string                     |
+|         BITBUCKET_X_EVENT | x-event which triggered the plugin         |
 
 ### Environment variables for Bitbucket Server pushs
 
@@ -132,8 +134,9 @@ _Please note: the branch, related to the events which trigger the builds, must b
 |   BITBUCKET_REPOSITORY_ID | repository id                              |
 |           BITBUCKET_ACTOR | actor name                                 |
 |         BITBUCKET_PAYLOAD | payload as json string                     |
+|         BITBUCKET_X_EVENT | x-event which triggered the plugin         |
 
-## Roadmap version 2.5.0
+## Roadmap version 2.5.X
 
 - Build Status propagation for BB Server
 - Approve Pull Request and Push on successful build for for BB Server

@@ -23,12 +23,15 @@ package io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.cloud;
 
 import java.io.File;
 import java.io.IOException;
+
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
+
 import hudson.Extension;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.cause.BitBucketPPRTriggerCause;
 import io.jenkins.plugins.bitbucketpushandpullrequest.cause.pullrequest.cloud.BitBucketPPRPullRequestCommentDeletedCause;
+import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRHookEvent;
 
 public class BitBucketPPRPullRequestCommentDeletedActionFilter
     extends BitBucketPPRPullRequestActionFilter {
@@ -53,9 +56,10 @@ public class BitBucketPPRPullRequestCommentDeletedActionFilter
   }
 
   @Override
-  public BitBucketPPRTriggerCause getCause(File pollingLog, BitBucketPPRAction pullRequestAction)
+  public BitBucketPPRTriggerCause getCause(File pollingLog, BitBucketPPRAction pullRequestAction, 
+      BitBucketPPRHookEvent bitBucketEvent)
       throws IOException {
-    return new BitBucketPPRPullRequestCommentDeletedCause(pollingLog, pullRequestAction);
+    return new BitBucketPPRPullRequestCommentDeletedCause(pollingLog, pullRequestAction, bitBucketEvent);
   }
 
   @Override

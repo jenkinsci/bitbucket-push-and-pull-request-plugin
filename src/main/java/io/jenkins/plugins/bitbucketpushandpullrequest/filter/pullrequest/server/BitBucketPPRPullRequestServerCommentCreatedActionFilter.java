@@ -23,13 +23,16 @@ package io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.server
 
 import java.io.File;
 import java.io.IOException;
+
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
+
 import hudson.EnvVars;
 import hudson.Extension;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.cause.BitBucketPPRTriggerCause;
 import io.jenkins.plugins.bitbucketpushandpullrequest.cause.pullrequest.server.BitBucketPPRPullRequestServerCommentCreatedCause;
+import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRHookEvent;
 import io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRUtils;
 
 public class BitBucketPPRPullRequestServerCommentCreatedActionFilter
@@ -66,9 +69,10 @@ public class BitBucketPPRPullRequestServerCommentCreatedActionFilter
     }
 
   @Override
-  public BitBucketPPRTriggerCause getCause(File pollingLog, BitBucketPPRAction pullRequestAction)
+  public BitBucketPPRTriggerCause getCause(File pollingLog, BitBucketPPRAction pullRequestAction, 
+      BitBucketPPRHookEvent bitBucketEvent)
       throws IOException {
-    return new BitBucketPPRPullRequestServerCommentCreatedCause(pollingLog, pullRequestAction);
+    return new BitBucketPPRPullRequestServerCommentCreatedCause(pollingLog, pullRequestAction, bitBucketEvent);
   }
 
   @Override

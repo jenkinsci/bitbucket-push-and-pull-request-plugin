@@ -28,6 +28,7 @@ import hudson.EnvVars;
 import hudson.model.AbstractDescribableImpl;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.cause.BitBucketPPRTriggerCause;
+import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRHookEvent;
 import io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRUtils;
 
 
@@ -41,7 +42,7 @@ public abstract class BitBucketPPRPullRequestServerActionFilter
   public abstract boolean shouldTriggerBuild(BitBucketPPRAction bitbucketAction);
 
   public abstract BitBucketPPRTriggerCause getCause(File pollingLog,
-      BitBucketPPRAction pullRequestAction) throws IOException;
+      BitBucketPPRAction pullRequestAction, BitBucketPPRHookEvent bitBucketEvent) throws IOException;
 
   public abstract boolean shouldSendApprove();
 }
