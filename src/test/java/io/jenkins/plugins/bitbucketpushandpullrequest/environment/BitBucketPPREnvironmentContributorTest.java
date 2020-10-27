@@ -1,7 +1,7 @@
 /*******************************************************************************
  * The MIT License
  *
- * Copyright (C) 2019, CloudBees, Inc.
+ * Copyright (C) 2020, CloudBees, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -75,23 +75,22 @@ public class BitBucketPPREnvironmentContributorTest {
 
     BitBucketPPRRepositoryCause cause = mock(BitBucketPPRRepositoryCause.class);
     when(cause.getRepositoryPayLoad()).thenReturn(new BitBucketPPRRepositoryAction(payload));
+    when(cause.getHookEvent()).thenReturn("X-EVENT");
 
     // do
     runEnvironmentContributorForCause(cause);
 
     // assert
-    assertThat(envVars, hasEntry(
-        BitBucketPPREnvironmentContributor.BITBUCKET_SOURCE_BRANCH, "feature/do-not-merge"));
+    assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_SOURCE_BRANCH, "feature/do-not-merge"));
     assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.REPOSITORY_LINK,
         "https://bitbucket.org/some-repository/some-repo"));
-    assertThat(envVars,
-        hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_REPOSITORY_URL,
-            "https://bitbucket.org/some-repository/some-repo"));
-    assertThat(envVars,
-        hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_REPOSITORY_UUID,
-            "{6b5a1057-07ff-47c1-a65e-6c136cce4hj4}"));
+    assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_REPOSITORY_URL,
+        "https://bitbucket.org/some-repository/some-repo"));
+    assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_REPOSITORY_UUID,
+        "{6b5a1057-07ff-47c1-a65e-6c136cce4hj4}"));
     assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_ACTOR, "me-van-me-nickname"));
     assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PAYLOAD, payload.toString()));
+    assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_X_EVENT, "X-EVENT"));
   }
 
   @Test
@@ -100,22 +99,24 @@ public class BitBucketPPREnvironmentContributorTest {
 
     BitBucketPPRPullRequestCause cause = mock(BitBucketPPRPullRequestCause.class);
     when(cause.getPullRequestPayLoad()).thenReturn(new BitBucketPPRPullRequestAction(payload));
+    when(cause.getHookEvent()).thenReturn("X-EVENT");
 
     // do
     runEnvironmentContributorForCause(cause);
 
     // assert
-    assertThat(envVars, hasEntry(
-        BitBucketPPREnvironmentContributor.BITBUCKET_SOURCE_BRANCH, "feature/do-not-merge"));
+    assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_SOURCE_BRANCH, "feature/do-not-merge"));
     assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_TARGET_BRANCH, "develop"));
-    assertThat(envVars,
-        hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_LINK,
-            "https://bitbucket.org/some-repo-namespace/some-repo/pull-requests/198"));
+    assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_LINK,
+        "https://bitbucket.org/some-repo-namespace/some-repo/pull-requests/198"));
     assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_ID, "198"));
     assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_ACTOR, "me-nickname"));
-    assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_TITLE, "I have to push the pram a lot X."));
-    assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_DESCRIPTION, "Some description for PR"));
+    assertThat(envVars,
+        hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_TITLE, "I have to push the pram a lot X."));
+    assertThat(envVars,
+        hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_DESCRIPTION, "Some description for PR"));
     assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PAYLOAD, payload.toString()));
+    assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_X_EVENT, "X-EVENT"));
   }
 
   @Test
@@ -124,22 +125,24 @@ public class BitBucketPPREnvironmentContributorTest {
 
     BitBucketPPRPullRequestCause cause = mock(BitBucketPPRPullRequestCause.class);
     when(cause.getPullRequestPayLoad()).thenReturn(new BitBucketPPRPullRequestAction(payload));
+    when(cause.getHookEvent()).thenReturn("X-EVENT");
 
     // do
     runEnvironmentContributorForCause(cause);
 
     // assert
-    assertThat(envVars, hasEntry(
-        BitBucketPPREnvironmentContributor.BITBUCKET_SOURCE_BRANCH, "feature/do-not-merge"));
+    assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_SOURCE_BRANCH, "feature/do-not-merge"));
     assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_TARGET_BRANCH, "develop"));
-    assertThat(envVars,
-        hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_LINK,
-            "https://bitbucket.org/some-repo-namespace/some-repo/pull-requests/198"));
+    assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_LINK,
+        "https://bitbucket.org/some-repo-namespace/some-repo/pull-requests/198"));
     assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_ID, "198"));
     assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_ACTOR, "me-nickname"));
-    assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_TITLE, "I have to push the pram a lot X."));
-    assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_DESCRIPTION, "Some description for PR"));
+    assertThat(envVars,
+        hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_TITLE, "I have to push the pram a lot X."));
+    assertThat(envVars,
+        hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_DESCRIPTION, "Some description for PR"));
     assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PAYLOAD, payload.toString()));
+    assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_X_EVENT, "X-EVENT"));
   }
 
   @Test
@@ -148,22 +151,24 @@ public class BitBucketPPREnvironmentContributorTest {
 
     BitBucketPPRPullRequestCause cause = mock(BitBucketPPRPullRequestCause.class);
     when(cause.getPullRequestPayLoad()).thenReturn(new BitBucketPPRPullRequestAction(payload));
+    when(cause.getHookEvent()).thenReturn("X-EVENT");
 
     // do
     runEnvironmentContributorForCause(cause);
 
     // assert
-    assertThat(envVars, hasEntry(
-        BitBucketPPREnvironmentContributor.BITBUCKET_SOURCE_BRANCH, "feature/do-not-merge"));
+    assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_SOURCE_BRANCH, "feature/do-not-merge"));
     assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_TARGET_BRANCH, "develop"));
-    assertThat(envVars,
-        hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_LINK,
-            "https://bitbucket.org/some-repo-namespace/some-repo/pull-requests/198"));
+    assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_LINK,
+        "https://bitbucket.org/some-repo-namespace/some-repo/pull-requests/198"));
     assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_ID, "198"));
     assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_ACTOR, "me-nickname"));
-    assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_TITLE, "I have to push the pram a lot X."));
-    assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_DESCRIPTION, "Some description for PR"));
+    assertThat(envVars,
+        hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_TITLE, "I have to push the pram a lot X."));
+    assertThat(envVars,
+        hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_DESCRIPTION, "Some description for PR"));
     assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PAYLOAD, payload.toString()));
+    assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_X_EVENT, "X-EVENT"));
   }
 
   @Test
@@ -172,22 +177,24 @@ public class BitBucketPPREnvironmentContributorTest {
 
     BitBucketPPRPullRequestCause cause = mock(BitBucketPPRPullRequestCause.class);
     when(cause.getPullRequestPayLoad()).thenReturn(new BitBucketPPRPullRequestAction(payload));
+    when(cause.getHookEvent()).thenReturn("X-EVENT");
 
     // do
     runEnvironmentContributorForCause(cause);
 
     // assert
-    assertThat(envVars, hasEntry(
-        BitBucketPPREnvironmentContributor.BITBUCKET_SOURCE_BRANCH, "feature/do-not-merge"));
+    assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_SOURCE_BRANCH, "feature/do-not-merge"));
     assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_TARGET_BRANCH, "develop"));
-    assertThat(envVars,
-        hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_LINK,
-            "https://bitbucket.org/some-repo-namespace/some-repo/pull-requests/198"));
+    assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_LINK,
+        "https://bitbucket.org/some-repo-namespace/some-repo/pull-requests/198"));
     assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_ID, "198"));
     assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_ACTOR, "me-nickname"));
-    assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_TITLE, "I have to push the pram a lot X."));
-    assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_DESCRIPTION, "Some description for PR"));
+    assertThat(envVars,
+        hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_TITLE, "I have to push the pram a lot X."));
+    assertThat(envVars,
+        hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_DESCRIPTION, "Some description for PR"));
     assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PAYLOAD, payload.toString()));
+    assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_X_EVENT, "X-EVENT"));
   }
 
   @Test
@@ -196,28 +203,24 @@ public class BitBucketPPREnvironmentContributorTest {
 
     BitBucketPPRPullRequestCause cause = mock(BitBucketPPRPullRequestCause.class);
     when(cause.getPullRequestPayLoad()).thenReturn(new BitBucketPPRPullRequestAction(payload));
+    when(cause.getHookEvent()).thenReturn("X-EVENT");
 
     // do
     runEnvironmentContributorForCause(cause);
 
     // assert
-    assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_SOURCE_BRANCH,
-        "feature/do-not-merge"));
-    assertThat(envVars,
-        hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_TARGET_BRANCH, "destination-branch"));
+    assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_SOURCE_BRANCH, "feature/do-not-merge"));
+    assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_TARGET_BRANCH, "destination-branch"));
     assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_LINK,
         "https://bitbucket.org/some-repo-namespace/some-repo/pull-requests/198"));
+    assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_ID, "198"));
+    assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_ACTOR, "me-nickname"));
     assertThat(envVars,
-        hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_ID, "198"));
+        hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_TITLE, "I have to push the pram a lot X."));
     assertThat(envVars,
-        hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_ACTOR, "me-nickname"));
-    assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_TITLE,
-        "I have to push the pram a lot X."));
-    assertThat(envVars,
-        hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_DESCRIPTION,
-            "Some description for PR"));
-    assertThat(envVars,
-        hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PAYLOAD, payload.toString()));
+        hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_DESCRIPTION, "Some description for PR"));
+    assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PAYLOAD, payload.toString()));
+    assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_X_EVENT, "X-EVENT"));
   }
 
   @Test
@@ -226,6 +229,7 @@ public class BitBucketPPREnvironmentContributorTest {
 
     BitBucketPPRPullRequestServerCause cause = mock(BitBucketPPRPullRequestServerCause.class);
     when(cause.getPullRequestPayLoad()).thenReturn(new BitBucketPPRPullRequestServerAction(payload));
+    when(cause.getHookEvent()).thenReturn("X-EVENT");
 
     // do
     runEnvironmentContributorForCause(cause);
@@ -234,20 +238,13 @@ public class BitBucketPPREnvironmentContributorTest {
     assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_SOURCE_BRANCH, "develop"));
     assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_TARGET_BRANCH, "master"));
     assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_ID, "61"));
-    assertThat(envVars, hasEntry(
-        BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_LINK,
-        "http://example.org/projects/ABC/repos/some-repo/pull-requests/61"
-    ));
+    assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_LINK,
+        "http://example.org/projects/ABC/repos/some-repo/pull-requests/61"));
     assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_ACTOR, "me-name"));
-    assertThat(envVars, hasEntry(
-        BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_TITLE,
-        "test"
-    ));
-    assertThat(envVars, hasEntry(
-        BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_DESCRIPTION,
-        ""
-    ));
+    assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_TITLE, "test"));
+    assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_DESCRIPTION, ""));
     assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PAYLOAD, payload.toString()));
+    assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_X_EVENT, "X-EVENT"));
   }
 
   @Test
@@ -256,6 +253,7 @@ public class BitBucketPPREnvironmentContributorTest {
 
     BitBucketPPRPullRequestServerCause cause = mock(BitBucketPPRPullRequestServerCause.class);
     when(cause.getPullRequestPayLoad()).thenReturn(new BitBucketPPRPullRequestServerAction(payload));
+    when(cause.getHookEvent()).thenReturn("X-EVENT");
 
     // do
     runEnvironmentContributorForCause(cause);
@@ -264,42 +262,37 @@ public class BitBucketPPREnvironmentContributorTest {
     assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_SOURCE_BRANCH, "develop"));
     assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_TARGET_BRANCH, "master"));
     assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_LINK,
-      "http://example.org/projects/ABC/repos/some-repo/pull-requests/13"));
+        "http://example.org/projects/ABC/repos/some-repo/pull-requests/13"));
     assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_ID, "13"));
     assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_ACTOR, "me-name"));
     assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_TITLE, "test"));
     assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_DESCRIPTION, ""));
     assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PAYLOAD, payload.toString()));
+    assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_X_EVENT, "X-EVENT"));
   }
-
 
   @Test
   public void buildEnvironmentForServerSourcePullRequestUpdatedTest() {
     BitBucketPPRServerPayload payload = getServerPayload("./server/pr_from_ref_updated.json");
 
     BitBucketPPRPullRequestServerCause cause = mock(BitBucketPPRPullRequestServerCause.class);
-    when(cause.getPullRequestPayLoad())
-        .thenReturn(new BitBucketPPRPullRequestServerAction(payload));
+    when(cause.getPullRequestPayLoad()).thenReturn(new BitBucketPPRPullRequestServerAction(payload));
+    when(cause.getHookEvent()).thenReturn("X-EVENT");
 
     // do
     runEnvironmentContributorForCause(cause);
 
     // assert
-    assertThat(envVars,
-        hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_SOURCE_BRANCH, "develop"));
-    assertThat(envVars,
-        hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_TARGET_BRANCH, "master"));
+    assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_SOURCE_BRANCH, "develop"));
+    assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_TARGET_BRANCH, "master"));
     assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_LINK,
         "http://example.org/projects/ABC/repos/some-repo/pull-requests/61"));
-    assertThat(envVars,
-        hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_ID, "1"));
+    assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_ID, "1"));
     assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_ACTOR, "me-name"));
-    assertThat(envVars,
-        hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_TITLE, "test"));
-    assertThat(envVars,
-        hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_DESCRIPTION, ""));
-    assertThat(envVars,
-        hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PAYLOAD, payload.toString()));
+    assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_TITLE, "test"));
+    assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_DESCRIPTION, ""));
+    assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PAYLOAD, payload.toString()));
+    assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_X_EVENT, "X-EVENT"));
   }
 
   @Test
@@ -308,6 +301,7 @@ public class BitBucketPPREnvironmentContributorTest {
 
     BitBucketPPRPullRequestServerCause cause = mock(BitBucketPPRPullRequestServerCause.class);
     when(cause.getPullRequestPayLoad()).thenReturn(new BitBucketPPRPullRequestServerAction(payload));
+    when(cause.getHookEvent()).thenReturn("X-EVENT");
 
     // do
     runEnvironmentContributorForCause(cause);
@@ -316,12 +310,13 @@ public class BitBucketPPREnvironmentContributorTest {
     assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_SOURCE_BRANCH, "develop"));
     assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_TARGET_BRANCH, "master"));
     assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_LINK,
-      "http://example.org/projects/ABC/repos/some-repo/pull-requests/12"));
+        "http://example.org/projects/ABC/repos/some-repo/pull-requests/12"));
     assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_ID, "12"));
     assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_ACTOR, "some-reviewer"));
     assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_TITLE, "test"));
     assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_DESCRIPTION, ""));
     assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PAYLOAD, payload.toString()));
+    assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_X_EVENT, "X-EVENT"));
   }
 
   @Test
@@ -330,6 +325,7 @@ public class BitBucketPPREnvironmentContributorTest {
 
     BitBucketPPRPullRequestServerCause cause = mock(BitBucketPPRPullRequestServerCause.class);
     when(cause.getPullRequestPayLoad()).thenReturn(new BitBucketPPRPullRequestServerAction(payload));
+    when(cause.getHookEvent()).thenReturn("X-EVENT");
 
     // do
     runEnvironmentContributorForCause(cause);
@@ -338,12 +334,13 @@ public class BitBucketPPREnvironmentContributorTest {
     assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_SOURCE_BRANCH, "develop"));
     assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_TARGET_BRANCH, "master"));
     assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_LINK,
-      "http://example.org/projects/ABC/repos/some-repo/pull-requests/61"));
+        "http://example.org/projects/ABC/repos/some-repo/pull-requests/61"));
     assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_ID, "61"));
     assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_ACTOR, "me-name"));
     assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_TITLE, "test"));
     assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_DESCRIPTION, ""));
     assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PAYLOAD, payload.toString()));
+    assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_X_EVENT, "X-EVENT"));
   }
 
   @Test
@@ -352,6 +349,7 @@ public class BitBucketPPREnvironmentContributorTest {
 
     BitBucketPPRServerRepositoryCause cause = mock(BitBucketPPRServerRepositoryCause.class);
     when(cause.getServerRepositoryPayLoad()).thenReturn(new BitBucketPPRServerRepositoryAction(payload));
+    when(cause.getHookEvent()).thenReturn("X-EVENT");
 
     // do
     runEnvironmentContributorForCause(cause);
@@ -361,6 +359,7 @@ public class BitBucketPPREnvironmentContributorTest {
     assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_ACTOR, "me-name"));
     assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_REPOSITORY_ID, "99"));
     assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PAYLOAD, payload.toString()));
+    assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_X_EVENT, "X-EVENT"));
   }
 
   @Test
@@ -369,6 +368,7 @@ public class BitBucketPPREnvironmentContributorTest {
 
     BitBucketPPRPullRequestServerCause cause = mock(BitBucketPPRPullRequestServerCause.class);
     when(cause.getPullRequestPayLoad()).thenReturn(new BitBucketPPRPullRequestServerAction(payload));
+    when(cause.getHookEvent()).thenReturn("X-EVENT");
 
     // do
     runEnvironmentContributorForCause(cause);
@@ -377,26 +377,23 @@ public class BitBucketPPREnvironmentContributorTest {
     assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_SOURCE_BRANCH, "test-pr2"));
     assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_TARGET_BRANCH, "master"));
     assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_LINK,
-      "https://bitbucket.company.com/bitbucket/users/username/repos/test-repo/pull-requests/2"));
+        "https://bitbucket.company.com/bitbucket/users/username/repos/test-repo/pull-requests/2"));
     assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_ID, "2"));
     assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_ACTOR, "username"));
     assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_TITLE, "Test pr2"));
     assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_DESCRIPTION, ""));
     assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PAYLOAD, payload.toString()));
-    assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_COMMENT_TEXT, "Comment content"));
+    assertThat(envVars,
+        hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_COMMENT_TEXT, "Comment content"));
+    assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_X_EVENT, "X-EVENT"));
   }
 
-
   private BitBucketPPRPayload getCloudPayload(String res) {
-    return (BitBucketPPRPayload) getGenericPayload(
-      res, BitBucketPPRCloudPayload.class
-    );
+    return (BitBucketPPRPayload) getGenericPayload(res, BitBucketPPRCloudPayload.class);
   }
 
   private BitBucketPPRServerPayload getServerPayload(String res) {
-    return (BitBucketPPRServerPayload) getGenericPayload(
-      res, BitBucketPPRServerPayload.class
-    );
+    return (BitBucketPPRServerPayload) getGenericPayload(res, BitBucketPPRServerPayload.class);
   }
 
   private BitBucketPPRPayload getGenericPayload(String res, Class<?> payloadClass) {
