@@ -126,7 +126,7 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
               for (BitBucketPPRTriggerFilter filter : matchingFilters) {
                 BitBucketPPRTriggerCause cause;
                 try {
-                  cause = filter.getCause(getLogFile(), bitbucketAction);
+                  cause = filter.getCause(getLogFile(), bitbucketAction, bitbucketEvent);
 
                   LOGGER.log(Level.INFO, () -> "On Poll Success, get cause: " + cause.toString());
 

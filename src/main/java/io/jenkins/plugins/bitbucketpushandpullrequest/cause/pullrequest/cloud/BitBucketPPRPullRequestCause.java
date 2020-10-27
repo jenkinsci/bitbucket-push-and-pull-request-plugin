@@ -24,22 +24,24 @@ package io.jenkins.plugins.bitbucketpushandpullrequest.cause.pullrequest.cloud;
 
 import java.io.File;
 import java.io.IOException;
+
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRPullRequestAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.cause.BitBucketPPRTriggerCause;
+import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRHookEvent;
 
 
 public class BitBucketPPRPullRequestCause extends BitBucketPPRTriggerCause {
 
-  public BitBucketPPRPullRequestCause(File pollingLog, BitBucketPPRAction bitbucketAction)
+  public BitBucketPPRPullRequestCause(File pollingLog, BitBucketPPRAction bitbucketAction, BitBucketPPRHookEvent bitBucketEvent)
       throws IOException {
-    super(pollingLog, bitbucketAction);
+    super(pollingLog, bitbucketAction, bitBucketEvent);
   }
 
   public BitBucketPPRPullRequestAction getPullRequestPayLoad() {
     return (BitBucketPPRPullRequestAction) super.getAction();
   }
-
+  
   @Override
   public String getShortDescription() {
     String pusher = bitbucketAction.getUser() != null ? bitbucketAction.getUser() : "";

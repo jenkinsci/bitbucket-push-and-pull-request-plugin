@@ -1,7 +1,7 @@
 /*******************************************************************************
  * The MIT License
  * 
- * Copyright (C) 2018, CloudBees, Inc.
+ * Copyright (C) 2020, CloudBees, Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -25,12 +25,15 @@ package io.jenkins.plugins.bitbucketpushandpullrequest.filter.repository;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+
 import org.kohsuke.stapler.DataBoundConstructor;
+
 import hudson.Extension;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.cause.BitBucketPPRTriggerCause;
 import io.jenkins.plugins.bitbucketpushandpullrequest.filter.BitBucketPPRTriggerFilter;
 import io.jenkins.plugins.bitbucketpushandpullrequest.filter.BitBucketPPRTriggerFilterDescriptor;
+import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRHookEvent;
 import jenkins.model.Jenkins;
 
 
@@ -53,9 +56,9 @@ public class BitBucketPPRRepositoryTriggerFilter extends BitBucketPPRTriggerFilt
   }
 
   @Override
-  public BitBucketPPRTriggerCause getCause(File pollingLog, BitBucketPPRAction action)
+  public BitBucketPPRTriggerCause getCause(File pollingLog, BitBucketPPRAction action, BitBucketPPRHookEvent bitBucketEvent)
       throws IOException {
-    return actionFilter.getCause(pollingLog, action);
+    return actionFilter.getCause(pollingLog, action, bitBucketEvent);
   }
 
   @Override

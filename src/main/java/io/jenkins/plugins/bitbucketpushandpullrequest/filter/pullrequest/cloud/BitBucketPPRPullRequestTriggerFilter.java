@@ -24,13 +24,16 @@ package io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.cloud;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+
 import org.kohsuke.stapler.DataBoundConstructor;
+
 import hudson.Extension;
 import hudson.model.AbstractDescribableImpl;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.cause.BitBucketPPRTriggerCause;
 import io.jenkins.plugins.bitbucketpushandpullrequest.filter.BitBucketPPRTriggerFilter;
 import io.jenkins.plugins.bitbucketpushandpullrequest.filter.BitBucketPPRTriggerFilterDescriptor;
+import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRHookEvent;
 import jenkins.model.Jenkins;
 
 public class BitBucketPPRPullRequestTriggerFilter extends BitBucketPPRTriggerFilter {
@@ -52,9 +55,9 @@ public class BitBucketPPRPullRequestTriggerFilter extends BitBucketPPRTriggerFil
   }
 
   @Override
-  public BitBucketPPRTriggerCause getCause(File pollingLog, BitBucketPPRAction action)
+  public BitBucketPPRTriggerCause getCause(File pollingLog, BitBucketPPRAction action, BitBucketPPRHookEvent bitBucketEvent)
       throws IOException {
-    return actionFilter.getCause(pollingLog, action);
+    return actionFilter.getCause(pollingLog, action, bitBucketEvent);
   }
 
   @Extension

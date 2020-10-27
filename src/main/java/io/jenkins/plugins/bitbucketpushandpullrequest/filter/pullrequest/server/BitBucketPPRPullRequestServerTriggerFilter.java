@@ -32,6 +32,7 @@ import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.cause.BitBucketPPRTriggerCause;
 import io.jenkins.plugins.bitbucketpushandpullrequest.filter.BitBucketPPRTriggerFilter;
 import io.jenkins.plugins.bitbucketpushandpullrequest.filter.BitBucketPPRTriggerFilterDescriptor;
+import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRHookEvent;
 import jenkins.model.Jenkins;
 
 public class BitBucketPPRPullRequestServerTriggerFilter extends BitBucketPPRTriggerFilter {
@@ -50,9 +51,9 @@ public class BitBucketPPRPullRequestServerTriggerFilter extends BitBucketPPRTrig
   }
 
   @Override
-  public BitBucketPPRTriggerCause getCause(File pollingLog, BitBucketPPRAction action)
+  public BitBucketPPRTriggerCause getCause(File pollingLog, BitBucketPPRAction action, BitBucketPPRHookEvent bitBucketEvent)
       throws IOException {
-    return actionFilter.getCause(pollingLog, action);
+    return actionFilter.getCause(pollingLog, action, bitBucketEvent);
   }
 
   @Extension
