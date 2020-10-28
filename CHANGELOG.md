@@ -1,5 +1,20 @@
 # Change Log
 
+## 2.5.1 (2020-10-28)
+
+[Full Changelog](https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/compare/bitbucket-push-and-pull-request-2.5.0...bitbucket-push-and-pull-request-2.5.1)
+
+## News
+
+* Bug fix for multi branch push
+* New environment variable for bitbucket-x-event header
+
+## Relevant tickets closed
+
+* [Bug] Cloud Push doesn't trigger multi branch pipeline job #134 , #78 
+* [Enhancement] `BITBUCKET_X_EVENT` added to environment variables #130  
+
+
 ## 2.5.0 (2020-10-14)
 
 [Full Changelog](https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/compare/bitbucket-push-and-pull-request-2.4.0...bitbucket-push-and-pull-request-2.5)
