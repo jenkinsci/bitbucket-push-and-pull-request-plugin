@@ -67,7 +67,9 @@ public class BitBucketPPREnvironmentContributor extends EnvironmentContributor {
       causes = run.getCauses();
     }
 
-    LOGGER.log(Level.FINEST, "Injecting env vars because of pull request cause.");
+    if (causes == null) {
+      return;
+    }
 
     causes.stream().forEach((Cause cause) -> {
       try {
