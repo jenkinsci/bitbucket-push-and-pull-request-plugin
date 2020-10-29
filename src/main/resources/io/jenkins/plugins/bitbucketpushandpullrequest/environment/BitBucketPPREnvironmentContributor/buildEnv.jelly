@@ -25,11 +25,6 @@ THE SOFTWARE.
 
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:t="/lib/hudson">
-
-  <t:buildEnvVar name="BITBUCKET_HELLO_WORLD">
-    <j:out value="${%blurb.BITBUCKET_HELLO_WORLD}"/>
-  </t:buildEnvVar>
-
   <t:buildEnvVar name="BITBUCKET_SOURCE_BRANCH">
     <j:out value="${%blurb.BITBUCKET_SOURCE_BRANCH}"/>
   </t:buildEnvVar>

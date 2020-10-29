@@ -112,29 +112,29 @@ _Please note: the branch, related to the events which trigger the builds, must b
 
 ### Environment variables for Bitbucket Cloud pushs
 
-|                      NAME | VALUE                                      |
-| ------------------------: | :----------------------------------------  |
-|           REPOSITORY_LINK | branch (Deprecated. It will be removed.)   |
-|   BITBUCKET_SOURCE_BRANCH | branch                                     |
-|   BITBUCKET_TARGET_BRANCH | branch                                     |
-|  BITBUCKET_REPOSITORY_URL | repository url                             |
-| BITBUCKET_REPOSITORY_UUID | repository uuid                            |
-|   BITBUCKET_REPOSITORY_ID | repository uuid (for compat. with server)  |
-|           BITBUCKET_ACTOR | actor name                                 |
-|         BITBUCKET_PAYLOAD | payload as json string                     |
-|         BITBUCKET_X_EVENT | x-event which triggered the plugin         |
+|                      NAME | VALUE                                             |
+| ------------------------: | :-------------------------------------------------|
+|           REPOSITORY_LINK | link (Deprecated. It will be removed in v2.6)   |
+|   BITBUCKET_SOURCE_BRANCH | branch                                            |
+|   BITBUCKET_TARGET_BRANCH | branch                                            |
+|  BITBUCKET_REPOSITORY_URL | repository url                                    |
+| BITBUCKET_REPOSITORY_UUID | repository uuid                                   |
+|   BITBUCKET_REPOSITORY_ID | repository uuid (for compat. with server)         |
+|           BITBUCKET_ACTOR | actor name                                        |
+|         BITBUCKET_PAYLOAD | payload as json string                            |
+|         BITBUCKET_X_EVENT | x-event which triggered the plugin                |
 
 ### Environment variables for Bitbucket Server pushs
 
-|                      NAME | VALUE                                      |
-| ------------------------: | :----------------------------------------  |
-|   BITBUCKET_SOURCE_BRANCH | branch                                     |
-|   BITBUCKET_TARGET_BRANCH | branch                                     |
-|           REPOSITORY_NAME | repository name                            |
-|   BITBUCKET_REPOSITORY_ID | repository id                              |
-|           BITBUCKET_ACTOR | actor name                                 |
-|         BITBUCKET_PAYLOAD | payload as json string                     |
-|         BITBUCKET_X_EVENT | x-event which triggered the plugin         |
+|                      NAME | VALUE                                                |
+| ------------------------: | :----------------------------------------------------|
+|   BITBUCKET_SOURCE_BRANCH | branch                                               |
+|   BITBUCKET_TARGET_BRANCH | branch                                               |
+|           REPOSITORY_NAME | repository name (Deprecated. to be removed in v2.6)  |
+|   BITBUCKET_REPOSITORY_ID | repository id                                        |
+|           BITBUCKET_ACTOR | actor name                                           |
+|         BITBUCKET_PAYLOAD | payload as json string                               |
+|         BITBUCKET_X_EVENT | x-event which triggered the plugin                   |
 
 ## Roadmap version 2.5.X
 

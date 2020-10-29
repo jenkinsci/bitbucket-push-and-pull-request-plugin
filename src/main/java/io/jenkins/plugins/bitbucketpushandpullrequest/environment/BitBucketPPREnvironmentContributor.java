@@ -49,9 +49,7 @@ public class BitBucketPPREnvironmentContributor extends EnvironmentContributor {
   @Override
   public void buildEnvironmentFor(Job job, EnvVars envVars, TaskListener taskListener)
       throws IOException, InterruptedException {
-    envVars.put("BITBUCKET_HELLO_WORLD", "Hello blurb");
-    envVars.put("BITBUCKET_TARGET_BRANCH", "Hello blurb");
-
+    // NOTHING TO DO HERE
   }
 
   @Override
