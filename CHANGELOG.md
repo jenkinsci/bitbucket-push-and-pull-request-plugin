@@ -1,10 +1,23 @@
 # Change Log
 
+## 2.5.2 (2020-10-30)
+
+[Full Changelog](https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/compare/bitbucket-push-and-pull-request-2.5.1...bitbucket-push-and-pull-request-2.5.2)
+
+**Implemented enhancements:**
+
+* Added environment variables for multiconfiguration jobs
+* Added description of Bitbucket Push and Pull Request environment variables in the Jenkins list of available environment variables.
+
+## Relevant tickets closed
+
+* [Enhancement] missing environment variables for multi configuration #132
+
 ## 2.5.1 (2020-10-28)
 
 [Full Changelog](https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/compare/bitbucket-push-and-pull-request-2.5.0...bitbucket-push-and-pull-request-2.5.1)
 
-## News
+**Implemented enhancements:**
 
 * Bug fix for multi branch push
 * New environment variable for bitbucket-x-event header
