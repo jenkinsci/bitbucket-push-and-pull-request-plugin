@@ -23,6 +23,7 @@ package io.jenkins.plugins.bitbucketpushandpullrequest.event;
 import com.cloudbees.plugins.credentials.CredentialsProvider;
 import com.cloudbees.plugins.credentials.common.StandardCredentials;
 import com.cloudbees.plugins.credentials.domains.URIRequirementBuilder;
+
 import hudson.model.Run;
 import hudson.plugins.git.GitSCM;
 import hudson.plugins.git.UserRemoteConfig;
