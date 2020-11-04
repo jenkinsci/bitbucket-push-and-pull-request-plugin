@@ -25,6 +25,8 @@ import java.util.logging.Logger;
 
 import javax.annotation.Nonnull;
 
+import org.apache.commons.lang.NotImplementedException;
+
 import hudson.model.Result;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.client.BitBucketPPRClientFactory;
@@ -82,8 +84,8 @@ public class BitBucketPPRPushServerObserver extends BitBucketPPRHandlerTemplate 
     try {
       BitBucketPPRAction bitbucketAction = context.getAction();
       List<String> commitLinks = bitbucketAction.getCommitLinks();
-      int buildNumber = context.getRun().getNumber();
-      String absoluteUrl = context.getAbsoluteUrl();
+      int buildNumber = context.getJobNextBuildNumber();
+      String absoluteUrl = context.getJobAbsoluteUrl();
 
       for (String url : commitLinks) {
         String payload = "{\"key\": \"" + buildNumber + "\", \"url\": \"" + absoluteUrl

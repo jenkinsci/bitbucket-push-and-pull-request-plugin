@@ -24,13 +24,13 @@ import com.cloudbees.plugins.credentials.CredentialsProvider;
 import com.cloudbees.plugins.credentials.common.StandardCredentials;
 import com.cloudbees.plugins.credentials.domains.URIRequirementBuilder;
 
+import hudson.model.Job;
 import hudson.model.Run;
 import hudson.plugins.git.GitSCM;
 import hudson.plugins.git.UserRemoteConfig;
 import hudson.scm.SCM;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.filter.BitBucketPPRTriggerFilter;
-
 
 public class BitBucketPPREventContext {
   private SCM scmTrigger;
@@ -40,6 +40,7 @@ public class BitBucketPPREventContext {
   private UserRemoteConfig userRemoteConfig;
   private String credentialsId;
   private String url;
+  private Job<?, ?> job;
 
   public BitBucketPPREventContext(BitBucketPPRAction action, SCM scmTrigger, Run<?, ?> run,
       BitBucketPPRTriggerFilter filter) throws Exception {
@@ -51,6 +52,18 @@ public class BitBucketPPREventContext {
     this.credentialsId = userRemoteConfig.getCredentialsId();
     this.url = userRemoteConfig.getUrl();
   }
+
+  public BitBucketPPREventContext(BitBucketPPRAction action, SCM scmTrigger, Job<?, ?> job,
+      BitBucketPPRTriggerFilter filter) throws Exception {
+    this.action = action;
+    this.scmTrigger = scmTrigger;
+    this.job = job;
+    this.filter = filter;
+    this.userRemoteConfig = getUserRemoteConfigs(scmTrigger);
+    this.credentialsId = userRemoteConfig.getCredentialsId();
+    this.url = userRemoteConfig.getUrl();
+  }
+
 
   public StandardCredentials getStandardCredentials() throws Exception {
     final StandardCredentials credentials = CredentialsProvider.findCredentialById(credentialsId,
@@ -92,6 +105,14 @@ public class BitBucketPPREventContext {
     return run.getAbsoluteUrl();
   }
 
+  public String getJobAbsoluteUrl() {
+    return job.getAbsoluteUrl();
+  }
+
+  public int getJobNextBuildNumber() {
+    return job.getNextBuildNumber();
+  }
+
   public BitBucketPPRTriggerFilter getFilter() {
     return this.filter;
   }
@@ -100,6 +121,10 @@ public class BitBucketPPREventContext {
     GitSCM gitSCM = (GitSCM) scm;
     UserRemoteConfig config = gitSCM.getUserRemoteConfigs().get(0);
     return config;
+  }
+
+  public Job<?, ?> getJob() {
+    return job;
   }
 
   @Override

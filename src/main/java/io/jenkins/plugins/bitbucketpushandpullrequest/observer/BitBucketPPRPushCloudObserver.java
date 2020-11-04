@@ -80,8 +80,8 @@ public class BitBucketPPRPushCloudObserver extends BitBucketPPRHandlerTemplate
     try {
       BitBucketPPRAction bitbucketAction = context.getAction();
       List<String> commitLinks = bitbucketAction.getCommitLinks();
-      int buildNumber = context.getRun().getNumber();
-      String absoluteUrl = context.getAbsoluteUrl();
+      int buildNumber = context.getJobNextBuildNumber();
+      String absoluteUrl = context.getJobAbsoluteUrl();
 
       for (String link : commitLinks) {
         String url = link + "/statuses/build";

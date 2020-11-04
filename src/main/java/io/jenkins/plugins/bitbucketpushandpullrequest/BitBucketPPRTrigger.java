@@ -199,7 +199,7 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
       try {
         observable.notifyObservers(BitBucketPPREventFactory.createEvent(
             BitBucketPPREventType.BUILD_STARTED, new BitBucketPPREventContext(bitbucketAction,
-                scmTrigger, (Run<?, ?>) future.get(), filter)));
+                scmTrigger, job, filter)));
       } catch (Throwable e) {
         LOGGER.info(e.getMessage());
         e.printStackTrace();
