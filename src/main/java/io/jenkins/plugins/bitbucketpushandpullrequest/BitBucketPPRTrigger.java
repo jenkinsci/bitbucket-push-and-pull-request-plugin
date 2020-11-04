@@ -171,6 +171,11 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
 
   private void scheduleJob(BitBucketPPRTriggerCause cause, BitBucketPPRAction bitbucketAction, SCM scmTrigger,
       BitBucketPPRObservable observable, BitBucketPPRTriggerFilter filter) {
+
+    if (job == null) {
+      LOGGER.warning(() -> "Error: the job is null");
+      return;
+    }
     ParameterizedJobMixIn<?, ?> pJob = new ParameterizedJobMixIn() {
       @Override
       protected Job<?, ?> asJob() {
@@ -180,15 +185,14 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
     LOGGER.info("Check if job should be triggered due to changes in SCM");
 
     QueueTaskFuture<?> future = pJob.scheduleBuild2(5, new CauseAction(cause), bitbucketAction);
-    int buildNumber = job.getNextBuildNumber();
 
+    int buildNumber = job.getNextBuildNumber();
     LOGGER.info(() -> "SCM changes detected in " + job.getName() + ". Triggering " + " #" + buildNumber);
 
-    
     if (future != null) {
       try {
         future.waitForStart();
-        
+
         try {
           observable.notifyObservers(BitBucketPPREventFactory.createEvent(BitBucketPPREventType.BUILD_STARTED,
               new BitBucketPPREventContext(bitbucketAction, scmTrigger, job, buildNumber, filter)));
@@ -196,7 +200,7 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
           LOGGER.info(e.getMessage());
           e.printStackTrace();
         }
-        
+
         Run<?, ?> run = (Run<?, ?>) future.get();
         if (future.isDone()) {
           try {
