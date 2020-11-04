@@ -1,6 +1,19 @@
 # Change Log
 
 ## 2.5.2 (2020-10-30)
+[Full Changelog](https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/compare/bitbucket-push-and-pull-request-2.5.2...bitbucket-push-and-pull-request-2.6.0)
+
+**Implemented enhancements:**
+
+* Added back propagation for build status and approve form BB Server  
+* Documentation improved
+
+**Relevant tickets closed:**
+
+* [Bug]  #113 Build status "in progress" will be sent when the build is completed  
+
+
+## 2.5.2 (2020-10-30)
 
 [Full Changelog](https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/compare/bitbucket-push-and-pull-request-2.5.1...bitbucket-push-and-pull-request-2.5.2)
 
@@ -9,7 +22,7 @@
 * Added environment variables for multiconfiguration jobs
 * Added description of Bitbucket Push and Pull Request environment variables in the Jenkins list of available environment variables.
 
-## Relevant tickets closed
+**Relevant tickets closed:**
 
 * [Enhancement] missing environment variables for multi configuration #132
 
@@ -22,7 +35,7 @@
 * Bug fix for multi branch push
 * New environment variable for bitbucket-x-event header
 
-## Relevant tickets closed
+**Relevant tickets closed:**
 
 * [Bug] Cloud Push doesn't trigger multi branch pipeline job #134 , #78 
 * [Enhancement] `BITBUCKET_X_EVENT` added to environment variables #130  
@@ -37,7 +50,7 @@
 * Add possibility to trigger jobs only on tag pushes (for Bitbucket Cloud and Bitbucket Server)
 * Add trigger for PR comment created (for Bitbucket Server)
 
-## Relevant tickets closed
+**Relevant tickets closed:**
 
 * [Feature] Triggering a job only when tags are pushed #119 
 * [Feature] Trigger builds on new tag only #106 
@@ -51,7 +64,7 @@
 * Added build state propagation (for Bitbucket Cloud)
 * Added Approve push and pull request by Jenkins on successful build (for Bitbucket Cloud)
 
-## Relevant tickets closed
+**Relevant tickets closed:**
 
 * [Feature] Propagate build status to Bitbucket #23 
 * [Feature] Approve pull request on successful build #29
@@ -64,7 +77,7 @@
 
 * Added triggers for Comments on pull requests from BB Cloud 
 
-## Closed tickets
+**Relevant tickets closed:**
 
 * Create a BucketPPRPullRequestCommentCreatedFilter #64 
 
@@ -77,7 +90,7 @@
 * Verified compatibility with BitBucket Server 7.0
 * Added trigger for "Source branch updated" event of BitBucket Server >= 7.0
 
-## Closed tickets
+**Relevant tickets closed:**
 
 * New "Source branch updated" PR Webhook/Event supported in BBS 7.0 #97 
 
