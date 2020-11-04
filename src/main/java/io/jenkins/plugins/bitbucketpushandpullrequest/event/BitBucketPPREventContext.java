@@ -41,6 +41,7 @@ public class BitBucketPPREventContext {
   private String credentialsId;
   private String url;
   private Job<?, ?> job;
+  private int buildNumber;
 
   public BitBucketPPREventContext(BitBucketPPRAction action, SCM scmTrigger, Run<?, ?> run,
       BitBucketPPRTriggerFilter filter) throws Exception {
@@ -54,16 +55,16 @@ public class BitBucketPPREventContext {
   }
 
   public BitBucketPPREventContext(BitBucketPPRAction action, SCM scmTrigger, Job<?, ?> job,
-      BitBucketPPRTriggerFilter filter) throws Exception {
+      int buildNumber, BitBucketPPRTriggerFilter filter) throws Exception {
     this.action = action;
     this.scmTrigger = scmTrigger;
     this.job = job;
+    this.buildNumber = buildNumber;
     this.filter = filter;
     this.userRemoteConfig = getUserRemoteConfigs(scmTrigger);
     this.credentialsId = userRemoteConfig.getCredentialsId();
     this.url = userRemoteConfig.getUrl();
   }
-
 
   public StandardCredentials getStandardCredentials() throws Exception {
     final StandardCredentials credentials = CredentialsProvider.findCredentialById(credentialsId,
@@ -73,8 +74,20 @@ public class BitBucketPPREventContext {
       return credentials;
     }
 
-    throw new Exception("No Credentials found for run: " + run.getNumber() + " - url: " + url
-        + " - credentialsId: " + credentialsId + " - absolute url : " + run.getAbsoluteUrl());
+    throw new Exception("No Credentials found for run: " + run.getNumber() + " - url: " + url + " - credentialsId: "
+        + credentialsId + " - absolute url : " + run.getAbsoluteUrl());
+  }
+
+  public StandardCredentials getCredentialsFromJob() {
+    if (credentialsId != null) {
+      for (StandardCredentials c : CredentialsProvider.lookupCredentials(StandardCredentials.class, job, null,
+          URIRequirementBuilder.fromUri(url).build())) {
+        if (c.getId().equals(credentialsId)) {
+          return c;
+        }
+      }
+    }
+    return null;
   }
 
   public String getUrl() {
@@ -106,11 +119,11 @@ public class BitBucketPPREventContext {
   }
 
   public String getJobAbsoluteUrl() {
-    return job.getAbsoluteUrl();
+    return job.getAbsoluteUrl() + buildNumber;
   }
 
   public int getJobNextBuildNumber() {
-    return job.getNextBuildNumber();
+    return buildNumber;
   }
 
   public BitBucketPPRTriggerFilter getFilter() {
@@ -129,8 +142,8 @@ public class BitBucketPPREventContext {
 
   @Override
   public String toString() {
-    return "BitBucketPPREventContext [action=" + action + ", credentialsId=" + credentialsId
-        + ", filter=" + filter + ", run=" + run + ", scmTrigger=" + scmTrigger + ", url=" + url
-        + ", userRemoteConfig=" + userRemoteConfig + "]";
+    return "BitBucketPPREventContext [action=" + action + ", credentialsId=" + credentialsId + ", filter=" + filter
+        + ", run=" + run + ", scmTrigger=" + scmTrigger + ", url=" + url + ", userRemoteConfig=" + userRemoteConfig
+        + "]";
   }
 }

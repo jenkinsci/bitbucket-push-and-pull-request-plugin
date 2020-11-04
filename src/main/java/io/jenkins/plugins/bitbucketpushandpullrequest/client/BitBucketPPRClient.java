@@ -23,5 +23,7 @@ package io.jenkins.plugins.bitbucketpushandpullrequest.client;
 public interface BitBucketPPRClient {
   public void send(String url, String payload) throws Exception;
 
+  public void send2(String url, String payload) throws Exception;
+
   public void accept(BitBucketPPRClientVisitor visitor);
 }

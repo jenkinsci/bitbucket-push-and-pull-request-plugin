@@ -78,7 +78,7 @@ public class BitBucketPPRCloudObserverTest {
     spyObserver.getNotification(event);
     spyObserver.setBuildStatusInProgress();
     Mockito.verify(spyObserver).setBuildStatusInProgress();
-    Mockito.verify(spyObserver).callClient(
+    Mockito.verify(spyObserver).callClient2(
         "https://api.bitbucket.org/2.0/repositories/some-repository/some-repo/commit/09c4367c5bdbef7d7a28ba4cc2638488c2088d6b/statuses/build",
         "{\"key\": \"12\", \"url\": \"https://someURL\", \"state\": \"INPROGRESS\" }");
   }

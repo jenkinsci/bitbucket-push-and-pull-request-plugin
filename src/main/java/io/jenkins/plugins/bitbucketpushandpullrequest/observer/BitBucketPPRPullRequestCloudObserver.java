@@ -101,12 +101,20 @@ public class BitBucketPPRPullRequestCloudObserver extends BitBucketPPRHandlerTem
 
     String payload = "{\"key\": \"" + buildNumber + "\", \"url\": \"" + absoluteUrl + "\", \"state\": \"INPROGRESS\" }";
 
-    callClient(url, payload);
+    callClient2(url, payload);
   }
 
   private void callClient(@Nonnull String url, @Nonnull String payload) {
     try {
       BitBucketPPRClientFactory.createClient(BitBucketPPRClientType.CLOUD, context).send(url, payload);
+    } catch (Exception e) {
+      LOGGER.warning(e.getMessage());
+    }
+  }
+  
+  private void callClient2(@Nonnull String url, @Nonnull String payload) {
+    try {
+      BitBucketPPRClientFactory.createClient(BitBucketPPRClientType.CLOUD, context).send2(url, payload);
     } catch (Exception e) {
       LOGGER.warning(e.getMessage());
     }

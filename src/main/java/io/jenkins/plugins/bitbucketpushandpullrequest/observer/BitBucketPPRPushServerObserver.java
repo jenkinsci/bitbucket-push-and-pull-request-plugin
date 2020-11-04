@@ -91,7 +91,7 @@ public class BitBucketPPRPushServerObserver extends BitBucketPPRHandlerTemplate 
         String payload = "{\"key\": \"" + buildNumber + "\", \"url\": \"" + absoluteUrl
             + "\", \"state\": \"INPROGRESS\" }";
 
-        callClient(url, payload);
+        callClient2(url, payload);
       }
     } catch (Throwable e) {
       logger.info("Set build status in progress for push called but something went wrong.");
@@ -101,5 +101,9 @@ public class BitBucketPPRPushServerObserver extends BitBucketPPRHandlerTemplate 
 
   public void callClient(@Nonnull String url, @Nonnull String payload) throws Throwable {
     BitBucketPPRClientFactory.createClient(BitBucketPPRClientType.SERVER, context).send(url, payload);
+  }
+
+  public void callClient2(@Nonnull String url, @Nonnull String payload) throws Throwable {
+    BitBucketPPRClientFactory.createClient(BitBucketPPRClientType.SERVER, context).send2(url, payload);
   }
 }

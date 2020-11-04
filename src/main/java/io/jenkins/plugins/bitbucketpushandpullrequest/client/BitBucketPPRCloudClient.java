@@ -45,4 +45,9 @@ public class BitBucketPPRCloudClient implements BitBucketPPRClient {
   public void send(final String url, String payload) throws Exception {
     visitor.send(context.getStandardCredentials(), url, payload);
   }
+
+  @Override
+  public void send2(final String url, String payload) throws Exception {
+    visitor.send(context.getCredentialsFromJob(), url, payload);
+  }
 }
