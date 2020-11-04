@@ -29,11 +29,8 @@ import io.jenkins.plugins.bitbucketpushandpullrequest.client.BitBucketPPRClientT
 import io.jenkins.plugins.bitbucketpushandpullrequest.event.BitBucketPPREvent;
 import io.jenkins.plugins.bitbucketpushandpullrequest.event.BitBucketPPREventContext;
 
-
-public class BitBucketPPRPullRequestCloudObserver extends BitBucketPPRHandlerTemplate
-    implements BitBucketPPRObserver {
-  static final Logger LOGGER =
-      Logger.getLogger(BitBucketPPRPullRequestCloudObserver.class.getName());
+public class BitBucketPPRPullRequestCloudObserver extends BitBucketPPRHandlerTemplate implements BitBucketPPRObserver {
+  static final Logger LOGGER = Logger.getLogger(BitBucketPPRPullRequestCloudObserver.class.getName());
 
   BitBucketPPREventContext context;
 
@@ -46,10 +43,10 @@ public class BitBucketPPRPullRequestCloudObserver extends BitBucketPPRHandlerTem
 
   @Override
   public void setApproved() {
-    if(!context.getFilter().shouldSendApprove()){
+    if (!context.getFilter().shouldSendApprove()) {
       return;
     }
-    
+
     try {
       Result result = context.getRun().getResult();
       LOGGER.info(() -> "The result is " + result);
@@ -69,9 +66,7 @@ public class BitBucketPPRPullRequestCloudObserver extends BitBucketPPRHandlerTem
         return;
       }
 
-      BitBucketPPRClientFactory
-          .createClient(BitBucketPPRClientType.CLOUD,context)
-          .send(url, payload);
+      BitBucketPPRClientFactory.createClient(BitBucketPPRClientType.CLOUD, context).send(url, payload);
 
     } catch (NullPointerException e) {
       LOGGER.warning(e.getMessage());
@@ -88,8 +83,8 @@ public class BitBucketPPRPullRequestCloudObserver extends BitBucketPPRHandlerTem
     String url = bitbucketAction.getCommitLink() + "/statuses/build";
     Result result = context.getRun().getResult();
 
-    String payload = "{\"key\": \"" + context.getRun().getNumber() + "\", \"url\": \""
-        + context.getAbsoluteUrl() + "\", ";
+    String payload = "{\"key\": \"" + context.getRun().getNumber() + "\", \"url\": \"" + context.getAbsoluteUrl()
+        + "\", ";
     payload += result == Result.SUCCESS ? "\"state\": \"SUCCESSFUL\""
         : result == Result.ABORTED ? "\"state\": \"STOPPED\"" : "\"state\": \"FAILED\"";
     payload += " }";
@@ -101,16 +96,25 @@ public class BitBucketPPRPullRequestCloudObserver extends BitBucketPPRHandlerTem
   public void setBuildStatusInProgress() {
     BitBucketPPRAction bitbucketAction = context.getAction();
     String url = bitbucketAction.getCommitLink() + "/statuses/build";
-    String payload = "{\"key\": \"" + context.getRun().getNumber() + "\", \"url\": \""
-        + context.getAbsoluteUrl() + "\", \"state\": \"INPROGRESS\" }";
+    int buildNumber = context.getJobNextBuildNumber();
+    String absoluteUrl = context.getJobAbsoluteUrl();
 
-    callClient(url, payload);
+    String payload = "{\"key\": \"" + buildNumber + "\", \"url\": \"" + absoluteUrl + "\", \"state\": \"INPROGRESS\" }";
+
+    callClient2(url, payload);
   }
 
   private void callClient(@Nonnull String url, @Nonnull String payload) {
     try {
-      BitBucketPPRClientFactory.createClient(BitBucketPPRClientType.CLOUD, context)
-          .send(url, payload);
+      BitBucketPPRClientFactory.createClient(BitBucketPPRClientType.CLOUD, context).send(url, payload);
+    } catch (Exception e) {
+      LOGGER.warning(e.getMessage());
+    }
+  }
+  
+  private void callClient2(@Nonnull String url, @Nonnull String payload) {
+    try {
+      BitBucketPPRClientFactory.createClient(BitBucketPPRClientType.CLOUD, context).send2(url, payload);
     } catch (Exception e) {
       LOGGER.warning(e.getMessage());
     }

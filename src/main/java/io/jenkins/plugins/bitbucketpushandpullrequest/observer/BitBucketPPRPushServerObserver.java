@@ -25,6 +25,8 @@ import java.util.logging.Logger;
 
 import javax.annotation.Nonnull;
 
+import org.apache.commons.lang.NotImplementedException;
+
 import hudson.model.Result;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.client.BitBucketPPRClientFactory;
@@ -82,14 +84,14 @@ public class BitBucketPPRPushServerObserver extends BitBucketPPRHandlerTemplate 
     try {
       BitBucketPPRAction bitbucketAction = context.getAction();
       List<String> commitLinks = bitbucketAction.getCommitLinks();
-      int buildNumber = context.getRun().getNumber();
-      String absoluteUrl = context.getAbsoluteUrl();
+      int buildNumber = context.getJobNextBuildNumber();
+      String absoluteUrl = context.getJobAbsoluteUrl();
 
       for (String url : commitLinks) {
         String payload = "{\"key\": \"" + buildNumber + "\", \"url\": \"" + absoluteUrl
             + "\", \"state\": \"INPROGRESS\" }";
 
-        callClient(url, payload);
+        callClient2(url, payload);
       }
     } catch (Throwable e) {
       logger.info("Set build status in progress for push called but something went wrong.");
@@ -99,5 +101,9 @@ public class BitBucketPPRPushServerObserver extends BitBucketPPRHandlerTemplate 
 
   public void callClient(@Nonnull String url, @Nonnull String payload) throws Throwable {
     BitBucketPPRClientFactory.createClient(BitBucketPPRClientType.SERVER, context).send(url, payload);
+  }
+
+  public void callClient2(@Nonnull String url, @Nonnull String payload) throws Throwable {
+    BitBucketPPRClientFactory.createClient(BitBucketPPRClientType.SERVER, context).send2(url, payload);
   }
 }

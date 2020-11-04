@@ -87,20 +87,20 @@ public class BitBucketPPRPullRequestServerObserver extends BitBucketPPRHandlerTe
 
     // Example of payload
     // {
-      // "key": "TEST-REP123",
-      // "state": "SUCCESSFUL",
-      // "url": "https://bamboo.url/browse/TEST-REP1-3",
-      // "buildNumber": "3",
-      // "description": "Unit test build",
-      // "duration": 1500000,
-      // "name": "Database Matrix Tests",
-      // "parent": "TEST-REP",
-      // "ref": "refs/heads/master",
-      // "testResults": {
-        // "failed": 1,
-        // "skipped": 8,
-        // "successful": 0
-      // }
+    // "key": "TEST-REP123",
+    // "state": "SUCCESSFUL",
+    // "url": "https://bamboo.url/browse/TEST-REP1-3",
+    // "buildNumber": "3",
+    // "description": "Unit test build",
+    // "duration": 1500000,
+    // "name": "Database Matrix Tests",
+    // "parent": "TEST-REP",
+    // "ref": "refs/heads/master",
+    // "testResults": {
+    // "failed": 1,
+    // "skipped": 8,
+    // "successful": 0
+    // }
     // }
 
     String payload = "{\"key\": \"" + context.getRun().getNumber() + "\", \"url\": \"" + context.getAbsoluteUrl()
@@ -116,15 +116,25 @@ public class BitBucketPPRPullRequestServerObserver extends BitBucketPPRHandlerTe
   public void setBuildStatusInProgress() {
     BitBucketPPRAction bitbucketAction = context.getAction();
     String url = bitbucketAction.getCommitLink();
-    String payload = "{\"key\": \"" + context.getRun().getNumber() + "\", \"url\": \"" + context.getAbsoluteUrl()
-        + "\", \"state\": \"INPROGRESS\" }";
+    int buildNumber = context.getJobNextBuildNumber();
+    String absoluteUrl = context.getJobAbsoluteUrl();
 
-    callClient(url, payload);
+    String payload = "{\"key\": \"" + buildNumber + "\", \"url\": \"" + absoluteUrl + "\", \"state\": \"INPROGRESS\" }";
+
+    callClient2(url, payload);
   }
 
   private void callClient(@Nonnull String url, @Nonnull String payload) {
     try {
       BitBucketPPRClientFactory.createClient(BitBucketPPRClientType.SERVER, context).send(url, payload);
+    } catch (Exception e) {
+      LOGGER.warning(e.getMessage());
+    }
+  }
+
+  private void callClient2(@Nonnull String url, @Nonnull String payload) {
+    try {
+      BitBucketPPRClientFactory.createClient(BitBucketPPRClientType.SERVER, context).send2(url, payload);
     } catch (Exception e) {
       LOGGER.warning(e.getMessage());
     }

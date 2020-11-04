@@ -72,7 +72,6 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
   private static final Logger LOGGER = Logger.getLogger(BitBucketPPRTrigger.class.getName());
   private List<BitBucketPPRTriggerFilter> triggers;
 
-
   {
     System.setErr(BitBucketPPRUtils.createLoggingProxy(System.err));
   }
@@ -88,10 +87,10 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
 
     // TODO: is this he place for that? And why only for push?
     if (triggers == null) {
-      BitBucketPPRRepositoryPushActionFilter repositoryPushActionFilter =
-          new BitBucketPPRRepositoryPushActionFilter(false, false, spec);
-      BitBucketPPRRepositoryTriggerFilter repositoryTriggerFilter =
-          new BitBucketPPRRepositoryTriggerFilter(repositoryPushActionFilter);
+      BitBucketPPRRepositoryPushActionFilter repositoryPushActionFilter = new BitBucketPPRRepositoryPushActionFilter(
+          false, false, spec);
+      BitBucketPPRRepositoryTriggerFilter repositoryTriggerFilter = new BitBucketPPRRepositoryTriggerFilter(
+          repositoryPushActionFilter);
       triggers = new ArrayList<>();
       triggers.add(repositoryTriggerFilter);
     }
@@ -106,19 +105,18 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
    * 
    * @throws IOException
    */
-  public void onPost(BitBucketPPRHookEvent bitbucketEvent, BitBucketPPRAction bitbucketAction,
-      SCM scmTrigger, BitBucketPPRObservable observable) throws Exception {
+  public void onPost(BitBucketPPRHookEvent bitbucketEvent, BitBucketPPRAction bitbucketAction, SCM scmTrigger,
+      BitBucketPPRObservable observable) throws Exception {
     LOGGER.log(Level.INFO, "Called onPost with " + bitbucketAction.toString());
 
     BitBucketPPRFilterMatcher filterMatcher = new BitBucketPPRFilterMatcher();
-    List<BitBucketPPRTriggerFilter> matchingFilters =
-        filterMatcher.getMatchingFilters(bitbucketEvent, triggers);
+    List<BitBucketPPRTriggerFilter> matchingFilters = filterMatcher.getMatchingFilters(bitbucketEvent, triggers);
 
     if (matchingFilters != null && !matchingFilters.isEmpty()) {
       LOGGER.log(Level.INFO, "matchingFilters is not null AND is not empty {0} ", matchingFilters);
 
-      BitBucketPPRPollingRunnable bitbucketPollingRunnable =
-          new BitBucketPPRPollingRunnable(job, getLogFile(), new BitBucketPPRPollResultListener() {
+      BitBucketPPRPollingRunnable bitbucketPollingRunnable = new BitBucketPPRPollingRunnable(job, getLogFile(),
+          new BitBucketPPRPollResultListener() {
             @Override
             public void onPollSuccess(PollingResult pollingResult) {
 
@@ -135,8 +133,7 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
                     return;
                   }
                 } catch (Throwable e) {
-                  LOGGER.log(Level.INFO,
-                      "Something went wrong in the on Poll Success " + e.getMessage());
+                  LOGGER.log(Level.INFO, "Something went wrong in the on Poll Success " + e.getMessage());
                   e.printStackTrace();
                 }
               }
@@ -165,15 +162,15 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
       BitBucketPPRAction bitbucketAction) {
     LOGGER.log(Level.INFO,
         "Should schedule job: {0} and (polling result has changes: {1} or trigger also if there aren't changes: {2})",
-        new Object[] {filter.shouldScheduleJob(bitbucketAction), pollingResult.hasChanges(),
-            filter.shouldTriggerAlsoIfNothingChanged()});
+        new Object[] { filter.shouldScheduleJob(bitbucketAction), pollingResult.hasChanges(),
+            filter.shouldTriggerAlsoIfNothingChanged() });
 
     return filter.shouldScheduleJob(bitbucketAction)
         && (pollingResult.hasChanges() || filter.shouldTriggerAlsoIfNothingChanged());
   }
 
-  private void scheduleJob(BitBucketPPRTriggerCause cause, BitBucketPPRAction bitbucketAction,
-      SCM scmTrigger, BitBucketPPRObservable observable, BitBucketPPRTriggerFilter filter) {
+  private void scheduleJob(BitBucketPPRTriggerCause cause, BitBucketPPRAction bitbucketAction, SCM scmTrigger,
+      BitBucketPPRObservable observable, BitBucketPPRTriggerFilter filter) {
     ParameterizedJobMixIn<?, ?> pJob = new ParameterizedJobMixIn() {
       @Override
       protected Job<?, ?> asJob() {
@@ -183,37 +180,38 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
     LOGGER.info("Check if job should be triggered due to changes in SCM");
 
     QueueTaskFuture<?> future = pJob.scheduleBuild2(5, new CauseAction(cause), bitbucketAction);
-    LOGGER.info(() -> "SCM changes detected in " + job.getName() + ". Triggering " + " #"
-        + job.getNextBuildNumber());
+    int buildNumber = job.getNextBuildNumber();
 
+    LOGGER.info(() -> "SCM changes detected in " + job.getName() + ". Triggering " + " #" + buildNumber);
+
+    
     if (future != null) {
       try {
         future.waitForStart();
+        
+        try {
+          observable.notifyObservers(BitBucketPPREventFactory.createEvent(BitBucketPPREventType.BUILD_STARTED,
+              new BitBucketPPREventContext(bitbucketAction, scmTrigger, job, buildNumber, filter)));
+        } catch (Throwable e) {
+          LOGGER.info(e.getMessage());
+          e.printStackTrace();
+        }
+        
+        Run<?, ?> run = (Run<?, ?>) future.get();
+        if (future.isDone()) {
+          try {
+            observable.notifyObservers(BitBucketPPREventFactory.createEvent(BitBucketPPREventType.BUILD_FINISHED,
+                new BitBucketPPREventContext(bitbucketAction, scmTrigger, run, filter)));
+          } catch (Throwable e) {
+            LOGGER.info(e.getMessage());
+            e.printStackTrace();
+          }
+        }
       } catch (InterruptedException | ExecutionException e) {
         LOGGER.info(e.getMessage());
         e.printStackTrace();
       } catch (Throwable e) {
         e.printStackTrace();
-      }
-
-      try {
-        observable.notifyObservers(BitBucketPPREventFactory.createEvent(
-            BitBucketPPREventType.BUILD_STARTED, new BitBucketPPREventContext(bitbucketAction,
-                scmTrigger, (Run<?, ?>) future.get(), filter)));
-      } catch (Throwable e) {
-        LOGGER.info(e.getMessage());
-        e.printStackTrace();
-      }
-
-      if (future.isDone()) {
-        try {
-          observable.notifyObservers(BitBucketPPREventFactory.createEvent(
-              BitBucketPPREventType.BUILD_FINISHED, new BitBucketPPREventContext(bitbucketAction,
-                  scmTrigger, (Run<?, ?>) future.get(), filter)));
-        } catch (Throwable e) {
-          LOGGER.info(e.getMessage());
-          e.printStackTrace();
-        }
       }
     }
   }
@@ -237,7 +235,7 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
     File file = new File(job.getRootDir(), "bitbucket-polling.log");
     if (file.createNewFile()) {
       LOGGER.log(Level.FINE, "Created new file {0} for logging in the directory {1}.",
-          new Object[] {"bitbucket-polling.log", job.getRootDir()});
+          new Object[] { "bitbucket-polling.log", job.getRootDir() });
     }
 
     return file;
@@ -253,7 +251,8 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
   }
 
   /**
-   * Action object for {@link BitBucketPPRProject}. Used to display the polling log.
+   * Action object for {@link BitBucketPPRProject}. Used to display the polling
+   * log.
    */
   public class BitBucketPPRWebHookPollingAction implements hudson.model.Action {
     public Job<?, ?> getOwner() {
@@ -283,16 +282,16 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
      * Writes the annotated log to the given output.
      */
     public void writeLogTo(XMLOutput out) throws Exception {
-      new AnnotatedLargeText<BitBucketPPRWebHookPollingAction>(getLogFile(),
-          Charset.defaultCharset(), true, this).writeHtmlTo(0, out.asWriter());
+      new AnnotatedLargeText<BitBucketPPRWebHookPollingAction>(getLogFile(), Charset.defaultCharset(), true, this)
+          .writeHtmlTo(0, out.asWriter());
     }
   }
 
   @Symbol("bitBucketTrigger")
   @Extension
   public static class DescriptorImpl extends TriggerDescriptor {
-    private final SequentialExecutionQueue queue =
-        new SequentialExecutionQueue(Jenkins.MasterComputer.threadPoolForRemoting);
+    private final SequentialExecutionQueue queue = new SequentialExecutionQueue(
+        Jenkins.MasterComputer.threadPoolForRemoting);
 
     @Override
     public boolean isApplicable(Item item) {

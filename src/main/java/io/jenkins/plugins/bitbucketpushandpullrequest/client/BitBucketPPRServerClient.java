@@ -42,6 +42,11 @@ public class BitBucketPPRServerClient implements BitBucketPPRClient {
   }
 
   @Override
+  public void send2(final String url, String payload) throws Exception {
+    visitor.send(context.getCredentialsFromJob(), url, payload);
+  }
+
+  @Override
   public void accept(BitBucketPPRClientVisitor visitor) {
     this.visitor = visitor;
   }
