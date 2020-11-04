@@ -20,32 +20,29 @@
  ******************************************************************************/
 package io.jenkins.plugins.bitbucketpushandpullrequest.client;
 
-import org.apache.commons.lang.NotImplementedException;
 import io.jenkins.plugins.bitbucketpushandpullrequest.event.BitBucketPPREventContext;
 import io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRUtils;
 
 public class BitBucketPPRServerClient implements BitBucketPPRClient {
 
-  //private BitBucketPPREventContext context;
+  private BitBucketPPREventContext context;
+  private BitBucketPPRClientVisitor visitor;
 
   {
     System.setErr(BitBucketPPRUtils.createLoggingProxy(System.err));
   }
 
   public BitBucketPPRServerClient(BitBucketPPREventContext context) {
-    //this.context = context;
+    this.context = context;
   }
 
   @Override
-  public void send(String url, String payload) {
-    throw new NotImplementedException();
-
+  public void send(final String url, String payload) throws Exception {
+    visitor.send(context.getStandardCredentials(), url, payload);
   }
 
   @Override
   public void accept(BitBucketPPRClientVisitor visitor) {
-    throw new NotImplementedException();
-
+    this.visitor = visitor;
   }
-  
 }

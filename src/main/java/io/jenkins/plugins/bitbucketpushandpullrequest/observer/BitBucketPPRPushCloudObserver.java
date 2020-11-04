@@ -33,7 +33,7 @@ import io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRUtils;
 
 public class BitBucketPPRPushCloudObserver extends BitBucketPPRHandlerTemplate
     implements BitBucketPPRObserver {
-  static final Logger LOGGER = Logger.getLogger(BitBucketPPRPushCloudObserver.class.getName());
+  static final Logger logger = Logger.getLogger(BitBucketPPRPushCloudObserver.class.getName());
 
   private BitBucketPPREventContext context;
 
@@ -50,7 +50,7 @@ public class BitBucketPPRPushCloudObserver extends BitBucketPPRHandlerTemplate
 
   @Override
   public void setBuildStatusOnFinished() {
-    LOGGER.info("Set build status on finished for push called.");
+    logger.info("Set build status on finished for push called.");
     try {
       BitBucketPPRAction bitbucketAction = context.getAction();
       List<String> commitLinks = bitbucketAction.getCommitLinks();
@@ -68,14 +68,14 @@ public class BitBucketPPRPushCloudObserver extends BitBucketPPRHandlerTemplate
         callClient(url, payload);
       }
     } catch (Throwable e) {
-      LOGGER.info("Set build status on finished for push called but something went wrong.");
-      LOGGER.info(e.getMessage());
+      logger.info("Set build status on finished for push called but something went wrong.");
+      logger.info(e.getMessage());
     }
   }
 
   @Override
   public void setBuildStatusInProgress() {
-    LOGGER.info("Set build status in progress for push called.");
+    logger.info("Set build status in progress for push called.");
 
     try {
       BitBucketPPRAction bitbucketAction = context.getAction();
@@ -91,7 +91,7 @@ public class BitBucketPPRPushCloudObserver extends BitBucketPPRHandlerTemplate
         callClient(url, payload);
       }
     } catch (Throwable e) {
-      LOGGER.info("Set build status in progress for push called but something went wrong.");
+      logger.info("Set build status in progress for push called but something went wrong.");
       e.printStackTrace();
     }
   }

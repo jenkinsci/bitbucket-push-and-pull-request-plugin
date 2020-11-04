@@ -40,7 +40,7 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
 
 public class BitBucketPPRClientCloudVisitor implements BitBucketPPRClientVisitor {
-  private static final Logger LOGGER =
+  private static final Logger logger =
       Logger.getLogger(BitBucketPPRClientCloudVisitor.class.getName());
 
   @Override
@@ -55,7 +55,7 @@ public class BitBucketPPRClientCloudVisitor implements BitBucketPPRClientVisitor
 
   private void send(StandardUsernamePasswordCredentials standardCredentials, String url,
       String payload) {
-    LOGGER.info("Set BB StandardUsernamePasswordCredentials for Cloud");
+    logger.info("Set BB StandardUsernamePasswordCredentials for Cloud");
 
     final org.apache.http.client.CredentialsProvider provider = new BasicCredentialsProvider();
     String username = standardCredentials.getUsername();
@@ -77,9 +77,9 @@ public class BitBucketPPRClientCloudVisitor implements BitBucketPPRClientVisitor
       final HttpResponse response = client.execute(request);
       final int statusCode = response.getStatusLine().getStatusCode();
       final String result = EntityUtils.toString(response.getEntity());
-      LOGGER.info("Result is: " + result + " Status Code: " + statusCode);
+      logger.info("Result is: " + result + " Status Code: " + statusCode);
     } catch (Throwable t) {
-      LOGGER.warning("Error: " + t.getMessage());
+      logger.warning("Error: " + t.getMessage());
     }
   }
 

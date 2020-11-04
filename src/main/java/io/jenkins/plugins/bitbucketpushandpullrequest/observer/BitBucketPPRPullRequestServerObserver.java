@@ -21,14 +21,18 @@
 package io.jenkins.plugins.bitbucketpushandpullrequest.observer;
 
 import java.util.logging.Logger;
-import org.apache.commons.lang.NotImplementedException;
+
+import javax.annotation.Nonnull;
+
+import hudson.model.Result;
+import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
+import io.jenkins.plugins.bitbucketpushandpullrequest.client.BitBucketPPRClientFactory;
+import io.jenkins.plugins.bitbucketpushandpullrequest.client.BitBucketPPRClientType;
 import io.jenkins.plugins.bitbucketpushandpullrequest.event.BitBucketPPREvent;
 import io.jenkins.plugins.bitbucketpushandpullrequest.event.BitBucketPPREventContext;
 
-public class BitBucketPPRPullRequestServerObserver extends BitBucketPPRHandlerTemplate
-    implements BitBucketPPRObserver {
-  static final Logger LOGGER =
-      Logger.getLogger(BitBucketPPRPullRequestServerObserver.class.getName());
+public class BitBucketPPRPullRequestServerObserver extends BitBucketPPRHandlerTemplate implements BitBucketPPRObserver {
+  static final Logger LOGGER = Logger.getLogger(BitBucketPPRPullRequestServerObserver.class.getName());
 
   BitBucketPPREventContext context;
 
@@ -40,13 +44,89 @@ public class BitBucketPPRPullRequestServerObserver extends BitBucketPPRHandlerTe
   }
 
   @Override
-  public void setBuildStatusOnFinished() {
-    throw new NotImplementedException();
+  public void setApproved() {
+    if (!context.getFilter().shouldSendApprove()) {
+      return;
+    }
 
+    try {
+      Result result = context.getRun().getResult();
+      LOGGER.info(() -> "The result is " + result);
+
+      BitBucketPPRAction bitbucketAction = context.getAction();
+      String url = null;
+      String payload = null;
+      if (result == Result.SUCCESS) {
+        url = bitbucketAction.getLinkApprove();
+        payload = "";
+      } else if (result == Result.FAILURE) {
+        url = bitbucketAction.getLinkDecline();
+        payload = "";
+      }
+      if (url == null) {
+        LOGGER.info(() -> "Cannot set URL for approved.");
+        return;
+      }
+
+      BitBucketPPRClientFactory.createClient(BitBucketPPRClientType.SERVER, context).send(url, payload);
+
+    } catch (NullPointerException e) {
+      LOGGER.warning(e.getMessage());
+    } catch (InterruptedException e) {
+      LOGGER.warning(e.getMessage());
+    } catch (Exception e) {
+      LOGGER.warning(e.getMessage());
+    }
+  }
+
+  @Override
+  public void setBuildStatusOnFinished() {
+    BitBucketPPRAction bitbucketAction = context.getAction();
+    String url = bitbucketAction.getCommitLink();
+    Result result = context.getRun().getResult();
+
+    // Example of payload
+    // {
+      // "key": "TEST-REP123",
+      // "state": "SUCCESSFUL",
+      // "url": "https://bamboo.url/browse/TEST-REP1-3",
+      // "buildNumber": "3",
+      // "description": "Unit test build",
+      // "duration": 1500000,
+      // "name": "Database Matrix Tests",
+      // "parent": "TEST-REP",
+      // "ref": "refs/heads/master",
+      // "testResults": {
+        // "failed": 1,
+        // "skipped": 8,
+        // "successful": 0
+      // }
+    // }
+
+    String payload = "{\"key\": \"" + context.getRun().getNumber() + "\", \"url\": \"" + context.getAbsoluteUrl()
+        + "\", ";
+    payload += result == Result.SUCCESS ? "\"state\": \"SUCCESSFUL\""
+        : result == Result.ABORTED ? "\"state\": \"STOPPED\"" : "\"state\": \"FAILED\"";
+    payload += " }";
+
+    callClient(url, payload);
   }
 
   @Override
   public void setBuildStatusInProgress() {
-    throw new NotImplementedException();
+    BitBucketPPRAction bitbucketAction = context.getAction();
+    String url = bitbucketAction.getCommitLink();
+    String payload = "{\"key\": \"" + context.getRun().getNumber() + "\", \"url\": \"" + context.getAbsoluteUrl()
+        + "\", \"state\": \"INPROGRESS\" }";
+
+    callClient(url, payload);
+  }
+
+  private void callClient(@Nonnull String url, @Nonnull String payload) {
+    try {
+      BitBucketPPRClientFactory.createClient(BitBucketPPRClientType.SERVER, context).send(url, payload);
+    } catch (Exception e) {
+      LOGGER.warning(e.getMessage());
+    }
   }
 }
