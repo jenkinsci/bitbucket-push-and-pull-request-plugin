@@ -18,7 +18,7 @@ The new features introduced by Bitbucket Push and Pull Request 2.x.x are:
 - support of pull requests for Bitbucket cloud (rest api v2.x+ with mercurial and git) and bitbucket Server (5.14+ with git)
 - support of pushs for Bitbucket cloud (rest api v2.x+ with mercurial and git) and Bitbucket server (5.14+ with git)
 - usage of Gson instead of net.sf.json.JSONObject
-- Introduction of odels and major security improvements
+- Introduction of models and major security improvements
 
 Bitbucket Push and Pull Request supports the
 
