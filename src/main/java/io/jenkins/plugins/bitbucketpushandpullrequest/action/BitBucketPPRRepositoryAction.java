@@ -69,6 +69,7 @@ public class BitBucketPPRRepositoryAction extends InvisibleAction implements Bit
     return targetBranchName;
   }
 
+  @Override
   public String getRepositoryUrl() {
     return payload.getRepository().getLinks().getHtml().getHref();
   }

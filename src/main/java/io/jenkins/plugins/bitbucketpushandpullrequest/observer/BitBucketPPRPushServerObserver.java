@@ -20,28 +20,86 @@
  ******************************************************************************/
 package io.jenkins.plugins.bitbucketpushandpullrequest.observer;
 
+import java.util.List;
+import java.util.logging.Logger;
+
+import javax.annotation.Nonnull;
+
 import org.apache.commons.lang.NotImplementedException;
+
+import hudson.model.Result;
+import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
+import io.jenkins.plugins.bitbucketpushandpullrequest.client.BitBucketPPRClientFactory;
+import io.jenkins.plugins.bitbucketpushandpullrequest.client.BitBucketPPRClientType;
 import io.jenkins.plugins.bitbucketpushandpullrequest.event.BitBucketPPREvent;
+import io.jenkins.plugins.bitbucketpushandpullrequest.event.BitBucketPPREventContext;
+import io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRUtils;
 
-public class BitBucketPPRPushServerObserver extends BitBucketPPRHandlerTemplate
-    implements BitBucketPPRObserver {
+public class BitBucketPPRPushServerObserver extends BitBucketPPRHandlerTemplate implements BitBucketPPRObserver {
+  static final Logger logger = Logger.getLogger(BitBucketPPRPushCloudObserver.class.getName());
 
-  
+  private BitBucketPPREventContext context;
+
+  {
+    System.setErr(BitBucketPPRUtils.createLoggingProxy(System.err));
+  }
+
   @Override
   public void getNotification(BitBucketPPREvent event) {
+    this.context = event.getContext();
     event.setEventHandler(this);
     event.runHandler();
   }
 
-  
   @Override
   public void setBuildStatusOnFinished() {
-    throw new NotImplementedException();
+    logger.info("Set build status on finished for push called.");
 
+    try {
+      BitBucketPPRAction bitbucketAction = context.getAction();
+      
+      List<String> commitLinks = bitbucketAction.getCommitLinks();
+      int buildNumber = context.getRun().getNumber();
+      Result result = context.getRun().getResult();
+      String absoluteUrl = context.getAbsoluteUrl();
+
+      for (String url : commitLinks) {
+        String payload = "{\"key\": \"" + buildNumber + "\", \"url\": \"" + absoluteUrl + "\", ";
+        payload += result == Result.SUCCESS ? "\"state\": \"SUCCESSFUL\""
+            : result == Result.ABORTED ? "\"state\": \"STOPPED\"" : "\"state\": \"FAILED\"";
+        payload += " }";
+
+        callClient(url, payload);
+      }
+    } catch (Throwable e) {
+      logger.info("Set build status on finished for push called but something went wrong.");
+      logger.info(e.getMessage());
+    }
   }
 
   @Override
   public void setBuildStatusInProgress() {
-    throw new NotImplementedException();
+    logger.info("Set build status in progress for push called.");
+
+    try {
+      BitBucketPPRAction bitbucketAction = context.getAction();
+      List<String> commitLinks = bitbucketAction.getCommitLinks();
+      int buildNumber = context.getRun().getNumber();
+      String absoluteUrl = context.getAbsoluteUrl();
+
+      for (String url : commitLinks) {
+        String payload = "{\"key\": \"" + buildNumber + "\", \"url\": \"" + absoluteUrl
+            + "\", \"state\": \"INPROGRESS\" }";
+
+        callClient(url, payload);
+      }
+    } catch (Throwable e) {
+      logger.info("Set build status in progress for push called but something went wrong.");
+      e.printStackTrace();
+    }
+  }
+
+  public void callClient(@Nonnull String url, @Nonnull String payload) throws Throwable {
+    BitBucketPPRClientFactory.createClient(BitBucketPPRClientType.SERVER, context).send(url, payload);
   }
 }

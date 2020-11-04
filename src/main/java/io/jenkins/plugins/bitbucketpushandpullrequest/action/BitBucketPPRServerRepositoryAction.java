@@ -21,6 +21,8 @@
 
 package io.jenkins.plugins.bitbucketpushandpullrequest.action;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -32,7 +34,6 @@ import hudson.model.InvisibleAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.server.BitBucketPPRServerChange;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.server.BitBucketPPRServerClone;
-
 
 public class BitBucketPPRServerRepositoryAction extends InvisibleAction implements BitBucketPPRAction {
   private static final Logger LOGGER = Logger.getLogger(BitBucketPPRAction.class.getName());
@@ -46,14 +47,12 @@ public class BitBucketPPRServerRepositoryAction extends InvisibleAction implemen
   public BitBucketPPRServerRepositoryAction(BitBucketPPRPayload payload) {
     this.payload = payload;
 
-    // TODO: do we need link clones or link self is enough??    
-    List<BitBucketPPRServerClone> clones =
-        payload.getServerRepository().getLinks().getCloneProperty();
+    // TODO: do we need link clones or link self is enough??
+    List<BitBucketPPRServerClone> clones = payload.getServerRepository().getLinks().getCloneProperty();
 
     for (BitBucketPPRServerClone clone : clones) {
-      if (clone.getName().equalsIgnoreCase("http")
-        || clone.getName().equalsIgnoreCase("https")
-        || clone.getName().equalsIgnoreCase("ssh")) {
+      if (clone.getName().equalsIgnoreCase("http") || clone.getName().equalsIgnoreCase("https")
+          || clone.getName().equalsIgnoreCase("ssh")) {
         this.scmUrls.add(clone.getHref());
       }
     }
@@ -123,7 +122,48 @@ public class BitBucketPPRServerRepositoryAction extends InvisibleAction implemen
   }
 
   @Override
+  public String getRepositoryUrl() {
+    return payload.getServerRepository().getLinks().getSelfProperty().get(0).getHref();
+  }
+
+  @Override
+  public String getProjectUrl() {
+    return payload.getServerRepository().getProject().getLinks().getSelfProperty().get(0).getHref();
+  }
+
+  @Override
   public String toString() {
     return "BitBucketPPRServerRepositoryAction";
+  }
+
+  @Override
+  public List<String> getCommitLinks() {
+    // returns:
+    // /rest/build-status/1.0/commits/{commitId}
+
+    String baseUrl = getBaseUrl(getProjectUrl());
+    if (baseUrl == null) {
+      LOGGER.log(Level.WARNING, "Base url is empty.");
+      return new ArrayList<String>();
+    }
+
+    List<BitBucketPPRServerChange> changes = payload.getServerChanges();
+    List<String> links = new ArrayList<>();
+    for (BitBucketPPRServerChange change : changes) {
+      links.add(baseUrl + "/rest/build-status/1.0/commits/" + change.getToHash());
+    }
+
+    return links;
+  }
+
+  private String getBaseUrl(String projectSelfUrl) {
+    String baseUrl = null;
+    try {
+      URL url = new URL(projectSelfUrl);
+      baseUrl = url.getProtocol() + "://" + url.getHost() + ":" + url.getPort();
+    } catch (MalformedURLException e) {
+      LOGGER.log(Level.WARNING, "Cannot extract base url", e);
+    }
+    return baseUrl;
   }
 }

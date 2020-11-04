@@ -88,6 +88,14 @@ public interface BitBucketPPRAction extends Action {
     return null;
   }
 
+  public default String getRepositoryUrl() {
+    return null;
+  }
+
+  public default String getProjectUrl() {
+    return null;
+  }
+
   public default String getPullRequestUrl(){
     return null;
   }
