@@ -55,23 +55,23 @@ _Please note: the branch, related to the events which trigger the builds, must b
 
 ## Environment variables
 
-|                               NAME  | VALUE                              | SCOPE   | BB TYPE | NOTES                        |
-| ---------------------------------: -| :--------------------------------- |-------------------|------------------------------|
-| BITBUCKET_TARGET_BRANCH             | target branch                      | PR + P  | C + S   |                              |
-| BITBUCKET_ACTOR                     | actor name                         | PR + P  | C + S   |                              |
-| BITBUCKET_PAYLOAD                   | Complete payload as json string    | PR + P  | C + S   |                              |
-| BITBUCKET_X_EVENT                   | x-event which triggered the plugin | PR + P  | C + S   |                              |
-| BITBUCKET_SOURCE_BRANCH             | source branch                      | PR      | C + S   |                              |
-| BITBUCKET_PULL_REQUEST_TITLE        | PR title                           | PR      | C + S   |                              |
-| BITBUCKET_PULL_REQUEST_ID           | id                                 | PR      | C + S   |                              |
-| BITBUCKET_PULL_REQUEST_LINK         | link                               | PR      | C + S   |                              |
-| BITBUCKET_PULL_REQUEST_DESCRIPTION  | PR description                     | PR      | C + S   |                              |
-| BITBUCKET_PULL_REQUEST_COMMENT_TEXT | Comment of BB Cloud Pull Request   | PR      | C + S   |                              |
-| BITBUCKET_REPOSITORY_UUID           | Repository identifier              | P       | C       |                              |
-| BITBUCKET_REPOSITORY_ID             | Repository identifier              | P       | S       |                              |
-| BITBUCKET_REPOSITORY_URL            | Repository URL                     | PR      | C       |                              |
-| REPOSITORY_LINK                     | Repository link                    | P       | C       | Deprecated: to remove in 2.6 |
-| REPOSITORY_NAME                     | Repository name                    | P       | S       | Deprecated: to remove in 2.6 |
+NAME | VALUE | SCOPE | BB TYPE | NOTES
+--- | :-- | :--- | :--- | ---
+BITBUCKET_TARGET_BRANCH | target branch | PR + P | C + S |
+BITBUCKET_ACTOR | actor name | PR + P | C + S |
+BITBUCKET_PAYLOAD | Complete payload as json string | PR + P | C + S |
+BITBUCKET_X_EVENT | x-event which triggered the plugin | PR + P | C + S |
+BITBUCKET_SOURCE_BRANCH | source branch | PR | C + S |
+BITBUCKET_PULL_REQUEST_TITLE | PR title | PR | C + S |
+BITBUCKET_PULL_REQUEST_ID | id | PR | C + S |
+BITBUCKET_PULL_REQUEST_LINK | link | PR | C + S |
+BITBUCKET_PULL_REQUEST_DESCRIPTION | PR description | PR | C + S |
+BITBUCKET_PULL_REQUEST_COMMENT_TEXT | Comment of BB Cloud Pull Request | PR | C + S |
+BITBUCKET_REPOSITORY_UUID | Repository identifier | P | C |
+BITBUCKET_REPOSITORY_ID | Repository identifier | P | S |
+BITBUCKET_REPOSITORY_URL | Repository URL | PR | C |
+REPOSITORY_LINK | Repository link | P | C | Deprecated: to remove in 2.6
+REPOSITORY_NAME | Repository name | P | S | Deprecated: to remove in 2.6
 
 ## Troubleshooting: Some important aspects to keep in mind
 
