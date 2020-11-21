@@ -23,6 +23,8 @@ package io.jenkins.plugins.bitbucketpushandpullrequest;
 
 import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.REPOSITORY_CLOUD_PUSH;
 import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.PULL_REQUEST_MERGED;
+import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.REPOSITORY_SERVER_PUSH;
+import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.PULL_REQUEST_SERVER_MERGED;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -62,8 +64,8 @@ public class BitBucketPPRJobProbe {
     System.setErr(BitBucketPPRUtils.createLoggingProxy(System.err));
   }
 
-  public void triggerMatchingJobs(BitBucketPPRHookEvent bitbucketEvent,
-      BitBucketPPRAction bitbucketAction, BitBucketPPRObservable observable) {
+  public void triggerMatchingJobs(BitBucketPPRHookEvent bitbucketEvent, BitBucketPPRAction bitbucketAction,
+      BitBucketPPRObservable observable) {
     this.bitbucketEvent = bitbucketEvent;
 
     if (!("git".equals(bitbucketAction.getScm()) || "hg".equals(bitbucketAction.getScm()))) {
@@ -83,7 +85,7 @@ public class BitBucketPPRJobProbe {
       });
     } catch (Exception e) {
       LOGGER.log(Level.WARNING, "Invalid repository URLs {0}\n{1}",
-          new Object[] {bitbucketAction.getScmUrls(), e.getMessage()});
+          new Object[] { bitbucketAction.getScmUrls(), e.getMessage() });
     }
   }
 
@@ -105,8 +107,7 @@ public class BitBucketPPRJobProbe {
 
     if (bitbucketTrigger != null) {
       List<SCM> scmTriggered = new ArrayList<>();
-      Optional<SCMTriggerItem> item =
-          Optional.ofNullable(SCMTriggerItem.SCMTriggerItems.asSCMTriggerItem(job));
+      Optional<SCMTriggerItem> item = Optional.ofNullable(SCMTriggerItem.SCMTriggerItems.asSCMTriggerItem(job));
 
       item.ifPresent(i -> i.getSCMs().stream().forEach(scmTrigger -> {
         LOGGER.log(Level.FINE, "Considering to use trigger {0}", scmTrigger.toString());
@@ -117,7 +118,8 @@ public class BitBucketPPRJobProbe {
 
         LOGGER.log(Level.FINE, "Scheduling for job:" + job.getDisplayName());
 
-        // TODO: is it needed? There is only a remote, the HTML one, that is used the do the
+        // TODO: is it needed? There is only a remote, the HTML one, that is used the do
+        // the
         // match
         boolean isRemoteSet = false;
         for (URIish remote : remotes) {
@@ -130,7 +132,7 @@ public class BitBucketPPRJobProbe {
         if (isRemoteSet && !hasBeenTriggered(scmTriggered, scmTrigger)) {
           scmTriggered.add(scmTrigger);
           LOGGER.log(Level.FINE, "Triggering trigger {0} for job {1}",
-              new Object[] {bitbucketTrigger.getClass().getName(), job.getFullDisplayName()});
+              new Object[] { bitbucketTrigger.getClass().getName(), job.getFullDisplayName() });
 
           try {
             bitbucketTrigger.onPost(this.bitbucketEvent, bitbucketAction, scmTrigger, observable);
@@ -140,13 +142,11 @@ public class BitBucketPPRJobProbe {
           }
 
         } else {
-          LOGGER.log(Level.FINE, "{0} SCM doesn't match remote repo {1}",
-              new Object[] {job.getName(), remotes});
+          LOGGER.log(Level.FINE, "{0} SCM doesn't match remote repo {1}", new Object[] { job.getName(), remotes });
         }
       }));
     } else {
-      LOGGER.log(Level.FINE, "Bitbucket Trigger for job: {0} is not present. ",
-          job.getFullDisplayName());
+      LOGGER.log(Level.FINE, "Bitbucket Trigger for job: {0} is not present. ", job.getFullDisplayName());
     }
   }
 
@@ -167,12 +167,15 @@ public class BitBucketPPRJobProbe {
       LOGGER.log(Level.FINE, "sourceBranchName: {0} ", sourceBranchName);
       LOGGER.log(Level.FINE, "targetBranchName : {0}", targetBranchName);
 
-      if (PULL_REQUEST_MERGED.equals(bitbucketEvent.getAction())) {
-        return !displayName.equals(targetBranchName);
+      if (PULL_REQUEST_MERGED.equalsIgnoreCase(bitbucketEvent.getAction())) {
+        return !displayName.equalsIgnoreCase(targetBranchName);
+      } else if (PULL_REQUEST_SERVER_MERGED.equalsIgnoreCase(bitbucketEvent.getAction())) {
+        return !displayName.equalsIgnoreCase(targetBranchName);
       } else if (sourceBranchName != null) {
-        return !displayName.equals(sourceBranchName);
-      } else if (REPOSITORY_CLOUD_PUSH.equals(bitbucketEvent.getAction())
-        && targetBranchName != null) {
+        return !displayName.equalsIgnoreCase(sourceBranchName);
+      } else if (REPOSITORY_CLOUD_PUSH.equalsIgnoreCase(bitbucketEvent.getAction()) && targetBranchName != null) {
+        return !displayName.equals(targetBranchName);
+      } else if (REPOSITORY_SERVER_PUSH.equalsIgnoreCase(bitbucketEvent.getAction()) && targetBranchName != null) {
         return !displayName.equals(targetBranchName);
       }
     }
@@ -184,8 +187,7 @@ public class BitBucketPPRJobProbe {
     BitBucketPPRTrigger trigger = null;
 
     if (job instanceof ParameterizedJobMixIn.ParameterizedJob) {
-      ParameterizedJobMixIn.ParameterizedJob<?, ?> pJob =
-          (ParameterizedJobMixIn.ParameterizedJob<?, ?>) job;
+      ParameterizedJobMixIn.ParameterizedJob<?, ?> pJob = (ParameterizedJobMixIn.ParameterizedJob<?, ?>) job;
 
       for (Trigger<?> t : pJob.getTriggers().values()) {
         if (t instanceof BitBucketPPRTrigger) {
@@ -243,8 +245,7 @@ public class BitBucketPPRJobProbe {
 
     for (RemoteConfig remoteConfig : gitSCM.getRepositories()) {
       for (URIish urIish : remoteConfig.getURIs()) {
-        LOGGER.log(Level.INFO, "Trying to match {0} ",
-            urIish.toString() + "<-->" + remote.toString());
+        LOGGER.log(Level.INFO, "Trying to match {0} ", urIish.toString() + "<-->" + remote.toString());
 
         // TODO: Should we implement the method or continue using the GitStatus one?
         if (GitStatus.looselyMatches(urIish, remote)) {
