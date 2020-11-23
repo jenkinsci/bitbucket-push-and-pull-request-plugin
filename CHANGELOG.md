@@ -1,6 +1,17 @@
 # Change Log
 
-## 2.5.2 (2020-10-30)
+## 2.6.1 (2020-11-23)
+[Full Changelog](https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/compare/bitbucket-push-and-pull-request-2.6.0...bitbucket-push-and-pull-request-2.6.1)
+
+**Implemented enhancements:**
+
+* Added multibranch pipeline jobs support for BB Server  
+
+**Relevant tickets closed:**
+
+* [Bug]  #149 refs/heads/<branchName> spec in Bitbucket Server push action seems not working properly
+
+## 2.6.0 (2020-11-13)
 [Full Changelog](https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/compare/bitbucket-push-and-pull-request-2.5.2...bitbucket-push-and-pull-request-2.6.0)
 
 **Implemented enhancements:**
