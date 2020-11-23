@@ -60,7 +60,8 @@ public class BitBucketPPRPullRequestServerUpdatedActionFilter
 
   @Override
   public boolean shouldTriggerBuild(BitBucketPPRAction bitbucketAction) {
-    return matches(allowedBranches, bitbucketAction.getTargetBranch(), null);
+    return matches(allowedBranches, bitbucketAction.getTargetBranch(), null)
+        || matches(allowedBranches, bitbucketAction.getTargetBranchRefId(), null);
   }
 
   @Override

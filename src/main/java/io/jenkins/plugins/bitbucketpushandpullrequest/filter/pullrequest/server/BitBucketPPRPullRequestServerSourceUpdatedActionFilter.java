@@ -19,7 +19,6 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  ******************************************************************************/
 
-
 package io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.server;
 
 import java.io.File;
@@ -34,15 +33,14 @@ import io.jenkins.plugins.bitbucketpushandpullrequest.cause.BitBucketPPRTriggerC
 import io.jenkins.plugins.bitbucketpushandpullrequest.cause.pullrequest.server.BitBucketPPRPullRequestServerUpdatedCause;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRHookEvent;
 
-
-public class BitBucketPPRPullRequestServerSourceUpdatedActionFilter
-    extends BitBucketPPRPullRequestServerActionFilter {
+public class BitBucketPPRPullRequestServerSourceUpdatedActionFilter extends BitBucketPPRPullRequestServerActionFilter {
 
   public String allowedBranches;
   boolean isToApprove;
 
   @DataBoundConstructor
-  public BitBucketPPRPullRequestServerSourceUpdatedActionFilter() {}
+  public BitBucketPPRPullRequestServerSourceUpdatedActionFilter() {
+  }
 
   @DataBoundSetter
   public void setAllowedBranches(String allowedBranches) {
@@ -60,19 +58,18 @@ public class BitBucketPPRPullRequestServerSourceUpdatedActionFilter
 
   @Override
   public boolean shouldTriggerBuild(BitBucketPPRAction bitbucketAction) {
-    return matches(allowedBranches, bitbucketAction.getTargetBranch(), null);
+    return matches(allowedBranches, bitbucketAction.getTargetBranch(), null)
+        || matches(allowedBranches, bitbucketAction.getTargetBranchRefId(), null);
   }
 
   @Override
-  public BitBucketPPRTriggerCause getCause(File pollingLog, BitBucketPPRAction pullRequestAction, 
-      BitBucketPPRHookEvent bitBucketEvent)
-      throws IOException {
+  public BitBucketPPRTriggerCause getCause(File pollingLog, BitBucketPPRAction pullRequestAction,
+      BitBucketPPRHookEvent bitBucketEvent) throws IOException {
     return new BitBucketPPRPullRequestServerUpdatedCause(pollingLog, pullRequestAction, bitBucketEvent);
   }
 
   @Extension
-  public static class ActionFilterDescriptorImpl
-      extends BitBucketPPRPullRequestServerActionDescriptor {
+  public static class ActionFilterDescriptorImpl extends BitBucketPPRPullRequestServerActionDescriptor {
 
     @Override
     public String getDisplayName() {
