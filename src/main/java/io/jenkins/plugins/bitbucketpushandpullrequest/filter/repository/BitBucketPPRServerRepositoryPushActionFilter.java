@@ -87,16 +87,12 @@ public class BitBucketPPRServerRepositoryPushActionFilter
         return false;
     }
 
-    String target = null;
-    if (bitbucketAction.getType().equalsIgnoreCase("TAG")) {
-      target = bitbucketAction.getTargetBranchRefId();
-    } else {
-      target = bitbucketAction.getTargetBranch();
-    }
+    LOGGER.log(Level.FINEST, "the target branch is: {0}.", bitbucketAction.getTargetBranch());
+    LOGGER.log(Level.FINEST, "the target branch ref id is: {0}.", bitbucketAction.getTargetBranchRefId());
 
-    LOGGER.log(Level.FINEST, "the target branch is: {0}.", target);
     LOGGER.log(Level.FINEST, "The allowed branches are: {0}.", allowedBranches);
-    return matches(allowedBranches, target, null);
+    return matches(allowedBranches, bitbucketAction.getTargetBranch(), null)
+        || matches(allowedBranches, bitbucketAction.getTargetBranchRefId(), null);
   }
 
   @Override
