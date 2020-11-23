@@ -69,6 +69,11 @@ public class BitBucketPPRPullRequestServerAction extends InvisibleAction impleme
   }
 
   @Override
+  public String getTargetBranchRefId() {
+    return payload.getServerPullRequest().getToRef().getId();
+  }
+
+  @Override
   public String getPullRequestUrl() {
     return payload.getServerPullRequest().getLinks().getSelfProperty().get(0).getHref();
   }

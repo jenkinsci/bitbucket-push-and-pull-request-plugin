@@ -75,7 +75,8 @@ public class BitBucketPPRPullRequestServerApprovedActionFilter
       return false;
     }
 
-    return matches(allowedBranches, bitbucketAction.getTargetBranch(), null);
+    return matches(allowedBranches, bitbucketAction.getTargetBranch(), null)
+        || matches(allowedBranches, bitbucketAction.getTargetBranchRefId(), null);
   }
 
   @Override

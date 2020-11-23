@@ -35,14 +35,14 @@ import io.jenkins.plugins.bitbucketpushandpullrequest.cause.pullrequest.server.B
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRHookEvent;
 import io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRUtils;
 
-public class BitBucketPPRPullRequestServerCommentCreatedActionFilter
-    extends BitBucketPPRPullRequestServerActionFilter {
+public class BitBucketPPRPullRequestServerCommentCreatedActionFilter extends BitBucketPPRPullRequestServerActionFilter {
 
   public String allowedBranches;
   public String commentFilter;
 
   @DataBoundConstructor
-  public BitBucketPPRPullRequestServerCommentCreatedActionFilter() {}
+  public BitBucketPPRPullRequestServerCommentCreatedActionFilter() {
+  }
 
   @DataBoundSetter
   public void setAllowedBranches(String allowedBranches) {
@@ -64,14 +64,14 @@ public class BitBucketPPRPullRequestServerCommentCreatedActionFilter
 
   @Override
   public boolean shouldTriggerBuild(BitBucketPPRAction bitbucketAction) {
-    return matches(allowedBranches, bitbucketAction.getTargetBranch(), null) &&
+    return ( matches(allowedBranches, bitbucketAction.getTargetBranch(), null)
+        || matches(allowedBranches, bitbucketAction.getTargetBranchRefId(), null)) &&
         hasInComment(bitbucketAction.getServerComment(), null);
     }
 
   @Override
-  public BitBucketPPRTriggerCause getCause(File pollingLog, BitBucketPPRAction pullRequestAction, 
-      BitBucketPPRHookEvent bitBucketEvent)
-      throws IOException {
+  public BitBucketPPRTriggerCause getCause(File pollingLog, BitBucketPPRAction pullRequestAction,
+      BitBucketPPRHookEvent bitBucketEvent) throws IOException {
     return new BitBucketPPRPullRequestServerCommentCreatedCause(pollingLog, pullRequestAction, bitBucketEvent);
   }
 
@@ -96,7 +96,6 @@ public class BitBucketPPRPullRequestServerCommentCreatedActionFilter
   @Override
   public String toString() {
     return "BitBucketPPRPullRequestServerCommentCreatedActionFilter [getDescriptor()=" + getDescriptor()
-        + ", getClass()=" + getClass() + ", hashCode()=" + hashCode() + ", toString()="
-        + super.toString() + "]";
+        + ", getClass()=" + getClass() + ", hashCode()=" + hashCode() + ", toString()=" + super.toString() + "]";
   }
 }
