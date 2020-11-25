@@ -32,7 +32,7 @@ import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRHookEven
 
 
 public class BitBucketPPRObserverFactory {
-  static final Logger LOGGER = Logger.getLogger(BitBucketPPRObserverFactory.class.getName());
+  static final Logger logger = Logger.getLogger(BitBucketPPRObserverFactory.class.getName());
 
   public static BitBucketPPRObservable createObservable(BitBucketPPRHookEvent bitbucketEvent)
       throws BitBucketPPRObserverNotFoundException {
@@ -41,20 +41,20 @@ public class BitBucketPPRObserverFactory {
 
     if (REPOSITORY_EVENT.equalsIgnoreCase(bitbucketEvent.getEvent())
         && REPOSITORY_CLOUD_PUSH.equalsIgnoreCase(bitbucketEvent.getAction())) {
-      LOGGER.log(Level.INFO, "Add BitBucketPPRPushCloudObserver for {0}",
+      logger.log(Level.INFO, "Add BitBucketPPRPushCloudObserver for {0}",
           bitbucketEvent.toString());
       observable.addObserver(new BitBucketPPRPushCloudObserver());
     } else if (REPOSITORY_EVENT.equalsIgnoreCase(bitbucketEvent.getEvent())
         && REPOSITORY_SERVER_PUSH.equalsIgnoreCase(bitbucketEvent.getAction())) {
-      LOGGER.log(Level.INFO, "Add BitBucketPPRPushServerObserver for {0}",
+      logger.log(Level.INFO, "Add BitBucketPPRPushServerObserver for {0}",
           bitbucketEvent.toString());
       observable.addObserver(new BitBucketPPRPushServerObserver());
     } else if (PULL_REQUEST_CLOUD_EVENT.equals(bitbucketEvent.getEvent())) {
-      LOGGER.log(Level.INFO, "Add BitBucketPPRPullRequestCloudObserver for {0}",
+      logger.log(Level.INFO, "Add BitBucketPPRPullRequestCloudObserver for {0}",
           bitbucketEvent.toString());
       observable.addObserver(new BitBucketPPRPullRequestCloudObserver());
     } else if (PULL_REQUEST_SERVER_EVENT.equals(bitbucketEvent.getEvent())) {
-      LOGGER.log(Level.INFO, "Add BitBucketPPRPullRequestServerObserver for {0}",
+      logger.log(Level.INFO, "Add BitBucketPPRPullRequestServerObserver for {0}",
           bitbucketEvent.toString());
       observable.addObserver(new BitBucketPPRPullRequestServerObserver());
     }

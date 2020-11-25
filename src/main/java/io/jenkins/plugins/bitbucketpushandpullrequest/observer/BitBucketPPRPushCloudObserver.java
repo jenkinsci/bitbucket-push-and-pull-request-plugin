@@ -50,7 +50,6 @@ public class BitBucketPPRPushCloudObserver extends BitBucketPPRHandlerTemplate
 
   @Override
   public void setBuildStatusOnFinished() {
-    logger.info("Set build status on finished for push called.");
     try {
       BitBucketPPRAction bitbucketAction = context.getAction();
       List<String> commitLinks = bitbucketAction.getCommitLinks();
@@ -67,16 +66,14 @@ public class BitBucketPPRPushCloudObserver extends BitBucketPPRHandlerTemplate
 
         callClient(url, payload);
       }
+      logger.info("BB build status was set on 'finished'.");
     } catch (Throwable e) {
-      logger.info("Set build status on finished for push called but something went wrong.");
-      logger.info(e.getMessage());
+      logger.warning("Tried to set BB Build Status on 'finished' using backprogation but " + e.getMessage());
     }
   }
 
   @Override
   public void setBuildStatusInProgress() {
-    logger.info("Set build status in progress for push called.");
-
     try {
       BitBucketPPRAction bitbucketAction = context.getAction();
       List<String> commitLinks = bitbucketAction.getCommitLinks();
@@ -90,9 +87,9 @@ public class BitBucketPPRPushCloudObserver extends BitBucketPPRHandlerTemplate
 
         callClient2(url, payload);
       }
+      logger.info("BB build status was set on 'in progress'.");
     } catch (Throwable e) {
-      logger.info("Set build status in progress for push called but something went wrong.");
-      e.printStackTrace();
+      logger.warning("Tried to set BB Build Status on 'in progress' using backprogation but " + e.getMessage());
     }
   }
 

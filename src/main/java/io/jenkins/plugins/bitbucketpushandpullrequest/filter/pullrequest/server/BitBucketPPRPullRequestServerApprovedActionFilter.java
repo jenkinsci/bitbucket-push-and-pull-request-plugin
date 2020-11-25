@@ -41,7 +41,7 @@ import io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud.BitBucketPPRPa
 
 public class BitBucketPPRPullRequestServerApprovedActionFilter
     extends BitBucketPPRPullRequestServerActionFilter {
-  private static final Logger LOGGER =
+  private static final Logger logger =
       Logger.getLogger(BitBucketPPRPullRequestApprovedActionFilter.class.getName());
 
   public String allowedBranches;
@@ -71,7 +71,7 @@ public class BitBucketPPRPullRequestServerApprovedActionFilter
   @Override
   public boolean shouldTriggerBuild(BitBucketPPRAction bitbucketAction) {
     if (triggerOnlyIfAllReviewersApproved && !allReviewersHaveApproved(bitbucketAction)) {
-      LOGGER.info("Not triggered because not all reviewers have approved the pull request");
+      logger.info("Not triggered because not all reviewers have approved the pull request");
       return false;
     }
 

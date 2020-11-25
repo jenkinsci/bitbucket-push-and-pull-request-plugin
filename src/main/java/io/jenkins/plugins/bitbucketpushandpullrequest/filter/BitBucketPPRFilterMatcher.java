@@ -35,7 +35,7 @@ import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRHookEven
 import io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils;
 
 public class BitBucketPPRFilterMatcher {
-  private static final Logger LOGGER = Logger.getLogger(BitBucketPPRFilterMatcher.class.getName());
+  private static final Logger logger = Logger.getLogger(BitBucketPPRFilterMatcher.class.getName());
 
   public List<BitBucketPPRTriggerFilter> getMatchingFilters(BitBucketPPRHookEvent event,
       List<BitBucketPPRTriggerFilter> triggerFilterList) {
@@ -45,10 +45,10 @@ public class BitBucketPPRFilterMatcher {
       for (BitBucketPPRTriggerFilter triggerFilter : triggerFilterList) {
         if (matchesEventAndAction(event, triggerFilter)) {
           filteredList.add(triggerFilter);
-          LOGGER.log(Level.INFO, "Event {0} matches trigger filter {1}",
+          logger.log(Level.INFO, "Event {0} matches trigger filter {1}",
               new Object[] {event, triggerFilter});
         } else {
-          LOGGER.log(Level.INFO, "Event {0} doesnt match trigger filter {1}",
+          logger.log(Level.INFO, "Event {0} doesnt match trigger filter {1}",
               new Object[] {event, triggerFilter});
         }
 

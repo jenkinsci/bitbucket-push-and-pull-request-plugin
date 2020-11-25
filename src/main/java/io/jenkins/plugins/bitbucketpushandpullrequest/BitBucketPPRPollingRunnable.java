@@ -38,7 +38,7 @@ public class BitBucketPPRPollingRunnable implements Runnable {
   private Job<?, ?> job;
   private File logFile;
 
-  private static final Logger LOGGER =
+  private static final Logger logger =
       Logger.getLogger(BitBucketPPRPollingRunnable.class.getName());
 
   BitBucketPPRPollResultListener bitbucketPollResultListener;
@@ -51,12 +51,12 @@ public class BitBucketPPRPollingRunnable implements Runnable {
   }
 
   public void run() {
-    LOGGER.log(Level.FINE, "Run method called.");
+    logger.log(Level.FINE, "Run method called.");
 
     try (StreamTaskListener streamListener = new StreamTaskListener(logFile)) {
       exec(streamListener);
     } catch (IOException e) {
-      LOGGER.log(Level.SEVERE, "Failed {0}", e.getMessage());
+      logger.log(Level.SEVERE, "Failed {0}", e.getMessage());
     }
   }
 
@@ -72,15 +72,15 @@ public class BitBucketPPRPollingRunnable implements Runnable {
       bitbucketPollResultListener.onPollSuccess(pollingResult);
 
     } catch (NullPointerException e) {
-      LOGGER.log(Level.SEVERE, "NullPointerException: Failed to record SCM polling {0}",
+      logger.log(Level.SEVERE, "NullPointerException: Failed to record SCM polling {0}",
           e.getMessage());
     } catch (RuntimeException e) {
       e.printStackTrace(streamListener.error("Failed to record SCM polling"));
-      LOGGER.log(Level.SEVERE, "RuntimeException: Failed to record SCM polling {0}",
+      logger.log(Level.SEVERE, "RuntimeException: Failed to record SCM polling {0}",
           e.getMessage());
       bitbucketPollResultListener.onPollError(e);
     } catch (Exception e) {
-      LOGGER.log(Level.SEVERE, "Failed ", e);
+      logger.log(Level.SEVERE, "Failed ", e);
     }
   }
 }

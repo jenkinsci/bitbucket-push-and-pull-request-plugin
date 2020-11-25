@@ -36,7 +36,7 @@ import io.jenkins.plugins.bitbucketpushandpullrequest.model.server.BitBucketPPRS
 
 public class BitBucketPPRPayloadFactory {
 
-  static final Logger LOGGER = Logger.getLogger(BitBucketPPRPayloadFactory.class.getName());
+  static final Logger logger = Logger.getLogger(BitBucketPPRPayloadFactory.class.getName());
 
   private BitBucketPPRPayloadFactory() {}
 
@@ -48,7 +48,7 @@ public class BitBucketPPRPayloadFactory {
       if (REPOSITORY_CLOUD_PUSH.equalsIgnoreCase(bitbucketEvent.getAction())) {
         payload = new BitBucketPPRCloudPayload();
       } else if (REPOSITORY_POST.equalsIgnoreCase(bitbucketEvent.getAction())) {
-        LOGGER.warning("Got unexpected old post event, ignored!");
+        logger.warning("Got unexpected old post event, ignored!");
       } else if (REPOSITORY_SERVER_PUSH.equalsIgnoreCase(bitbucketEvent.getAction())) {
         payload = new BitBucketPPRServerPayload();
       }

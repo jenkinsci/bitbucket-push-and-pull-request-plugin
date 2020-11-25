@@ -57,7 +57,7 @@ import jenkins.model.ParameterizedJobMixIn;
 import jenkins.triggers.SCMTriggerItem;
 
 public class BitBucketPPRJobProbe {
-  private static final Logger LOGGER = Logger.getLogger(BitBucketPPRJobProbe.class.getName());
+  private static final Logger logger = Logger.getLogger(BitBucketPPRJobProbe.class.getName());
   private BitBucketPPRHookEvent bitbucketEvent;
 
   {
@@ -76,15 +76,15 @@ public class BitBucketPPRJobProbe {
 
     try (ACLContext old = ACL.as(ACL.SYSTEM)) {
       List<URIish> remotes = getRemotesAsList(bitbucketAction);
-      LOGGER.log(Level.FINE, "Considering remote {0}", remotes);
+      logger.log(Level.FINE, "Considering remote {0}", remotes);
 
       Jenkins.get().getAllItems(Job.class).stream().forEach(job -> {
-        LOGGER.log(Level.FINE, "Considering candidate job {0}", job.getName());
+        logger.log(Level.FINE, "Considering candidate job {0}", job.getName());
 
         triggerScm(job, remotes, bitbucketAction, observable);
       });
     } catch (Exception e) {
-      LOGGER.log(Level.WARNING, "Invalid repository URLs {0}\n{1}",
+      logger.log(Level.WARNING, "Invalid repository URLs {0}\n{1}",
           new Object[] { bitbucketAction.getScmUrls(), e.getMessage() });
     }
   }
@@ -94,7 +94,7 @@ public class BitBucketPPRJobProbe {
       try {
         return new URIish(a);
       } catch (URISyntaxException e) {
-        LOGGER.log(Level.WARNING, "Invalid URI {0}", e.getMessage());
+        logger.log(Level.WARNING, "Invalid URI {0}", e.getMessage());
         return null;
       }
     }).collect(Collectors.toList());
@@ -102,7 +102,7 @@ public class BitBucketPPRJobProbe {
 
   private void triggerScm(Job<?, ?> job, List<URIish> remotes, BitBucketPPRAction bitbucketAction,
       BitBucketPPRObservable observable) {
-    LOGGER.log(Level.FINE, "Considering to poke {0}", job.getFullDisplayName());
+    logger.log(Level.FINE, "Considering to poke {0}", job.getFullDisplayName());
     BitBucketPPRTrigger bitbucketTrigger = getBitBucketTrigger(job);
 
     if (bitbucketTrigger != null) {
@@ -110,13 +110,13 @@ public class BitBucketPPRJobProbe {
       Optional<SCMTriggerItem> item = Optional.ofNullable(SCMTriggerItem.SCMTriggerItems.asSCMTriggerItem(job));
 
       item.ifPresent(i -> i.getSCMs().stream().forEach(scmTrigger -> {
-        LOGGER.log(Level.FINE, "Considering to use trigger {0}", scmTrigger.toString());
+        logger.log(Level.FINE, "Considering to use trigger {0}", scmTrigger.toString());
         if (isMultiBranchPipeline(job) && mPJobShouldNotBeTriggered(job, bitbucketAction)) {
-          LOGGER.log(Level.FINE, "Skipping for job:" + job.getDisplayName());
+          logger.log(Level.FINE, "Skipping for job:" + job.getDisplayName());
           return;
         }
 
-        LOGGER.log(Level.FINE, "Scheduling for job:" + job.getDisplayName());
+        logger.log(Level.FINE, "Scheduling for job:" + job.getDisplayName());
 
         // TODO: is it needed? There is only a remote, the HTML one, that is used the do
         // the
@@ -131,27 +131,27 @@ public class BitBucketPPRJobProbe {
 
         if (isRemoteSet && !hasBeenTriggered(scmTriggered, scmTrigger)) {
           scmTriggered.add(scmTrigger);
-          LOGGER.log(Level.FINE, "Triggering trigger {0} for job {1}",
+          logger.log(Level.FINE, "Triggering trigger {0} for job {1}",
               new Object[] { bitbucketTrigger.getClass().getName(), job.getFullDisplayName() });
 
           try {
             bitbucketTrigger.onPost(this.bitbucketEvent, bitbucketAction, scmTrigger, observable);
           } catch (Throwable e) {
-            LOGGER.log(Level.WARNING, "Error: {0}", e.getMessage());
+            logger.log(Level.WARNING, "Error: {0}", e.getMessage());
             e.printStackTrace();
           }
 
         } else {
-          LOGGER.log(Level.FINE, "{0} SCM doesn't match remote repo {1}", new Object[] { job.getName(), remotes });
+          logger.log(Level.FINE, "{0} SCM doesn't match remote repo {1}", new Object[] { job.getName(), remotes });
         }
       }));
     } else {
-      LOGGER.log(Level.FINE, "Bitbucket Trigger for job: {0} is not present. ", job.getFullDisplayName());
+      logger.log(Level.FINE, "Bitbucket Trigger for job: {0} is not present. ", job.getFullDisplayName());
     }
   }
 
   private boolean isMultiBranchPipeline(Job<?, ?> job) {
-    LOGGER.log(Level.FINE, "Job is of type: " + job.getParent().getClass().getTypeName());
+    logger.log(Level.FINE, "Job is of type: " + job.getParent().getClass().getTypeName());
 
     return job.getParent() instanceof MultiBranchProject;
   }
@@ -162,10 +162,10 @@ public class BitBucketPPRJobProbe {
       String sourceBranchName = bitbucketAction.getSourceBranch();
       String targetBranchName = bitbucketAction.getTargetBranch();
 
-      LOGGER.log(Level.FINE, "Bitbucket event is : {0}", bitbucketEvent.getAction());
-      LOGGER.log(Level.FINE, "Job Name : {0}", displayName);
-      LOGGER.log(Level.FINE, "sourceBranchName: {0} ", sourceBranchName);
-      LOGGER.log(Level.FINE, "targetBranchName : {0}", targetBranchName);
+      logger.log(Level.FINE, "Bitbucket event is : {0}", bitbucketEvent.getAction());
+      logger.log(Level.FINE, "Job Name : {0}", displayName);
+      logger.log(Level.FINE, "sourceBranchName: {0} ", sourceBranchName);
+      logger.log(Level.FINE, "targetBranchName : {0}", targetBranchName);
 
       if (PULL_REQUEST_MERGED.equalsIgnoreCase(bitbucketEvent.getAction())) {
         return !displayName.equalsIgnoreCase(targetBranchName);
@@ -201,7 +201,7 @@ public class BitBucketPPRJobProbe {
   private boolean hasBeenTriggered(List<SCM> scmTriggered, SCM scmTrigger) {
     for (SCM scm : scmTriggered) {
       if (scm.equals(scmTrigger)) {
-        LOGGER.log(Level.FINEST, "Has been triggered {0}", scmTrigger.getType());
+        logger.log(Level.FINEST, "Has been triggered {0}", scmTrigger.getType());
         return true;
       }
     }
@@ -225,16 +225,16 @@ public class BitBucketPPRJobProbe {
     try {
       URI hgUri = new URI(((MercurialSCM) scm).getSource());
 
-      LOGGER.log(Level.INFO, "Trying to match {0} ", hgUri.toString() + "<-->" + remote.toString());
+      logger.log(Level.INFO, "Trying to match {0} ", hgUri.toString() + "<-->" + remote.toString());
       result = hgLooselyMatches(hgUri, remote.toString());
 
       if (result) {
-        LOGGER.info("Matched scm ");
+        logger.info("Matched scm ");
       } else {
-        LOGGER.info(() -> "Didn't match scm " + hgUri.toString());
+        logger.info(() -> "Didn't match scm " + hgUri.toString());
       }
     } catch (URISyntaxException ex) {
-      LOGGER.log(Level.SEVERE, "Could not parse jobSource uri: {0} ", ex);
+      logger.log(Level.SEVERE, "Could not parse jobSource uri: {0} ", ex);
     }
 
     return result;
@@ -245,11 +245,11 @@ public class BitBucketPPRJobProbe {
 
     for (RemoteConfig remoteConfig : gitSCM.getRepositories()) {
       for (URIish urIish : remoteConfig.getURIs()) {
-        LOGGER.log(Level.INFO, "Trying to match {0} ", urIish.toString() + "<-->" + remote.toString());
+        logger.log(Level.INFO, "Trying to match {0} ", urIish.toString() + "<-->" + remote.toString());
 
         // TODO: Should we implement the method or continue using the GitStatus one?
         if (GitStatus.looselyMatches(urIish, remote)) {
-          LOGGER.info("Matched scm");
+          logger.info("Matched scm");
           return true;
         }
       }
@@ -263,7 +263,7 @@ public class BitBucketPPRJobProbe {
     try {
       if (!hgIsUnexpandedEnvVar(repository)) {
         URI repositoryUri = new URI(repository);
-        LOGGER.log(Level.INFO, "Mercurial loose match between {0} ",
+        logger.log(Level.INFO, "Mercurial loose match between {0} ",
             notifyUri.toString() + "<- and ->" + repositoryUri.toString());
         result = Objects.equal(notifyUri.getHost(), repositoryUri.getHost())
             && Objects.equal(StringUtils.stripEnd(notifyUri.getPath(), "/"),
@@ -271,7 +271,7 @@ public class BitBucketPPRJobProbe {
             && Objects.equal(notifyUri.getQuery(), repositoryUri.getQuery());
       }
     } catch (URISyntaxException ex) {
-      LOGGER.log(Level.SEVERE, "could not parse repository uri " + repository, ex);
+      logger.log(Level.SEVERE, "could not parse repository uri " + repository, ex);
     }
     return result;
   }

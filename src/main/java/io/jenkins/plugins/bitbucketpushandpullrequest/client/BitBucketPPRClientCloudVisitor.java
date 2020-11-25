@@ -22,11 +22,14 @@ package io.jenkins.plugins.bitbucketpushandpullrequest.client;
 
 import java.nio.charset.StandardCharsets;
 import java.util.logging.Logger;
+
 import com.cloudbees.jenkins.plugins.sshcredentials.SSHUserPrivateKey;
 import com.cloudbees.plugins.credentials.common.StandardCredentials;
 import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials;
+
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.NotImplementedException;
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpResponse;
 import org.apache.http.auth.AuthScope;
@@ -50,12 +53,12 @@ public class BitBucketPPRClientCloudVisitor implements BitBucketPPRClientVisitor
     else if (standardCredentials instanceof SSHUserPrivateKey) {
       this.send((SSHUserPrivateKey) standardCredentials, url, payload);
     } else
-      throw new NotImplementedException("No credentials provider found");
+      throw new NotImplementedException("Credentials provider for back propagation not found");
   }
 
   private void send(StandardUsernamePasswordCredentials standardCredentials, String url,
       String payload) {
-    logger.info("Set BB StandardUsernamePasswordCredentials for Cloud");
+    logger.info("Set BB StandardUsernamePasswordCredentials for BB Cloud backpropagation");
 
     final org.apache.http.client.CredentialsProvider provider = new BasicCredentialsProvider();
     String username = standardCredentials.getUsername();
@@ -76,16 +79,18 @@ public class BitBucketPPRClientCloudVisitor implements BitBucketPPRClientVisitor
       request.setEntity(new StringEntity(payload, ContentType.APPLICATION_JSON));
       final HttpResponse response = client.execute(request);
       final int statusCode = response.getStatusLine().getStatusCode();
-      final String result = EntityUtils.toString(response.getEntity());
+      
+      HttpEntity responseEntity = response.getEntity();
+      final String result = responseEntity == null ? "" : EntityUtils.toString(responseEntity);
       logger.info("Result is: " + result + " Status Code: " + statusCode);
     } catch (Throwable t) {
-      logger.warning("Error: " + t.getMessage());
+      logger.warning("Error during backpropagation to BB Cloud: " + t.getMessage());
     }
   }
 
   private void send(SSHUserPrivateKey standardCredentials, String url, String payload) {
 
     throw new NotImplementedException(
-        "This authentication method is not suported by the BitBucket Cloud Rest API.");
+        "This authentication method is not supported by the BB Cloud Rest API.");
   }
 }

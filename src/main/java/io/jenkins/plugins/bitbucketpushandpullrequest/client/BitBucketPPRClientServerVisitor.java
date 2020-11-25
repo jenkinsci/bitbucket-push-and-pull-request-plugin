@@ -29,6 +29,7 @@ import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredenti
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.NotImplementedException;
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpResponse;
 import org.apache.http.auth.AuthScope;
@@ -51,13 +52,12 @@ public class BitBucketPPRClientServerVisitor implements BitBucketPPRClientVisito
     else if (standardCredentials instanceof SSHUserPrivateKey) {
       this.send((SSHUserPrivateKey) standardCredentials, url, payload);
     } else
-      throw new NotImplementedException("No credentials provider found");
+      throw new NotImplementedException("Credentials provider for backpropagation not found");
   }
 
   private void send(StandardUsernamePasswordCredentials standardCredentials, String url, String payload) {
-    logger.info("Set BB StandardUsernamePasswordCredentials for Server");
-    logger.info("Url for backpropagation" + url + " with paylaod " + payload);
-
+    logger.fine("Set BB StandardUsernamePasswordCredentials for backpropagation");
+    logger.fine("Url for backpropagation" + url + " with paylaod " + payload);
 
     final org.apache.http.client.CredentialsProvider provider = new BasicCredentialsProvider();
     String username = standardCredentials.getUsername();
@@ -67,7 +67,7 @@ public class BitBucketPPRClientServerVisitor implements BitBucketPPRClientVisito
       final UsernamePasswordCredentials credentials = new UsernamePasswordCredentials(username, password);
       provider.setCredentials(AuthScope.ANY, credentials);
       final String auth = username + ":" + password;
-      
+
       byte[] encodedAuth = Base64.encodeBase64(auth.getBytes(StandardCharsets.ISO_8859_1));
       String authHeader = "Basic " + new String(encodedAuth, StandardCharsets.ISO_8859_1);
 
@@ -79,14 +79,16 @@ public class BitBucketPPRClientServerVisitor implements BitBucketPPRClientVisito
       request.setEntity(new StringEntity(payload, ContentType.APPLICATION_JSON));
       final HttpResponse response = client.execute(request);
       final int statusCode = response.getStatusLine().getStatusCode();
-      final String result = EntityUtils.toString(response.getEntity());
-      logger.info("Result is: " + result + " Status Code: " + statusCode);
+
+      HttpEntity responseEntity = response.getEntity();
+      final String result = responseEntity == null ? "" : EntityUtils.toString(responseEntity);
+      logger.fine("Result of the backpropagation is: " + result + " , with status code: " + statusCode);
     } catch (Throwable t) {
-      logger.warning("Error: " + t.getMessage());
+      logger.warning("An error occurred during the backpropagation: " + t.getMessage());
     }
   }
 
   private void send(SSHUserPrivateKey standardCredentials, String url, String payload) {
-    throw new NotImplementedException("This authentication method is not suported by the BitBucket Cloud Rest API.");
+    throw new NotImplementedException("This authentication method is not suported by the BitBucket Server Rest API.");
   }
 }

@@ -105,6 +105,9 @@ public class BitBucketPPRPullRequestServerAction extends InvisibleAction impleme
 
   @Override
   public String getServerComment() {
+    if (payload.getServerComment() == null) {
+      return "";
+    }
     return payload.getServerComment().getText();
   }
 
