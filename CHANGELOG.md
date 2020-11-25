@@ -1,5 +1,12 @@
 # Change Log
 
+## 2.6.2 (2020-11-25)
+[Full Changelog](https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/compare/bitbucket-push-and-pull-request-2.6.1...bitbucket-push-and-pull-request-2.6.2)
+
+**Implemented enhancements:**
+
+* Improving logging  
+
 ## 2.6.1 (2020-11-23)
 [Full Changelog](https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/compare/bitbucket-push-and-pull-request-2.6.0...bitbucket-push-and-pull-request-2.6.1)
 
