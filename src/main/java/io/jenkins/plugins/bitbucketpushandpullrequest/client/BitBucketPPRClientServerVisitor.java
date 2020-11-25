@@ -81,7 +81,7 @@ public class BitBucketPPRClientServerVisitor implements BitBucketPPRClientVisito
       final int statusCode = response.getStatusLine().getStatusCode();
 
       HttpEntity responseEntity = response.getEntity();
-      final String result = responseEntity == null ? "" : EntityUtils.toString(responseEntity);
+      final String result = responseEntity == null ? "no content" : EntityUtils.toString(responseEntity);
       logger.fine("Result of the backpropagation is: " + result + " , with status code: " + statusCode);
     } catch (Throwable t) {
       logger.warning("An error occurred during the backpropagation: " + t.getMessage());
