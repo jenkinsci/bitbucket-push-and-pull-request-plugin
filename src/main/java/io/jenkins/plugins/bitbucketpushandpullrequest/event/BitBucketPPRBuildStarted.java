@@ -25,7 +25,7 @@ import java.util.logging.Logger;
 import io.jenkins.plugins.bitbucketpushandpullrequest.observer.BitBucketPPRHandlerTemplate;
 
 public class BitBucketPPRBuildStarted implements BitBucketPPREvent {
-  private static final Logger LOGGER = Logger.getLogger(BitBucketPPRBuildStarted.class.getName());
+  private static final Logger logger = Logger.getLogger(BitBucketPPRBuildStarted.class.getName());
 
   BitBucketPPREventContext context;
   BitBucketPPRHandlerTemplate handler;
@@ -46,7 +46,7 @@ public class BitBucketPPRBuildStarted implements BitBucketPPREvent {
     try {
       handler.run(BitBucketPPREventType.BUILD_STARTED);
     } catch (Exception e) {
-      LOGGER.log(Level.INFO, e.getMessage());
+      logger.log(Level.INFO, e.getMessage());
     }
   }
 

@@ -39,7 +39,7 @@ import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRHookEven
 
 public class BitBucketPPRServerRepositoryPushActionFilter
     extends BitBucketPPRRepositoryActionFilter {
-  private static final Logger LOGGER =
+  private static final Logger logger =
       Logger.getLogger(BitBucketPPRServerRepositoryPushActionFilter.class.getName());
 
   public boolean triggerAlsoIfTagPush;
@@ -68,7 +68,7 @@ public class BitBucketPPRServerRepositoryPushActionFilter
 
   @Override
   public boolean shouldTriggerBuild(BitBucketPPRAction bitbucketAction) {
-    LOGGER
+    logger
         .info(() -> "Should trigger build for bitbucket action" + bitbucketAction.toString() + "?");
 
     if (!bitbucketAction.getType().equalsIgnoreCase("BRANCH")
@@ -76,7 +76,7 @@ public class BitBucketPPRServerRepositoryPushActionFilter
         && !bitbucketAction.getType().equalsIgnoreCase("UPDATE")
         && !bitbucketAction.getType().equalsIgnoreCase("TAG")
         && !this.triggerAlsoIfTagPush) {
-          LOGGER.info(
+          logger.info(
           () -> "Neither bitbucketActionType is BRANCH, nor UPDATE, nor trigger on tag push is set for bitbucket type: "
               + bitbucketAction.getType() + ".");
 
@@ -87,10 +87,10 @@ public class BitBucketPPRServerRepositoryPushActionFilter
         return false;
     }
 
-    LOGGER.log(Level.FINEST, "the target branch is: {0}.", bitbucketAction.getTargetBranch());
-    LOGGER.log(Level.FINEST, "the target branch ref id is: {0}.", bitbucketAction.getTargetBranchRefId());
+    logger.log(Level.FINEST, "the target branch is: {0}.", bitbucketAction.getTargetBranch());
+    logger.log(Level.FINEST, "the target branch ref id is: {0}.", bitbucketAction.getTargetBranchRefId());
 
-    LOGGER.log(Level.FINEST, "The allowed branches are: {0}.", allowedBranches);
+    logger.log(Level.FINEST, "The allowed branches are: {0}.", allowedBranches);
     return matches(allowedBranches, bitbucketAction.getTargetBranch(), null)
         || matches(allowedBranches, bitbucketAction.getTargetBranchRefId(), null);
   }

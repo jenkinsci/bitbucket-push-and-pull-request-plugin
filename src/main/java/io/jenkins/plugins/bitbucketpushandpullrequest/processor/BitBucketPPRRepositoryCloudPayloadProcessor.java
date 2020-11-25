@@ -31,7 +31,7 @@ import io.jenkins.plugins.bitbucketpushandpullrequest.observer.BitBucketPPRObser
 
 
 public class BitBucketPPRRepositoryCloudPayloadProcessor extends BitBucketPPRPayloadProcessor {
-  static final Logger LOGGER =
+  static final Logger logger =
       Logger.getLogger(BitBucketPPRRepositoryCloudPayloadProcessor.class.getName());
 
   public BitBucketPPRRepositoryCloudPayloadProcessor(@Nonnull BitBucketPPRJobProbe jobProbe,
@@ -40,7 +40,7 @@ public class BitBucketPPRRepositoryCloudPayloadProcessor extends BitBucketPPRPay
   }
 
   private BitBucketPPRAction buildActionForJobs(@Nonnull BitBucketPPRPayload payload) {
-    LOGGER.info("Instantiate BitBucketPPRRepositoryAction");
+    logger.info("Instantiate BitBucketPPRRepositoryAction");
     return new BitBucketPPRRepositoryAction(payload);
   }
 

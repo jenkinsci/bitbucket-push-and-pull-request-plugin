@@ -98,6 +98,10 @@ public class BitBucketPPRPullRequestAction extends InvisibleAction implements Bi
 
   @Override
   public String getComment() {
+    if (payload.getComment() == null || payload.getComment().getContent() == null
+        || payload.getComment().getContent().getRaw() == null) {
+      return "";
+    }
     return payload.getComment().getContent().getRaw();
   }
 

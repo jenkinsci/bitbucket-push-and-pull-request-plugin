@@ -32,7 +32,7 @@ import io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud.BitBucketPPRCh
 
 
 public class BitBucketPPRRepositoryAction extends InvisibleAction implements BitBucketPPRAction {
-  private static final Logger LOGGER = Logger.getLogger(BitBucketPPRAction.class.getName());
+  private static final Logger logger = Logger.getLogger(BitBucketPPRAction.class.getName());
 
   private final @Nonnull BitBucketPPRPayload payload;
 
@@ -59,9 +59,9 @@ public class BitBucketPPRRepositoryAction extends InvisibleAction implements Bit
       }
     }
 
-    LOGGER.log(Level.INFO,
+    logger.log(Level.INFO,
         () -> "Received commit hook notification for branch: " + this.targetBranchName);
-    LOGGER.log(Level.INFO, () -> "Received commit hook type: " + this.type);
+    logger.log(Level.INFO, () -> "Received commit hook type: " + this.type);
   }
 
   @Override

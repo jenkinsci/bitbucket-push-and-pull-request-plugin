@@ -36,7 +36,7 @@ import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRHookEven
 
 public final class BitBucketPPRPayloadProcessorFactory {
 
-  static final Logger LOGGER =
+  static final Logger logger =
       Logger.getLogger(BitBucketPPRPayloadProcessorFactory.class.getName());
 
   private BitBucketPPRPayloadProcessorFactory() {
@@ -53,26 +53,26 @@ public final class BitBucketPPRPayloadProcessorFactory {
 
     if (REPOSITORY_EVENT.equalsIgnoreCase(bitbucketEvent.getEvent())
         && REPOSITORY_CLOUD_PUSH.equalsIgnoreCase(bitbucketEvent.getAction())) {
-          LOGGER.info("Create BitBucketPPRRepositoryCloudPayloadProcessor");
+          logger.info("Create BitBucketPPRRepositoryCloudPayloadProcessor");
       return new BitBucketPPRRepositoryCloudPayloadProcessor(probe, bitbucketEvent);
     }
     if (REPOSITORY_EVENT.equalsIgnoreCase(bitbucketEvent.getEvent())
         && REPOSITORY_SERVER_PUSH.equalsIgnoreCase(bitbucketEvent.getAction())) {
-          LOGGER.info("Create BitBucketPPRRepositoryServerPayloadProcessor");
+          logger.info("Create BitBucketPPRRepositoryServerPayloadProcessor");
       return new BitBucketPPRRepositoryServerPayloadProcessor(probe, bitbucketEvent);
     }
     if (REPOSITORY_EVENT.equalsIgnoreCase(bitbucketEvent.getEvent())
         && REPOSITORY_POST.equalsIgnoreCase(bitbucketEvent.getAction())) {
-      LOGGER.warning("Got unexpected old post action, ignored!");
+      logger.warning("Got unexpected old post action, ignored!");
     }
 
     if (PULL_REQUEST_CLOUD_EVENT.equals(bitbucketEvent.getEvent())) {
-      LOGGER.info("Create BitBucketPPRPullRequestCloudPayloadProcessor");
+      logger.info("Create BitBucketPPRPullRequestCloudPayloadProcessor");
       return new BitBucketPPRPullRequestCloudPayloadProcessor(probe, bitbucketEvent);
     }
 
     if (PULL_REQUEST_SERVER_EVENT.equals(bitbucketEvent.getEvent())) {
-      LOGGER.info("Create BitBucketPPRPullRequestServerPayloadProcessor");
+      logger.info("Create BitBucketPPRPullRequestServerPayloadProcessor");
       return new BitBucketPPRPullRequestServerPayloadProcessor(probe, bitbucketEvent);
     }
 

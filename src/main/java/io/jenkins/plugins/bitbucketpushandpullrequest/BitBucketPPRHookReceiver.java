@@ -19,7 +19,6 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  ******************************************************************************/
 
-
 package io.jenkins.plugins.bitbucketpushandpullrequest;
 
 import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.HOOK_URL;
@@ -45,11 +44,11 @@ import io.jenkins.plugins.bitbucketpushandpullrequest.observer.BitBucketPPRObser
 import io.jenkins.plugins.bitbucketpushandpullrequest.processor.BitBucketPPRPayloadProcessor;
 import io.jenkins.plugins.bitbucketpushandpullrequest.processor.BitBucketPPRPayloadProcessorFactory;
 
-
 /**
- * BitbucketHookReceiver which processes HTTP POST packages to $JENKINS_URL/bitbucket-hook
+ * BitbucketHookReceiver which processes HTTP POST packages to
+ * $JENKINS_URL/bitbucket-hook
  * 
- * @version 2.0
+ * @version 2.6.2
  */
 @Extension
 public class BitBucketPPRHookReceiver implements UnprotectedRootAction {
@@ -75,12 +74,12 @@ public class BitBucketPPRHookReceiver implements UnprotectedRootAction {
     String inputStream = IOUtils.toString(request.getInputStream());
 
     if (inputStream.isEmpty()) {
-      logger.warning("The Jenkins job cannot be triggered. The input stream is empty.");
+      logger.severe("The Jenkins job cannot be triggered. The input stream is empty.");
       return;
     }
 
     if (request.getRequestURI().contains("/" + HOOK_URL + "/")) {
-      logger.log(Level.FINE, "Received commit hook notification : {0}", inputStream);
+      logger.finest("Received input stream over Bitbucket hook notification:" + inputStream);
 
       inputStream = decodeInputStream(inputStream, request.getContentType());
 
@@ -88,17 +87,16 @@ public class BitBucketPPRHookReceiver implements UnprotectedRootAction {
       if (request.getHeader("x-event-key") != null) {
         try {
           bitbucketEvent = new BitBucketPPRHookEvent(request.getHeader("x-event-key"));
-          logger.log(Level.INFO,
-              () -> "Received x-event-key " + request.getHeader("x-event-key") + " from Bitbucket");
+          logger.info("Received x-event-key: " + request.getHeader("x-event-key") + " from Bitbucket");
         } catch (OperationNotSupportedException e) {
-          logger.log(Level.WARNING, e.getMessage());
+          logger.severe(e.getMessage());
         }
       } else {
-        logger.log(Level.WARNING, "Received old POST payload. (Deprecated, it will be removed.)");
+        logger.warning("Received old POST payload. (Deprecated, it will be removed.)");
         try {
           bitbucketEvent = new BitBucketPPRHookEvent("repo:post");
         } catch (OperationNotSupportedException e) {
-          logger.log(Level.WARNING, e.getMessage());
+          logger.severe(e.getMessage());
         }
       }
 
@@ -109,15 +107,11 @@ public class BitBucketPPRHookReceiver implements UnprotectedRootAction {
               BitBucketPPRPayloadFactory.getInstance(bitbucketEvent).getClass());
           logger.log(Level.FINEST, "the payload is: {0}", payload.toString());
 
-          BitBucketPPRPayloadProcessor bitbucketPayloadProcessor =
-              BitBucketPPRPayloadProcessorFactory.createProcessor(bitbucketEvent);
-          BitBucketPPRObservable observable =
-              BitBucketPPRObserverFactory.createObservable(bitbucketEvent);
+          BitBucketPPRPayloadProcessor bitbucketPayloadProcessor = BitBucketPPRPayloadProcessorFactory
+              .createProcessor(bitbucketEvent);
+          BitBucketPPRObservable observable = BitBucketPPRObserverFactory.createObservable(bitbucketEvent);
 
-            
-
-          logger.log(Level.FINEST, "the selected payload processor is: {0}",
-              bitbucketPayloadProcessor.toString());
+          logger.log(Level.FINEST, "the selected payload processor is: {0}", bitbucketPayloadProcessor.toString());
 
           bitbucketPayloadProcessor.processPayload(payload, observable);
         } catch (Exception e) {
@@ -141,10 +135,8 @@ public class BitBucketPPRHookReceiver implements UnprotectedRootAction {
         logger.warning(e.getMessage());
       }
     } else {
-      logger.log(Level.WARNING,
-          () -> "The Jenkins job cannot be triggered. You might no have configured "
-              + "correctly the WebHook on BitBucket with the last slash "
-              + "`http://<JENKINS-URL>/bitbucket-hook/`");
+      logger.log(Level.WARNING, () -> "The Jenkins job cannot be triggered. You might no have configured "
+          + "correctly the WebHook on BitBucket with the last slash " + "`http://<JENKINS-URL>/bitbucket-hook/`");
     }
   }
 

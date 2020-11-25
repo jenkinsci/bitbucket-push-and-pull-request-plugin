@@ -36,7 +36,7 @@ import io.jenkins.plugins.bitbucketpushandpullrequest.model.server.BitBucketPPRS
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.server.BitBucketPPRServerClone;
 
 public class BitBucketPPRServerRepositoryAction extends InvisibleAction implements BitBucketPPRAction {
-  private static final Logger LOGGER = Logger.getLogger(BitBucketPPRAction.class.getName());
+  private static final Logger logger = Logger.getLogger(BitBucketPPRAction.class.getName());
 
   private final @Nonnull BitBucketPPRPayload payload;
   private List<String> scmUrls = new ArrayList<>(2);
@@ -66,9 +66,9 @@ public class BitBucketPPRServerRepositoryAction extends InvisibleAction implemen
       }
     }
 
-    LOGGER.log(Level.INFO,
+    logger.log(Level.INFO,
         () -> "Received commit hook notification from server for destination branch: " + this.targetBranchName);
-    LOGGER.log(Level.INFO, () -> "Received commit hook type from server: " + this.type);
+    logger.log(Level.INFO, () -> "Received commit hook type from server: " + this.type);
   }
 
   @Override
@@ -143,7 +143,7 @@ public class BitBucketPPRServerRepositoryAction extends InvisibleAction implemen
 
     String baseUrl = getBaseUrl(getProjectUrl());
     if (baseUrl == null) {
-      LOGGER.log(Level.WARNING, "Base url is empty.");
+      logger.log(Level.WARNING, "Base url is empty.");
       return new ArrayList<String>();
     }
 
@@ -162,7 +162,7 @@ public class BitBucketPPRServerRepositoryAction extends InvisibleAction implemen
       URL url = new URL(projectSelfUrl);
       baseUrl = url.getProtocol() + "://" + url.getHost() + ":" + url.getPort();
     } catch (MalformedURLException e) {
-      LOGGER.log(Level.WARNING, "Cannot extract base url", e);
+      logger.log(Level.WARNING, "Cannot extract base url", e);
     }
     return baseUrl;
   }

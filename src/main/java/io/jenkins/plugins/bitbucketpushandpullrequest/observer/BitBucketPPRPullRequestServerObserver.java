@@ -32,7 +32,7 @@ import io.jenkins.plugins.bitbucketpushandpullrequest.event.BitBucketPPREvent;
 import io.jenkins.plugins.bitbucketpushandpullrequest.event.BitBucketPPREventContext;
 
 public class BitBucketPPRPullRequestServerObserver extends BitBucketPPRHandlerTemplate implements BitBucketPPRObserver {
-  static final Logger LOGGER = Logger.getLogger(BitBucketPPRPullRequestServerObserver.class.getName());
+  static final Logger logger = Logger.getLogger(BitBucketPPRPullRequestServerObserver.class.getName());
 
   BitBucketPPREventContext context;
 
@@ -51,7 +51,7 @@ public class BitBucketPPRPullRequestServerObserver extends BitBucketPPRHandlerTe
 
     try {
       Result result = context.getRun().getResult();
-      LOGGER.info(() -> "The result is " + result);
+      logger.info(() -> "The result is " + result);
 
       BitBucketPPRAction bitbucketAction = context.getAction();
       String url = null;
@@ -64,18 +64,18 @@ public class BitBucketPPRPullRequestServerObserver extends BitBucketPPRHandlerTe
         payload = "";
       }
       if (url == null) {
-        LOGGER.info(() -> "Cannot set URL for approved.");
+        logger.info(() -> "Cannot set URL for approved.");
         return;
       }
 
       BitBucketPPRClientFactory.createClient(BitBucketPPRClientType.SERVER, context).send(url, payload);
 
     } catch (NullPointerException e) {
-      LOGGER.warning(e.getMessage());
+      logger.warning(e.getMessage());
     } catch (InterruptedException e) {
-      LOGGER.warning(e.getMessage());
+      logger.warning(e.getMessage());
     } catch (Exception e) {
-      LOGGER.warning(e.getMessage());
+      logger.warning(e.getMessage());
     }
   }
 
@@ -128,7 +128,7 @@ public class BitBucketPPRPullRequestServerObserver extends BitBucketPPRHandlerTe
     try {
       BitBucketPPRClientFactory.createClient(BitBucketPPRClientType.SERVER, context).send(url, payload);
     } catch (Exception e) {
-      LOGGER.warning(e.getMessage());
+      logger.warning(e.getMessage());
     }
   }
 
@@ -136,7 +136,7 @@ public class BitBucketPPRPullRequestServerObserver extends BitBucketPPRHandlerTe
     try {
       BitBucketPPRClientFactory.createClient(BitBucketPPRClientType.SERVER, context).send2(url, payload);
     } catch (Exception e) {
-      LOGGER.warning(e.getMessage());
+      logger.warning(e.getMessage());
     }
   }
 }

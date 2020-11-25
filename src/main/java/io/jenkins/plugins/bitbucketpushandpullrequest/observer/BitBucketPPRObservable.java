@@ -27,7 +27,7 @@ import java.util.logging.Logger;
 import io.jenkins.plugins.bitbucketpushandpullrequest.event.BitBucketPPREvent;
 
 public class BitBucketPPRObservable {
-  private static final Logger LOGGER = Logger.getLogger(BitBucketPPRObservable.class.getName());
+  private static final Logger logger = Logger.getLogger(BitBucketPPRObservable.class.getName());
 
   private List<BitBucketPPRObserver> observers = new ArrayList<>();
 
@@ -47,11 +47,11 @@ public class BitBucketPPRObservable {
 
     for (BitBucketPPRObserver observer : this.observers) {
       if (observer != null && event != null) {
-        LOGGER.log(Level.INFO, "Event: {0} for observer {1}",
+        logger.log(Level.INFO, "Event: {0} for observer {1}",
             new String[] {event.toString(), observer.toString()});
         observer.getNotification(event);
       } else {
-        LOGGER.log(Level.INFO, "observer or event are null");
+        logger.log(Level.INFO, "observer or event are null");
       }
     }
   }
