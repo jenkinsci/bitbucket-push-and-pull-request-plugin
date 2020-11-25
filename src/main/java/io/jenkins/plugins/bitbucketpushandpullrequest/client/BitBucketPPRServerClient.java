@@ -29,7 +29,7 @@ public class BitBucketPPRServerClient implements BitBucketPPRClient {
   private BitBucketPPRClientVisitor visitor;
 
   {
-    System.setErr(BitBucketPPRUtils.createLoggingProxy(System.err));
+    System.setErr(BitBucketPPRUtils.createLoggingProxyForErrors(System.err));
   }
 
   public BitBucketPPRServerClient(BitBucketPPREventContext context) {

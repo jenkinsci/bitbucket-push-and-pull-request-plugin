@@ -73,7 +73,7 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
   private List<BitBucketPPRTriggerFilter> triggers;
 
   {
-    System.setErr(BitBucketPPRUtils.createLoggingProxy(System.err));
+    System.setErr(BitBucketPPRUtils.createLoggingProxyForErrors(System.err));
   }
 
   @DataBoundConstructor

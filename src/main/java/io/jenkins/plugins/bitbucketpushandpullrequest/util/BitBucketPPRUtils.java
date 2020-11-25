@@ -35,28 +35,27 @@ import hudson.plugins.git.BranchSpec;
 
 public class BitBucketPPRUtils {
 
-  private static final Logger LOGGER = Logger.getLogger(BitBucketPPRUtils.class.getName());
-
+  private static final Logger logger = Logger.getLogger(BitBucketPPRUtils.class.getName());
 
   public static boolean matches(String allBranches, String branchName, EnvVars env) {
-    String allowedBranches = allBranches != null ? allBranches : "";
+    String allowedBranchesPattern = allBranches != null ? allBranches : "";
 
-    LOGGER.finest("Following allowed branches patterns are set: " + allowedBranches);
-    LOGGER.finest("The branchName in action is: " + branchName);
-    LOGGER.finest("The environment variables are: " + env);
+    logger.fine("Following allowed branches patterns are set: " + allowedBranchesPattern);
+    logger.fine("The branchName in action is: " + branchName);
+    logger.fine("The environment variables are: " + env);
 
-    BiFunction<List<String>, BiPredicate<String, EnvVars>, List<String>> filter =
-        (List<String> list, BiPredicate<String, EnvVars> p) -> {
-          List<String> results = new ArrayList<>();
-          for (String t : list) {
-            if (p.test(t, env)) {
-              results.add(t);
-            }
-          }
-          return results;
-        };
+    BiFunction<List<String>, BiPredicate<String, EnvVars>, List<String>> filter = (List<String> list,
+        BiPredicate<String, EnvVars> p) -> {
+      List<String> results = new ArrayList<>();
+      for (String t : list) {
+        if (p.test(t, env)) {
+          results.add(t);
+        }
+      }
+      return results;
+    };
 
-    List<String> nonEmpty = filter.apply(Arrays.asList(allowedBranches.split(",")),
+    List<String> matchedBranches = filter.apply(Arrays.asList(allowedBranchesPattern.split(",")),
         (String branchSpec, EnvVars envVar) -> {
           BranchSpec pattern = new BranchSpec(branchSpec.trim());
           if (envVar == null) {
@@ -66,37 +65,39 @@ public class BitBucketPPRUtils {
           }
         });
 
-    nonEmpty.forEach((String s) -> LOGGER.finest("Matching branch: " + s));
+    if (matchedBranches.isEmpty()) {
+      logger.info("no matches for allowed branches pattern: " + allowedBranchesPattern);
+      return false;
+    }
 
-    return nonEmpty.size() > 0;
+    matchedBranches.forEach((String s) -> logger.info("Matched branch: " + s));
+    return true;
   }
 
-  public static boolean matchWithRegex(@Nonnull String haystack, @Nonnull String patternStr,
-      EnvVars env) {
+  public static boolean matchWithRegex(@Nonnull String haystack, @Nonnull String patternStr, EnvVars env) {
     if (haystack == null || haystack.trim().isEmpty()) {
-      LOGGER.fine("The comment from BB is null or it is empty");
+      logger.info("The comment from BB is null or it is empty");
       return false;
     }
 
     if (patternStr == null || patternStr.trim().isEmpty()) {
-      LOGGER.fine("The regex filter on the comment from BB is null or it is empty");
+      logger.fine(String.format("The regex filter on the comment from BB is null or it is empty", new Object[] {}));
       return true;
     }
 
-    LOGGER.log(Level.FINE, "Applying the pattern {0} to the comment {1}",
-        new Object[] {patternStr, haystack});
+    logger.log(Level.FINEST, "Applying the pattern {0} to the comment {1}", new Object[] { patternStr, haystack });
     Pattern pattern = Pattern.compile(patternStr.trim(), Pattern.CASE_INSENSITIVE);
     return pattern.matcher(haystack.trim()).find();
   }
 
-  public static PrintStream createLoggingProxy(final PrintStream realPrintStream) {
+  public static PrintStream createLoggingProxyForErrors(final PrintStream realPrintStream) {
     return new PrintStream(realPrintStream) {
       public void print(final String string) {
-        LOGGER.info(string);
+        logger.severe(string);
       }
 
       public void println(final String string) {
-        LOGGER.info(string);
+        logger.severe(string);
       }
     };
   }

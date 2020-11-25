@@ -61,7 +61,7 @@ public class BitBucketPPRJobProbe {
   private BitBucketPPRHookEvent bitbucketEvent;
 
   {
-    System.setErr(BitBucketPPRUtils.createLoggingProxy(System.err));
+    System.setErr(BitBucketPPRUtils.createLoggingProxyForErrors(System.err));
   }
 
   public void triggerMatchingJobs(BitBucketPPRHookEvent bitbucketEvent, BitBucketPPRAction bitbucketAction,

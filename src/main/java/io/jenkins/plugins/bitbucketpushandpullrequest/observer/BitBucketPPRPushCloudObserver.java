@@ -38,7 +38,7 @@ public class BitBucketPPRPushCloudObserver extends BitBucketPPRHandlerTemplate
   private BitBucketPPREventContext context;
 
   {
-    System.setErr(BitBucketPPRUtils.createLoggingProxy(System.err));
+    System.setErr(BitBucketPPRUtils.createLoggingProxyForErrors(System.err));
   }
   
   @Override
