@@ -43,7 +43,7 @@ public class BitBucketPPRTriggerCause extends SCMTrigger.SCMTriggerCause {
   }
 
   public String getHookEvent() {
-    return this.bitBucketHookEvent.getEvent();
+    return this.bitBucketHookEvent.getBitbucketEventKey();
   }
 
   public BitBucketPPRAction getAction() {

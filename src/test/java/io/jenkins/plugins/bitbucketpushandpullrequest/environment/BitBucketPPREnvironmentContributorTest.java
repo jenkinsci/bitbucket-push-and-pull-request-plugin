@@ -22,12 +22,14 @@
 package io.jenkins.plugins.bitbucketpushandpullrequest.environment;
 
 import static org.hamcrest.collection.IsMapContaining.hasEntry;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
+import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
@@ -46,6 +48,7 @@ import hudson.EnvVars;
 import hudson.model.Cause;
 import hudson.model.Run;
 import hudson.model.TaskListener;
+import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRPullRequestAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRPullRequestServerAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRRepositoryAction;
@@ -55,6 +58,9 @@ import io.jenkins.plugins.bitbucketpushandpullrequest.cause.pullrequest.cloud.Bi
 import io.jenkins.plugins.bitbucketpushandpullrequest.cause.pullrequest.server.BitBucketPPRPullRequestServerCause;
 import io.jenkins.plugins.bitbucketpushandpullrequest.cause.repository.BitBucketPPRRepositoryCause;
 import io.jenkins.plugins.bitbucketpushandpullrequest.cause.repository.BitBucketPPRServerRepositoryCause;
+import io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.cloud.BitBucketPPRPullRequestCreatedActionFilter;
+import io.jenkins.plugins.bitbucketpushandpullrequest.filter.repository.BitBucketPPRRepositoryPushActionFilter;
+import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRHookEvent;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud.BitBucketPPRCloudPayload;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.server.BitBucketPPRServerPayload;
@@ -386,6 +392,42 @@ public class BitBucketPPREnvironmentContributorTest {
     assertThat(envVars,
         hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_COMMENT_TEXT, "Comment content"));
     assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_X_EVENT, "X-EVENT"));
+  }
+
+  @Test
+  public void getBitbucketEventKeyPrOpenedTest() throws Exception {
+    String hookEventAction = "pr:opened";
+    String prefix = "jenkinsUnitTests";
+    String suffix = "environmentContributor_getBitbucketEventKeyTest";
+    File pollingLog = File.createTempFile(prefix, suffix);
+
+    BitBucketPPRAction bitbucketAction = mock(BitBucketPPRAction.class);
+    BitBucketPPRHookEvent bitBucketHookEvent = new BitBucketPPRHookEvent(hookEventAction);
+    BitBucketPPRPullRequestCreatedActionFilter actionFilter = new BitBucketPPRPullRequestCreatedActionFilter();
+    BitBucketPPRTriggerCause cause = actionFilter.getCause(pollingLog, bitbucketAction, bitBucketHookEvent);
+
+    assertEquals("Bitbuckethook event and hockEvent property of cause object are the same.", cause.getHookEvent(),
+        hookEventAction);
+  }
+
+  @Test
+  public void getBitbucketEventKeyrepoRefsChangedTest() throws Exception {
+    String hookEventAction = "repo:refs_changed";
+    String prefix = "jenkinsUnitTests";
+    String suffix = "environmentContributor_getBitbucketEventKeyTest";
+    File pollingLog = File.createTempFile(prefix, suffix);
+
+    BitBucketPPRAction bitbucketAction = mock(BitBucketPPRAction.class);
+    BitBucketPPRHookEvent bitBucketHookEvent = new BitBucketPPRHookEvent(hookEventAction);
+
+    // method params: boolean triggerAlsoIfTagPush, boolean
+    // triggerAlsoIfNothingChanged, String allowedBranches
+    BitBucketPPRRepositoryPushActionFilter actionFilter = new BitBucketPPRRepositoryPushActionFilter(false, false,
+        null);
+    BitBucketPPRTriggerCause cause = actionFilter.getCause(pollingLog, bitbucketAction, bitBucketHookEvent);
+
+    assertEquals("Bitbuckethook event and hockEvent property of cause object are the same.", cause.getHookEvent(),
+        hookEventAction);
   }
 
   private BitBucketPPRPayload getCloudPayload(String res) {
