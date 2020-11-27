@@ -47,8 +47,10 @@ import javax.naming.OperationNotSupportedException;
 public class BitBucketPPRHookEvent {
   private String event;
   private String action;
+  private String bitbucketEventKey;
 
   public BitBucketPPRHookEvent(String eventAction) throws OperationNotSupportedException {
+    bitbucketEventKey = eventAction;
     String[] eventActionPair = eventAction.split(":");
 
     event = eventActionPair[0];
@@ -107,6 +109,10 @@ public class BitBucketPPRHookEvent {
 
   public String getEvent() {
     return event;
+  }
+
+  public String getBitbucketEventKey() {
+    return bitbucketEventKey;
   }
 
   public String getAction() {
