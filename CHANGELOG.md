@@ -1,5 +1,16 @@
 # Change Log
 
+## 2.6.3 (2020-11-27)
+[Full Changelog](https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/compare/bitbucket-push-and-pull-request-2.6.2...bitbucket-push-and-pull-request-2.6.3)
+
+**Fixed bugs:**
+
+* Fixed bug BITBUCKET_X_EVENT not populated with full eventKey. 
+
+**Relevant tickets closed**
+
+* [Bug] #152 BITBUCKET_X_EVENT not populated with full eventKey. 
+
 ## 2.6.2 (2020-11-25)
 [Full Changelog](https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/compare/bitbucket-push-and-pull-request-2.6.1...bitbucket-push-and-pull-request-2.6.2)
 
