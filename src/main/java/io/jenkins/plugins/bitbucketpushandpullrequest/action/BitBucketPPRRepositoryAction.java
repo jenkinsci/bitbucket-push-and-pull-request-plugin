@@ -110,6 +110,19 @@ public class BitBucketPPRRepositoryAction extends InvisibleAction implements Bit
   }
 
   @Override
+  public String getLatestCommit() {
+    // According to constructor `targetBranchName`, `type` and `repositoryUuid` will be set to first non-null change
+    // So lets hope it is not very destructive move to set latestCommit from first change.
+    for (BitBucketPPRChange change : payload.getPush().getChanges()) {
+      if (change.getNewChange() != null) {
+        return change.getNewChange().getTarget().getHash();
+      }
+    }
+
+    return null;
+  }
+
+  @Override
   public List<String> getCommitLinks() {
     List<BitBucketPPRChange> changes = payload.getPush().getChanges();
     List<String> links = new ArrayList<>();

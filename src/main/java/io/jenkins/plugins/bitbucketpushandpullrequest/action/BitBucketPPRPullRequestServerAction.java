@@ -169,6 +169,11 @@ public class BitBucketPPRPullRequestServerAction extends InvisibleAction impleme
   }
 
   @Override
+  public String getLatestCommit() {
+    return payload.getServerPullRequest().getFromRef().getLatestCommit();
+  }
+
+  @Override
   public String getCommitLink() {
     // returns:
     // /rest/build-status/1.0/commits/{commitId}

@@ -24,6 +24,7 @@ package io.jenkins.plugins.bitbucketpushandpullrequest;
 import java.io.File;
 import java.io.IOException;
 import java.io.ObjectStreamException;
+import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -34,6 +35,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.commons.jelly.XMLOutput;
+import org.eclipse.jgit.transport.URIish;
 import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.DataBoundConstructor;
 import hudson.Extension;
@@ -44,6 +46,7 @@ import hudson.model.Item;
 import hudson.model.Job;
 import hudson.model.Run;
 import hudson.model.queue.QueueTaskFuture;
+import hudson.plugins.git.RevisionParameterAction;
 import hudson.scm.PollingResult;
 import hudson.scm.SCM;
 import hudson.triggers.Trigger;
@@ -184,7 +187,19 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
     };
     logger.info("Check if job should be triggered due to changes in SCM");
 
-    QueueTaskFuture<?> future = pJob.scheduleBuild2(5, new CauseAction(cause), bitbucketAction);
+    // Jenkins will take all instances of QueueAction from this job and will try to compare these instances
+    // to all instances of QueueAction from all other pending jobs
+    // while calling scheduleBuild2 (see hudson.model.Queue.scheduleInternal)
+    // So we need RevisionParameterAction to distinguish THIS job from all other pending jobs in queue
+    QueueTaskFuture<?> future = null;
+    try {
+      future = pJob.scheduleBuild2(5, new CauseAction(cause), bitbucketAction,
+              new RevisionParameterAction(bitbucketAction.getLatestCommit(),
+                      new URIish(bitbucketAction.getScmUrls().get(0))));
+    } catch (URISyntaxException e) {
+      logger.info(e.getMessage());
+      e.printStackTrace();
+    }
 
     int buildNumber = job.getNextBuildNumber();
     logger.info(() -> "SCM changes detected in " + job.getName() + ". Triggering " + " #" + buildNumber);
