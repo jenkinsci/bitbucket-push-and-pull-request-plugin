@@ -105,8 +105,7 @@ public class BitBucketPPRPullRequestServerObserver extends BitBucketPPRHandlerTe
 
     String payload = "{\"key\": \"" + context.getRun().getNumber() + "\", \"url\": \"" + context.getAbsoluteUrl()
         + "\", ";
-    payload += result == Result.SUCCESS ? "\"state\": \"SUCCESSFUL\""
-        : result == Result.ABORTED ? "\"state\": \"STOPPED\"" : "\"state\": \"FAILED\"";
+    payload += result == Result.SUCCESS ? "\"state\": \"SUCCESSFUL\"" : "\"state\": \"FAILED\"";
     payload += " }";
 
     callClient(url, payload);
