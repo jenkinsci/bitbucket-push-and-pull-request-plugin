@@ -57,7 +57,7 @@ public class BitBucketPPRClientServerVisitor implements BitBucketPPRClientVisito
 
   private void send(StandardUsernamePasswordCredentials standardCredentials, String url, String payload) {
     logger.fine("Set BB StandardUsernamePasswordCredentials for backpropagation");
-    logger.fine("Url for backpropagation" + url + " with paylaod " + payload);
+    logger.fine("Url for backpropagation " + url + " with payload " + payload);
 
     final org.apache.http.client.CredentialsProvider provider = new BasicCredentialsProvider();
     String username = standardCredentials.getUsername();
