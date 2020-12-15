@@ -45,6 +45,9 @@ import javaposse.jobdsl.plugin.ExecuteDslScripts;
 import javaposse.jobdsl.plugin.RemovedJobAction;
 import hudson.triggers.TriggerDescriptor;
 import hudson.triggers.Trigger;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import org.apache.commons.io.IOUtils;
 
 
 @RunWith(MockitoJUnitRunner.class)
@@ -67,11 +70,22 @@ public class BitBucketPPRHookJobDslExtensionTest {
     j.buildAndAssertSuccess(seedJob);
   }
 
+  private String readDslScript(String path) throws Exception {
+    String script = null;
+    try {
+        ClassLoader classloader = Thread.currentThread().getContextClassLoader();
+        InputStream is = classloader.getResourceAsStream(path);
+        script = IOUtils.toString(is, StandardCharsets.UTF_8);
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+    return script;
+  }
+
   @Test
-  public void testDslTriggerPushAction() throws Exception {
+  public void testDslTriggerPushActionFreeStyle() throws Exception {
     /* Create seed job which will process DSL */
-    createSeedJob(
-        "freeStyleJob('test-job') { triggers { bitbucketTriggers { repositoryPushAction(false, false, '') } } }");
+    createSeedJob(readDslScript("./dsl/testDslTriggerPushActionFreeStyle.groovy"));
     /* Fetch the newly created job and check its trigger configuration */
     FreeStyleProject createdJob = (FreeStyleProject) j.getInstance().getItem("test-job");
     /* Go through all triggers to validate DSL */
@@ -96,10 +110,9 @@ public class BitBucketPPRHookJobDslExtensionTest {
   }
 
   @Test
-  public void testDslTriggerIsToApprovePushAction() throws Exception {
+  public void testDslTriggerIsToApprovePushActionFreeStyle() throws Exception {
     /* Create seed job which will process DSL */
-    createSeedJob(
-        "freeStyleJob('test-job') { triggers { bitbucketTriggers { repositoryPushAction(false, false, '', true) } } }");
+    createSeedJob(readDslScript("./dsl/testDslTriggerIsToApprovePushActionFreeStyle.groovy"));
     /* Fetch the newly created job and check its trigger configuration */
     FreeStyleProject createdJob = (FreeStyleProject) j.getInstance().getItem("test-job");
     /* Go through all triggers to validate DSL */
@@ -123,10 +136,9 @@ public class BitBucketPPRHookJobDslExtensionTest {
   }
 
   @Test
-  public void testDslTriggerPRApproved() throws Exception {
+  public void testDslTriggerPRApprovedFreeStyle() throws Exception {
     /* Create seed job which will process DSL */
-    createSeedJob(
-        "freeStyleJob('test-job') { triggers { bitbucketTriggers { pullRequestApprovedAction(false) } } }");
+    createSeedJob(readDslScript("./dsl/testDslTriggerPRApprovedFreeStyle.groovy"));
     /* Fetch the newly created job and check its trigger configuration */
     FreeStyleProject createdJob = (FreeStyleProject) j.getInstance().getItem("test-job");
     /* Go through all triggers to validate DSL */
@@ -150,9 +162,9 @@ public class BitBucketPPRHookJobDslExtensionTest {
   }
 
   @Test
-  public void testDslTriggerPRIsToApproveApproved() throws Exception {
+  public void testDslTriggerPRIsToApproveApprovedFreeStyle() throws Exception {
     /* Create seed job which will process DSL */
-    createSeedJob("freeStyleJob('test-job') { triggers { bitbucketTriggers { pullRequestApprovedAction(false, '', true) } } }");
+    createSeedJob(readDslScript("./dsl/testDslTriggerPRIsToApproveApprovedFreeStyle.groovy"));
     /* Fetch the newly created job and check its trigger configuration */
     FreeStyleProject createdJob = (FreeStyleProject) j.getInstance().getItem("test-job");
     /* Go through all triggers to validate DSL */
@@ -176,10 +188,9 @@ public class BitBucketPPRHookJobDslExtensionTest {
   }
 
   @Test
-  public void testDslTriggerPRAllowedBranchesApproved() throws Exception {
+  public void testDslTriggerPRAllowedBranchesApprovedFreeStyle() throws Exception {
     /* Create seed job which will process DSL */
-    createSeedJob(
-        "freeStyleJob('test-job') { triggers { bitbucketTriggers { pullRequestApprovedAction(false, \"**\") } } }");
+    createSeedJob(readDslScript("./dsl/testDslTriggerPRAllowedBranchesApprovedFreeStyle.groovy"));
     /* Fetch the newly created job and check its trigger configuration */
     FreeStyleProject createdJob = (FreeStyleProject) j.getInstance().getItem("test-job");
     /* Go through all triggers to validate DSL */
@@ -198,10 +209,9 @@ public class BitBucketPPRHookJobDslExtensionTest {
   }
 
   @Test
-  public void testDslTriggerPRCommentCreated() throws Exception {
+  public void testDslTriggerPRCommentCreatedFreeStyle() throws Exception {
     /* Create seed job which will process DSL */
-    createSeedJob(
-        "freeStyleJob('test-job') { triggers { bitbucketTriggers { pullRequestCommentCreatedAction() } } }");
+    createSeedJob(readDslScript("./dsl/testDslTriggerPRCommentCreatedFreeStyle.groovy"));
     /* Fetch the newly created job and check its trigger configuration */
     FreeStyleProject createdJob = (FreeStyleProject) j.getInstance().getItem("test-job");
     /* Go through all triggers to validate DSL */
@@ -220,10 +230,9 @@ public class BitBucketPPRHookJobDslExtensionTest {
   }
 
   @Test
-  public void testDslTriggerPRAllowedBranchesCommentCreated() throws Exception {
+  public void testDslTriggerPRAllowedBranchesCommentCreatedFreeStyle() throws Exception {
     /* Create seed job which will process DSL */
-    createSeedJob(
-        "freeStyleJob('test-job') { triggers { bitbucketTriggers { pullRequestCommentCreatedAction(\"**\") } } }");
+    createSeedJob(readDslScript("./dsl/testDslTriggerPRAllowedBranchesCommentCreatedFreeStyle.groovy"));
     /* Fetch the newly created job and check its trigger configuration */
     FreeStyleProject createdJob = (FreeStyleProject) j.getInstance().getItem("test-job");
     /* Go through all triggers to validate DSL */
@@ -242,10 +251,9 @@ public class BitBucketPPRHookJobDslExtensionTest {
   }
 
   @Test
-  public void testDslTriggerPRCommentFilterCommentCreated() throws Exception {
+  public void testDslTriggerPRCommentFilterCommentCreatedFreeStyle() throws Exception {
     /* Create seed job which will process DSL */
-    createSeedJob(
-        "freeStyleJob('test-job') { triggers { bitbucketTriggers { pullRequestCommentCreatedAction(\"**\", \"text\") } } }");
+    createSeedJob(readDslScript("./dsl/testDslTriggerPRCommentFilterCommentCreatedFreeStyle.groovy"));
     /* Fetch the newly created job and check its trigger configuration */
     FreeStyleProject createdJob = (FreeStyleProject) j.getInstance().getItem("test-job");
     /* Go through all triggers to validate DSL */
@@ -264,10 +272,9 @@ public class BitBucketPPRHookJobDslExtensionTest {
   }
 
   @Test
-  public void testDslTriggerPRCommentUpdated() throws Exception {
+  public void testDslTriggerPRCommentUpdatedFreeStyle() throws Exception {
     /* Create seed job which will process DSL */
-    createSeedJob(
-        "freeStyleJob('test-job') { triggers { bitbucketTriggers { pullRequestCommentUpdatedAction() } } }");
+    createSeedJob(readDslScript("./dsl/testDslTriggerPRCommentUpdatedFreeStyle.groovy"));
     /* Fetch the newly created job and check its trigger configuration */
     FreeStyleProject createdJob = (FreeStyleProject) j.getInstance().getItem("test-job");
     /* Go through all triggers to validate DSL */
@@ -286,10 +293,9 @@ public class BitBucketPPRHookJobDslExtensionTest {
   }
 
   @Test
-  public void testDslTriggerPRAllowedBranchesCommentUpdated() throws Exception {
+  public void testDslTriggerPRAllowedBranchesCommentUpdatedFreeStyle() throws Exception {
     /* Create seed job which will process DSL */
-    createSeedJob(
-        "freeStyleJob('test-job') { triggers { bitbucketTriggers { pullRequestCommentUpdatedAction(\"**\") } } }");
+    createSeedJob(readDslScript("./dsl/testDslTriggerPRAllowedBranchesCommentUpdatedFreeStyle.groovy"));
     /* Fetch the newly created job and check its trigger configuration */
     FreeStyleProject createdJob = (FreeStyleProject) j.getInstance().getItem("test-job");
     /* Go through all triggers to validate DSL */
@@ -308,10 +314,9 @@ public class BitBucketPPRHookJobDslExtensionTest {
   }
 
   @Test
-  public void testDslTriggerPRCommentFilterCommentUpdated() throws Exception {
+  public void testDslTriggerPRCommentFilterCommentUpdatedFreeStyle() throws Exception {
     /* Create seed job which will process DSL */
-    createSeedJob(
-        "freeStyleJob('test-job') { triggers { bitbucketTriggers { pullRequestCommentUpdatedAction(\"**\", \"text\")}}}");
+    createSeedJob(readDslScript("./dsl/testDslTriggerPRCommentFilterCommentUpdatedFreeStyle.groovy"));
     /* Fetch the newly created job and check its trigger configuration */
     FreeStyleProject createdJob = (FreeStyleProject) j.getInstance().getItem("test-job");
     /* Go through all triggers to validate DSL */
@@ -330,10 +335,9 @@ public class BitBucketPPRHookJobDslExtensionTest {
   }
 
   @Test
-  public void testDslTriggerPRCommentDeleted() throws Exception {
+  public void testDslTriggerPRCommentDeletedFreeStyle() throws Exception {
     /* Create seed job which will process DSL */
-    createSeedJob(
-        "freeStyleJob('test-job') { triggers { bitbucketTriggers { pullRequestCommentDeletedAction() } } }");
+    createSeedJob(readDslScript("./dsl/testDslTriggerPRCommentDeletedFreeStyle.groovy"));
     /* Fetch the newly created job and check its trigger configuration */
     FreeStyleProject createdJob = (FreeStyleProject) j.getInstance().getItem("test-job");
     /* Go through all triggers to validate DSL */
@@ -352,10 +356,9 @@ public class BitBucketPPRHookJobDslExtensionTest {
   }
 
   @Test
-  public void testDslTriggerPRAllowedBranchesCommentDeleted() throws Exception {
+  public void testDslTriggerPRAllowedBranchesCommentDeletedFreeStyle() throws Exception {
     /* Create seed job which will process DSL */
-    createSeedJob(
-        "freeStyleJob('test-job') { triggers { bitbucketTriggers { pullRequestCommentDeletedAction(\"**\") } } }");
+    createSeedJob(readDslScript("./dsl/testDslTriggerPRAllowedBranchesCommentDeletedFreeStyle.groovy"));
     /* Fetch the newly created job and check its trigger configuration */
     FreeStyleProject createdJob = (FreeStyleProject) j.getInstance().getItem("test-job");
     /* Go through all triggers to validate DSL */
@@ -374,10 +377,9 @@ public class BitBucketPPRHookJobDslExtensionTest {
   }
 
   @Test
-  public void testDslTriggerPRCreated() throws Exception {
+  public void testDslTriggerPRCreatedFreeStyle() throws Exception {
     /* Create seed job which will process DSL */
-    createSeedJob(
-        "freeStyleJob('test-job') { triggers { bitbucketTriggers { pullRequestCreatedAction() } } }");
+    createSeedJob(readDslScript("./dsl/testDslTriggerPRCreatedFreeStyle.groovy"));
     /* Fetch the newly created job and check its trigger configuration */
     FreeStyleProject createdJob = (FreeStyleProject) j.getInstance().getItem("test-job");
     /* Go through all triggers to validate DSL */
@@ -396,10 +398,9 @@ public class BitBucketPPRHookJobDslExtensionTest {
   }
 
   @Test
-  public void testDslTriggerPRAllowBranchesCreated() throws Exception {
+  public void testDslTriggerPRAllowBranchesCreatedFreeStyle() throws Exception {
     /* Create seed job which will process DSL */
-    createSeedJob(
-        "freeStyleJob('test-job') { triggers { bitbucketTriggers { pullRequestCreatedAction(\"**\") } } }");
+    createSeedJob(readDslScript("./dsl/testDslTriggerPRAllowBranchesCreatedFreeStyle.groovy"));
     /* Fetch the newly created job and check its trigger configuration */
     FreeStyleProject createdJob = (FreeStyleProject) j.getInstance().getItem("test-job");
     /* Go through all triggers to validate DSL */
@@ -423,10 +424,9 @@ public class BitBucketPPRHookJobDslExtensionTest {
   }
 
   @Test
-  public void testDslTriggerPRAllowBranchesWithApproveCreated() throws Exception {
+  public void testDslTriggerPRAllowBranchesWithApproveCreatedFreeStyle() throws Exception {
     /* Create seed job which will process DSL */
-    createSeedJob(
-        "freeStyleJob('test-job') { triggers { bitbucketTriggers { pullRequestCreatedAction(\"**\", true) } } }");
+    createSeedJob(readDslScript("./dsl/testDslTriggerPRAllowBranchesWithApproveCreatedFreeStyle.groovy"));
     /* Fetch the newly created job and check its trigger configuration */
     FreeStyleProject createdJob = (FreeStyleProject) j.getInstance().getItem("test-job");
     /* Go through all triggers to validate DSL */
@@ -450,10 +450,9 @@ public class BitBucketPPRHookJobDslExtensionTest {
   }
 
   @Test
-  public void testDslTriggerPRUpdated() throws Exception {
+  public void testDslTriggerPRUpdatedFreeeStyle() throws Exception {
     /* Create seed job which will process DSL */
-    createSeedJob(
-        "freeStyleJob('test-job') { triggers { bitbucketTriggers { pullRequestUpdatedAction() } } }");
+    createSeedJob(readDslScript("./dsl/testDslTriggerPRUpdatedFreeeStyle.groovy"));
     /* Fetch the newly created job and check its trigger configuration */
     FreeStyleProject createdJob = (FreeStyleProject) j.getInstance().getItem("test-job");
     /* Go through all triggers to validate DSL */
@@ -472,10 +471,9 @@ public class BitBucketPPRHookJobDslExtensionTest {
   }
 
   @Test
-  public void testDslTriggerPRAllowedBranchesUpdated() throws Exception {
+  public void testDslTriggerPRAllowedBranchesUpdatedFreeStyle() throws Exception {
     /* Create seed job which will process DSL */
-    createSeedJob(
-        "freeStyleJob('test-job') { triggers { bitbucketTriggers { pullRequestUpdatedAction(\"**\") } } }");
+    createSeedJob(readDslScript("./dsl/testDslTriggerPRAllowedBranchesUpdatedFreeStyle.groovy"));
     /* Fetch the newly created job and check its trigger configuration */
     FreeStyleProject createdJob = (FreeStyleProject) j.getInstance().getItem("test-job");
     /* Go through all triggers to validate DSL */
@@ -499,9 +497,9 @@ public class BitBucketPPRHookJobDslExtensionTest {
   }
 
   @Test
-  public void testDslTriggerPRAllowedBranchesWithApproveUpdated() throws Exception {
+  public void testDslTriggerPRAllowedBranchesWithApproveUpdatedFreeStyle() throws Exception {
     /* Create seed job which will process DSL */
-    createSeedJob("freeStyleJob('test-job') { triggers { bitbucketTriggers { pullRequestUpdatedAction(\"**\", true) } } }");
+    createSeedJob(readDslScript("./dsl/testDslTriggerPRAllowedBranchesWithApproveUpdatedFreeStyle.groovy"));
     /* Fetch the newly created job and check its trigger configuration */
     FreeStyleProject createdJob = (FreeStyleProject) j.getInstance().getItem("test-job");
     /* Go through all triggers to validate DSL */
@@ -526,10 +524,9 @@ public class BitBucketPPRHookJobDslExtensionTest {
 
 
   @Test
-  public void testDslTriggerPRMerged() throws Exception {
+  public void testDslTriggerPRMergedFreeStyle() throws Exception {
     /* Create seed job which will process DSL */
-    createSeedJob(
-        "freeStyleJob('test-job') { triggers { bitbucketTriggers { pullRequestMergedAction() } } }");
+    createSeedJob(readDslScript("./dsl/testDslTriggerPRMergedFreeStyle.groovy"));
     /* Fetch the newly created job and check its trigger configuration */
     FreeStyleProject createdJob = (FreeStyleProject) j.getInstance().getItem("test-job");
     /* Go through all triggers to validate DSL */
@@ -548,10 +545,9 @@ public class BitBucketPPRHookJobDslExtensionTest {
   }
 
   @Test
-  public void testDslTriggerPRAllowedBranchesMerged() throws Exception {
+  public void testDslTriggerPRAllowedBranchesMergedFreeStyle() throws Exception {
     /* Create seed job which will process DSL */
-    createSeedJob(
-        "freeStyleJob('test-job') { triggers { bitbucketTriggers { pullRequestMergedAction(\"**\") } } }");
+    createSeedJob(readDslScript("./dsl/testDslTriggerPRAllowedBranchesMergedFreeStyle.groovy"));
     /* Fetch the newly created job and check its trigger configuration */
     FreeStyleProject createdJob = (FreeStyleProject) j.getInstance().getItem("test-job");
     /* Go through all triggers to validate DSL */
@@ -575,9 +571,9 @@ public class BitBucketPPRHookJobDslExtensionTest {
   }
 
   @Test
-  public void testDslTriggerPRAllowedBranchesWithApproveMerged() throws Exception {
+  public void testDslTriggerPRAllowedBranchesWithApproveMergedFreeStyle() throws Exception {
     /* Create seed job which will process DSL */
-    createSeedJob("freeStyleJob('test-job') { triggers { bitbucketTriggers { pullRequestMergedAction(\"**\", true) } } }");
+    createSeedJob(readDslScript("./dsl/testDslTriggerPRAllowedBranchesWithApproveMergedFreeStyle.groovy"));
     /* Fetch the newly created job and check its trigger configuration */
     FreeStyleProject createdJob = (FreeStyleProject) j.getInstance().getItem("test-job");
     /* Go through all triggers to validate DSL */
@@ -601,10 +597,9 @@ public class BitBucketPPRHookJobDslExtensionTest {
   }
 
   @Test
-  public void testDslTriggerCreateUpdatedApprovedPRActions() throws Exception {
+  public void testDslTriggerCreateUpdatedApprovedPRActionsFreeStyle() throws Exception {
     /* Create seed job which will process DSL */
-    createSeedJob(
-        "freeStyleJob('test-job') { triggers { bitbucketTriggers { pullRequestCreatedAction()\npullRequestUpdatedAction()\npullRequestApprovedAction(false) } } }");
+    createSeedJob(readDslScript("./dsl/testDslTriggerCreateUpdatedApprovedPRActionsFreeStyle.groovy"));
     /* Fetch the newly created job and check its trigger configuration */
     FreeStyleProject createdJob = (FreeStyleProject) j.getInstance().getItem("test-job");
     /* Go through all triggers to validate DSL */
@@ -633,10 +628,9 @@ public class BitBucketPPRHookJobDslExtensionTest {
   }
 
   @Test
-  public void testDslTriggerCreateUpdatedMergedApprovedPRAllowBranchesActions() throws Exception {
+  public void testDslTriggerCreateUpdatedMergedApprovedPRAllowBranchesActionsFreeStyle() throws Exception {
     /* Create seed job which will process DSL */
-    createSeedJob(
-        "freeStyleJob('test-job') { triggers { bitbucketTriggers { pullRequestCreatedAction(\"**\")\npullRequestUpdatedAction(\"**\")\npullRequestMergedAction(\"**\")\npullRequestApprovedAction(false, \"**\") } } }");
+    createSeedJob(readDslScript("./dsl/testDslTriggerCreateUpdatedMergedApprovedPRAllowBranchesActionsFreeStyle.groovy"));
     /* Fetch the newly created job and check its trigger configuration */
     FreeStyleProject createdJob = (FreeStyleProject) j.getInstance().getItem("test-job");
     /* Go through all triggers to validate DSL */
@@ -669,16 +663,9 @@ public class BitBucketPPRHookJobDslExtensionTest {
   }
 
   @Test
-  public void testDslTriggerCreateUpdatedMergedApprovedPRAllowBranchesWithApproveActions() throws Exception {
+  public void testDslTriggerCreateUpdatedMergedApprovedPRAllowBranchesWithApproveActionsFreeStyle() throws Exception {
     /* Create seed job which will process DSL */
-    String seedJobDesc = "freeStyleJob('test-job') { triggers { bitbucketTriggers {\n";
-    seedJobDesc += "pullRequestCreatedAction(\"**\", true)\n";
-    seedJobDesc += "pullRequestUpdatedAction(\"**\", true)\n";
-    seedJobDesc += "pullRequestMergedAction(\"**\", true)\n";
-    seedJobDesc += "pullRequestApprovedAction(false, \"**\", true)\n";
-    seedJobDesc += "} } }";
-
-    createSeedJob(seedJobDesc);
+    createSeedJob(readDslScript("./dsl/testDslTriggerCreateUpdatedMergedApprovedPRAllowBranchesWithApproveActionsFreeStyle.groovy"));
     /* Fetch the newly created job and check its trigger configuration */
     FreeStyleProject createdJob = (FreeStyleProject) j.getInstance().getItem("test-job");
     /* Go through all triggers to validate DSL */
@@ -711,10 +698,9 @@ public class BitBucketPPRHookJobDslExtensionTest {
   }
 
   @Test
-  public void testDslMultipleJobsInSeed() throws Exception {
+  public void testDslMultipleJobsInSeedFreeStyle() throws Exception {
     /* Create seed job which will process DSL */
-    createSeedJob(
-        "freeStyleJob('test-job1') { triggers { bitbucketTriggers { pullRequestCreatedAction() } } };freeStyleJob('test-job2') { triggers { bitbucketTriggers { repositoryPushAction(false, false, '') } } }");
+    createSeedJob(readDslScript("./dsl/testDslMultipleJobsInSeedFreeStyle.groovy"));
     /* Fetch the newly created job and check its trigger configuration */
     FreeStyleProject createdJob = (FreeStyleProject) j.getInstance().getItem("test-job1");
     /* Go through all triggers to validate DSL */
@@ -749,15 +735,9 @@ public class BitBucketPPRHookJobDslExtensionTest {
   }
 
   @Test
-  public void testDslServerAllPRActions() throws Exception {
-    String seedJobDesc = "freeStyleJob('test-job') { triggers { bitbucketTriggers {";
-    seedJobDesc += "pullRequestServerCreatedAction()\n";
-    seedJobDesc += "pullRequestServerUpdatedAction()\n";
-    seedJobDesc += "pullRequestServerApprovedAction(false)\n";
-    seedJobDesc += "pullRequestServerMergedAction()";
-    seedJobDesc += "} } }";
+  public void testDslServerAllPRActionsFreeStyle() throws Exception {
     /* Create seed job which will process DSL */
-    createSeedJob(seedJobDesc);
+    createSeedJob(readDslScript("./dsl/testDslServerAllPRActionsFreeStyle.groovy"));
     /* Fetch the newly created job and check its trigger configuration */
     FreeStyleProject createdJob = (FreeStyleProject) j.getInstance().getItem("test-job");
     /* Go through all triggers to validate DSL */
@@ -790,16 +770,9 @@ public class BitBucketPPRHookJobDslExtensionTest {
   }
 
   @Test
-  public void testDslServerAllPRAllowedBranchesActions() throws Exception {
-    String seedJobDesc = "freeStyleJob('test-job') { triggers { bitbucketTriggers {";
-    seedJobDesc += "pullRequestServerCreatedAction(\"*\")\n";
-    seedJobDesc += "pullRequestServerUpdatedAction(\"*\")\n";
-    seedJobDesc += "pullRequestServerSourceUpdatedAction(\"*\")\n";
-    seedJobDesc += "pullRequestServerApprovedAction(false, \"*\")\n";
-    seedJobDesc += "pullRequestServerMergedAction(\"*\")";
-    seedJobDesc += "} } }";
+  public void testDslServerAllPRAllowedBranchesActionsFreeStyle() throws Exception {
     /* Create seed job which will process DSL */
-    createSeedJob(seedJobDesc);
+    createSeedJob(readDslScript("./dsl/testDslServerAllPRAllowedBranchesActionsFreeStyle.groovy"));
     /* Fetch the newly created job and check its trigger configuration */
     FreeStyleProject createdJob = (FreeStyleProject) j.getInstance().getItem("test-job");
     /* Go through all triggers to validate DSL */
@@ -838,16 +811,9 @@ public class BitBucketPPRHookJobDslExtensionTest {
   }
 
   @Test
-  public void testDslServerAllPRAllowedBranchesWithApproveActions() throws Exception {
-    String seedJobDesc = "freeStyleJob('test-job') { triggers { bitbucketTriggers {";
-    seedJobDesc += "pullRequestServerCreatedAction(\"*\", true)\n";
-    seedJobDesc += "pullRequestServerUpdatedAction(\"*\", true)\n";
-    seedJobDesc += "pullRequestServerSourceUpdatedAction(\"*\", true)\n";
-    seedJobDesc += "pullRequestServerApprovedAction(false, \"*\", true)\n";
-    seedJobDesc += "pullRequestServerMergedAction(\"*\", true)";
-    seedJobDesc += "} } }";
+  public void testDslServerAllPRAllowedBranchesWithApproveActionsFreeStyle() throws Exception {
     /* Create seed job which will process DSL */
-    createSeedJob(seedJobDesc);
+    createSeedJob(readDslScript("./dsl/testDslServerAllPRAllowedBranchesWithApproveActionsFreeStyle.groovy"));
     /* Fetch the newly created job and check its trigger configuration */
     FreeStyleProject createdJob = (FreeStyleProject) j.getInstance().getItem("test-job");
     /* Go through all triggers to validate DSL */
@@ -886,22 +852,9 @@ public class BitBucketPPRHookJobDslExtensionTest {
   }
 
   @Test
-  public void testDslServerAllPRUnfilteredAndAllowedBranchesActions() throws Exception {
-    String seedJobDesc = "freeStyleJob('test-job') { triggers { bitbucketTriggers {";
-    seedJobDesc += "pullRequestServerCreatedAction()\n";
-    seedJobDesc += "pullRequestServerUpdatedAction()\n";
-    seedJobDesc += "pullRequestServerSourceUpdatedAction()\n";
-    seedJobDesc += "pullRequestServerApprovedAction(false)\n";
-    seedJobDesc += "pullRequestServerMergedAction()\n";
-
-    seedJobDesc += "pullRequestServerCreatedAction(\"*\")\n";
-    seedJobDesc += "pullRequestServerUpdatedAction(\"*\")\n";
-    seedJobDesc += "pullRequestServerSourceUpdatedAction(\"*\")\n";
-    seedJobDesc += "pullRequestServerApprovedAction(false, \"*\")\n";
-    seedJobDesc += "pullRequestServerMergedAction(\"*\")";
-    seedJobDesc += "} } }";
+  public void testDslServerAllPRUnfilteredAndAllowedBranchesActionsFreeStyle() throws Exception {
     /* Create seed job which will process DSL */
-    createSeedJob(seedJobDesc);
+    createSeedJob(readDslScript("./dsl/testDslServerAllPRUnfilteredAndAllowedBranchesActionsFreeStyle.groovy"));
     /* Fetch the newly created job and check its trigger configuration */
     FreeStyleProject createdJob = (FreeStyleProject) j.getInstance().getItem("test-job");
     /* Go through all triggers to validate DSL */
