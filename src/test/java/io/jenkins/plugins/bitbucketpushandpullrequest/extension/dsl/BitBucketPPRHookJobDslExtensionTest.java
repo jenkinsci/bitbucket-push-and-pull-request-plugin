@@ -48,6 +48,7 @@ import hudson.triggers.Trigger;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import org.apache.commons.io.IOUtils;
+import org.jenkinsci.plugins.workflow.job.properties.PipelineTriggersJobProperty;
 
 
 @RunWith(MockitoJUnitRunner.class)
@@ -89,7 +90,8 @@ public class BitBucketPPRHookJobDslExtensionTest {
     /* Fetch the newly created job and check its trigger configuration */
     FreeStyleProject createdJob = (FreeStyleProject) j.getInstance().getItem("test-job");
     /* Go through all triggers to validate DSL */
-    Map<TriggerDescriptor, Trigger<?>> triggers = createdJob.getTriggers();
+    PipelineTriggersJobProperty pipelineTriggers = (PipelineTriggersJobProperty) createdJob.getProperty(PipelineTriggersJobProperty.class);
+    Map<TriggerDescriptor, Trigger<?>> triggers = pipelineTriggers.getTriggersMap();
     assertEquals(1, triggers.size());
     List<String> dispNames = new ArrayList<>();
     boolean isToApprove = false;
