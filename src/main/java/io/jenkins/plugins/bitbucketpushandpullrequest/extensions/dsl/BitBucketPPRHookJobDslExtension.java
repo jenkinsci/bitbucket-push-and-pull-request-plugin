@@ -28,11 +28,11 @@ import javaposse.jobdsl.dsl.helpers.triggers.TriggerContext;
 import javaposse.jobdsl.plugin.ContextExtensionPoint;
 import javaposse.jobdsl.plugin.DslExtensionMethod;
 
-@Extension
+@Extension(optional = true)
 public class BitBucketPPRHookJobDslExtension extends ContextExtensionPoint {
 
   @Deprecated
-  @DslExtensionMethod(context = TriggerContext.class)  
+  @DslExtensionMethod(context = TriggerContext.class)
   public Object bitbucketTriggers(Runnable closure) {
     BitBucketPPRHookJobDslContext context = new BitBucketPPRHookJobDslContext();
     executeInContext(closure, context);
