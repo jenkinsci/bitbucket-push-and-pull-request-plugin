@@ -1,5 +1,25 @@
 # Change Log
 
+
+## 2.6.4 (2020-12-18)
+[Full Changelog](https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/compare/bitbucket-push-and-pull-request-2.6.3...bitbucket-push-and-pull-request-2.6.4)
+
+**Implemented enhancements:**
+
+- Handle for deprecation of DSL triggers{}
+ Since job-dsl plugin v1.77, triggers{} has been marked deprecated (see details), this pull request is a proposal of how to handle it by relying solely on properties{}.
+(tnx @rhotau )
+
+**Fixed bugs:**
+
+- Fixed problem with PR that trigger simultaneously will override one another 
+(tnx @hexonxons )   
+
+**Relevant tickets closed**
+
+* [Bug] #146 PR that trigger simultaneously will override one another  
+
+
 ## 2.6.3 (2020-11-27)
 [Full Changelog](https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/compare/bitbucket-push-and-pull-request-2.6.2...bitbucket-push-and-pull-request-2.6.3)
 
