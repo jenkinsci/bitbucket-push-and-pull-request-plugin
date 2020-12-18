@@ -25,7 +25,16 @@ import java.io.Serializable;
 public class BitBucketPPRTarget implements Serializable {
   private static final long serialVersionUID = 1L;
 
+  private String hash;
   private BitBucketPPRLinks links;
+
+  public String getHash() {
+    return hash;
+  }
+
+  public void setHash(String hash) {
+    this.hash = hash;
+  }
 
   public BitBucketPPRLinks getLinks() {
     return links;

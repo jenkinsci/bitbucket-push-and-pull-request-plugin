@@ -116,6 +116,10 @@ public interface BitBucketPPRAction extends Action {
     return null;
   }
 
+  public default String getLatestCommit() {
+    return null;
+  }
+
   public default String getCommitLink() {
     return null;
   }

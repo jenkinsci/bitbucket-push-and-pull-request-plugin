@@ -63,8 +63,7 @@ public class BitBucketPPRPushServerObserver extends BitBucketPPRHandlerTemplate 
 
       for (String url : commitLinks) {
         String payload = "{\"key\": \"" + buildNumber + "\", \"url\": \"" + absoluteUrl + "\", ";
-        payload += result == Result.SUCCESS ? "\"state\": \"SUCCESSFUL\""
-            : result == Result.ABORTED ? "\"state\": \"STOPPED\"" : "\"state\": \"FAILED\"";
+        payload += result == Result.SUCCESS ? "\"state\": \"SUCCESSFUL\"" : "\"state\": \"FAILED\"";
         payload += " }";
 
         callClient(url, payload);

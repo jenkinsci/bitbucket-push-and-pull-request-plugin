@@ -137,6 +137,18 @@ public class BitBucketPPRServerRepositoryAction extends InvisibleAction implemen
   }
 
   @Override
+  public String getLatestCommit() {
+    // According to constructor `targetBranchName`, `type` and `targetBranchRefId` will be set to first non-null change
+    // So lets hope it is not very destructive move to set latestCommit from first change.
+    for (BitBucketPPRServerChange change : payload.getServerChanges()) {
+      if (change.getRefId() != null) {
+        return change.getToHash();
+      }
+    }
+    return null;
+  }
+
+  @Override
   public List<String> getCommitLinks() {
     // returns:
     // /rest/build-status/1.0/commits/{commitId}
