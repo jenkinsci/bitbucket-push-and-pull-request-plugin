@@ -106,9 +106,12 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
   /**
    * Called when a POST is made.
    * 
-   * @param scmTrigger
+   * @param scmTrigger SCM Trigger
+   * @param bitbucketAction BitBucket action
+   * @param bitbucketEvent BitBucket event
+   * @param observable BitBucket observable
    * 
-   * @throws IOException
+   * @throws IOException throw IO Exception
    */
   public void onPost(BitBucketPPRHookEvent bitbucketEvent, BitBucketPPRAction bitbucketAction, SCM scmTrigger,
       BitBucketPPRObservable observable) throws Exception {
@@ -250,7 +253,10 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
   /**
    * Returns the file that records the last/current polling activity.
    * 
-   * @throws JobNotStartedException, IOException
+   * @throws JobNotStartedException Job not started exception
+   * @throws IOException IOException
+   * 
+   * @return returns log file
    */
   public File getLogFile() throws JobNotStartedException, IOException {
 
@@ -305,6 +311,10 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
 
     /**
      * Writes the annotated log to the given output.
+     * 
+     * @param out XML output
+     * 
+     * @throws Exception throws exception
      */
     public void writeLogTo(XMLOutput out) throws Exception {
       new AnnotatedLargeText<BitBucketPPRWebHookPollingAction>(getLogFile(), Charset.defaultCharset(), true, this)
