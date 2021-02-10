@@ -43,7 +43,6 @@ public class BitBucketPPRPluginConfig extends GlobalConfiguration {
   }
 
   public String getHookUrl() {
-    load();
     return hookUrl;
   }
 
