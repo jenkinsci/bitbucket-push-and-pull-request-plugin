@@ -1,0 +1,11 @@
+{
+    "extends": "recommended",
+    "groovyLint.format.enable": true,
+    "rules": {
+        "formatting.Indentation": {
+            "spacesPerIndentLevel": 2,
+            "severity": "info"
+        },
+        "UnnecessaryReturnKeyword": "error"
+    }
+}

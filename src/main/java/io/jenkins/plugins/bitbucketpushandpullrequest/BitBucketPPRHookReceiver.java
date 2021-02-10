@@ -30,12 +30,13 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.naming.OperationNotSupportedException;
 import javax.servlet.http.HttpServletResponse;
-import com.google.gson.Gson;
 import org.apache.commons.io.IOUtils;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
+import com.google.gson.Gson;
 import hudson.Extension;
 import hudson.model.UnprotectedRootAction;
+import io.jenkins.plugins.bitbucketpushandpullrequest.config.BitBucketPPRPluginConfig;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRHookEvent;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayloadFactory;
@@ -54,7 +55,8 @@ import io.jenkins.plugins.bitbucketpushandpullrequest.processor.BitBucketPPRPayl
 public class BitBucketPPRHookReceiver implements UnprotectedRootAction {
 
   private static final Logger logger = Logger.getLogger(BitBucketPPRHookReceiver.class.getName());
-
+  private static final BitBucketPPRPluginConfig globalConfig = BitBucketPPRPluginConfig.getInstance();
+  
   @Override
   public String getIconFileName() {
     return null;
@@ -67,7 +69,7 @@ public class BitBucketPPRHookReceiver implements UnprotectedRootAction {
 
   @Override
   public String getUrlName() {
-    return HOOK_URL;
+    return globalConfig.isHookUrlSet() ? globalConfig.getHookUrl() :HOOK_URL;
   }
 
   public void doIndex(StaplerRequest request, StaplerResponse response) throws IOException {
@@ -78,7 +80,7 @@ public class BitBucketPPRHookReceiver implements UnprotectedRootAction {
       return;
     }
 
-    if (request.getRequestURI().contains("/" + HOOK_URL + "/")) {
+    if (request.getRequestURI().contains("/" + getUrlName() + "/")) {
       logger.finest("Received input stream over Bitbucket hook notification:" + inputStream);
 
       inputStream = decodeInputStream(inputStream, request.getContentType());

@@ -72,6 +72,8 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
   private static final Logger logger = Logger.getLogger(BitBucketPPRTrigger.class.getName());
   private List<BitBucketPPRTriggerFilter> triggers;
 
+  public static final boolean ALLOW_HOOKURL_OVERRIDE = true;
+
   {
     System.setErr(BitBucketPPRUtils.createLoggingProxyForErrors(System.err));
   }
@@ -87,10 +89,10 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
 
     // TODO: is this he place for that? And why only for push?
     if (triggers == null) {
-      BitBucketPPRRepositoryPushActionFilter repositoryPushActionFilter = new BitBucketPPRRepositoryPushActionFilter(
-          false, false, spec);
-      BitBucketPPRRepositoryTriggerFilter repositoryTriggerFilter = new BitBucketPPRRepositoryTriggerFilter(
-          repositoryPushActionFilter);
+      BitBucketPPRRepositoryPushActionFilter repositoryPushActionFilter =
+          new BitBucketPPRRepositoryPushActionFilter(false, false, spec);
+      BitBucketPPRRepositoryTriggerFilter repositoryTriggerFilter =
+          new BitBucketPPRRepositoryTriggerFilter(repositoryPushActionFilter);
       triggers = new ArrayList<>();
       triggers.add(repositoryTriggerFilter);
     }
@@ -107,33 +109,37 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
    */
   public void onPost(BitBucketPPRHookEvent bitbucketEvent, BitBucketPPRAction bitbucketAction, SCM scmTrigger,
       BitBucketPPRObservable observable) throws Exception {
-    logger.log(Level.INFO, "Called onPost with " + bitbucketAction.toString());
+    logger.log(Level.FINEST, "Called onPost Method for action " + bitbucketAction.toString());
 
     BitBucketPPRFilterMatcher filterMatcher = new BitBucketPPRFilterMatcher();
     List<BitBucketPPRTriggerFilter> matchingFilters = filterMatcher.getMatchingFilters(bitbucketEvent, triggers);
 
     if (matchingFilters != null && !matchingFilters.isEmpty()) {
-      logger.log(Level.INFO, "matchingFilters is not null AND is not empty {0} ", matchingFilters);
+      logger.finest("Following triggers are configured:");
+      for (BitBucketPPRTriggerFilter matchingFilter : matchingFilters) {
+        logger.finest(matchingFilter.getClass().getName());
+      }
 
-      BitBucketPPRPollingRunnable bitbucketPollingRunnable = new BitBucketPPRPollingRunnable(job, getLogFile(),
-          new BitBucketPPRPollResultListener() {
+      BitBucketPPRPollingRunnable bitbucketPollingRunnable =
+          new BitBucketPPRPollingRunnable(job, getLogFile(), new BitBucketPPRPollResultListener() {
             @Override
             public void onPollSuccess(PollingResult pollingResult) {
 
-              logger.log(Level.INFO, "Called onPollSuccess with polling result {0}", pollingResult);
+              logger.log(Level.INFO, "Polled BB PPR. The result of the polling is {0}", pollingResult.change.name());
               for (BitBucketPPRTriggerFilter filter : matchingFilters) {
                 BitBucketPPRTriggerCause cause;
                 try {
                   cause = filter.getCause(getLogFile(), bitbucketAction, bitbucketEvent);
 
-                  logger.log(Level.INFO, () -> "On Poll Success, get cause: " + cause.toString());
+                  logger.info("The polling of the BB PPR job was successful for the cause: " + cause.toString());
 
                   if (shouldScheduleJob(filter, pollingResult, bitbucketAction)) {
                     scheduleJob(cause, bitbucketAction, scmTrigger, observable, filter);
                     return;
                   }
                 } catch (Throwable e) {
-                  logger.log(Level.INFO, "Something went wrong in the on Poll Success " + e.getMessage());
+                  logger
+                      .warning("During the polling process of a BB PPR job an exception was thrown: " + e.getMessage());
                   e.printStackTrace();
                 }
               }
@@ -141,7 +147,7 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
 
             @Override
             public void onPollError(Throwable e) {
-              logger.log(Level.INFO, "Called onPollError: " + e.getMessage());
+              logger.log(Level.FINEST, "Called onPollError: " + e.getMessage());
               e.printStackTrace();
             }
           });
@@ -149,21 +155,22 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
       try {
         getDescriptor().queue.execute(bitbucketPollingRunnable);
       } catch (Throwable e) {
-        logger.log(Level.INFO, "No matching filters {0}", e.getMessage());
+        logger.warning("Error: cannot add the BB PPR polling runnable to the Jenkins' SequentialExecutionQueue queue:"
+            + e.getMessage());
         e.printStackTrace();
       }
 
     } else {
-      logger.log(Level.INFO, "No matching filters");
+      logger.info("Triggers are not configured.");
     }
   }
 
   private boolean shouldScheduleJob(BitBucketPPRTriggerFilter filter, PollingResult pollingResult,
       BitBucketPPRAction bitbucketAction) {
-    logger.log(Level.INFO,
+    logger.log(Level.FINEST,
         "Should schedule job: {0} and (polling result has changes: {1} or trigger also if there aren't changes: {2})",
-        new Object[] { filter.shouldScheduleJob(bitbucketAction), pollingResult.hasChanges(),
-            filter.shouldTriggerAlsoIfNothingChanged() });
+        new Object[] {filter.shouldScheduleJob(bitbucketAction), pollingResult.hasChanges(),
+            filter.shouldTriggerAlsoIfNothingChanged()});
 
     return filter.shouldScheduleJob(bitbucketAction)
         && (pollingResult.hasChanges() || filter.shouldTriggerAlsoIfNothingChanged());
@@ -239,7 +246,7 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
     File file = new File(job.getRootDir(), "bitbucket-polling.log");
     if (file.createNewFile()) {
       logger.log(Level.FINE, "Created new file {0} for logging in the directory {1}.",
-          new Object[] { "bitbucket-polling.log", job.getRootDir() });
+          new Object[] {"bitbucket-polling.log", job.getRootDir()});
     }
 
     return file;
@@ -255,8 +262,7 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
   }
 
   /**
-   * Action object for {@link BitBucketPPRProject}. Used to display the polling
-   * log.
+   * Action object for {@link BitBucketPPRProject}. Used to display the polling log.
    */
   public class BitBucketPPRWebHookPollingAction implements hudson.model.Action {
     public Job<?, ?> getOwner() {
@@ -294,8 +300,8 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
   @Symbol("bitBucketTrigger")
   @Extension
   public static class DescriptorImpl extends TriggerDescriptor {
-    private final SequentialExecutionQueue queue = new SequentialExecutionQueue(
-        Jenkins.MasterComputer.threadPoolForRemoting);
+    private final SequentialExecutionQueue queue =
+        new SequentialExecutionQueue(Jenkins.MasterComputer.threadPoolForRemoting);
 
     @Override
     public boolean isApplicable(Item item) {

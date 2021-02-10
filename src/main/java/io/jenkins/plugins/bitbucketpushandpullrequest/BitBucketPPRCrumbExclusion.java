@@ -29,17 +29,24 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import hudson.Extension;
 import hudson.security.csrf.CrumbExclusion;
+import io.jenkins.plugins.bitbucketpushandpullrequest.config.BitBucketPPRPluginConfig;
 
 
 @Extension
 public class BitBucketPPRCrumbExclusion extends CrumbExclusion {
-
+  
+  private static final BitBucketPPRPluginConfig globalConfig = BitBucketPPRPluginConfig.getInstance();
+  
+  public String getHookPath() {
+    return globalConfig.isHookUrlSet() ? globalConfig.getHookUrl() :HOOK_URL;
+  }
+  
   @Override
   public boolean process(HttpServletRequest request, HttpServletResponse response,
       FilterChain chain) throws IOException, ServletException {
 
     String path = request.getPathInfo();
-    if (path != null && (path.equals("/" + HOOK_URL) || path.equals("/" + HOOK_URL + "/"))) {
+    if (path != null && (path.equals("/" + getHookPath()) || path.equals("/" + getHookPath() + "/"))) {
 
       chain.doFilter(request, response);
 
