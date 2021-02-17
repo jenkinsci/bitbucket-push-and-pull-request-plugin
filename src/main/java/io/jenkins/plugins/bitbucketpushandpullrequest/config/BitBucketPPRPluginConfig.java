@@ -19,8 +19,11 @@ public class BitBucketPPRPluginConfig extends GlobalConfiguration {
   @SuppressWarnings("unused")
   public String hookUrl;
 
+  private boolean notifyBitBucket;
+
   public BitBucketPPRPluginConfig() {
     logger.fine("Read bitbucket push and pull request plugin global configuration.");
+    this.notifyBitBucket = true;
     load();
   }
 
@@ -44,6 +47,15 @@ public class BitBucketPPRPluginConfig extends GlobalConfiguration {
 
   public String getHookUrl() {
     return hookUrl;
+  }
+
+  public boolean shouldNotifyBitBucket() {
+    return notifyBitBucket;
+  }
+
+  @DataBoundSetter
+  public void setNotifyBitBucket(boolean notifyBitBucket) {
+    this.notifyBitBucket = notifyBitBucket;
   }
 
   @Override

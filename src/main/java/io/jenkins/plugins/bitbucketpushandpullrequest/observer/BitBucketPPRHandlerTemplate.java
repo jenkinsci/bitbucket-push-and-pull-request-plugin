@@ -1,24 +1,27 @@
 package io.jenkins.plugins.bitbucketpushandpullrequest.observer;
 
-import io.jenkins.plugins.bitbucketpushandpullrequest.configuration.BitBucketPPRNotifyConfiguration;
+import io.jenkins.plugins.bitbucketpushandpullrequest.config.BitBucketPPRPluginConfig;
 import io.jenkins.plugins.bitbucketpushandpullrequest.event.BitBucketPPREventType;
 
 public abstract class BitBucketPPRHandlerTemplate {
 
   public void run(BitBucketPPREventType eventType) throws Exception {
-    BitBucketPPRNotifyConfiguration config = BitBucketPPRNotifyConfiguration.get();
-    if(config.isNotifyBitBucket()) {
-      switch (eventType) {
-        case BUILD_STARTED:
+    BitBucketPPRPluginConfig config = BitBucketPPRPluginConfig.getInstance();
+
+    switch (eventType) {
+      case BUILD_STARTED:
+        if (config.shouldNotifyBitBucket()) {
           setBuildStatusInProgress();
-          break;
-        case BUILD_FINISHED:
+        }
+        break;
+      case BUILD_FINISHED:
+        if (config.shouldNotifyBitBucket()) {
           setBuildStatusOnFinished();
           setApproved();
-          break;
-        default:
-          throw new Exception();
-      }
+        }
+        break;
+      default:
+        throw new Exception();
     }
   }
 
