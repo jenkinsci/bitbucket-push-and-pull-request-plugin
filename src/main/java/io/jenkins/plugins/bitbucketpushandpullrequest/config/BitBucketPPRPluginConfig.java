@@ -16,10 +16,9 @@ public class BitBucketPPRPluginConfig extends GlobalConfiguration {
   private static final Logger logger = Logger.getLogger(BitBucketPPRPluginConfig.class.getName());
   public static final String BITBUCKET_PPR_PLUGIN_CONFIGURATION_ID = "bitbucket-ppr-plugin-configuration";
 
-  @SuppressWarnings("unused")
   public String hookUrl;
 
-  private boolean notifyBitBucket;
+  public boolean notifyBitBucket;
 
   public BitBucketPPRPluginConfig() {
     logger.fine("Read bitbucket push and pull request plugin global configuration.");
