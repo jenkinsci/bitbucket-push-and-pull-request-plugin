@@ -6,8 +6,6 @@
       <f:entry title="Hook URL" field="hookUrlTitle">
         <f:textbox field="hookUrl" />
       </f:entry>
-    </f:section>
-    <f:section title="${%BitBucket Push and Pull Request}">
       <f:entry title="${%Send build status to BitBucket}" field="notifyBitBucket">
         <f:checkbox default="true" />
       </f:entry>
