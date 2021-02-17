@@ -3,8 +3,11 @@
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout"
          xmlns:t="/lib/hudson" xmlns:f="/lib/form">
     <f:section title="${%BitBucket Push and Pull Request}">
-        <f:entry title="Hook URL" field="hookUrlTitle">
-        	<f:textbox field="hookUrl" />
-    	</f:entry>
+      <f:entry title="Hook URL" field="hookUrlTitle">
+        <f:textbox field="hookUrl" />
+      </f:entry>
+      <f:entry title="${%Send build status to BitBucket}" field="notifyBitBucket">
+        <f:checkbox default="true" />
+      </f:entry>
     </f:section>
 </j:jelly>
