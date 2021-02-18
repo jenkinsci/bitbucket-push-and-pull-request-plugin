@@ -53,6 +53,16 @@ _Please note: the branch, related to the events which trigger the builds, must b
 ![example config jenkins bb ppr 3](./img/example_config_jenkins_bb_ppr_3.png)
 ![example config jenkins bb ppr 4](./img/example_config_jenkins_bb_ppr_4.png)
 
+### Configure the Global Configurations of the Plugin
+
+in the __Jenkins Global Configurations__: 
+
+1. you can override the default webhook endpoint "/bitbucket-hook/" consumed by the plugin
+
+2. you can disable the build status notifications propagation.
+
+![example global config jenkins bb ppr 1](./img/global-config.png)
+
 ## Environment variables
 
 NAME | VALUE | SCOPE | BB TYPE | NOTES
