@@ -36,7 +36,7 @@ public class BitBucketPPRHookJobDslExtension extends ContextExtensionPoint {
    * This {@link DslExtensionMethod} is only valid for Freestyle jobs
    * since this function (<a href="https://github.com/jenkinsci/job-dsl-plugin/blob/job-dsl-1.77/job-dsl-core/src/main/groovy/javaposse/jobdsl/dsl/Project.groovy#L161">see</a>) gets invoked when processing freestyle dsl.
    * The triggers context has been deprecated for Pipeline jobs, <a href="https://github.com/jenkinsci/job-dsl-plugin/blob/job-dsl-1.77/job-dsl-core/src/main/groovy/javaposse/jobdsl/dsl/jobs/WorkflowJob.groovy#L40">see</a>.
-   * @param closure define one trigger per line, evaluated by {@link executeInContext}
+   * @param closure define one trigger per line, evaluated by executeInContext
    * @return the {@link BitBucketPPRTrigger} object with the list of triggers to be monitored
    */
   @DslExtensionMethod(context = TriggerContext.class)
