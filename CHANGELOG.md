@@ -1,5 +1,35 @@
 # Change Log
 
+## 2.7.1 (2021-03-07)
+[Full Changelog](https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/compare/bitbucket-push-and-pull-request-2.7.0...bitbucket-push-and-pull-request-2.7.1)
+
+**Fixed bugs:**
+
+- Removed deprecation warning on `triggers()` closure for freestyle jobs (it only affects Pipelines).
+- Updated unit tests and docs accordingly.
+
+**Pull requests closed:**
+
+- #168 hotfix/proper triggers dsl deprecation (tnx @rhotau) 
+
+**Relevant tickets closed:**
+
+- [Fix] #166 Job DSL configuration failing
+- [Fix] #143 [Docs] Missing DSL
+
+## 2.7.0 (2021-02-18)
+[Full Changelog](https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/compare/bitbucket-push-and-pull-request-2.6.4...bitbucket-push-and-pull-request-2.7.0)
+
+**Implemented enhancements:**
+
+- Added __global configuration__ 
+- Added "silence notifications" option in global configuration
+- Added "override default webhook endpoint" option in global configuration
+
+**Relevant tickets closed**
+
+- [Enhancement] #154 Add global configuration 
+- [Enhancement] #142 Silence notifications enhancement (tnx @SirMrDexter)
 
 ## 2.6.4 (2020-12-18)
 [Full Changelog](https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/compare/bitbucket-push-and-pull-request-2.6.3...bitbucket-push-and-pull-request-2.6.4)
