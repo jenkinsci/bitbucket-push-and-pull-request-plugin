@@ -116,7 +116,6 @@ The reason for that is the wish to guarantee consistency between the two plugins
 
 The only limit of this solution is that **the build status propagation will work only if you are using**, for the git plugin, **credentials of the kind: "Username with Password"**.
 
-
 ## Dsl Job actions for Bitbucket Push and Pull Request Trigger
 
 ```groovy
@@ -172,15 +171,23 @@ bitbucketTriggers {
   pullRequestServerUpdatedAction(allowedBranches: String)
   pullRequestServerUpdatedAction(allowedBranches: String, isToApprove: boolean)
 
+  pullRequestServerSourceUpdatedAction()
+  pullRequestServerSourceUpdatedAction(allowedBranches: String)
+  pullRequestServerSourceUpdatedAction(allowedBranches: String, isToApprove: boolean)
+
   pullRequestServerMergedAction()
   pullRequestServerMergedAction(allowedBranches: String)
   pullRequestServerMergedAction(allowedBranches: String, isToApprove: boolean)
+
+  pullRequestServerCommentCreatedAction()
+  pullRequestServerCommentCreatedAction(allowedBranches : String)
+  pullRequestServerCommentCreatedAction(allowedBranches : String, commentFilter : String)
 }
 ```
 
 ## Dsl Job snippets
 
-### Valid until job-dsl plugin v1.76 (deprecated in v1.77)
+### Valid for freestyle jobs and pipeline jobs (until job-dsl plugin v1.76, deprecated in v1.77 for pipeline jobs)
 
 ```groovy
 // pullRequestCreatedAction()
@@ -479,7 +486,7 @@ job('example-pull-request-created-updated') {
 }
 ```
 
-### Valid for jod-dsl 1.77+ (and before)
+### Valid for pipeline with job-dsl 1.77+ (and before)
 
 Note that this may require an additional script approval, the seed job failing with a message similar to:
 ```
@@ -976,6 +983,29 @@ job('example-pull-request-created-updated') {
   }
   steps {
       shell('echo START pull request created')
+  }
+}
+```
+
+### Second (more verbose) valid dsl for freestyle jobs
+
+Below example is for Pull-request updated (that shall be approved) on BitBucket Cloud, for a FreeStyle job.
+All the above examples can be adapted with the same paradigm.
+
+```groovy
+freeStyleJob('test-job') {
+  triggers {
+    bitBucketTrigger {
+      triggers {
+        bitBucketPPRPullRequestTriggerFilter {
+          actionFilter {
+            bitBucketPPRPullRequestUpdatedActionFilter {
+              isToApprove(true)
+            }
+          }
+        }
+      }
+    }
   }
 }
 ```
