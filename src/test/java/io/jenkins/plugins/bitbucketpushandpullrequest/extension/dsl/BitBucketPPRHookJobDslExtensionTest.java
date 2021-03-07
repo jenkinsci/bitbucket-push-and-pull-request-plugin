@@ -48,6 +48,7 @@ import hudson.triggers.Trigger;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import org.apache.commons.io.IOUtils;
+import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.jenkinsci.plugins.workflow.job.properties.PipelineTriggersJobProperty;
 
 
@@ -90,8 +91,7 @@ public class BitBucketPPRHookJobDslExtensionTest {
     /* Fetch the newly created job and check its trigger configuration */
     FreeStyleProject createdJob = (FreeStyleProject) j.getInstance().getItem("test-job");
     /* Go through all triggers to validate DSL */
-    PipelineTriggersJobProperty pipelineTriggers = (PipelineTriggersJobProperty) createdJob.getProperty(PipelineTriggersJobProperty.class);
-    Map<TriggerDescriptor, Trigger<?>> triggers = pipelineTriggers.getTriggersMap();
+    Map<TriggerDescriptor, Trigger<?>> triggers = createdJob.getTriggers();
     assertEquals(1, triggers.size());
     List<String> dispNames = new ArrayList<>();
     boolean isToApprove = false;
@@ -118,8 +118,7 @@ public class BitBucketPPRHookJobDslExtensionTest {
     /* Fetch the newly created job and check its trigger configuration */
     FreeStyleProject createdJob = (FreeStyleProject) j.getInstance().getItem("test-job");
     /* Go through all triggers to validate DSL */
-    PipelineTriggersJobProperty pipelineTriggers = (PipelineTriggersJobProperty) createdJob.getProperty(PipelineTriggersJobProperty.class);
-    Map<TriggerDescriptor, Trigger<?>> triggers = pipelineTriggers.getTriggersMap();
+    Map<TriggerDescriptor, Trigger<?>> triggers = createdJob.getTriggers();
     assertEquals(1, triggers.size());
     List<String> dispNames = new ArrayList<>();
     boolean isToApprove = false;
@@ -145,8 +144,7 @@ public class BitBucketPPRHookJobDslExtensionTest {
     /* Fetch the newly created job and check its trigger configuration */
     FreeStyleProject createdJob = (FreeStyleProject) j.getInstance().getItem("test-job");
     /* Go through all triggers to validate DSL */
-    PipelineTriggersJobProperty pipelineTriggers = (PipelineTriggersJobProperty) createdJob.getProperty(PipelineTriggersJobProperty.class);
-    Map<TriggerDescriptor, Trigger<?>> triggers = pipelineTriggers.getTriggersMap();
+    Map<TriggerDescriptor, Trigger<?>> triggers = createdJob.getTriggers();
     assertEquals(1, triggers.size());
     List<String> dispNames = new ArrayList<>();
     boolean isToApprove = false;
@@ -172,8 +170,7 @@ public class BitBucketPPRHookJobDslExtensionTest {
     /* Fetch the newly created job and check its trigger configuration */
     FreeStyleProject createdJob = (FreeStyleProject) j.getInstance().getItem("test-job");
     /* Go through all triggers to validate DSL */
-    PipelineTriggersJobProperty pipelineTriggers = (PipelineTriggersJobProperty) createdJob.getProperty(PipelineTriggersJobProperty.class);
-    Map<TriggerDescriptor, Trigger<?>> triggers = pipelineTriggers.getTriggersMap();
+    Map<TriggerDescriptor, Trigger<?>> triggers = createdJob.getTriggers();
     assertEquals(1, triggers.size());
     List<String> dispNames = new ArrayList<>();
     boolean isToApprove = false;
@@ -199,8 +196,7 @@ public class BitBucketPPRHookJobDslExtensionTest {
     /* Fetch the newly created job and check its trigger configuration */
     FreeStyleProject createdJob = (FreeStyleProject) j.getInstance().getItem("test-job");
     /* Go through all triggers to validate DSL */
-    PipelineTriggersJobProperty pipelineTriggers = (PipelineTriggersJobProperty) createdJob.getProperty(PipelineTriggersJobProperty.class);
-    Map<TriggerDescriptor, Trigger<?>> triggers = pipelineTriggers.getTriggersMap();
+    Map<TriggerDescriptor, Trigger<?>> triggers = createdJob.getTriggers();
     assertEquals(1, triggers.size());
     List<String> dispNames = new ArrayList<>();
     for (Trigger<?> entry : triggers.values()) {
@@ -221,8 +217,7 @@ public class BitBucketPPRHookJobDslExtensionTest {
     /* Fetch the newly created job and check its trigger configuration */
     FreeStyleProject createdJob = (FreeStyleProject) j.getInstance().getItem("test-job");
     /* Go through all triggers to validate DSL */
-    PipelineTriggersJobProperty pipelineTriggers = (PipelineTriggersJobProperty) createdJob.getProperty(PipelineTriggersJobProperty.class);
-    Map<TriggerDescriptor, Trigger<?>> triggers = pipelineTriggers.getTriggersMap();
+    Map<TriggerDescriptor, Trigger<?>> triggers = createdJob.getTriggers();
     assertEquals(1, triggers.size());
     List<String> dispNames = new ArrayList<>();
     for (Trigger<?> entry : triggers.values()) {
@@ -243,8 +238,7 @@ public class BitBucketPPRHookJobDslExtensionTest {
     /* Fetch the newly created job and check its trigger configuration */
     FreeStyleProject createdJob = (FreeStyleProject) j.getInstance().getItem("test-job");
     /* Go through all triggers to validate DSL */
-    PipelineTriggersJobProperty pipelineTriggers = (PipelineTriggersJobProperty) createdJob.getProperty(PipelineTriggersJobProperty.class);
-    Map<TriggerDescriptor, Trigger<?>> triggers = pipelineTriggers.getTriggersMap();
+    Map<TriggerDescriptor, Trigger<?>> triggers = createdJob.getTriggers();
     assertEquals(1, triggers.size());
     List<String> dispNames = new ArrayList<>();
     for (Trigger<?> entry : triggers.values()) {
@@ -265,8 +259,7 @@ public class BitBucketPPRHookJobDslExtensionTest {
     /* Fetch the newly created job and check its trigger configuration */
     FreeStyleProject createdJob = (FreeStyleProject) j.getInstance().getItem("test-job");
     /* Go through all triggers to validate DSL */
-    PipelineTriggersJobProperty pipelineTriggers = (PipelineTriggersJobProperty) createdJob.getProperty(PipelineTriggersJobProperty.class);
-    Map<TriggerDescriptor, Trigger<?>> triggers = pipelineTriggers.getTriggersMap();
+    Map<TriggerDescriptor, Trigger<?>> triggers = createdJob.getTriggers();
     assertEquals(1, triggers.size());
     List<String> dispNames = new ArrayList<>();
     for (Trigger<?> entry : triggers.values()) {
@@ -287,8 +280,7 @@ public class BitBucketPPRHookJobDslExtensionTest {
     /* Fetch the newly created job and check its trigger configuration */
     FreeStyleProject createdJob = (FreeStyleProject) j.getInstance().getItem("test-job");
     /* Go through all triggers to validate DSL */
-    PipelineTriggersJobProperty pipelineTriggers = (PipelineTriggersJobProperty) createdJob.getProperty(PipelineTriggersJobProperty.class);
-    Map<TriggerDescriptor, Trigger<?>> triggers = pipelineTriggers.getTriggersMap();
+    Map<TriggerDescriptor, Trigger<?>> triggers = createdJob.getTriggers();
     assertEquals(1, triggers.size());
     List<String> dispNames = new ArrayList<>();
     for (Trigger<?> entry : triggers.values()) {
@@ -309,8 +301,7 @@ public class BitBucketPPRHookJobDslExtensionTest {
     /* Fetch the newly created job and check its trigger configuration */
     FreeStyleProject createdJob = (FreeStyleProject) j.getInstance().getItem("test-job");
     /* Go through all triggers to validate DSL */
-    PipelineTriggersJobProperty pipelineTriggers = (PipelineTriggersJobProperty) createdJob.getProperty(PipelineTriggersJobProperty.class);
-    Map<TriggerDescriptor, Trigger<?>> triggers = pipelineTriggers.getTriggersMap();
+    Map<TriggerDescriptor, Trigger<?>> triggers = createdJob.getTriggers();
     assertEquals(1, triggers.size());
     List<String> dispNames = new ArrayList<>();
     for (Trigger<?> entry : triggers.values()) {
@@ -331,8 +322,7 @@ public class BitBucketPPRHookJobDslExtensionTest {
     /* Fetch the newly created job and check its trigger configuration */
     FreeStyleProject createdJob = (FreeStyleProject) j.getInstance().getItem("test-job");
     /* Go through all triggers to validate DSL */
-    PipelineTriggersJobProperty pipelineTriggers = (PipelineTriggersJobProperty) createdJob.getProperty(PipelineTriggersJobProperty.class);
-    Map<TriggerDescriptor, Trigger<?>> triggers = pipelineTriggers.getTriggersMap();
+    Map<TriggerDescriptor, Trigger<?>> triggers = createdJob.getTriggers();
     assertEquals(1, triggers.size());
     List<String> dispNames = new ArrayList<>();
     for (Trigger<?> entry : triggers.values()) {
@@ -353,8 +343,7 @@ public class BitBucketPPRHookJobDslExtensionTest {
     /* Fetch the newly created job and check its trigger configuration */
     FreeStyleProject createdJob = (FreeStyleProject) j.getInstance().getItem("test-job");
     /* Go through all triggers to validate DSL */
-    PipelineTriggersJobProperty pipelineTriggers = (PipelineTriggersJobProperty) createdJob.getProperty(PipelineTriggersJobProperty.class);
-    Map<TriggerDescriptor, Trigger<?>> triggers = pipelineTriggers.getTriggersMap();
+    Map<TriggerDescriptor, Trigger<?>> triggers = createdJob.getTriggers();
     assertEquals(1, triggers.size());
     List<String> dispNames = new ArrayList<>();
     for (Trigger<?> entry : triggers.values()) {
@@ -375,8 +364,7 @@ public class BitBucketPPRHookJobDslExtensionTest {
     /* Fetch the newly created job and check its trigger configuration */
     FreeStyleProject createdJob = (FreeStyleProject) j.getInstance().getItem("test-job");
     /* Go through all triggers to validate DSL */
-    PipelineTriggersJobProperty pipelineTriggers = (PipelineTriggersJobProperty) createdJob.getProperty(PipelineTriggersJobProperty.class);
-    Map<TriggerDescriptor, Trigger<?>> triggers = pipelineTriggers.getTriggersMap();
+    Map<TriggerDescriptor, Trigger<?>> triggers = createdJob.getTriggers();
     assertEquals(1, triggers.size());
     List<String> dispNames = new ArrayList<>();
     for (Trigger<?> entry : triggers.values()) {
@@ -397,8 +385,7 @@ public class BitBucketPPRHookJobDslExtensionTest {
     /* Fetch the newly created job and check its trigger configuration */
     FreeStyleProject createdJob = (FreeStyleProject) j.getInstance().getItem("test-job");
     /* Go through all triggers to validate DSL */
-    PipelineTriggersJobProperty pipelineTriggers = (PipelineTriggersJobProperty) createdJob.getProperty(PipelineTriggersJobProperty.class);
-    Map<TriggerDescriptor, Trigger<?>> triggers = pipelineTriggers.getTriggersMap();
+    Map<TriggerDescriptor, Trigger<?>> triggers = createdJob.getTriggers();
     assertEquals(1, triggers.size());
     List<String> dispNames = new ArrayList<>();
     for (Trigger<?> entry : triggers.values()) {
@@ -419,8 +406,7 @@ public class BitBucketPPRHookJobDslExtensionTest {
     /* Fetch the newly created job and check its trigger configuration */
     FreeStyleProject createdJob = (FreeStyleProject) j.getInstance().getItem("test-job");
     /* Go through all triggers to validate DSL */
-    PipelineTriggersJobProperty pipelineTriggers = (PipelineTriggersJobProperty) createdJob.getProperty(PipelineTriggersJobProperty.class);
-    Map<TriggerDescriptor, Trigger<?>> triggers = pipelineTriggers.getTriggersMap();
+    Map<TriggerDescriptor, Trigger<?>> triggers = createdJob.getTriggers();
     assertEquals(1, triggers.size());
     List<String> dispNames = new ArrayList<>();
     boolean isToApprove = false;
@@ -446,8 +432,7 @@ public class BitBucketPPRHookJobDslExtensionTest {
     /* Fetch the newly created job and check its trigger configuration */
     FreeStyleProject createdJob = (FreeStyleProject) j.getInstance().getItem("test-job");
     /* Go through all triggers to validate DSL */
-    PipelineTriggersJobProperty pipelineTriggers = (PipelineTriggersJobProperty) createdJob.getProperty(PipelineTriggersJobProperty.class);
-    Map<TriggerDescriptor, Trigger<?>> triggers = pipelineTriggers.getTriggersMap();
+    Map<TriggerDescriptor, Trigger<?>> triggers = createdJob.getTriggers();
     assertEquals(1, triggers.size());
     List<String> dispNames = new ArrayList<>();
     boolean isToApprove = false;
@@ -473,8 +458,7 @@ public class BitBucketPPRHookJobDslExtensionTest {
     /* Fetch the newly created job and check its trigger configuration */
     FreeStyleProject createdJob = (FreeStyleProject) j.getInstance().getItem("test-job");
     /* Go through all triggers to validate DSL */
-    PipelineTriggersJobProperty pipelineTriggers = (PipelineTriggersJobProperty) createdJob.getProperty(PipelineTriggersJobProperty.class);
-    Map<TriggerDescriptor, Trigger<?>> triggers = pipelineTriggers.getTriggersMap();
+    Map<TriggerDescriptor, Trigger<?>> triggers = createdJob.getTriggers();
     assertEquals(1, triggers.size());
     List<String> dispNames = new ArrayList<>();
     for (Trigger<?> entry : triggers.values()) {
@@ -495,8 +479,7 @@ public class BitBucketPPRHookJobDslExtensionTest {
     /* Fetch the newly created job and check its trigger configuration */
     FreeStyleProject createdJob = (FreeStyleProject) j.getInstance().getItem("test-job");
     /* Go through all triggers to validate DSL */
-    PipelineTriggersJobProperty pipelineTriggers = (PipelineTriggersJobProperty) createdJob.getProperty(PipelineTriggersJobProperty.class);
-    Map<TriggerDescriptor, Trigger<?>> triggers = pipelineTriggers.getTriggersMap();
+    Map<TriggerDescriptor, Trigger<?>> triggers = createdJob.getTriggers();
     assertEquals(1, triggers.size());
     List<String> dispNames = new ArrayList<>();
     boolean isToApprove = false;
@@ -522,8 +505,7 @@ public class BitBucketPPRHookJobDslExtensionTest {
     /* Fetch the newly created job and check its trigger configuration */
     FreeStyleProject createdJob = (FreeStyleProject) j.getInstance().getItem("test-job");
     /* Go through all triggers to validate DSL */
-    PipelineTriggersJobProperty pipelineTriggers = (PipelineTriggersJobProperty) createdJob.getProperty(PipelineTriggersJobProperty.class);
-    Map<TriggerDescriptor, Trigger<?>> triggers = pipelineTriggers.getTriggersMap();
+    Map<TriggerDescriptor, Trigger<?>> triggers = createdJob.getTriggers();
     assertEquals(1, triggers.size());
     List<String> dispNames = new ArrayList<>();
     boolean isToApprove = false;
@@ -550,8 +532,7 @@ public class BitBucketPPRHookJobDslExtensionTest {
     /* Fetch the newly created job and check its trigger configuration */
     FreeStyleProject createdJob = (FreeStyleProject) j.getInstance().getItem("test-job");
     /* Go through all triggers to validate DSL */
-    PipelineTriggersJobProperty pipelineTriggers = (PipelineTriggersJobProperty) createdJob.getProperty(PipelineTriggersJobProperty.class);
-    Map<TriggerDescriptor, Trigger<?>> triggers = pipelineTriggers.getTriggersMap();
+    Map<TriggerDescriptor, Trigger<?>> triggers = createdJob.getTriggers();
     assertEquals(1, triggers.size());
     List<String> dispNames = new ArrayList<>();
     for (Trigger<?> entry : triggers.values()) {
@@ -572,8 +553,7 @@ public class BitBucketPPRHookJobDslExtensionTest {
     /* Fetch the newly created job and check its trigger configuration */
     FreeStyleProject createdJob = (FreeStyleProject) j.getInstance().getItem("test-job");
     /* Go through all triggers to validate DSL */
-    PipelineTriggersJobProperty pipelineTriggers = (PipelineTriggersJobProperty) createdJob.getProperty(PipelineTriggersJobProperty.class);
-    Map<TriggerDescriptor, Trigger<?>> triggers = pipelineTriggers.getTriggersMap();
+    Map<TriggerDescriptor, Trigger<?>> triggers = createdJob.getTriggers();
     assertEquals(1, triggers.size());
     List<String> dispNames = new ArrayList<>();
     boolean isToApprove = false;
@@ -599,8 +579,7 @@ public class BitBucketPPRHookJobDslExtensionTest {
     /* Fetch the newly created job and check its trigger configuration */
     FreeStyleProject createdJob = (FreeStyleProject) j.getInstance().getItem("test-job");
     /* Go through all triggers to validate DSL */
-    PipelineTriggersJobProperty pipelineTriggers = (PipelineTriggersJobProperty) createdJob.getProperty(PipelineTriggersJobProperty.class);
-    Map<TriggerDescriptor, Trigger<?>> triggers = pipelineTriggers.getTriggersMap();
+    Map<TriggerDescriptor, Trigger<?>> triggers = createdJob.getTriggers();
     assertEquals(1, triggers.size());
     List<String> dispNames = new ArrayList<>();
     boolean isToApprove = false;
@@ -626,8 +605,7 @@ public class BitBucketPPRHookJobDslExtensionTest {
     /* Fetch the newly created job and check its trigger configuration */
     FreeStyleProject createdJob = (FreeStyleProject) j.getInstance().getItem("test-job");
     /* Go through all triggers to validate DSL */
-    PipelineTriggersJobProperty pipelineTriggers = (PipelineTriggersJobProperty) createdJob.getProperty(PipelineTriggersJobProperty.class);
-    Map<TriggerDescriptor, Trigger<?>> triggers = pipelineTriggers.getTriggersMap();
+    Map<TriggerDescriptor, Trigger<?>> triggers = createdJob.getTriggers();
     /* Only one 'triggers{}' closure */
     assertEquals(1, triggers.size());
     List<String> dispNames = new ArrayList<>();
@@ -658,8 +636,7 @@ public class BitBucketPPRHookJobDslExtensionTest {
     /* Fetch the newly created job and check its trigger configuration */
     FreeStyleProject createdJob = (FreeStyleProject) j.getInstance().getItem("test-job");
     /* Go through all triggers to validate DSL */
-    PipelineTriggersJobProperty pipelineTriggers = (PipelineTriggersJobProperty) createdJob.getProperty(PipelineTriggersJobProperty.class);
-    Map<TriggerDescriptor, Trigger<?>> triggers = pipelineTriggers.getTriggersMap();
+    Map<TriggerDescriptor, Trigger<?>> triggers = createdJob.getTriggers();
     /* Only one 'triggers{}' closure */
     assertEquals(1, triggers.size());
     List<String> dispNames = new ArrayList<>();
@@ -694,8 +671,7 @@ public class BitBucketPPRHookJobDslExtensionTest {
     /* Fetch the newly created job and check its trigger configuration */
     FreeStyleProject createdJob = (FreeStyleProject) j.getInstance().getItem("test-job");
     /* Go through all triggers to validate DSL */
-    PipelineTriggersJobProperty pipelineTriggers = (PipelineTriggersJobProperty) createdJob.getProperty(PipelineTriggersJobProperty.class);
-    Map<TriggerDescriptor, Trigger<?>> triggers = pipelineTriggers.getTriggersMap();
+    Map<TriggerDescriptor, Trigger<?>> triggers = createdJob.getTriggers();
     /* Only one 'triggers{}' closure */
     assertEquals(1, triggers.size());
     List<String> dispNames = new ArrayList<>();
@@ -730,8 +706,7 @@ public class BitBucketPPRHookJobDslExtensionTest {
     /* Fetch the newly created job and check its trigger configuration */
     FreeStyleProject createdJob = (FreeStyleProject) j.getInstance().getItem("test-job1");
     /* Go through all triggers to validate DSL */
-    PipelineTriggersJobProperty pipelineTriggers = (PipelineTriggersJobProperty) createdJob.getProperty(PipelineTriggersJobProperty.class);
-    Map<TriggerDescriptor, Trigger<?>> triggers = pipelineTriggers.getTriggersMap();
+    Map<TriggerDescriptor, Trigger<?>> triggers = createdJob.getTriggers();
     assertEquals(1, triggers.size());
     List<String> dispNames = new ArrayList<>();
     for (Trigger<?> entry : triggers.values()) {
@@ -747,8 +722,7 @@ public class BitBucketPPRHookJobDslExtensionTest {
     /* Verify second job content */
     createdJob = (FreeStyleProject) j.getInstance().getItem("test-job2");
     /* Go through all triggers to validate DSL */
-    pipelineTriggers = (PipelineTriggersJobProperty) createdJob.getProperty(PipelineTriggersJobProperty.class);
-    triggers = pipelineTriggers.getTriggersMap();
+    triggers = createdJob.getTriggers();
     assertEquals(1, triggers.size());
     dispNames.clear();
     for (Trigger<?> entry : triggers.values()) {
@@ -769,8 +743,7 @@ public class BitBucketPPRHookJobDslExtensionTest {
     /* Fetch the newly created job and check its trigger configuration */
     FreeStyleProject createdJob = (FreeStyleProject) j.getInstance().getItem("test-job");
     /* Go through all triggers to validate DSL */
-    PipelineTriggersJobProperty pipelineTriggers = (PipelineTriggersJobProperty) createdJob.getProperty(PipelineTriggersJobProperty.class);
-    Map<TriggerDescriptor, Trigger<?>> triggers = pipelineTriggers.getTriggersMap();
+    Map<TriggerDescriptor, Trigger<?>> triggers = createdJob.getTriggers();
     /* Only one 'triggers{}' closure */
     assertEquals(1, triggers.size());
     List<String> dispNames = new ArrayList<>();
@@ -805,8 +778,7 @@ public class BitBucketPPRHookJobDslExtensionTest {
     /* Fetch the newly created job and check its trigger configuration */
     FreeStyleProject createdJob = (FreeStyleProject) j.getInstance().getItem("test-job");
     /* Go through all triggers to validate DSL */
-    PipelineTriggersJobProperty pipelineTriggers = (PipelineTriggersJobProperty) createdJob.getProperty(PipelineTriggersJobProperty.class);
-    Map<TriggerDescriptor, Trigger<?>> triggers = pipelineTriggers.getTriggersMap();
+    Map<TriggerDescriptor, Trigger<?>> triggers = createdJob.getTriggers();
     /* Only one 'triggers{}' closure */
     assertEquals(1, triggers.size());
     List<String> dispNames = new ArrayList<>();
@@ -847,8 +819,7 @@ public class BitBucketPPRHookJobDslExtensionTest {
     /* Fetch the newly created job and check its trigger configuration */
     FreeStyleProject createdJob = (FreeStyleProject) j.getInstance().getItem("test-job");
     /* Go through all triggers to validate DSL */
-    PipelineTriggersJobProperty pipelineTriggers = (PipelineTriggersJobProperty) createdJob.getProperty(PipelineTriggersJobProperty.class);
-    Map<TriggerDescriptor, Trigger<?>> triggers = pipelineTriggers.getTriggersMap();
+    Map<TriggerDescriptor, Trigger<?>> triggers = createdJob.getTriggers();
     /* Only one 'triggers{}' closure */
     assertEquals(1, triggers.size());
     List<String> dispNames = new ArrayList<>();
@@ -888,6 +859,185 @@ public class BitBucketPPRHookJobDslExtensionTest {
     createSeedJob(readDslScript("./dsl/testDslServerAllPRUnfilteredAndAllowedBranchesActionsFreeStyle.groovy"));
     /* Fetch the newly created job and check its trigger configuration */
     FreeStyleProject createdJob = (FreeStyleProject) j.getInstance().getItem("test-job");
+    /* Go through all triggers to validate DSL */
+    Map<TriggerDescriptor, Trigger<?>> triggers = createdJob.getTriggers();
+    /* Only one 'triggers{}' closure */
+    assertEquals(1, triggers.size());
+    List<String> dispNames = new ArrayList<>();
+    for (Trigger<?> entry : triggers.values()) {
+      BitBucketPPRTrigger tmp2 = (BitBucketPPRTrigger) entry;
+      /* Four different triggers expected */
+      assertEquals(10, tmp2.getTriggers().size());
+      String tmpNname = tmp2.getTriggers().get(0).getActionFilter().getClass().getName();
+      String dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      dispNames.add(dispName);
+      tmpNname = tmp2.getTriggers().get(1).getActionFilter().getClass().getName();
+      dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      dispNames.add(dispName);
+      tmpNname = tmp2.getTriggers().get(2).getActionFilter().getClass().getName();
+      dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      dispNames.add(dispName);
+      tmpNname = tmp2.getTriggers().get(3).getActionFilter().getClass().getName();
+      dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      dispNames.add(dispName);
+      tmpNname = tmp2.getTriggers().get(4).getActionFilter().getClass().getName();
+      dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      dispNames.add(dispName);
+      tmpNname = tmp2.getTriggers().get(5).getActionFilter().getClass().getName();
+      dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      dispNames.add(dispName);
+      tmpNname = tmp2.getTriggers().get(6).getActionFilter().getClass().getName();
+      dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      dispNames.add(dispName);
+      tmpNname = tmp2.getTriggers().get(7).getActionFilter().getClass().getName();
+      dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      dispNames.add(dispName);
+      tmpNname = tmp2.getTriggers().get(8).getActionFilter().getClass().getName();
+      dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      dispNames.add(dispName);
+      tmpNname = tmp2.getTriggers().get(9).getActionFilter().getClass().getName();
+      dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      dispNames.add(dispName);
+    }
+    assertEquals(10, dispNames.size());
+    assertEquals(dispNames.get(0), "BitBucketPPRPullRequestServerCreatedActionFilter");
+    assertEquals(dispNames.get(1), "BitBucketPPRPullRequestServerUpdatedActionFilter");
+    assertEquals(dispNames.get(2), "BitBucketPPRPullRequestServerSourceUpdatedActionFilter");
+    assertEquals(dispNames.get(3), "BitBucketPPRPullRequestServerApprovedActionFilter");
+    assertEquals(dispNames.get(4), "BitBucketPPRPullRequestServerMergedActionFilter");
+    assertEquals(dispNames.get(5), "BitBucketPPRPullRequestServerCreatedActionFilter");
+    assertEquals(dispNames.get(6), "BitBucketPPRPullRequestServerUpdatedActionFilter");
+    assertEquals(dispNames.get(7), "BitBucketPPRPullRequestServerSourceUpdatedActionFilter");
+    assertEquals(dispNames.get(8), "BitBucketPPRPullRequestServerApprovedActionFilter");
+    assertEquals(dispNames.get(9), "BitBucketPPRPullRequestServerMergedActionFilter");
+  }
+
+  @Test
+  public void testDslServerAllPRActionsPipeline() throws Exception {
+    /* Create seed job which will process DSL */
+    createSeedJob(readDslScript("./dsl/testDslServerAllPRActionsPipeline.groovy"));
+    /* Fetch the newly created job and check its trigger configuration */
+    WorkflowJob createdJob = (WorkflowJob) j.getInstance().getItem("test-job");
+    /* Go through all triggers to validate DSL */
+    PipelineTriggersJobProperty pipelineTriggers = (PipelineTriggersJobProperty) createdJob.getProperty(PipelineTriggersJobProperty.class);
+    Map<TriggerDescriptor, Trigger<?>> triggers = pipelineTriggers.getTriggersMap();
+    /* Only one 'triggers{}' closure */
+    assertEquals(1, triggers.size());
+    List<String> dispNames = new ArrayList<>();
+    for (Trigger<?> entry : triggers.values()) {
+      BitBucketPPRTrigger tmp2 = (BitBucketPPRTrigger) entry;
+      /* Four different triggers expected */
+      assertEquals(4, tmp2.getTriggers().size());
+      String tmpNname = tmp2.getTriggers().get(0).getActionFilter().getClass().getName();
+      String dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      dispNames.add(dispName);
+      tmpNname = tmp2.getTriggers().get(1).getActionFilter().getClass().getName();
+      dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      dispNames.add(dispName);
+      tmpNname = tmp2.getTriggers().get(2).getActionFilter().getClass().getName();
+      dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      dispNames.add(dispName);
+      tmpNname = tmp2.getTriggers().get(3).getActionFilter().getClass().getName();
+      dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      dispNames.add(dispName);
+    }
+    assertEquals(4, dispNames.size());
+    assertEquals(dispNames.get(0), "BitBucketPPRPullRequestServerCreatedActionFilter");
+    assertEquals(dispNames.get(1), "BitBucketPPRPullRequestServerUpdatedActionFilter");
+    assertEquals(dispNames.get(2), "BitBucketPPRPullRequestServerApprovedActionFilter");
+    assertEquals(dispNames.get(3), "BitBucketPPRPullRequestServerMergedActionFilter");
+  }
+
+  @Test
+  public void testDslServerAllPRAllowedBranchesActionsPipeline() throws Exception {
+    /* Create seed job which will process DSL */
+    createSeedJob(readDslScript("./dsl/testDslServerAllPRAllowedBranchesActionsPipeline.groovy"));
+    /* Fetch the newly created job and check its trigger configuration */
+    WorkflowJob createdJob = (WorkflowJob) j.getInstance().getItem("test-job");
+    /* Go through all triggers to validate DSL */
+    PipelineTriggersJobProperty pipelineTriggers = (PipelineTriggersJobProperty) createdJob.getProperty(PipelineTriggersJobProperty.class);
+    Map<TriggerDescriptor, Trigger<?>> triggers = pipelineTriggers.getTriggersMap();
+    /* Only one 'triggers{}' closure */
+    assertEquals(1, triggers.size());
+    List<String> dispNames = new ArrayList<>();
+    for (Trigger<?> entry : triggers.values()) {
+      BitBucketPPRTrigger tmp2 = (BitBucketPPRTrigger) entry;
+      /* Four different triggers expected */
+      assertEquals(5, tmp2.getTriggers().size());
+      String tmpNname = tmp2.getTriggers().get(0).getActionFilter().getClass().getName();
+      String dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      dispNames.add(dispName);
+      tmpNname = tmp2.getTriggers().get(1).getActionFilter().getClass().getName();
+      dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      dispNames.add(dispName);
+
+      tmpNname = tmp2.getTriggers().get(2).getActionFilter().getClass().getName();
+      dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      dispNames.add(dispName);
+
+      tmpNname = tmp2.getTriggers().get(3).getActionFilter().getClass().getName();
+      dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      dispNames.add(dispName);
+      tmpNname = tmp2.getTriggers().get(4).getActionFilter().getClass().getName();
+      dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      dispNames.add(dispName);
+    }
+    assertEquals(5, dispNames.size());
+    assertEquals(dispNames.get(0), "BitBucketPPRPullRequestServerCreatedActionFilter");
+    assertEquals(dispNames.get(1), "BitBucketPPRPullRequestServerUpdatedActionFilter");
+    assertEquals(dispNames.get(2), "BitBucketPPRPullRequestServerSourceUpdatedActionFilter");
+    assertEquals(dispNames.get(3), "BitBucketPPRPullRequestServerApprovedActionFilter");
+    assertEquals(dispNames.get(4), "BitBucketPPRPullRequestServerMergedActionFilter");
+  }
+  
+  @Test
+  public void testDslServerAllPRAllowedBranchesWithApproveActionsPipeline() throws Exception {
+    /* Create seed job which will process DSL */
+    createSeedJob(readDslScript("./dsl/testDslServerAllPRAllowedBranchesWithApproveActionsPipeline.groovy"));
+    /* Fetch the newly created job and check its trigger configuration */
+    WorkflowJob createdJob = (WorkflowJob) j.getInstance().getItem("test-job");
+    /* Go through all triggers to validate DSL */
+    PipelineTriggersJobProperty pipelineTriggers = (PipelineTriggersJobProperty) createdJob.getProperty(PipelineTriggersJobProperty.class);
+    Map<TriggerDescriptor, Trigger<?>> triggers = pipelineTriggers.getTriggersMap();
+    /* Only one 'triggers{}' closure */
+    assertEquals(1, triggers.size());
+    List<String> dispNames = new ArrayList<>();
+    for (Trigger<?> entry : triggers.values()) {
+      BitBucketPPRTrigger tmp2 = (BitBucketPPRTrigger) entry;
+      /* Four different triggers expected */
+      assertEquals(5, tmp2.getTriggers().size());
+      String tmpNname = tmp2.getTriggers().get(0).getActionFilter().getClass().getName();
+      String dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      dispNames.add(dispName);
+      tmpNname = tmp2.getTriggers().get(1).getActionFilter().getClass().getName();
+      dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      dispNames.add(dispName);
+
+      tmpNname = tmp2.getTriggers().get(2).getActionFilter().getClass().getName();
+      dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      dispNames.add(dispName);
+
+      tmpNname = tmp2.getTriggers().get(3).getActionFilter().getClass().getName();
+      dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      dispNames.add(dispName);
+      tmpNname = tmp2.getTriggers().get(4).getActionFilter().getClass().getName();
+      dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      dispNames.add(dispName);
+    }
+    assertEquals(5, dispNames.size());
+    assertEquals(dispNames.get(0), "BitBucketPPRPullRequestServerCreatedActionFilter");
+    assertEquals(dispNames.get(1), "BitBucketPPRPullRequestServerUpdatedActionFilter");
+    assertEquals(dispNames.get(2), "BitBucketPPRPullRequestServerSourceUpdatedActionFilter");
+    assertEquals(dispNames.get(3), "BitBucketPPRPullRequestServerApprovedActionFilter");
+    assertEquals(dispNames.get(4), "BitBucketPPRPullRequestServerMergedActionFilter");
+  }
+  
+  @Test
+  public void testDslServerAllPRUnfilteredAndAllowedBranchesActionsPipeline() throws Exception {
+    /* Create seed job which will process DSL */
+    createSeedJob(readDslScript("./dsl/testDslServerAllPRUnfilteredAndAllowedBranchesActionsPipeline.groovy"));
+    /* Fetch the newly created job and check its trigger configuration */
+    WorkflowJob createdJob = (WorkflowJob) j.getInstance().getItem("test-job");
     /* Go through all triggers to validate DSL */
     PipelineTriggersJobProperty pipelineTriggers = (PipelineTriggersJobProperty) createdJob.getProperty(PipelineTriggersJobProperty.class);
     Map<TriggerDescriptor, Trigger<?>> triggers = pipelineTriggers.getTriggersMap();
@@ -940,5 +1090,129 @@ public class BitBucketPPRHookJobDslExtensionTest {
     assertEquals(dispNames.get(7), "BitBucketPPRPullRequestServerSourceUpdatedActionFilter");
     assertEquals(dispNames.get(8), "BitBucketPPRPullRequestServerApprovedActionFilter");
     assertEquals(dispNames.get(9), "BitBucketPPRPullRequestServerMergedActionFilter");
+  }
+
+  @Test
+  public void testDslTriggerCreateUpdatedMergedApprovedPRAllowBranchesWithApproveActionsPipeline() throws Exception {
+    /* Create seed job which will process DSL */
+    createSeedJob(readDslScript("./dsl/testDslTriggerCreateUpdatedMergedApprovedPRAllowBranchesWithApproveActionsPipeline.groovy"));
+    /* Fetch the newly created job and check its trigger configuration */
+    WorkflowJob createdJob = (WorkflowJob) j.getInstance().getItem("test-job");
+    /* Go through all triggers to validate DSL */
+    PipelineTriggersJobProperty pipelineTriggers = (PipelineTriggersJobProperty) createdJob.getProperty(PipelineTriggersJobProperty.class);
+    Map<TriggerDescriptor, Trigger<?>> triggers = pipelineTriggers.getTriggersMap();
+    /* Only one 'triggers{}' closure */
+    assertEquals(1, triggers.size());
+    List<String> dispNames = new ArrayList<>();
+    for (Trigger<?> entry : triggers.values()) {
+      BitBucketPPRTrigger tmp2 = (BitBucketPPRTrigger) entry;
+      /* Three different triggers expected */
+      assertEquals(4, tmp2.getTriggers().size());
+      String tmpNname = tmp2.getTriggers().get(0).getActionFilter().getClass().getName();
+      String dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      dispNames.add(dispName);
+      tmpNname = tmp2.getTriggers().get(1).getActionFilter().getClass().getName();
+      dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      dispNames.add(dispName);
+      tmpNname = tmp2.getTriggers().get(2).getActionFilter().getClass().getName();
+      dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      dispNames.add(dispName);
+      tmpNname = tmp2.getTriggers().get(3).getActionFilter().getClass().getName();
+      dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      dispNames.add(dispName);
+    }
+    assertEquals(4, dispNames.size());
+    assertEquals(dispNames.get(0), "BitBucketPPRPullRequestCreatedActionFilter");
+    assertEquals(dispNames.get(1), "BitBucketPPRPullRequestUpdatedActionFilter");
+    assertEquals(dispNames.get(2), "BitBucketPPRPullRequestMergedActionFilter");
+    assertEquals(dispNames.get(3), "BitBucketPPRPullRequestApprovedActionFilter");
+  }
+
+  @Test
+  public void testDslTriggerPushActionPipeline() throws Exception {
+    /* Create seed job which will process DSL */
+    createSeedJob(readDslScript("./dsl/testDslTriggerPushActionPipeline.groovy"));
+    /* Fetch the newly created job and check its trigger configuration */
+    WorkflowJob createdJob = (WorkflowJob) j.getInstance().getItem("test-job");
+    /* Go through all triggers to validate DSL */
+    PipelineTriggersJobProperty pipelineTriggers = (PipelineTriggersJobProperty) createdJob.getProperty(PipelineTriggersJobProperty.class);
+    Map<TriggerDescriptor, Trigger<?>> triggers = pipelineTriggers.getTriggersMap();
+    assertEquals(1, triggers.size());
+    List<String> dispNames = new ArrayList<>();
+    boolean isToApprove = false;
+    for (Trigger<?> entry : triggers.values()) {
+      BitBucketPPRTrigger tmp2 = (BitBucketPPRTrigger) entry;
+      assertEquals(1, tmp2.getTriggers().size());
+      String tmpNname = tmp2.getTriggers().get(0).getActionFilter().getClass().getName();
+      String dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      dispNames.add(dispName);
+
+      BitBucketPPRRepositoryPushActionFilter tmp3 = (BitBucketPPRRepositoryPushActionFilter) tmp2.getTriggers().get(0)
+          .getActionFilter();
+      isToApprove = tmp3.shouldSendApprove();
+    }
+    assertEquals(1, dispNames.size());
+    assertEquals(dispNames.get(0), "BitBucketPPRRepositoryPushActionFilter");
+    assertFalse(isToApprove);
+  }
+
+  @Test
+  public void testDslMultipleJobsInSeedVarious() throws Exception {
+    /* Create seed job which will process DSL */
+    createSeedJob(readDslScript("./dsl/testDslMultipleJobsInSeedVarious.groovy"));
+    /* Fetch the newly created job and check its trigger configuration */
+    FreeStyleProject createdJob = (FreeStyleProject) j.getInstance().getItem("test-job1");
+    WorkflowJob createdPipelineJob;
+    PipelineTriggersJobProperty pipelineTriggers;
+    /* Go through all triggers to validate DSL */
+    Map<TriggerDescriptor, Trigger<?>> triggers = createdJob.getTriggers();
+    assertEquals(1, triggers.size());
+    List<String> dispNames = new ArrayList<>();
+    for (Trigger<?> entry : triggers.values()) {
+      BitBucketPPRTrigger tmp2 = (BitBucketPPRTrigger) entry;
+      assertEquals(1, tmp2.getTriggers().size());
+      String tmpNname = tmp2.getTriggers().get(0).getActionFilter().getClass().getName();
+      String dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      dispNames.add(dispName);
+    }
+    assertEquals(1, dispNames.size());
+    assertEquals(dispNames.get(0), "BitBucketPPRPullRequestCreatedActionFilter");
+
+    /* Verify second job content */
+    createdJob = (FreeStyleProject) j.getInstance().getItem("test-job2");
+    /* Go through all triggers to validate DSL */
+    triggers = createdJob.getTriggers();
+    assertEquals(1, triggers.size());
+    dispNames.clear();
+    for (Trigger<?> entry : triggers.values()) {
+      BitBucketPPRTrigger tmp2 = (BitBucketPPRTrigger) entry;
+      assertEquals(1, tmp2.getTriggers().size());
+      String tmpNname = tmp2.getTriggers().get(0).getActionFilter().getClass().getName();
+      String dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      dispNames.add(dispName);
+    }
+    assertEquals(1, dispNames.size());
+    assertEquals(dispNames.get(0), "BitBucketPPRPullRequestUpdatedActionFilter");
+
+    /* Verify third job content */
+    createdPipelineJob = (WorkflowJob) j.getInstance().getItem("test-job3");
+    /* Go through all triggers to validate DSL */
+    pipelineTriggers = (PipelineTriggersJobProperty) createdPipelineJob.getProperty(PipelineTriggersJobProperty.class);
+    triggers = pipelineTriggers.getTriggersMap();
+    assertEquals(1, triggers.size());
+    dispNames.clear();
+    for (Trigger<?> entry : triggers.values()) {
+      BitBucketPPRTrigger tmp2 = (BitBucketPPRTrigger) entry;
+      assertEquals(2, tmp2.getTriggers().size());
+      String tmpName = tmp2.getTriggers().get(0).getActionFilter().getClass().getName();
+      String dispName = tmpName.substring(tmpName.lastIndexOf(".") + 1);
+      dispNames.add(dispName);
+      tmpName = tmp2.getTriggers().get(1).getActionFilter().getClass().getName();
+      dispName = tmpName.substring(tmpName.lastIndexOf(".") + 1);
+      dispNames.add(dispName);
+    }
+    assertEquals(2, dispNames.size());
+    assertEquals(dispNames.get(0), "BitBucketPPRRepositoryPushActionFilter");
+    assertEquals(dispNames.get(1), "BitBucketPPRPullRequestCommentDeletedActionFilter");
   }
 }
