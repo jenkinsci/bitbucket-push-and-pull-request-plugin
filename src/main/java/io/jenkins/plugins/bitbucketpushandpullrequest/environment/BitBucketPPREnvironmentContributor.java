@@ -44,8 +44,11 @@ public class BitBucketPPREnvironmentContributor extends EnvironmentContributor {
   static final String BITBUCKET_PULL_REQUEST_DESCRIPTION = "BITBUCKET_PULL_REQUEST_DESCRIPTION";
   static final String BITBUCKET_PAYLOAD = "BITBUCKET_PAYLOAD";
   static final String BITBUCKET_X_EVENT = "BITBUCKET_X_EVENT";
-
+  static final String BITBUCKET_PULL_REQUEST_LATEST_COMMIT_FROM_SOURCE_BRANCH = "BITBUCKET_PULL_REQUEST_LATEST_COMMIT_FROM_SOURCE_BRANCH";
+  static final String BITBUCKET_PULL_REQUEST_LATEST_COMMIT_FROM_TARGET_BRANCH = "BITBUCKET_PULL_REQUEST_LATEST_COMMIT_FROM_TARGET_BRANCH";
+  
   static final Logger logger = Logger.getLogger(BitBucketPPREnvironmentContributor.class.getName());
+  
 
   {
     System.setErr(BitBucketPPRUtils.createLoggingProxyForErrors(System.err));
@@ -152,7 +155,13 @@ public class BitBucketPPREnvironmentContributor extends EnvironmentContributor {
   private static void setEnvVarsForCloudPullRequest(EnvVars envVars, BitBucketPPRPullRequestAction action,
       String hookEvent) {
     logger.log(Level.FINEST, "Injecting env vars for Cloud PR");
-
+    
+    String pullRequestGetLatestCommitFromSourceBranch = action.getLatestCommitFromRef();
+    putEnvVar(envVars, BITBUCKET_PULL_REQUEST_LATEST_COMMIT_FROM_SOURCE_BRANCH, pullRequestGetLatestCommitFromSourceBranch);
+    
+    String pullRequestGetLatestCommitFromTargetBranch = action.getLatestCommitToRef();
+    putEnvVar(envVars, BITBUCKET_PULL_REQUEST_LATEST_COMMIT_FROM_TARGET_BRANCH, pullRequestGetLatestCommitFromTargetBranch);
+    
     String pullRequestSourceBranch = action.getSourceBranch();
     putEnvVar(envVars, BITBUCKET_SOURCE_BRANCH, pullRequestSourceBranch);
 
@@ -184,6 +193,12 @@ public class BitBucketPPREnvironmentContributor extends EnvironmentContributor {
       String hookEvent) {
     logger.log(Level.FINEST, "Injecting env vars for Server PR");
 
+    String pullRequestGetLatestCommitFromSourceBranch = action.getLatestCommitFromRef();
+    putEnvVar(envVars, BITBUCKET_PULL_REQUEST_LATEST_COMMIT_FROM_SOURCE_BRANCH, pullRequestGetLatestCommitFromSourceBranch);
+    
+    String pullRequestGetLatestCommitFromTargetBranch = action.getLatestCommitToRef();
+    putEnvVar(envVars, BITBUCKET_PULL_REQUEST_LATEST_COMMIT_FROM_TARGET_BRANCH, pullRequestGetLatestCommitFromTargetBranch);
+    
     String pullRequestSourceBranch = action.getSourceBranch();
     putEnvVar(envVars, BITBUCKET_SOURCE_BRANCH, pullRequestSourceBranch);
 
@@ -204,7 +219,7 @@ public class BitBucketPPREnvironmentContributor extends EnvironmentContributor {
 
     String description = action.getDescription();
     putEnvVar(envVars, BITBUCKET_PULL_REQUEST_DESCRIPTION, description);
-
+        
     String payload = action.getPayload().toString();
     putEnvVar(envVars, BITBUCKET_PAYLOAD, payload);
 

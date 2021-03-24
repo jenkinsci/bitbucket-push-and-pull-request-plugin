@@ -77,6 +77,8 @@ BITBUCKET_PULL_REQUEST_ID | id | PR | C + S |
 BITBUCKET_PULL_REQUEST_LINK | link | PR | C + S |
 BITBUCKET_PULL_REQUEST_DESCRIPTION | PR description | PR | C + S |
 BITBUCKET_PULL_REQUEST_COMMENT_TEXT | Comment of BB Cloud Pull Request | PR | C + S |
+BITBUCKET_PULL_REQUEST_LATEST_COMMIT_FROM_SOURCE_BRANCH | Latest commit hash on the source branch | PR | C + S | 
+BITBUCKET_PULL_REQUEST_LATEST_COMMIT_FROM_TARGET_BRANCH | Latest commit hash on the target branch | PR | C + S | 
 BITBUCKET_REPOSITORY_UUID | Repository identifier | P | C |
 BITBUCKET_REPOSITORY_ID | Repository identifier | P | S |
 BITBUCKET_REPOSITORY_URL | Repository URL | PR | C |
