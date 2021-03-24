@@ -84,5 +84,13 @@ THE SOFTWARE.
   <t:buildEnvVar name="BITBUCKET_X_EVENT">
     <j:out value="${%blurb.BITBUCKET_X_EVENT}"/>
   </t:buildEnvVar>
-
+  
+  <t:buildEnvVar name="BITBUCKET_PULL_REQUEST_LATEST_COMMIT_FROM_SOURCE_BRANCH">
+    <j:out value="${%blurb.BITBUCKET_PULL_REQUEST_LATEST_COMMIT_FROM_SOURCE_BRANCH}"/>
+  </t:buildEnvVar>
+  
+  <t:buildEnvVar name="BITBUCKET_PULL_REQUEST_LATEST_COMMIT_FROM_TARGET_BRANCH">
+    <j:out value="${%blurb.BITBUCKET_PULL_REQUEST_LATEST_COMMIT_FROM_TARGET_BRANCH}"/>
+  </t:buildEnvVar>
+  
 </j:jelly>

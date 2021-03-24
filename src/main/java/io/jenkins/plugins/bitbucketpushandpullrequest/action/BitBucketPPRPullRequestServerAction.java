@@ -62,6 +62,16 @@ public class BitBucketPPRPullRequestServerAction extends InvisibleAction impleme
   public String getSourceBranch() {
     return payload.getServerPullRequest().getFromRef().getDisplayId();
   }
+  
+  @Override
+  public String getLatestCommitFromRef() {
+    return payload.getServerPullRequest().getFromRef().getLatestCommit();
+  }
+  
+  @Override
+  public String getLatestCommitToRef() {
+    return payload.getServerPullRequest().getToRef().getLatestCommit();
+  }
 
   @Override
   public String getTargetBranch() {
