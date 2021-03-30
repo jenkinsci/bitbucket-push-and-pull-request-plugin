@@ -1,5 +1,21 @@
 # Change Log
 
+## 2.7.2 (2021-03-30)
+[Full Changelog](https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/compare/bitbucket-push-and-pull-request-2.7.1...bitbucket-push-and-pull-request-2.7.2)
+
+**Implemented enhancements:**
+
+- Added env vars for latest commit hashes from source and destination branches
+
+**Pull requests closed:**
+
+- #171 Add env vars for latest commit hashes from source and destination branches docs views
+
+**Relevant tickets closed:**
+
+- [Investigation] #163 Only builds latest commit on master if no Git filter matches source branch
+
+
 ## 2.7.1 (2021-03-07)
 [Full Changelog](https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/compare/bitbucket-push-and-pull-request-2.7.0...bitbucket-push-and-pull-request-2.7.1)
 
