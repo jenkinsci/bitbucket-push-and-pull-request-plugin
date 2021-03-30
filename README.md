@@ -36,8 +36,6 @@ In case you want to use both plugins on the same Jenkins instance, you must:
 - After that, restart Jenkins
 - and configure the Bitbucket Cloud / Server webhooks accordingly to the new webhook endpoint (in our example: "/bitbucket-ppr-webhook/")
 
-
-
 ## Configuration
 
 ### Configure the webhook
