@@ -28,6 +28,16 @@ Bitbucket Push and Pull Request supports the
 **Before you start**
 Bitbucket Push And Pull Request Plugin will not work if the old Bitbucket plugin <https://plugins.jenkins.io/bitbucket> is still installed. So, please de-install from Jenkins the previous Bitbucket plugin if you want to use this new one.
 
+Reason is: both plugins use the same webhook endpoint and Jenkins gives priority to the old Bitbucket plugin, due to the lexical ordering used by Stapler to dispatch the request.
+
+In case you want to use both plugins on the same Jenkins instance, you must:
+
+- override the default webhook endpoint "/bitbucket-hook/" in the Jenkins Global Configurations of the Bitbucket Push and Pull Request Plugin using a fresh new webhook - let's say: "/bitbucket-ppr-webhook/". **This webhook has to be a new one, consumed only by the Bitbucket Push and Pull Request Plugin, in order to avoid conflicts with other plugins**
+- After that, restart Jenkins
+- and configure the Bitbucket Cloud / Server webhooks accordingly to the new webhook endpoint (in our example: "/bitbucket-ppr-webhook/")
+
+
+
 ## Configuration
 
 ### Configure the webhook
