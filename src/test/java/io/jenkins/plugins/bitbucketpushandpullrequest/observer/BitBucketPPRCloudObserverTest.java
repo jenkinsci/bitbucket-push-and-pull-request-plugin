@@ -14,6 +14,8 @@ import javax.naming.OperationNotSupportedException;
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
 
+import hudson.model.Job;
+import hudson.model.Run;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -27,6 +29,7 @@ import io.jenkins.plugins.bitbucketpushandpullrequest.event.BitBucketPPREventCon
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRHookEvent;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud.BitBucketPPRCloudPayload;
+import io.jenkins.plugins.bitbucketpushandpullrequest.config.BitBucketPPRPluginConfig;
 
 
 @RunWith(MockitoJUnitRunner.class)
@@ -69,11 +72,13 @@ public class BitBucketPPRCloudObserverTest {
     BitBucketPPRPushCloudObserver spyObserver = Mockito.spy(BitBucketPPRPushCloudObserver.class);
     BitBucketPPREvent event = Mockito.mock(BitBucketPPREvent.class);
     BitBucketPPREventContext context = Mockito.mock(BitBucketPPREventContext.class);
-    
+    BitBucketPPRPluginConfig config = Mockito.mock(BitBucketPPRPluginConfig.class);
+
     Mockito.when(context.getJobAbsoluteUrl()).thenReturn("https://someURL");
     Mockito.when(context.getJobNextBuildNumber()).thenReturn(12);
     Mockito.when(context.getAction()).thenReturn(action);
     Mockito.when(event.getContext()).thenReturn(context);
+    Mockito.doReturn(config).when(spyObserver).getGlobalConfig();
 
     spyObserver.getNotification(event);
     spyObserver.setBuildStatusInProgress();
@@ -82,4 +87,63 @@ public class BitBucketPPRCloudObserverTest {
         "https://api.bitbucket.org/2.0/repositories/some-repository/some-repo/commit/09c4367c5bdbef7d7a28ba4cc2638488c2088d6b/statuses/build",
         "{\"key\": \"12\", \"url\": \"https://someURL\", \"state\": \"INPROGRESS\" }");
   }
-}
+
+  @Test
+  public void testComputeBitBucketBuildKeyForInProgressBuild(){
+    BitBucketPPRPushCloudObserver spyObserver = Mockito.spy(BitBucketPPRPushCloudObserver.class);
+    BitBucketPPREventContext context = Mockito.mock(BitBucketPPREventContext.class);
+    BitBucketPPRPluginConfig config = Mockito.mock(BitBucketPPRPluginConfig.class);
+    Job job = Mockito.mock(Job.class);
+
+    // Given that the job was just started with the below parameters
+    int buildNumber = 12;
+    String jobName = "unit test job";
+    Mockito.when(job.getDisplayName()).thenReturn(jobName);
+    Mockito.when(context.getJobNextBuildNumber()).thenReturn(buildNumber);
+    Mockito.when(context.getJob()).thenReturn(job);
+    Mockito.doReturn(config).when(spyObserver).getGlobalConfig();
+
+    // When it's configured to not use the job name
+    Mockito.when(config.shouldUseJobNameAsBuildKey()).thenReturn(false);
+
+    // Then the build number shall be the key
+    assertEquals(String.valueOf(buildNumber), spyObserver.computeBitBucketBuildKey(context));
+
+    // When it's configured to use the job name
+    Mockito.when(config.shouldUseJobNameAsBuildKey()).thenReturn(true);
+
+    // Then the the job name shall be the key
+    assertEquals(jobName, spyObserver.computeBitBucketBuildKey(context));
+  }
+
+  @Test
+  public void testComputeBitBucketBuildKeyForFinishedBuild() {
+    BitBucketPPRPushCloudObserver spyObserver = Mockito.spy(BitBucketPPRPushCloudObserver.class);
+    BitBucketPPREventContext context = Mockito.mock(BitBucketPPREventContext.class);
+    BitBucketPPRPluginConfig config = Mockito.mock(BitBucketPPRPluginConfig.class);
+    Run run = Mockito.mock(Run.class);
+    Job job = Mockito.mock(Job.class);
+
+    // Given that the job finished with the below parameters
+    int buildNumber = 12;
+    String jobName = "unit test job";
+    Mockito.when(job.getDisplayName()).thenReturn(jobName);
+    Mockito.when(run.getNumber()).thenReturn(buildNumber);
+    Mockito.when(run.getParent()).thenReturn(job);
+    Mockito.when(context.getRun()).thenReturn(run);
+    Mockito.doReturn(config).when(spyObserver).getGlobalConfig();
+
+
+    // When it's configured to not use the job name
+    Mockito.when(config.shouldUseJobNameAsBuildKey()).thenReturn(false);
+
+    // Then the build number shall be the key
+    assertEquals(String.valueOf(buildNumber), spyObserver.computeBitBucketBuildKey(context));
+
+    // When it's configured to use the job name
+    Mockito.when(config.shouldUseJobNameAsBuildKey()).thenReturn(true);
+
+    // Then the the job name shall be the key
+    assertEquals(jobName, spyObserver.computeBitBucketBuildKey(context));
+    }
+  }

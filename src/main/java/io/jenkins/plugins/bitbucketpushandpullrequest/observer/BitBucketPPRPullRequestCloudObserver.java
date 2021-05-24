@@ -83,7 +83,7 @@ public class BitBucketPPRPullRequestCloudObserver extends BitBucketPPRHandlerTem
     String url = bitbucketAction.getCommitLink() + "/statuses/build";
     Result result = context.getRun().getResult();
 
-    String payload = "{\"key\": \"" + context.getRun().getNumber() + "\", \"url\": \"" + context.getAbsoluteUrl()
+    String payload = "{\"key\": \"" + computeBitBucketBuildKey(context) + "\", \"url\": \"" + context.getAbsoluteUrl()
         + "\", ";
     payload += result == Result.SUCCESS ? "\"state\": \"SUCCESSFUL\""
         : result == Result.ABORTED ? "\"state\": \"STOPPED\"" : "\"state\": \"FAILED\"";
@@ -96,10 +96,9 @@ public class BitBucketPPRPullRequestCloudObserver extends BitBucketPPRHandlerTem
   public void setBuildStatusInProgress() {
     BitBucketPPRAction bitbucketAction = context.getAction();
     String url = bitbucketAction.getCommitLink() + "/statuses/build";
-    int buildNumber = context.getJobNextBuildNumber();
     String absoluteUrl = context.getJobAbsoluteUrl();
 
-    String payload = "{\"key\": \"" + buildNumber + "\", \"url\": \"" + absoluteUrl + "\", \"state\": \"INPROGRESS\" }";
+    String payload = "{\"key\": \"" + computeBitBucketBuildKey(context) + "\", \"url\": \"" + absoluteUrl + "\", \"state\": \"INPROGRESS\" }";
 
     callClient2(url, payload);
   }

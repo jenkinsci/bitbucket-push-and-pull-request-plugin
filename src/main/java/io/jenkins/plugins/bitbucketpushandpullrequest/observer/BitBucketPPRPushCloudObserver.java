@@ -53,13 +53,12 @@ public class BitBucketPPRPushCloudObserver extends BitBucketPPRHandlerTemplate
     try {
       BitBucketPPRAction bitbucketAction = context.getAction();
       List<String> commitLinks = bitbucketAction.getCommitLinks();
-      int buildNumber = context.getRun().getNumber();
       Result result = context.getRun().getResult();
       String absoluteUrl = context.getAbsoluteUrl();
 
       for (String link : commitLinks) {
         String url = link + "/statuses/build";
-        String payload = "{\"key\": \"" + buildNumber + "\", \"url\": \"" + absoluteUrl + "\", ";
+        String payload = "{\"key\": \"" + computeBitBucketBuildKey(context) + "\", \"url\": \"" + absoluteUrl + "\", ";
         payload += result == Result.SUCCESS ? "\"state\": \"SUCCESSFUL\""
             : result == Result.ABORTED ? "\"state\": \"STOPPED\"" : "\"state\": \"FAILED\"";
         payload += " }";
@@ -77,12 +76,11 @@ public class BitBucketPPRPushCloudObserver extends BitBucketPPRHandlerTemplate
     try {
       BitBucketPPRAction bitbucketAction = context.getAction();
       List<String> commitLinks = bitbucketAction.getCommitLinks();
-      int buildNumber = context.getJobNextBuildNumber();
       String absoluteUrl = context.getJobAbsoluteUrl();
 
       for (String link : commitLinks) {
         String url = link + "/statuses/build";
-        String payload = "{\"key\": \"" + buildNumber + "\", \"url\": \"" + absoluteUrl
+        String payload = "{\"key\": \"" + computeBitBucketBuildKey(context) + "\", \"url\": \"" + absoluteUrl
             + "\", \"state\": \"INPROGRESS\" }";
 
         callClient2(url, payload);

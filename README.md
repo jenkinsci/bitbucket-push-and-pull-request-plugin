@@ -69,6 +69,8 @@ in the __Jenkins Global Configurations__:
 
 2. you can disable the build status notifications propagation.
 
+3. you can choose what build key to use for build status propagation
+
 ![example global config jenkins bb ppr 1](docs/img/global-config.png)
 
 ## Environment variables

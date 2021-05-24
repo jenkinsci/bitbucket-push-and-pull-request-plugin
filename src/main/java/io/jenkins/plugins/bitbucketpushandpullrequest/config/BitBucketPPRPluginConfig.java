@@ -20,6 +20,8 @@ public class BitBucketPPRPluginConfig extends GlobalConfiguration {
 
   public boolean notifyBitBucket;
 
+  public boolean useJobNameAsBuildKey;
+
   public BitBucketPPRPluginConfig() {
     logger.fine("Read bitbucket push and pull request plugin global configuration.");
     this.notifyBitBucket = true;
@@ -55,6 +57,15 @@ public class BitBucketPPRPluginConfig extends GlobalConfiguration {
   @DataBoundSetter
   public void setNotifyBitBucket(boolean notifyBitBucket) {
     this.notifyBitBucket = notifyBitBucket;
+  }
+
+  public boolean shouldUseJobNameAsBuildKey(){
+    return useJobNameAsBuildKey;
+  }
+
+  @DataBoundSetter
+  public void setUseJobNameAsBuildKey(boolean useJobNameAsBuildKey){
+    this.useJobNameAsBuildKey = useJobNameAsBuildKey;
   }
 
   @Override
