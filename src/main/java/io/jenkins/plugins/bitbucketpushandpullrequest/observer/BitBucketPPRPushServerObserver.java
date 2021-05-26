@@ -25,8 +25,6 @@ import java.util.logging.Logger;
 
 import javax.annotation.Nonnull;
 
-import org.apache.commons.lang.NotImplementedException;
-
 import hudson.model.Result;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.client.BitBucketPPRClientFactory;
@@ -57,12 +55,11 @@ public class BitBucketPPRPushServerObserver extends BitBucketPPRHandlerTemplate 
       BitBucketPPRAction bitbucketAction = context.getAction();
 
       List<String> commitLinks = bitbucketAction.getCommitLinks();
-      int buildNumber = context.getRun().getNumber();
       Result result = context.getRun().getResult();
       String absoluteUrl = context.getAbsoluteUrl();
 
       for (String url : commitLinks) {
-        String payload = "{\"key\": \"" + buildNumber + "\", \"url\": \"" + absoluteUrl + "\", ";
+        String payload = "{\"key\": \"" + computeBitBucketBuildKey(context) + "\", \"url\": \"" + absoluteUrl + "\", ";
         payload += result == Result.SUCCESS ? "\"state\": \"SUCCESSFUL\"" : "\"state\": \"FAILED\"";
         payload += " }";
 
@@ -79,11 +76,10 @@ public class BitBucketPPRPushServerObserver extends BitBucketPPRHandlerTemplate 
     try {
       BitBucketPPRAction bitbucketAction = context.getAction();
       List<String> commitLinks = bitbucketAction.getCommitLinks();
-      int buildNumber = context.getJobNextBuildNumber();
       String absoluteUrl = context.getJobAbsoluteUrl();
 
       for (String url : commitLinks) {
-        String payload = "{\"key\": \"" + buildNumber + "\", \"url\": \"" + absoluteUrl
+        String payload = "{\"key\": \"" + computeBitBucketBuildKey(context) + "\", \"url\": \"" + absoluteUrl
             + "\", \"state\": \"INPROGRESS\" }";
 
         callClient2(url, payload);

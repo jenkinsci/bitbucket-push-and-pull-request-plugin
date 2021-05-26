@@ -103,7 +103,7 @@ public class BitBucketPPRPullRequestServerObserver extends BitBucketPPRHandlerTe
     // }
     // }
 
-    String payload = "{\"key\": \"" + context.getRun().getNumber() + "\", \"url\": \"" + context.getAbsoluteUrl()
+    String payload = "{\"key\": \"" + computeBitBucketBuildKey(context) + "\", \"url\": \"" + context.getAbsoluteUrl()
         + "\", ";
     payload += result == Result.SUCCESS ? "\"state\": \"SUCCESSFUL\"" : "\"state\": \"FAILED\"";
     payload += " }";
@@ -115,10 +115,9 @@ public class BitBucketPPRPullRequestServerObserver extends BitBucketPPRHandlerTe
   public void setBuildStatusInProgress() {
     BitBucketPPRAction bitbucketAction = context.getAction();
     String url = bitbucketAction.getCommitLink();
-    int buildNumber = context.getJobNextBuildNumber();
     String absoluteUrl = context.getJobAbsoluteUrl();
 
-    String payload = "{\"key\": \"" + buildNumber + "\", \"url\": \"" + absoluteUrl + "\", \"state\": \"INPROGRESS\" }";
+    String payload = "{\"key\": \"" + computeBitBucketBuildKey(context) + "\", \"url\": \"" + absoluteUrl + "\", \"state\": \"INPROGRESS\" }";
 
     callClient2(url, payload);
   }
