@@ -45,6 +45,7 @@ import hudson.model.CauseAction;
 import hudson.model.Item;
 import hudson.model.Job;
 import hudson.model.Run;
+import hudson.model.Build;
 import hudson.model.queue.QueueTaskFuture;
 import hudson.plugins.git.RevisionParameterAction;
 import hudson.scm.PollingResult;
@@ -208,16 +209,15 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
       e.printStackTrace();
     }
 
-    int buildNumber = job.getNextBuildNumber();
-    logger.info(() -> "SCM changes detected in " + job.getName() + ". Triggering " + " #" + buildNumber);
+    logger.info(() -> "SCM changes detected in " + job.getName() + ". Triggering build.");
 
     if (future != null) {
       try {
-        future.waitForStart();
+        Build<?, ?> startedBuild = (Build<?, ?>) future.waitForStart();
 
         try {
           observable.notifyObservers(BitBucketPPREventFactory.createEvent(BitBucketPPREventType.BUILD_STARTED,
-              new BitBucketPPREventContext(bitbucketAction, scmTrigger, job, buildNumber, filter)));
+              new BitBucketPPREventContext(bitbucketAction, scmTrigger, startedBuild, filter)));
         } catch (Throwable e) {
           logger.info(e.getMessage());
           e.printStackTrace();
