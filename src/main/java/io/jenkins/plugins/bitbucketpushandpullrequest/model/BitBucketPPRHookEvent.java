@@ -27,6 +27,7 @@ import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRCo
 import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.PULL_REQUEST_APPROVED;
 import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.PULL_REQUEST_CREATED;
 import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.PULL_REQUEST_CLOUD_EVENT;
+import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.PULL_REQUEST_DECLINED;
 import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.PULL_REQUEST_MERGED;
 import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.PULL_REQUEST_SERVER_APPROVED;
 import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.PULL_REQUEST_SERVER_CREATED;
@@ -85,6 +86,7 @@ public class BitBucketPPRHookEvent {
           || PULL_REQUEST_CREATED.equalsIgnoreCase(action)
           || PULL_REQUEST_UPDATED.equalsIgnoreCase(action)
           || PULL_REQUEST_MERGED.equalsIgnoreCase(action)
+          || PULL_REQUEST_DECLINED.equalsIgnoreCase(action)
           || PULL_REQUEST_COMMENT_CREATED.equalsIgnoreCase(action)
           || PULL_REQUEST_COMMENT_UPDATED.equalsIgnoreCase(action)
           || PULL_REQUEST_COMMENT_DELETED.equalsIgnoreCase(action)

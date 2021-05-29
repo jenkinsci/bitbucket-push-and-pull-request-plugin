@@ -24,6 +24,7 @@ package io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.cloud;
 
 import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.PULL_REQUEST_APPROVED;
 import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.PULL_REQUEST_CREATED;
+import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.PULL_REQUEST_DECLINED;
 import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.PULL_REQUEST_MERGED;
 import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.PULL_REQUEST_UPDATED;
 import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.PULL_REQUEST_COMMENT_CREATED;
@@ -52,6 +53,8 @@ public class BitBucketPPRPullRequestTriggerMatcher implements BitBucketPPREventT
         || PULL_REQUEST_COMMENT_DELETED.equals(bitbucketEvent.getAction()) && triggerFilter
             .getActionFilter() instanceof BitBucketPPRPullRequestCommentDeletedActionFilter
         || PULL_REQUEST_MERGED.equals(bitbucketEvent.getAction())
-            && triggerFilter.getActionFilter() instanceof BitBucketPPRPullRequestMergedActionFilter;
+            && triggerFilter.getActionFilter() instanceof BitBucketPPRPullRequestMergedActionFilter
+        || PULL_REQUEST_DECLINED.equals(bitbucketEvent.getAction())
+            && triggerFilter.getActionFilter() instanceof BitBucketPPRPullRequestDeclinedActionFilter;
   }
 }
