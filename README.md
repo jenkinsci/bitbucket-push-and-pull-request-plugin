@@ -155,6 +155,9 @@ bitbucketTriggers {
   pullRequestMergedAction(allowedBranches: String)
   pullRequestMergedAction(allowedBranches: String, isToApprove: String)
 
+  pullRequestDeclinedAction()
+  pullRequestDeclinedAction(allowedBranches: String)
+
   pullRequestCommentCreatedAction()
   pullRequestCommentCreatedAction(allowedBranches: String)
   pullRequestCommentCreatedAction(allowedBranches: String, commentFilter: String) // CommentFilter is java a regex expression
@@ -191,6 +194,9 @@ bitbucketTriggers {
   pullRequestServerMergedAction()
   pullRequestServerMergedAction(allowedBranches: String)
   pullRequestServerMergedAction(allowedBranches: String, isToApprove: boolean)
+
+  pullRequestServerDeclinedAction()
+  pullRequestServerDeclinedAction(allowedBranches: String)
 
   pullRequestServerCommentCreatedAction()
   pullRequestServerCommentCreatedAction(allowedBranches : String)

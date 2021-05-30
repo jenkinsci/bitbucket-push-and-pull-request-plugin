@@ -152,6 +152,32 @@ public class BitBucketPPREnvironmentContributorTest {
   }
 
   @Test
+  public void buildEnvironmentForCloudPullRequestDecliedTest() {
+    BitBucketPPRPayload payload = getCloudPayload("./cloud/pr_rejected.json");
+
+    BitBucketPPRPullRequestCause cause = mock(BitBucketPPRPullRequestCause.class);
+    when(cause.getPullRequestPayLoad()).thenReturn(new BitBucketPPRPullRequestAction(payload));
+    when(cause.getHookEvent()).thenReturn("X-EVENT");
+
+    // do
+    runEnvironmentContributorForCause(cause);
+
+    // assert
+    assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_SOURCE_BRANCH, "feature/do-not-merge"));
+    assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_TARGET_BRANCH, "develop"));
+    assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_LINK,
+            "https://bitbucket.org/some-repo-namespace/some-repo/pull-requests/198"));
+    assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_ID, "198"));
+    assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_ACTOR, "me-nickname"));
+    assertThat(envVars,
+            hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_TITLE, "I have to push the pram a lot X."));
+    assertThat(envVars,
+            hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_DESCRIPTION, "Some description for PR"));
+    assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PAYLOAD, payload.toString()));
+    assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_X_EVENT, "X-EVENT"));
+  }
+
+  @Test
   public void buildEnvironmentForCloudPullRequestUpdatedTest() {
     BitBucketPPRPayload payload = getCloudPayload("./cloud/pr_updated.json");
 
@@ -344,6 +370,30 @@ public class BitBucketPPREnvironmentContributorTest {
     assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_ID, "61"));
     assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_ACTOR, "me-name"));
     assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_TITLE, "test"));
+    assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_DESCRIPTION, ""));
+    assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PAYLOAD, payload.toString()));
+    assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_X_EVENT, "X-EVENT"));
+  }
+
+  @Test
+  public void buildEnvironmentForServerPullRequestDeclinedTest() {
+    BitBucketPPRServerPayload payload = getServerPayload("./server/pr_declined.json");
+
+    BitBucketPPRPullRequestServerCause cause = mock(BitBucketPPRPullRequestServerCause.class);
+    when(cause.getPullRequestPayLoad()).thenReturn(new BitBucketPPRPullRequestServerAction(payload));
+    when(cause.getHookEvent()).thenReturn("X-EVENT");
+
+    // do
+    runEnvironmentContributorForCause(cause);
+
+    // assert
+    assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_SOURCE_BRANCH, "bugfix/tst-2"));
+    assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_TARGET_BRANCH, "master"));
+    assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_LINK,
+            "http://bitbucket:7990/projects/PPRPLUG/repos/hellophp/pull-requests/7"));
+    assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_ID, "7"));
+    assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_ACTOR, "me-name"));
+    assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_TITLE, "dummy change"));
     assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_DESCRIPTION, ""));
     assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PAYLOAD, payload.toString()));
     assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_X_EVENT, "X-EVENT"));

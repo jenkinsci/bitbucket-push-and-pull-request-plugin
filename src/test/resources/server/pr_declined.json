@@ -1,0 +1,156 @@
+{
+  "eventKey": "pr:declined",
+  "date": "2021-05-29T20:18:01+0000",
+  "actor": {
+    "name": "me-name",
+    "emailAddress": "me@example.org",
+    "id": 99,
+    "displayName": "me-display-name",
+    "active": true,
+    "slug": "me-slug",
+    "type": "NORMAL",
+    "links": {
+      "self": [
+        {
+          "href": "http://bitbucket:7990/users/me-name"
+        }
+      ]
+    }
+  },
+  "pullRequest": {
+    "id": 7,
+    "version": 6,
+    "title": "dummy change",
+    "state": "DECLINED",
+    "open": false,
+    "closed": true,
+    "createdDate": 1621859343568,
+    "updatedDate": 1622319481519,
+    "closedDate": 1622319481519,
+    "fromRef": {
+      "id": "refs/heads/bugfix/tst-2",
+      "displayId": "bugfix/tst-2",
+      "latestCommit": "6efe3d09aff4bb7f53ddf2f18a6fba52aa209d1a",
+      "repository": {
+        "slug": "hellophp",
+        "id": 2,
+        "name": "hellophp",
+        "hierarchyId": "a76a391f310843fe63ec",
+        "scmId": "git",
+        "state": "AVAILABLE",
+        "statusMessage": "Available",
+        "forkable": true,
+        "project": {
+          "key": "PPRPLUG",
+          "id": 1,
+          "name": "ppr-plugin-test",
+          "public": false,
+          "type": "NORMAL",
+          "links": {
+            "self": [
+              {
+                "href": "http://bitbucket:7990/projects/PPRPLUG"
+              }
+            ]
+          }
+        },
+        "public": false,
+        "links": {
+          "clone": [
+            {
+              "href": "http://bitbucket:7990/scm/pprplug/hellophp.git",
+              "name": "http"
+            },
+            {
+              "href": "ssh://git@bitbucket:7999/pprplug/hellophp.git",
+              "name": "ssh"
+            }
+          ],
+          "self": [
+            {
+              "href": "http://bitbucket:7990/projects/PPRPLUG/repos/hellophp/browse"
+            }
+          ]
+        }
+      }
+    },
+    "toRef": {
+      "id": "refs/heads/master",
+      "displayId": "master",
+      "latestCommit": "047882eedc24d603a03a30e6ea16b3a607afda1b",
+      "repository": {
+        "slug": "hellophp",
+        "id": 2,
+        "name": "hellophp",
+        "hierarchyId": "a76a391f310843fe63ec",
+        "scmId": "git",
+        "state": "AVAILABLE",
+        "statusMessage": "Available",
+        "forkable": true,
+        "project": {
+          "key": "PPRPLUG",
+          "id": 1,
+          "name": "ppr-plugin-test",
+          "public": false,
+          "type": "NORMAL",
+          "links": {
+            "self": [
+              {
+                "href": "http://bitbucket:7990/projects/PPRPLUG"
+              }
+            ]
+          }
+        },
+        "public": false,
+        "links": {
+          "clone": [
+            {
+              "href": "http://bitbucket:7990/scm/pprplug/hellophp.git",
+              "name": "http"
+            },
+            {
+              "href": "ssh://git@bitbucket:7999/pprplug/hellophp.git",
+              "name": "ssh"
+            }
+          ],
+          "self": [
+            {
+              "href": "http://bitbucket:7990/projects/PPRPLUG/repos/hellophp/browse"
+            }
+          ]
+        }
+      }
+    },
+    "locked": false,
+    "author": {
+      "user": {
+        "name": "me-name",
+        "emailAddress": "me@example.org",
+        "id": 1,
+        "displayName": "me-display-name",
+        "active": true,
+        "slug": "me-slug",
+        "type": "NORMAL",
+        "links": {
+          "self": [
+            {
+              "href": "http://bitbucket:7990/users/me-name"
+            }
+          ]
+        }
+      },
+      "role": "AUTHOR",
+      "approved": false,
+      "status": "UNAPPROVED"
+    },
+    "reviewers": [],
+    "participants": [],
+    "links": {
+      "self": [
+        {
+          "href": "http://bitbucket:7990/projects/PPRPLUG/repos/hellophp/pull-requests/7"
+        }
+      ]
+    }
+  }
+}

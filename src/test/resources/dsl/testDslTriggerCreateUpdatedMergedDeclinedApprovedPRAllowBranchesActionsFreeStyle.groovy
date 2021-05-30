@@ -4,6 +4,7 @@ freeStyleJob('test-job') {
       pullRequestCreatedAction("**")
       pullRequestUpdatedAction("**")
       pullRequestMergedAction("**")
+      pullRequestDeclinedAction("**")
       pullRequestApprovedAction(false, "**")
     }
   }
