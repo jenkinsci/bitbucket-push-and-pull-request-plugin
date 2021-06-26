@@ -1,0 +1,95 @@
+<div>
+  <p>Specify the branches if you'd like to track a specific branch in a repository.
+  If left blank, all branches will be examined for changes and built.</p>
+
+  <p>The safest way is to use the <code>refs/heads/&lt;branchName&gt;</code> syntax. This way the expected branch
+  is unambiguous.</p>
+
+  <p>If your branch name has a <code>/</code> in it make sure to use the full reference above. When not presented
+  with a full path the plugin will only use the part of the string right of the last slash.
+  Meaning <code>foo/bar</code> will actually match <code>bar</code>.</p>
+
+  <p>If you use a wildcard branch specifier, with a slash (e.g. <code>release/</code>),
+  you'll need to specify the origin repository in the branch names to
+  make sure changes are picked up. So e.g. <code>origin/release/</code></p>
+
+  <p>Possible options:
+    <ul>
+      <li> <strong><code>&lt;branchName&gt;</code></strong><br/>
+           Tracks/checks out the specified branch. If ambiguous the first result is taken, which is not necessarily
+           the expected one. Better use <code>refs/heads/&lt;branchName&gt;</code>.<br/>
+           E.g. <code>master</code>, <code>feature1</code>, ...
+      </li>
+      <li> <strong><code>refs/heads/&lt;branchName&gt;</code></strong><br/>
+           Tracks/checks out the specified branch.<br/>
+           E.g. <code>refs/heads/master</code>, <code>refs/heads/feature1/master</code>, ...
+      </li>
+      <li> <strong><code>&lt;remoteRepoName&gt;/&lt;branchName&gt;</code></strong><br/>
+           Tracks/checks out the specified branch. If ambiguous the first result is taken, which is not necessarily
+           the expected one.<br/>
+           Better use <code>refs/heads/&lt;branchName&gt;</code>.<br/>
+           E.g. <code>origin/master</code>
+      </li>
+      <li> <strong><code>remotes/&lt;remoteRepoName&gt;/&lt;branchName&gt;</code></strong><br/>
+           Tracks/checks out the specified branch.<br/>
+           E.g. <code>remotes/origin/master</code>
+      </li>
+      <li> <strong><code>refs/remotes/&lt;remoteRepoName&gt;/&lt;branchName&gt;</code></strong><br/>
+           Tracks/checks out the specified branch.<br/>
+           E.g. <code>refs/remotes/origin/master</code>
+      </li>
+      <li> <strong><code>&lt;tagName&gt;</code></strong><br/>
+           This does not work since the tag will not be recognized as tag.<br/>
+           Use <code>refs/tags/&lt;tagName&gt;</code> instead.<br/>
+           E.g. <code>git-2.3.0</code>
+      </li>
+      <li> <strong><code>refs/tags/&lt;tagName&gt;</code></strong><br/>
+           Tracks/checks out the specified tag.<br/>
+           E.g. <code>refs/tags/git-2.3.0</code>
+      </li>
+      <li> <strong><code>&lt;commitId&gt;</code></strong><br/>
+           Checks out the specified commit.<br/>
+           E.g. <code>5062ac843f2b947733e6a3b105977056821bd352</code>, <code>5062ac84</code>, ...
+      </li>
+      <li> <strong><code>${ENV_VARIABLE}</code></strong><br/>
+           It is also possible to use environment variables. In this case the variables are evaluated and the
+           result is used as described above.<br/>
+           E.g. <code>${TREEISH}</code>, <code>refs/tags/${TAGNAME}</code>, ...
+      </li>
+      <li> <strong><code>&lt;Wildcards&gt;</code></strong><br/>
+           The syntax is of the form: <code>REPOSITORYNAME/BRANCH</code>.
+           In addition, <code>BRANCH</code> is recognized as a shorthand of <code>*/BRANCH</code>, '*' is recognized as a wildcard,
+           and '**' is recognized as wildcard that includes the separator '/'. Therefore, <code>origin/branches*</code> would
+           match <code>origin/branches-foo</code> but not <code>origin/branches/foo</code>, while <code>origin/branches**</code> would
+           match both <code>origin/branches-foo</code> and <code>origin/branches/foo</code>.
+      </li>
+      <li> <strong><code>:&lt;regular expression&gt;</code></strong><br/>
+           The syntax is of the form: <code>:regexp</code>.
+           Regular expression syntax in branches to build will only
+           build those branches whose names match the regular
+           expression.<br/>
+           Examples:<br/>
+            <ul>
+                <li><code>:^(?!(origin/prefix)).*</code>
+                  <ul>
+                    <li>matches: <code>origin</code> or <code>origin/master</code> or <code>origin/feature</code></li>
+                    <li>does not match: <code>origin/prefix</code> or <code>origin/prefix_123</code> or <code>origin/prefix-abc</code></li>
+                  </ul>
+                </li>
+                <li><code>:origin/release-\d{8}</code>
+                  <ul>
+                    <li>matches: <code>origin/release-20150101</code></li>
+                    <li>does not match: <code>origin/release-2015010</code> or <code>origin/release-201501011</code> or <code>origin/release-20150101-something</code></li>
+                  </ul>
+                </li>
+                <li><code>:^(?!origin/master$|origin/develop$).*</code>
+                  <ul>
+                    <li>matches: <code>origin/branch1</code> or <code>origin/branch-2</code> or <code>origin/master123</code> or <code>origin/develop-123</code></li>
+                    <li>does not match: <code>origin/master</code> or <code>origin/develop</code></li>
+                  </ul>
+                </li>
+            </ul>
+      </li>
+    </ul>
+  </p>
+</div>

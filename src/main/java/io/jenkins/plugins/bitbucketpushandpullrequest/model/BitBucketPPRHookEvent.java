@@ -20,14 +20,18 @@
  ******************************************************************************/
 package io.jenkins.plugins.bitbucketpushandpullrequest.model;
 
+import javax.naming.OperationNotSupportedException;
+
 import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.DIAGNOSTICS;
 import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.PING;
 import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.PULL_REQUEST_APPROVED;
 import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.PULL_REQUEST_CREATED;
 import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.PULL_REQUEST_CLOUD_EVENT;
+import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.PULL_REQUEST_DECLINED;
 import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.PULL_REQUEST_MERGED;
 import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.PULL_REQUEST_SERVER_APPROVED;
 import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.PULL_REQUEST_SERVER_CREATED;
+import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.PULL_REQUEST_SERVER_DECLINED;
 import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.PULL_REQUEST_SERVER_EVENT;
 import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.PULL_REQUEST_SERVER_MERGED;
 import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.PULL_REQUEST_SERVER_UPDATED;
@@ -41,7 +45,7 @@ import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRCo
 import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.REPOSITORY_POST;
 import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.REPOSITORY_CLOUD_PUSH;
 import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.REPOSITORY_SERVER_PUSH;
-import javax.naming.OperationNotSupportedException;
+
 
 
 public class BitBucketPPRHookEvent {
@@ -82,6 +86,7 @@ public class BitBucketPPRHookEvent {
           || PULL_REQUEST_CREATED.equalsIgnoreCase(action)
           || PULL_REQUEST_UPDATED.equalsIgnoreCase(action)
           || PULL_REQUEST_MERGED.equalsIgnoreCase(action)
+          || PULL_REQUEST_DECLINED.equalsIgnoreCase(action)
           || PULL_REQUEST_COMMENT_CREATED.equalsIgnoreCase(action)
           || PULL_REQUEST_COMMENT_UPDATED.equalsIgnoreCase(action)
           || PULL_REQUEST_COMMENT_DELETED.equalsIgnoreCase(action)
@@ -90,6 +95,7 @@ public class BitBucketPPRHookEvent {
           || PULL_REQUEST_SERVER_SOURCE_UPDATED.equalsIgnoreCase(action)
           || PULL_REQUEST_SERVER_APPROVED.equalsIgnoreCase(action)
           || PULL_REQUEST_SERVER_MERGED.equalsIgnoreCase(action)
+          || PULL_REQUEST_SERVER_DECLINED.equalsIgnoreCase(action)
           || PULL_REQUEST_SERVER_COMMENT_CREATED.equalsIgnoreCase(action))) {
         error = true;
       }

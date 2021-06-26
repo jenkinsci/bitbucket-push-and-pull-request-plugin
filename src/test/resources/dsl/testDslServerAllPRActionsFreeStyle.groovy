@@ -5,6 +5,7 @@ freeStyleJob('test-job') {
       pullRequestServerUpdatedAction()
       pullRequestServerApprovedAction(false)
       pullRequestServerMergedAction()
+      pullRequestServerDeclinedAction()
     }
   }
 }

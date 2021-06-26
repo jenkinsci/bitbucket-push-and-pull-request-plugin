@@ -29,6 +29,12 @@ pipelineJob('test-job') {
                 }
               }
             }
+            bitBucketPPRPullRequestServerTriggerFilter {
+              actionFilter {
+                bitBucketPPRPullRequestServerDeclinedActionFilter {
+                }
+              }
+            }
           }
         }
       }
