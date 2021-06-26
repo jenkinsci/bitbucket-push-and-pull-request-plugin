@@ -32,9 +32,9 @@ Reason is: both plugins use the same webhook endpoint and Jenkins gives priority
 
 In case you want to use both plugins on the same Jenkins instance, you must:
 
-- override the default webhook endpoint "/bitbucket-hook/" in the Jenkins Global Configurations of the Bitbucket Push and Pull Request Plugin using a fresh new webhook - let's say: "/bitbucket-ppr-webhook/". **This webhook has to be a new one, consumed only by the Bitbucket Push and Pull Request Plugin, in order to avoid conflicts with other plugins**
+- override the default webhook endpoint "bitbucket-hook" in the Jenkins Global Configurations of the Bitbucket Push and Pull Request Plugin using a fresh new webhook - let's say: "bitbucket-ppr-webhook". **This webhook has to be a new one, consumed only by the Bitbucket Push and Pull Request Plugin, in order to avoid conflicts with other plugins**
 - After that, restart Jenkins
-- and configure the Bitbucket Cloud / Server webhooks accordingly to the new webhook endpoint (in our example: "/bitbucket-ppr-webhook/")
+- and configure the Bitbucket Cloud / Server webhooks accordingly to the new webhook endpoint (in our example: "bitbucket-ppr-webhook")
 
 ## Configuration
 
