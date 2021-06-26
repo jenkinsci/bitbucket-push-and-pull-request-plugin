@@ -74,8 +74,8 @@ public class BitBucketPPRCloudObserverTest {
     BitBucketPPREventContext context = Mockito.mock(BitBucketPPREventContext.class);
     BitBucketPPRPluginConfig config = Mockito.mock(BitBucketPPRPluginConfig.class);
 
-    Mockito.when(context.getJobAbsoluteUrl()).thenReturn("https://someURL");
-    Mockito.when(context.getJobNextBuildNumber()).thenReturn(12);
+    Mockito.when(context.getAbsoluteUrl()).thenReturn("https://someURL");
+    Mockito.when(context.getBuildNumber()).thenReturn(12);
     Mockito.when(context.getAction()).thenReturn(action);
     Mockito.when(event.getContext()).thenReturn(context);
     Mockito.doReturn(config).when(spyObserver).getGlobalConfig();
@@ -83,7 +83,7 @@ public class BitBucketPPRCloudObserverTest {
     spyObserver.getNotification(event);
     spyObserver.setBuildStatusInProgress();
     Mockito.verify(spyObserver).setBuildStatusInProgress();
-    Mockito.verify(spyObserver).callClient2(
+    Mockito.verify(spyObserver).callClient(
         "https://api.bitbucket.org/2.0/repositories/some-repository/some-repo/commit/09c4367c5bdbef7d7a28ba4cc2638488c2088d6b/statuses/build",
         "{\"key\": \"12\", \"url\": \"https://someURL\", \"state\": \"INPROGRESS\" }");
   }
@@ -93,14 +93,16 @@ public class BitBucketPPRCloudObserverTest {
     BitBucketPPRPushCloudObserver spyObserver = Mockito.spy(BitBucketPPRPushCloudObserver.class);
     BitBucketPPREventContext context = Mockito.mock(BitBucketPPREventContext.class);
     BitBucketPPRPluginConfig config = Mockito.mock(BitBucketPPRPluginConfig.class);
+    Run run = Mockito.mock(Run.class);
     Job job = Mockito.mock(Job.class);
 
     // Given that the job was just started with the below parameters
     int buildNumber = 12;
     String jobName = "unit test job";
     Mockito.when(job.getDisplayName()).thenReturn(jobName);
-    Mockito.when(context.getJobNextBuildNumber()).thenReturn(buildNumber);
-    Mockito.when(context.getJob()).thenReturn(job);
+    Mockito.when(run.getParent()).thenReturn(job);
+    Mockito.when(context.getRun()).thenReturn(run);
+    Mockito.when(context.getBuildNumber()).thenReturn(buildNumber);
     Mockito.doReturn(config).when(spyObserver).getGlobalConfig();
 
     // When it's configured to not use the job name
@@ -128,9 +130,9 @@ public class BitBucketPPRCloudObserverTest {
     int buildNumber = 12;
     String jobName = "unit test job";
     Mockito.when(job.getDisplayName()).thenReturn(jobName);
-    Mockito.when(run.getNumber()).thenReturn(buildNumber);
     Mockito.when(run.getParent()).thenReturn(job);
     Mockito.when(context.getRun()).thenReturn(run);
+    Mockito.when(context.getBuildNumber()).thenReturn(buildNumber);
     Mockito.doReturn(config).when(spyObserver).getGlobalConfig();
 
 

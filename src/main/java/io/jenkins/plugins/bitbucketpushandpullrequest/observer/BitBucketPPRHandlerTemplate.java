@@ -40,20 +40,10 @@ public abstract class BitBucketPPRHandlerTemplate {
 
   protected String computeBitBucketBuildKey(BitBucketPPREventContext context) {
     if (getGlobalConfig().shouldUseJobNameAsBuildKey()) {
-      Job<?, ?> job;
-      if (context.getRun() == null) {
-        job = context.getJob();
-      } else {
-        job = context.getRun().getParent();
-      }
+      Job<?, ?> job = context.getRun().getParent();
       return job.getDisplayName();
     } else {
-      int buildNumber;
-      if (context.getRun() == null) {
-        buildNumber = context.getJobNextBuildNumber();
-      } else {
-        buildNumber = context.getRun().getNumber();
-      }
+      int buildNumber = context.getBuildNumber();
       return Integer.toString(buildNumber);
     }
   }

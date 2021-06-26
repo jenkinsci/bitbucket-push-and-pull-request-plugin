@@ -76,14 +76,14 @@ public class BitBucketPPRPushCloudObserver extends BitBucketPPRHandlerTemplate
     try {
       BitBucketPPRAction bitbucketAction = context.getAction();
       List<String> commitLinks = bitbucketAction.getCommitLinks();
-      String absoluteUrl = context.getJobAbsoluteUrl();
+      String absoluteUrl = context.getAbsoluteUrl();
 
       for (String link : commitLinks) {
         String url = link + "/statuses/build";
         String payload = "{\"key\": \"" + computeBitBucketBuildKey(context) + "\", \"url\": \"" + absoluteUrl
             + "\", \"state\": \"INPROGRESS\" }";
 
-        callClient2(url, payload);
+        callClient(url, payload);
       }
       logger.info("BB build status was set on 'in progress'.");
     } catch (Throwable e) {
@@ -96,8 +96,4 @@ public class BitBucketPPRPushCloudObserver extends BitBucketPPRHandlerTemplate
         .send(url, payload);
   }
 
-  public void callClient2(@Nonnull String url, @Nonnull String payload) throws Throwable {
-    BitBucketPPRClientFactory.createClient(BitBucketPPRClientType.CLOUD,context)
-        .send2(url, payload);
-  }
 }
