@@ -32,8 +32,8 @@ import hudson.Extension;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.cause.BitBucketPPRTriggerCause;
 import io.jenkins.plugins.bitbucketpushandpullrequest.cause.pullrequest.server.BitBucketPPRPullRequestServerCommentCreatedCause;
+import io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRUtils;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRHookEvent;
-import io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRUtils;
 
 public class BitBucketPPRPullRequestServerCommentCreatedActionFilter extends BitBucketPPRPullRequestServerActionFilter {
 

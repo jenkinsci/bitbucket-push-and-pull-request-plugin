@@ -19,9 +19,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  ******************************************************************************/
 
-package io.jenkins.plugins.bitbucketpushandpullrequest;
+package io.jenkins.plugins.bitbucketpushandpullrequest.receiver;
 
-import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.HOOK_URL;
+import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst.HOOK_URL;
 import java.io.IOException;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -47,9 +47,8 @@ public class BitBucketPPRCrumbExclusion extends CrumbExclusion {
 
     String path = request.getPathInfo();
     if (path != null && (path.equals("/" + getHookPath()) || path.equals("/" + getHookPath() + "/"))) {
-
       chain.doFilter(request, response);
-
+      
       return true;
     }
 

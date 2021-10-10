@@ -21,10 +21,10 @@
 
 package io.jenkins.plugins.bitbucketpushandpullrequest;
 
-import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.REPOSITORY_CLOUD_PUSH;
-import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.PULL_REQUEST_MERGED;
-import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.REPOSITORY_SERVER_PUSH;
-import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.PULL_REQUEST_SERVER_MERGED;
+import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst.PULL_REQUEST_MERGED;
+import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst.PULL_REQUEST_SERVER_MERGED;
+import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst.REPOSITORY_CLOUD_PUSH;
+import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst.REPOSITORY_SERVER_PUSH;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -48,9 +48,9 @@ import hudson.security.ACLContext;
 import hudson.triggers.Trigger;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.cause.BitBucketPPRTriggerCause;
+import io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRUtils;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRHookEvent;
 import io.jenkins.plugins.bitbucketpushandpullrequest.observer.BitBucketPPRObservable;
-import io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRUtils;
 import jenkins.branch.MultiBranchProject;
 import jenkins.model.Jenkins;
 import jenkins.model.ParameterizedJobMixIn;

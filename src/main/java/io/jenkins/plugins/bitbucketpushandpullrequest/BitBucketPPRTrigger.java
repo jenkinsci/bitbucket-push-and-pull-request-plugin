@@ -54,6 +54,7 @@ import hudson.triggers.TriggerDescriptor;
 import hudson.util.SequentialExecutionQueue;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.cause.BitBucketPPRTriggerCause;
+import io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRUtils;
 import io.jenkins.plugins.bitbucketpushandpullrequest.event.BitBucketPPREventContext;
 import io.jenkins.plugins.bitbucketpushandpullrequest.event.BitBucketPPREventFactory;
 import io.jenkins.plugins.bitbucketpushandpullrequest.event.BitBucketPPREventType;
@@ -66,7 +67,6 @@ import io.jenkins.plugins.bitbucketpushandpullrequest.filter.repository.BitBucke
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRHookEvent;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud.BitBucketPPRProject;
 import io.jenkins.plugins.bitbucketpushandpullrequest.observer.BitBucketPPRObservable;
-import io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRUtils;
 import jenkins.model.Jenkins;
 import jenkins.model.ParameterizedJobMixIn;
 import jenkins.triggers.SCMTriggerItem;

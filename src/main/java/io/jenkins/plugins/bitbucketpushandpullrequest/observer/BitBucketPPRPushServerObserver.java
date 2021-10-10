@@ -29,9 +29,9 @@ import hudson.model.Result;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.client.BitBucketPPRClientFactory;
 import io.jenkins.plugins.bitbucketpushandpullrequest.client.BitBucketPPRClientType;
+import io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRUtils;
 import io.jenkins.plugins.bitbucketpushandpullrequest.event.BitBucketPPREvent;
 import io.jenkins.plugins.bitbucketpushandpullrequest.event.BitBucketPPREventContext;
-import io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRUtils;
 
 public class BitBucketPPRPushServerObserver extends BitBucketPPRHandlerTemplate implements BitBucketPPRObserver {
   static final Logger logger = Logger.getLogger(BitBucketPPRPushCloudObserver.class.getName());
