@@ -46,6 +46,8 @@ public class BitBucketPPRCrumbExclusion extends CrumbExclusion {
       FilterChain chain) throws IOException, ServletException {
 
     String path = request.getPathInfo();
+    
+    // @todo which of the two? At other places we explicitely presuppose /XXX/
     if (path != null && (path.equals("/" + getHookPath()) || path.equals("/" + getHookPath() + "/"))) {
       chain.doFilter(request, response);
       

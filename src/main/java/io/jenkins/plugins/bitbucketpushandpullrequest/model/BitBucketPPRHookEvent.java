@@ -49,10 +49,14 @@ public class BitBucketPPRHookEvent {
   private String action;
   private String bitbucketEventKey;
 
-  public BitBucketPPRHookEvent(String eventAction) throws OperationNotSupportedException {
-    bitbucketEventKey = eventAction;
-    String[] eventActionPair = eventAction.split(":");
+  public BitBucketPPRHookEvent(String bitbucketEventKey) throws OperationNotSupportedException {
+    this.bitbucketEventKey = bitbucketEventKey;
+    setEventAndAction();
+    checkOperationSupportedException();
+  }
 
+  private void setEventAndAction() {
+    String[] eventActionPair = bitbucketEventKey.split(":");
     event = eventActionPair[0];
 
     if (eventActionPair.length == 3 && eventActionPair[1].equalsIgnoreCase("reviewer")) {
@@ -62,49 +66,41 @@ public class BitBucketPPRHookEvent {
     } else {
       action = eventActionPair[1];
     }
-
-    checkOperationSupportedException(event, action);
   }
 
-  private void checkOperationSupportedException(String event, String action)
-      throws OperationNotSupportedException {
+  private void checkOperationSupportedException() throws OperationNotSupportedException {
 
-    boolean error = false;
-
-    if (REPOSITORY_EVENT.equalsIgnoreCase(event)) {
-      if (!(REPOSITORY_CLOUD_PUSH.equalsIgnoreCase(action) || REPOSITORY_POST.equalsIgnoreCase(action)
-          || REPOSITORY_SERVER_PUSH.equalsIgnoreCase(action))) {
-        error = true;
-      }
-    } else if (PULL_REQUEST_CLOUD_EVENT.equalsIgnoreCase(event)
-        || PULL_REQUEST_SERVER_EVENT.equalsIgnoreCase(event)) {
-      if (!(PULL_REQUEST_APPROVED.equalsIgnoreCase(action)
-          || PULL_REQUEST_CREATED.equalsIgnoreCase(action)
-          || PULL_REQUEST_UPDATED.equalsIgnoreCase(action)
-          || PULL_REQUEST_MERGED.equalsIgnoreCase(action)
-          || PULL_REQUEST_COMMENT_CREATED.equalsIgnoreCase(action)
-          || PULL_REQUEST_COMMENT_UPDATED.equalsIgnoreCase(action)
-          || PULL_REQUEST_COMMENT_DELETED.equalsIgnoreCase(action)
-          || PULL_REQUEST_SERVER_CREATED.equalsIgnoreCase(action)
-          || PULL_REQUEST_SERVER_UPDATED.equalsIgnoreCase(action)
-          || PULL_REQUEST_SERVER_SOURCE_UPDATED.equalsIgnoreCase(action)
-          || PULL_REQUEST_SERVER_APPROVED.equalsIgnoreCase(action)
-          || PULL_REQUEST_SERVER_MERGED.equalsIgnoreCase(action)
-          || PULL_REQUEST_SERVER_COMMENT_CREATED.equalsIgnoreCase(action))) {
-        error = true;
-      }
-    } else if (DIAGNOSTICS.equalsIgnoreCase(event)) {
-      if (!PING.equalsIgnoreCase(action)) {
-        error = true;
-      }
-    } else {
-      error = true;
+    if (REPOSITORY_EVENT.equalsIgnoreCase(event) && (REPOSITORY_CLOUD_PUSH.equalsIgnoreCase(action)
+        || REPOSITORY_POST.equalsIgnoreCase(action)
+        || REPOSITORY_SERVER_PUSH.equalsIgnoreCase(action))) {
+      return;
     }
 
-    if (error) {
-      throw new OperationNotSupportedException(
-          "The eventAction " + event + "  " + action + " is not supported.");
+    if (PULL_REQUEST_CLOUD_EVENT.equalsIgnoreCase(event)
+        || PULL_REQUEST_SERVER_EVENT.equalsIgnoreCase(event)
+            && (PULL_REQUEST_APPROVED.equalsIgnoreCase(action)
+                || PULL_REQUEST_CREATED.equalsIgnoreCase(action)
+                || PULL_REQUEST_UPDATED.equalsIgnoreCase(action)
+                || PULL_REQUEST_MERGED.equalsIgnoreCase(action)
+                || PULL_REQUEST_COMMENT_CREATED.equalsIgnoreCase(action)
+                || PULL_REQUEST_COMMENT_UPDATED.equalsIgnoreCase(action)
+                || PULL_REQUEST_COMMENT_DELETED.equalsIgnoreCase(action)
+                || PULL_REQUEST_SERVER_CREATED.equalsIgnoreCase(action)
+                || PULL_REQUEST_SERVER_UPDATED.equalsIgnoreCase(action)
+                || PULL_REQUEST_SERVER_SOURCE_UPDATED.equalsIgnoreCase(action)
+                || PULL_REQUEST_SERVER_APPROVED.equalsIgnoreCase(action)
+                || PULL_REQUEST_SERVER_MERGED.equalsIgnoreCase(action)
+                || PULL_REQUEST_SERVER_COMMENT_CREATED.equalsIgnoreCase(action))) {
+      return;
     }
+
+    if (DIAGNOSTICS.equalsIgnoreCase(event) && PING.equalsIgnoreCase(action)) {
+      return;
+    }
+
+    throw new OperationNotSupportedException(
+        String.format("The event action {} : {} with bitbucket Event Key {} is not supported.",
+            event, action, bitbucketEventKey));
   }
 
   public String getEvent() {
@@ -121,6 +117,7 @@ public class BitBucketPPRHookEvent {
 
   @Override
   public String toString() {
-    return "BitBucketPPREvent [event=" + event + ", action=" + action + "]";
+    return String.format("BitBucketPPREvent [bitbucketEventKey={}, event={}, action={}]",
+        bitbucketEventKey, event, action);
   }
 }
