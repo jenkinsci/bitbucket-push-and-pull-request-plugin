@@ -49,10 +49,9 @@ import io.jenkins.plugins.bitbucketpushandpullrequest.observer.BitBucketPPRObser
 import io.jenkins.plugins.bitbucketpushandpullrequest.processor.BitBucketPPRPayloadProcessorFactory;
 
 /**
+ * BitbucketHookReceiver processes HTTP POST requests sent to $JENKINS_URL/bitbucket-hook/
  * 
  * @author cdelmonte
- *
- *         BitbucketHookReceiver processes HTTP POST request sent to $JENKINS_URL/bitbucket-hook/
  * 
  */
 @Extension

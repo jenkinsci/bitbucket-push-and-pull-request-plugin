@@ -1,7 +1,7 @@
 /*******************************************************************************
  * The MIT License
  *
- * Copyright (C) 2020, CloudBees, Inc.
+ * Copyright (C) 2021, CloudBees, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -43,7 +43,13 @@ import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPR
 import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst.REPOSITORY_SERVER_PUSH;
 import javax.naming.OperationNotSupportedException;
 
-
+/**
+ * Extracts event and action from the event key sent by Bitbucket and verifies that they are
+ * supported by the plugin.
+ * 
+ * @author cdelmonte
+ * 
+ */
 public class BitBucketPPRHookEvent {
   private String event;
   private String action;
@@ -52,7 +58,7 @@ public class BitBucketPPRHookEvent {
   public BitBucketPPRHookEvent(String bitbucketEventKey) throws OperationNotSupportedException {
     this.bitbucketEventKey = bitbucketEventKey;
     setEventAndAction();
-    checkOperationSupportedException();
+    checkOperationSupported();
   }
 
   private void setEventAndAction() {
@@ -68,7 +74,7 @@ public class BitBucketPPRHookEvent {
     }
   }
 
-  private void checkOperationSupportedException() throws OperationNotSupportedException {
+  private void checkOperationSupported() throws OperationNotSupportedException {
 
     if (REPOSITORY_EVENT.equalsIgnoreCase(event) && (REPOSITORY_CLOUD_PUSH.equalsIgnoreCase(action)
         || REPOSITORY_POST.equalsIgnoreCase(action)

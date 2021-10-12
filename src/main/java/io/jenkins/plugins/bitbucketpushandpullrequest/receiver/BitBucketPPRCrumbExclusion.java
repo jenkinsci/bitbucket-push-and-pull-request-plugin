@@ -1,7 +1,7 @@
 /*******************************************************************************
  * The MIT License
  * 
- * Copyright (C) 2018, CloudBees, Inc.
+ * Copyright (C) 2021, CloudBees, Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -27,30 +27,37 @@ import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.apache.commons.lang3.StringUtils;
 import hudson.Extension;
 import hudson.security.csrf.CrumbExclusion;
 import io.jenkins.plugins.bitbucketpushandpullrequest.config.BitBucketPPRPluginConfig;
 
-
+/**
+ * Checks that the requested route matches the plugin's exclusion rule for CSRF protection filter.
+ * 
+ * 
+ * @author cdelmonte
+ *
+ */
 @Extension
 public class BitBucketPPRCrumbExclusion extends CrumbExclusion {
-  
-  private static final BitBucketPPRPluginConfig globalConfig = BitBucketPPRPluginConfig.getInstance();
-  
+
+  private static final BitBucketPPRPluginConfig globalConfig =
+      BitBucketPPRPluginConfig.getInstance();
+
   public String getHookPath() {
-    return globalConfig.isHookUrlSet() ? globalConfig.getHookUrl() :HOOK_URL;
+    return globalConfig.isHookUrlSet() ? globalConfig.getHookUrl() : HOOK_URL;
   }
-  
+
   @Override
   public boolean process(HttpServletRequest request, HttpServletResponse response,
       FilterChain chain) throws IOException, ServletException {
 
     String path = request.getPathInfo();
-    
-    // @todo which of the two? At other places we explicitely presuppose /XXX/
-    if (path != null && (path.equals("/" + getHookPath()) || path.equals("/" + getHookPath() + "/"))) {
+
+    if (StringUtils.isNotBlank(path) && path.equals("/" + getHookPath() + "/")) {
       chain.doFilter(request, response);
-      
+
       return true;
     }
 
