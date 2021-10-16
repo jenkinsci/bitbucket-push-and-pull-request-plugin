@@ -1,7 +1,7 @@
 /*******************************************************************************
  * The MIT License
  *
- * Copyright (C) 2019, CloudBees, Inc.
+ * Copyright (C) 2021, CloudBees, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -66,6 +66,7 @@ public class BitBucketPPRJobProbe {
   public void triggerMatchingJobs(BitBucketPPRHookEvent bitbucketEvent,
       BitBucketPPRAction bitbucketAction, BitBucketPPRObservable observable) {
 
+    // @todo deprecated. It will be removed in v3.0
     if (!("git".equals(bitbucketAction.getScm()) || "hg".equals(bitbucketAction.getScm()))) {
       throw new UnsupportedOperationException(
           String.format("Unsupported SCM type %s", bitbucketAction.getScm()));
@@ -82,8 +83,8 @@ public class BitBucketPPRJobProbe {
     List<URIish> remotes = (List<URIish>) bitbucketAction.getScmUrls().stream().map(f)
         .filter(Objects::nonNull).collect(Collectors.toList());
 
-    // @todo do we need this?
-    ACL auth = Jenkins.get().getACL();
+    // @todo: do we need this? 
+    // Jenkins.get().getACL();
 
     try (ACLContext ctx = ACL.as(ACL.SYSTEM)) {
       Jenkins.get().getAllItems(Job.class).stream().forEach(job -> {
@@ -96,9 +97,9 @@ public class BitBucketPPRJobProbe {
     }
   }
 
-  private void triggerScm(@Nonnull Job<?, ?> job, List<URIish> remotes, BitBucketPPRHookEvent bitbucketEvent,
-      BitBucketPPRAction bitbucketAction, BitBucketPPRObservable observable)
-      throws TriggerNotSetException {
+  private void triggerScm(@Nonnull Job<?, ?> job, List<URIish> remotes,
+      BitBucketPPRHookEvent bitbucketEvent, BitBucketPPRAction bitbucketAction,
+      BitBucketPPRObservable observable) throws TriggerNotSetException {
 
     BitBucketPPRTrigger bitbucketTrigger = getBitBucketTrigger(job)
         .orElseThrow(() -> new TriggerNotSetException(job.getFullDisplayName()));
@@ -114,23 +115,20 @@ public class BitBucketPPRJobProbe {
       // @todo add comments to explain what is this check for
       if (job.getParent() instanceof MultiBranchProject
           && mPJobShouldNotBeTriggered(job, bitbucketEvent, bitbucketAction)) {
-        logger.log(Level.FINE, "Skipping job {}.", job.getDisplayName());
+        logger.log(Level.FINEST, "Skipping job {}.", job.getDisplayName());
         return;
       }
-      
+
       Predicate<URIish> p = (url) -> scmTrigger instanceof GitSCM ? matchGitScm(scmTrigger, url)
           : scmTrigger instanceof MercurialSCM ? matchMercurialScm(scmTrigger, url) : false;
 
       if (remotes.stream().anyMatch(p) && !scmTriggered.contains(scmTrigger)) {
         scmTriggered.add(scmTrigger);
-        
+
         try {
-          logger.log(Level.FINE, "Triggering trigger {0} for job {1}",
-              new Object[] {bitbucketTrigger.getClass().getName(), job.getFullDisplayName()});
-          
           bitbucketTrigger.onPost(bitbucketEvent, bitbucketAction, scmTrigger, observable);
           return;
-          
+
         } catch (Throwable e) {
           logger.log(Level.WARNING, "Error: {0}", e.getMessage());
           e.printStackTrace();
@@ -145,34 +143,34 @@ public class BitBucketPPRJobProbe {
 
   private boolean mPJobShouldNotBeTriggered(Job<?, ?> job, BitBucketPPRHookEvent bitbucketEvent,
       BitBucketPPRAction bitbucketAction) {
-    
+
     if (job.getDisplayName() != null) {
       String displayName = job.getDisplayName();
       String sourceBranchName = bitbucketAction.getSourceBranch();
       String targetBranchName = bitbucketAction.getTargetBranch();
 
-      logger.log(Level.FINE, "Bitbucket event is : {0}", bitbucketEvent.getAction());
-      logger.log(Level.FINE, "Job Name : {0}", displayName);
-      logger.log(Level.FINE, "sourceBranchName: {0} ", sourceBranchName);
-      logger.log(Level.FINE, "targetBranchName : {0}", targetBranchName);
-
+      logger.log(Level.FINEST,
+          "Bitbucket event is : {0}, Job Name : {1}, sourceBranchName: {2}, targetBranchName: {3}",
+          new String[] {bitbucketEvent.getAction(), displayName, sourceBranchName,
+              targetBranchName});
+      
       if (PULL_REQUEST_MERGED.equalsIgnoreCase(bitbucketEvent.getAction())) {
         return !displayName.equalsIgnoreCase(targetBranchName);
-      } 
-      
+      }
+
       if (PULL_REQUEST_SERVER_MERGED.equalsIgnoreCase(bitbucketEvent.getAction())) {
         return !displayName.equalsIgnoreCase(targetBranchName);
       }
-      
+
       if (sourceBranchName != null) {
         return !displayName.equalsIgnoreCase(sourceBranchName);
-      } 
-      
+      }
+
       if (REPOSITORY_CLOUD_PUSH.equalsIgnoreCase(bitbucketEvent.getAction())
           && targetBranchName != null) {
         return !displayName.equals(targetBranchName);
-      } 
-      
+      }
+
       if (REPOSITORY_SERVER_PUSH.equalsIgnoreCase(bitbucketEvent.getAction())
           && targetBranchName != null) {
         return !displayName.equals(targetBranchName);

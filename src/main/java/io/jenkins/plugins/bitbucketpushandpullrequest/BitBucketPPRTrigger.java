@@ -1,7 +1,7 @@
 /*******************************************************************************
  * The MIT License
  * 
- * Copyright (C) 2020, CloudBees, Inc.
+ * Copyright (C) 2021, CloudBees, Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -69,9 +69,9 @@ import jenkins.model.ParameterizedJobMixIn;
 import jenkins.triggers.SCMTriggerItem;
 
 public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
+
   private static final Logger logger = Logger.getLogger(BitBucketPPRTrigger.class.getName());
   private List<BitBucketPPRTriggerFilter> triggers;
-
   public static final boolean ALLOW_HOOKURL_OVERRIDE = true;
 
   {
@@ -86,20 +86,20 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
   /**
    * Called when a POST is made.
    * 
+   * @param bitbucketEvent
+   * @param bitbucketAction
    * @param scmTrigger
-   * 
-   * @throws IOException
+   * @param observable
+   * @throws Exception
    */
   public void onPost(BitBucketPPRHookEvent bitbucketEvent, BitBucketPPRAction bitbucketAction,
       SCM scmTrigger, BitBucketPPRObservable observable) throws Exception {
     logger.log(Level.FINEST, "Called onPost Method for action {}", bitbucketAction.toString());
 
-
     if (job == null) {
       logger.warning(() -> "Error: the job is null");
       return;
     }
-
 
     BitBucketPPRFilterMatcher filterMatcher = new BitBucketPPRFilterMatcher();
     List<BitBucketPPRTriggerFilter> matchingFilters =
@@ -107,24 +107,15 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
 
     if (matchingFilters != null && !matchingFilters.isEmpty()) {
 
-      logger.finest("Following triggers are configured:");
-      matchingFilters.stream().forEach(f -> logger.finest(f.getClass().getName()));
-
       BitBucketPPRPollingRunnable bitbucketPollingRunnable =
           new BitBucketPPRPollingRunnable(job, getLogFile(), new BitBucketPPRPollResultListener() {
+
             @Override
             public void onPollSuccess(PollingResult pollingResult) {
-
-              logger.log(Level.INFO, "Polled BB PPR. The result of the polling is {0}",
-                  pollingResult.change.name());
-
               matchingFilters.stream().forEach(filter -> {
                 try {
                   BitBucketPPRTriggerCause cause =
                       filter.getCause(getLogFile(), bitbucketAction, bitbucketEvent);
-                  logger.info(
-                      String.format("Polling successful for the cause: {}.", cause.toString()));
-                  
                   if (shouldScheduleJob(filter, pollingResult, bitbucketAction)) {
                     scheduleJob(cause, bitbucketAction, scmTrigger, observable, filter);
                   }
@@ -138,7 +129,7 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
 
             @Override
             public void onPollError(Throwable e) {
-              logger.log(Level.FINEST, "Called onPollError: {}.", e.getMessage());
+              logger.log(Level.WARNING, "Called onPollError: {}.", e.getMessage());
               e.printStackTrace();
             }
           });
@@ -153,7 +144,7 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
       }
 
     } else {
-      logger.info("Triggers are not configured.");
+      logger.warning("Triggers are not configured.");
     }
   }
 
@@ -189,7 +180,7 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
             new URIish(bitbucketAction.getScmUrls().get(0))));
 
     QueueTaskFuture<? extends Run<?, ?>> f =
-        item != null ? (QueueTaskFuture<? extends Run<?, ?>>) item.getFuture() : null;
+        item != null ? (QueueTaskFuture) item.getFuture() : null;
 
     if (f == null)
       return;
@@ -210,16 +201,15 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
         observable.notifyObservers(
             BitBucketPPREventFactory.createEvent(BitBucketPPREventType.BUILD_FINISHED,
                 new BitBucketPPREventContext(bitbucketAction, scmTrigger, run, filter)));
-
       }
+
     } catch (InterruptedException | ExecutionException e) {
-      logger.info(e.getMessage());
+      logger.warning(e.getMessage());
       e.printStackTrace();
     } catch (Throwable e) {
       e.printStackTrace();
     }
   }
-
 
   @Override
   public Collection<? extends hudson.model.Action> getProjectActions() {
@@ -232,16 +222,13 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
    * @throws JobNotStartedException, IOException
    */
   public File getLogFile() throws JobNotStartedException, IOException {
-
-    if (job == null) {
+    if (job == null)
       throw new JobNotStartedException("No job started");
-    }
 
     File file = new File(job.getRootDir(), "bitbucket-polling.log");
-    if (file.createNewFile()) {
-      logger.log(Level.FINE, "Created new file {0} for logging in the directory {1}.",
-          new Object[] {"bitbucket-polling.log", job.getRootDir()});
-    }
+
+    if (!file.createNewFile())
+      throw new IOException();
 
     return file;
   }
