@@ -22,7 +22,6 @@
 package io.jenkins.plugins.bitbucketpushandpullrequest;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -30,7 +29,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.commons.jelly.XMLOutput;
 import org.eclipse.jgit.transport.URIish;
@@ -57,7 +55,6 @@ import io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRUtils;
 import io.jenkins.plugins.bitbucketpushandpullrequest.event.BitBucketPPREventContext;
 import io.jenkins.plugins.bitbucketpushandpullrequest.event.BitBucketPPREventFactory;
 import io.jenkins.plugins.bitbucketpushandpullrequest.event.BitBucketPPREventType;
-import io.jenkins.plugins.bitbucketpushandpullrequest.exception.JobNotStartedException;
 import io.jenkins.plugins.bitbucketpushandpullrequest.filter.BitBucketPPRFilterMatcher;
 import io.jenkins.plugins.bitbucketpushandpullrequest.filter.BitBucketPPRTriggerFilter;
 import io.jenkins.plugins.bitbucketpushandpullrequest.filter.BitBucketPPRTriggerFilterDescriptor;
@@ -68,8 +65,14 @@ import jenkins.model.Jenkins;
 import jenkins.model.ParameterizedJobMixIn;
 import jenkins.triggers.SCMTriggerItem;
 
+/**
+ * 
+ * @author cdelmonte
+ *
+ */
 public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
 
+  private static final String BITBUCKET_POLLING_LOG = "bitbucket-polling.log";
   private static final Logger logger = Logger.getLogger(BitBucketPPRTrigger.class.getName());
   private List<BitBucketPPRTriggerFilter> triggers;
   public static final boolean ALLOW_HOOKURL_OVERRIDE = true;
@@ -94,10 +97,10 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
    */
   public void onPost(BitBucketPPRHookEvent bitbucketEvent, BitBucketPPRAction bitbucketAction,
       SCM scmTrigger, BitBucketPPRObservable observable) throws Exception {
-    logger.log(Level.FINEST, "Called onPost Method for action {}", bitbucketAction.toString());
+    logger.finest(String.format("Called onPost Method for action %s", bitbucketAction));
 
     if (job == null) {
-      logger.warning(() -> "Error: the job is null");
+      logger.warning("Error: the job is null");
       return;
     }
 
@@ -120,8 +123,8 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
                     scheduleJob(cause, bitbucketAction, scmTrigger, observable, filter);
                   }
                 } catch (Throwable e) {
-                  logger.log(Level.WARNING,
-                      "During the polling process an exception was thrown: {}.", e.getMessage());
+                  logger.warning(String.format(
+                      "During the polling process an exception was thrown: %s.", e.getMessage()));
                   e.printStackTrace();
                 }
               });
@@ -129,7 +132,7 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
 
             @Override
             public void onPollError(Throwable e) {
-              logger.log(Level.WARNING, "Called onPollError: {}.", e.getMessage());
+              logger.warning(String.format("Called onPollError: %s.", e.getMessage()));
               e.printStackTrace();
             }
           });
@@ -137,9 +140,9 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
       try {
         getDescriptor().queue.execute(bitbucketPollingRunnable);
       } catch (Throwable e) {
-        logger.warning(
-            "Error: cannot add the BB PPR polling runnable to the Jenkins' SequentialExecutionQueue queue:"
-                + e.getMessage());
+        logger.warning(String.format(
+            "Error: cannot add the BB PPR polling runnable to the Jenkins' SequentialExecutionQueue queue: %s",
+            e.getMessage()));
         e.printStackTrace();
       }
 
@@ -150,10 +153,10 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
 
   private boolean shouldScheduleJob(BitBucketPPRTriggerFilter filter, PollingResult pollingResult,
       BitBucketPPRAction bitbucketAction) {
-    logger.log(Level.FINEST,
-        "Should schedule job: {0} and (polling result has changes: {1} or trigger also if there aren't changes: {2})",
-        new Object[] {filter.shouldScheduleJob(bitbucketAction), pollingResult.hasChanges(),
-            filter.shouldTriggerAlsoIfNothingChanged()});
+    logger.finest(String.format(
+        "Should schedule job: %s and (polling result has changes: %s or trigger also if there aren't changes: %s)",
+        filter.shouldScheduleJob(bitbucketAction), pollingResult.hasChanges(),
+        filter.shouldTriggerAlsoIfNothingChanged()));
 
     return filter.shouldScheduleJob(bitbucketAction)
         && (pollingResult.hasChanges() || filter.shouldTriggerAlsoIfNothingChanged());
@@ -162,11 +165,6 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
   private void scheduleJob(BitBucketPPRTriggerCause cause, BitBucketPPRAction bitbucketAction,
       SCM scmTrigger, BitBucketPPRObservable observable, BitBucketPPRTriggerFilter filter)
       throws URISyntaxException {
-
-    if (job == null) {
-      logger.warning(() -> "Error: the job is null");
-      return;
-    }
 
     // Jenkins will take all instances of QueueAction from this job and will try to compare these
     // instances
@@ -211,26 +209,15 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
     }
   }
 
+  File getLogFile() {
+    if (job == null)
+      return null;
+    return new File(job.getRootDir(), BITBUCKET_POLLING_LOG);
+  }
+
   @Override
   public Collection<? extends hudson.model.Action> getProjectActions() {
     return Collections.singleton(new BitBucketPPRWebHookPollingAction());
-  }
-
-  /**
-   * Returns the file that records the last/current polling activity.
-   * 
-   * @throws JobNotStartedException, IOException
-   */
-  public File getLogFile() throws JobNotStartedException, IOException {
-    if (job == null)
-      throw new JobNotStartedException("No job started");
-
-    File file = new File(job.getRootDir(), "bitbucket-polling.log");
-
-    if (!file.createNewFile())
-      throw new IOException();
-
-    return file;
   }
 
   @Override

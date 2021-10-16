@@ -56,6 +56,11 @@ import jenkins.model.Jenkins;
 import jenkins.model.ParameterizedJobMixIn;
 import jenkins.triggers.SCMTriggerItem;
 
+/**
+ * 
+ * @author cdelmonte
+ *
+ */
 public class BitBucketPPRJobProbe {
   private static final Logger logger = Logger.getLogger(BitBucketPPRJobProbe.class.getName());
 
@@ -76,14 +81,12 @@ public class BitBucketPPRJobProbe {
       try {
         return new URIish(a);
       } catch (URISyntaxException e) {
-        logger.log(Level.WARNING, "Invalid URI {0}", e.getMessage());
+        logger.warning(String.format("Invalid URI %s.", e.getMessage()));
         return null;
       }
     };
     List<URIish> remotes = (List<URIish>) bitbucketAction.getScmUrls().stream().map(f)
         .filter(Objects::nonNull).collect(Collectors.toList());
-
-    Jenkins.get().getACL();
 
     try (ACLContext ctx = ACL.as(ACL.SYSTEM)) {
       Jenkins.get().getAllItems(Job.class).stream().forEach(job -> {
@@ -152,7 +155,7 @@ public class BitBucketPPRJobProbe {
           "Bitbucket event is : {0}, Job Name : {1}, sourceBranchName: {2}, targetBranchName: {3}",
           new String[] {bitbucketEvent.getAction(), displayName, sourceBranchName,
               targetBranchName});
-      
+
       if (PULL_REQUEST_MERGED.equalsIgnoreCase(bitbucketEvent.getAction())) {
         return !displayName.equalsIgnoreCase(targetBranchName);
       }
