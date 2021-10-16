@@ -25,17 +25,16 @@ import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPR
 import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst.REPOSITORY_CLOUD_PUSH;
 import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst.REPOSITORY_EVENT;
 import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst.REPOSITORY_SERVER_PUSH;
-import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import io.jenkins.plugins.bitbucketpushandpullrequest.exception.BitBucketPPRObserverNotFoundException;
+import javax.annotation.Nonnull;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRHookEvent;
 
 
 public class BitBucketPPRObserverFactory {
   static final Logger logger = Logger.getLogger(BitBucketPPRObserverFactory.class.getName());
 
-  public static BitBucketPPRObservable createObservable(BitBucketPPRHookEvent bitbucketEvent) {
+  public static BitBucketPPRObservable createObservable(@Nonnull final BitBucketPPRHookEvent bitbucketEvent) {
 
     BitBucketPPRObservable observable = new BitBucketPPRObservable();
 

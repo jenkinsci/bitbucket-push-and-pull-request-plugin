@@ -34,8 +34,7 @@ import io.jenkins.plugins.bitbucketpushandpullrequest.config.BitBucketPPRPluginC
 
 /**
  * Checks that the requested route matches the plugin's exclusion rule for CSRF protection filter.
- * 
- * 
+ *
  * @author cdelmonte
  *
  */

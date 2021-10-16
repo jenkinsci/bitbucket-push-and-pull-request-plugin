@@ -29,6 +29,7 @@ import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.annotation.Nonnull;
 import javax.naming.OperationNotSupportedException;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.io.IOUtils;
@@ -60,7 +61,8 @@ public class BitBucketPPRHookReceiver implements UnprotectedRootAction {
   private static final BitBucketPPRPluginConfig globalConfig =
       BitBucketPPRPluginConfig.getInstance();
 
-  public void doIndex(StaplerRequest request, StaplerResponse response) throws IOException {
+  public void doIndex(@Nonnull StaplerRequest request, @Nonnull StaplerResponse response)
+      throws IOException {
     if (request.getRequestURI().contains("/" + getUrlName() + "/")
         && request.getMethod().equalsIgnoreCase("POST")) {
       logger.log(Level.INFO, "Received POST request over Bitbucket hook");
@@ -82,7 +84,8 @@ public class BitBucketPPRHookReceiver implements UnprotectedRootAction {
     }
   }
 
-  private void writeSuccessResponse(StaplerResponse response, String msg) throws IOException {
+  private void writeSuccessResponse(@Nonnull StaplerResponse response, @Nonnull String msg)
+      throws IOException {
     response.setContentType("text/html");
     response.setCharacterEncoding("UTF-8");
     response.setStatus(HttpServletResponse.SC_OK);
@@ -92,7 +95,8 @@ public class BitBucketPPRHookReceiver implements UnprotectedRootAction {
     out.close();
   }
 
-  private void writeFailResponse(StaplerResponse response, String msg) throws IOException {
+  private void writeFailResponse(@Nonnull StaplerResponse response, @Nonnull String msg)
+      throws IOException {
     response.setContentType("text/html");
     response.setCharacterEncoding("UTF-8");
     response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -101,16 +105,17 @@ public class BitBucketPPRHookReceiver implements UnprotectedRootAction {
     out.flush();
     out.close();
   }
-  
-  void process(StaplerRequest request, StaplerResponse response) throws IOException,
-      JsonSyntaxException, OperationNotSupportedException, InputStreamException {
+
+  void process(@Nonnull StaplerRequest request, @Nonnull StaplerResponse response)
+      throws IOException, JsonSyntaxException, OperationNotSupportedException,
+      InputStreamException {
     BitBucketPPRHookEvent bitbucketEvent = getBitbucketEvent(request);
     BitBucketPPRPayload payload = getPayload(response, getInputStream(request), bitbucketEvent);
     BitBucketPPRPayloadProcessorFactory.createProcessor(bitbucketEvent).processPayload(payload,
         BitBucketPPRObserverFactory.createObservable(bitbucketEvent));
   }
 
-  String getInputStream(StaplerRequest request) throws IOException, InputStreamException {
+  String getInputStream(@Nonnull StaplerRequest request) throws IOException, InputStreamException {
     String inputStream = IOUtils.toString(request.getInputStream());
     if (StringUtils.isBlank(inputStream)) {
       logger.severe("The Jenkins job cannot be triggered. The input stream is empty.");
@@ -119,8 +124,8 @@ public class BitBucketPPRHookReceiver implements UnprotectedRootAction {
     return decodeInputStream(inputStream, request.getContentType());
   }
 
-  BitBucketPPRPayload getPayload(StaplerResponse response, String inputStream,
-      BitBucketPPRHookEvent bitbucketEvent)
+  BitBucketPPRPayload getPayload(@Nonnull StaplerResponse response, @Nonnull final String inputStream,
+      @Nonnull BitBucketPPRHookEvent bitbucketEvent)
       throws JsonSyntaxException, OperationNotSupportedException {
     BitBucketPPRPayload pl = new Gson().fromJson(inputStream,
         BitBucketPPRPayloadFactory.getInstance(bitbucketEvent).getClass());
@@ -128,10 +133,11 @@ public class BitBucketPPRHookReceiver implements UnprotectedRootAction {
     return pl;
   }
 
-  static String decodeInputStream(String inputStream, String contentType)
-      throws UnsupportedEncodingException {
+  static String decodeInputStream(@Nonnull final String inputStream,
+      @Nonnull final String contentType) throws UnsupportedEncodingException {
     String input = inputStream;
-    if (StringUtils.startsWithIgnoreCase(contentType, BitBucketPPRConst.APPLICATION_X_WWW_FORM_URLENCODED)) {
+    if (StringUtils.startsWithIgnoreCase(contentType,
+        BitBucketPPRConst.APPLICATION_X_WWW_FORM_URLENCODED)) {
       input = URLDecoder.decode(input, StandardCharsets.UTF_8.toString());
     }
     if (StringUtils.startsWithIgnoreCase(input, BitBucketPPRConst.PAYLOAD_PFX)) {
@@ -140,9 +146,11 @@ public class BitBucketPPRHookReceiver implements UnprotectedRootAction {
     return input;
   }
 
-  BitBucketPPRHookEvent getBitbucketEvent(StaplerRequest request)
+  BitBucketPPRHookEvent getBitbucketEvent(@Nonnull StaplerRequest request)
       throws OperationNotSupportedException {
     String xEventHeader = request.getHeader(BitBucketPPRConst.X_EVENT_KEY);
+
+    // @todo: DEPRECATED_X_HEADER_REPO_POST deprecated. It will be removed in version 3.0.0
     return StringUtils.isNotBlank(xEventHeader) ? new BitBucketPPRHookEvent(xEventHeader)
         : new BitBucketPPRHookEvent(BitBucketPPRConst.DEPRECATED_X_HEADER_REPO_POST);
   }

@@ -1,7 +1,7 @@
 /*******************************************************************************
  * The MIT License
  *
- * Copyright (C) 2020, CloudBees, Inc.
+ * Copyright (C) 2021, CloudBees, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -27,7 +27,7 @@ import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPR
 import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst.REPOSITORY_POST;
 import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst.REPOSITORY_SERVER_PUSH;
 import java.util.logging.Logger;
-
+import javax.annotation.Nonnull;
 import javax.naming.OperationNotSupportedException;
 import io.jenkins.plugins.bitbucketpushandpullrequest.BitBucketPPRJobProbe;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRHookEvent;
@@ -42,13 +42,13 @@ public final class BitBucketPPRPayloadProcessorFactory {
     throw new AssertionError();
   }
 
-  public static BitBucketPPRPayloadProcessor createProcessor(final BitBucketPPRHookEvent bitbucketEvent)
+  public static BitBucketPPRPayloadProcessor createProcessor(@Nonnull final BitBucketPPRHookEvent bitbucketEvent)
       throws OperationNotSupportedException {
     return createProcessor(new BitBucketPPRJobProbe(), bitbucketEvent);
   }
 
-  public static BitBucketPPRPayloadProcessor createProcessor(final BitBucketPPRJobProbe probe,
-      final BitBucketPPRHookEvent bitbucketEvent) throws OperationNotSupportedException {
+  public static BitBucketPPRPayloadProcessor createProcessor(@Nonnull final BitBucketPPRJobProbe probe,
+      @Nonnull final BitBucketPPRHookEvent bitbucketEvent) throws OperationNotSupportedException {
 
     if (REPOSITORY_EVENT.equalsIgnoreCase(bitbucketEvent.getEvent())
         && REPOSITORY_CLOUD_PUSH.equalsIgnoreCase(bitbucketEvent.getAction())) {
@@ -60,6 +60,8 @@ public final class BitBucketPPRPayloadProcessorFactory {
           logger.info("Create BitBucketPPRRepositoryServerPayloadProcessor");
       return new BitBucketPPRRepositoryServerPayloadProcessor(probe, bitbucketEvent);
     }
+    
+    // @todo: will be removed in version 3.0.0
     if (REPOSITORY_EVENT.equalsIgnoreCase(bitbucketEvent.getEvent())
         && REPOSITORY_POST.equalsIgnoreCase(bitbucketEvent.getAction())) {
       logger.warning("Got unexpected old post action, ignored!");

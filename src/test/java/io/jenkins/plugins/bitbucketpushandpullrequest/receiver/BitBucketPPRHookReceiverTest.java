@@ -24,6 +24,7 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import java.io.UnsupportedEncodingException;
+import javax.annotation.Nonnull;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.MockedStatic;
@@ -54,7 +55,7 @@ public class BitBucketPPRHookReceiverTest {
 
     execTest(inputStream, contentType, expected);
   }
-  
+
   @Test
   public void testDecodeInputStream3() throws Exception {
     String inputStream = BitBucketPPRConst.PAYLOAD_PFX + "here%20we%20are%2C%20isn%27t%20it%3F%3F";
@@ -63,7 +64,7 @@ public class BitBucketPPRHookReceiverTest {
 
     execTest(inputStream, contentType, expected);
   }
-  
+
   @Test
   public void testDecodeInputStream4() throws Exception {
     String inputStream = "payloadhere%20we%20are%2C%20isn%27t%20it%3F%3F";
@@ -72,16 +73,18 @@ public class BitBucketPPRHookReceiverTest {
 
     execTest(inputStream, contentType, expected);
   }
-  
+
   @Test
+  @edu.umd.cs.findbugs.annotations.SuppressFBWarnings(
+      value="NP_NULL_PARAM_DEREF_NONVIRTUAL", 
+      justification="I know what I'm doing")
   public void testDecodeInputStream5() throws Exception {
     String inputStream = "here%20we%20are%2C%20isn%27t%20it%3F%3F";
-    String contentType = null;
+    String contentType = "";
     String expected = "here%20we%20are%2C%20isn%27t%20it%3F%3F";
     execTest(inputStream, contentType, expected);
   }
-  
-  
+
   @Test
   public void testDecodeInputStream6() throws Exception {
     String inputStream = "here%20we%20are%2C%20isn%27t%20it%3F%3F";

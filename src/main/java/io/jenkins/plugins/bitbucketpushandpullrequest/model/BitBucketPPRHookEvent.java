@@ -105,7 +105,7 @@ public class BitBucketPPRHookEvent {
     }
 
     throw new OperationNotSupportedException(
-        String.format("The event action {} : {} with bitbucket Event Key {} is not supported.",
+        String.format("The event action %s : %s with bitbucket Event Key %s is not supported.",
             event, action, bitbucketEventKey));
   }
 
@@ -123,7 +123,7 @@ public class BitBucketPPRHookEvent {
 
   @Override
   public String toString() {
-    return String.format("BitBucketPPREvent [bitbucketEventKey={}, event={}, action={}]",
+    return String.format("BitBucketPPREvent [bitbucketEventKey = %s, event = %s, action = %s]",
         bitbucketEventKey, event, action);
   }
 }

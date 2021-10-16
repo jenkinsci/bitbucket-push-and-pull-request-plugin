@@ -23,11 +23,9 @@ package io.jenkins.plugins.bitbucketpushandpullrequest;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.ObjectStreamException;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -44,6 +42,7 @@ import hudson.console.AnnotatedLargeText;
 import hudson.model.CauseAction;
 import hudson.model.Item;
 import hudson.model.Job;
+import hudson.model.Queue;
 import hudson.model.Run;
 import hudson.model.queue.QueueTaskFuture;
 import hudson.plugins.git.RevisionParameterAction;
@@ -62,8 +61,6 @@ import io.jenkins.plugins.bitbucketpushandpullrequest.exception.JobNotStartedExc
 import io.jenkins.plugins.bitbucketpushandpullrequest.filter.BitBucketPPRFilterMatcher;
 import io.jenkins.plugins.bitbucketpushandpullrequest.filter.BitBucketPPRTriggerFilter;
 import io.jenkins.plugins.bitbucketpushandpullrequest.filter.BitBucketPPRTriggerFilterDescriptor;
-import io.jenkins.plugins.bitbucketpushandpullrequest.filter.repository.BitBucketPPRRepositoryPushActionFilter;
-import io.jenkins.plugins.bitbucketpushandpullrequest.filter.repository.BitBucketPPRRepositoryTriggerFilter;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRHookEvent;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud.BitBucketPPRProject;
 import io.jenkins.plugins.bitbucketpushandpullrequest.observer.BitBucketPPRObservable;
@@ -86,23 +83,6 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
     this.triggers = triggers;
   }
 
-  @Override
-  public Object readResolve() throws ObjectStreamException {
-    super.readResolve();
-
-    // TODO: is this he place for that? And why only for push?
-    if (triggers == null) {
-      BitBucketPPRRepositoryPushActionFilter repositoryPushActionFilter =
-          new BitBucketPPRRepositoryPushActionFilter(false, false, spec);
-      BitBucketPPRRepositoryTriggerFilter repositoryTriggerFilter =
-          new BitBucketPPRRepositoryTriggerFilter(repositoryPushActionFilter);
-      triggers = new ArrayList<>();
-      triggers.add(repositoryTriggerFilter);
-    }
-
-    return this;
-  }
-
   /**
    * Called when a POST is made.
    * 
@@ -110,47 +90,55 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
    * 
    * @throws IOException
    */
-  public void onPost(BitBucketPPRHookEvent bitbucketEvent, BitBucketPPRAction bitbucketAction, SCM scmTrigger,
-      BitBucketPPRObservable observable) throws Exception {
-    logger.log(Level.FINEST, "Called onPost Method for action " + bitbucketAction.toString());
+  public void onPost(BitBucketPPRHookEvent bitbucketEvent, BitBucketPPRAction bitbucketAction,
+      SCM scmTrigger, BitBucketPPRObservable observable) throws Exception {
+    logger.log(Level.FINEST, "Called onPost Method for action {}", bitbucketAction.toString());
+
+
+    if (job == null) {
+      logger.warning(() -> "Error: the job is null");
+      return;
+    }
+
 
     BitBucketPPRFilterMatcher filterMatcher = new BitBucketPPRFilterMatcher();
-    List<BitBucketPPRTriggerFilter> matchingFilters = filterMatcher.getMatchingFilters(bitbucketEvent, triggers);
+    List<BitBucketPPRTriggerFilter> matchingFilters =
+        filterMatcher.getMatchingFilters(bitbucketEvent, triggers);
 
     if (matchingFilters != null && !matchingFilters.isEmpty()) {
+
       logger.finest("Following triggers are configured:");
-      for (BitBucketPPRTriggerFilter matchingFilter : matchingFilters) {
-        logger.finest(matchingFilter.getClass().getName());
-      }
+      matchingFilters.stream().forEach(f -> logger.finest(f.getClass().getName()));
 
       BitBucketPPRPollingRunnable bitbucketPollingRunnable =
           new BitBucketPPRPollingRunnable(job, getLogFile(), new BitBucketPPRPollResultListener() {
             @Override
             public void onPollSuccess(PollingResult pollingResult) {
 
-              logger.log(Level.INFO, "Polled BB PPR. The result of the polling is {0}", pollingResult.change.name());
-              for (BitBucketPPRTriggerFilter filter : matchingFilters) {
-                BitBucketPPRTriggerCause cause;
+              logger.log(Level.INFO, "Polled BB PPR. The result of the polling is {0}",
+                  pollingResult.change.name());
+
+              matchingFilters.stream().forEach(filter -> {
                 try {
-                  cause = filter.getCause(getLogFile(), bitbucketAction, bitbucketEvent);
-
-                  logger.info("The polling of the BB PPR job was successful for the cause: " + cause.toString());
-
+                  BitBucketPPRTriggerCause cause =
+                      filter.getCause(getLogFile(), bitbucketAction, bitbucketEvent);
+                  logger.info(
+                      String.format("Polling successful for the cause: {}.", cause.toString()));
+                  
                   if (shouldScheduleJob(filter, pollingResult, bitbucketAction)) {
                     scheduleJob(cause, bitbucketAction, scmTrigger, observable, filter);
-                    return;
                   }
                 } catch (Throwable e) {
-                  logger
-                      .warning("During the polling process of a BB PPR job an exception was thrown: " + e.getMessage());
+                  logger.log(Level.WARNING,
+                      "During the polling process an exception was thrown: {}.", e.getMessage());
                   e.printStackTrace();
                 }
-              }
+              });
             }
 
             @Override
             public void onPollError(Throwable e) {
-              logger.log(Level.FINEST, "Called onPollError: " + e.getMessage());
+              logger.log(Level.FINEST, "Called onPollError: {}.", e.getMessage());
               e.printStackTrace();
             }
           });
@@ -158,8 +146,9 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
       try {
         getDescriptor().queue.execute(bitbucketPollingRunnable);
       } catch (Throwable e) {
-        logger.warning("Error: cannot add the BB PPR polling runnable to the Jenkins' SequentialExecutionQueue queue:"
-            + e.getMessage());
+        logger.warning(
+            "Error: cannot add the BB PPR polling runnable to the Jenkins' SequentialExecutionQueue queue:"
+                + e.getMessage());
         e.printStackTrace();
       }
 
@@ -179,68 +168,58 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
         && (pollingResult.hasChanges() || filter.shouldTriggerAlsoIfNothingChanged());
   }
 
-  private void scheduleJob(BitBucketPPRTriggerCause cause, BitBucketPPRAction bitbucketAction, SCM scmTrigger,
-      BitBucketPPRObservable observable, BitBucketPPRTriggerFilter filter) {
+  private void scheduleJob(BitBucketPPRTriggerCause cause, BitBucketPPRAction bitbucketAction,
+      SCM scmTrigger, BitBucketPPRObservable observable, BitBucketPPRTriggerFilter filter)
+      throws URISyntaxException {
 
     if (job == null) {
       logger.warning(() -> "Error: the job is null");
       return;
     }
-    ParameterizedJobMixIn<?, ?> pJob = new ParameterizedJobMixIn() {
-      @Override
-      protected Job<?, ?> asJob() {
-        return job;
-      }
-    };
-    logger.info("Check if job should be triggered due to changes in SCM");
 
-    // Jenkins will take all instances of QueueAction from this job and will try to compare these instances
+    // Jenkins will take all instances of QueueAction from this job and will try to compare these
+    // instances
     // to all instances of QueueAction from all other pending jobs
     // while calling scheduleBuild2 (see hudson.model.Queue.scheduleInternal)
-    // So we need RevisionParameterAction to distinguish THIS job from all other pending jobs in queue
-    QueueTaskFuture<?> future = null;
+    // So we need RevisionParameterAction to distinguish THIS job from all other pending jobs in
+    // queue
+
+    Queue.Item item = ParameterizedJobMixIn.scheduleBuild2(job, 5, new CauseAction(cause),
+        bitbucketAction, new RevisionParameterAction(bitbucketAction.getLatestCommit(),
+            new URIish(bitbucketAction.getScmUrls().get(0))));
+
+    QueueTaskFuture<? extends Run<?, ?>> f =
+        item != null ? (QueueTaskFuture<? extends Run<?, ?>>) item.getFuture() : null;
+
+    if (f == null)
+      return;
+
     try {
-      future = pJob.scheduleBuild2(5, new CauseAction(cause), bitbucketAction,
-              new RevisionParameterAction(bitbucketAction.getLatestCommit(),
-                      new URIish(bitbucketAction.getScmUrls().get(0))));
-    } catch (URISyntaxException e) {
+      f.waitForStart();
+      int buildNumber = job.getNextBuildNumber();
+      logger.info(
+          String.format("SCM changes detected in %s. Triggering # %d", job.getName(), buildNumber));
+
+      observable
+          .notifyObservers(BitBucketPPREventFactory.createEvent(BitBucketPPREventType.BUILD_STARTED,
+              new BitBucketPPREventContext(bitbucketAction, scmTrigger, job, buildNumber, filter)));
+
+      Run<?, ?> run = (Run<?, ?>) f.get();
+
+      if (f.isDone()) {
+        observable.notifyObservers(
+            BitBucketPPREventFactory.createEvent(BitBucketPPREventType.BUILD_FINISHED,
+                new BitBucketPPREventContext(bitbucketAction, scmTrigger, run, filter)));
+
+      }
+    } catch (InterruptedException | ExecutionException e) {
       logger.info(e.getMessage());
       e.printStackTrace();
-    }
-
-    int buildNumber = job.getNextBuildNumber();
-    logger.info(() -> "SCM changes detected in " + job.getName() + ". Triggering " + " #" + buildNumber);
-
-    if (future != null) {
-      try {
-        future.waitForStart();
-
-        try {
-          observable.notifyObservers(BitBucketPPREventFactory.createEvent(BitBucketPPREventType.BUILD_STARTED,
-              new BitBucketPPREventContext(bitbucketAction, scmTrigger, job, buildNumber, filter)));
-        } catch (Throwable e) {
-          logger.info(e.getMessage());
-          e.printStackTrace();
-        }
-
-        Run<?, ?> run = (Run<?, ?>) future.get();
-        if (future.isDone()) {
-          try {
-            observable.notifyObservers(BitBucketPPREventFactory.createEvent(BitBucketPPREventType.BUILD_FINISHED,
-                new BitBucketPPREventContext(bitbucketAction, scmTrigger, run, filter)));
-          } catch (Throwable e) {
-            logger.info(e.getMessage());
-            e.printStackTrace();
-          }
-        }
-      } catch (InterruptedException | ExecutionException e) {
-        logger.info(e.getMessage());
-        e.printStackTrace();
-      } catch (Throwable e) {
-        e.printStackTrace();
-      }
+    } catch (Throwable e) {
+      e.printStackTrace();
     }
   }
+
 
   @Override
   public Collection<? extends hudson.model.Action> getProjectActions() {
@@ -307,8 +286,8 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
      * Writes the annotated log to the given output.
      */
     public void writeLogTo(XMLOutput out) throws Exception {
-      new AnnotatedLargeText<BitBucketPPRWebHookPollingAction>(getLogFile(), Charset.defaultCharset(), true, this)
-          .writeHtmlTo(0, out.asWriter());
+      new AnnotatedLargeText<BitBucketPPRWebHookPollingAction>(getLogFile(),
+          Charset.defaultCharset(), true, this).writeHtmlTo(0, out.asWriter());
     }
   }
 
