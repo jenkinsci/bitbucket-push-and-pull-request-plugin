@@ -83,8 +83,7 @@ public class BitBucketPPRJobProbe {
     List<URIish> remotes = (List<URIish>) bitbucketAction.getScmUrls().stream().map(f)
         .filter(Objects::nonNull).collect(Collectors.toList());
 
-    // @todo: do we need this? 
-    // Jenkins.get().getACL();
+    Jenkins.get().getACL();
 
     try (ACLContext ctx = ACL.as(ACL.SYSTEM)) {
       Jenkins.get().getAllItems(Job.class).stream().forEach(job -> {
