@@ -27,14 +27,14 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import javax.naming.OperationNotSupportedException;
-import com.google.gson.Gson;
-import com.google.gson.stream.JsonReader;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import com.google.gson.Gson;
+import com.google.gson.stream.JsonReader;
 import io.jenkins.plugins.bitbucketpushandpullrequest.BitBucketPPRJobProbe;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRHookEvent;
@@ -62,7 +62,7 @@ public class BitBucketPPRPullRequestPayloadProcessorTest {
 
 
   @Test
-  public void testProcessPullRequestApprovalWebhookGit() {
+  public void testProcessPullRequestApprovalWebhookGit() throws OperationNotSupportedException {
     JsonReader reader = null;
 
     try {
@@ -77,24 +77,12 @@ public class BitBucketPPRPullRequestPayloadProcessorTest {
     Gson gson = new Gson();
     BitBucketPPRPayload payload = gson.fromJson(reader, BitBucketPPRCloudPayload.class);
 
-    BitBucketPPRHookEvent bitbucketEvent = null;
-    try {
-      bitbucketEvent = new BitBucketPPRHookEvent("pullrequest:approved");
-    } catch (OperationNotSupportedException e) {
-      e.printStackTrace();
-    }
-
+    BitBucketPPRHookEvent bitbucketEvent = new BitBucketPPRHookEvent("pullrequest:approved");
     pullRequestPayloadProcessor =
         new BitBucketPPRPullRequestCloudPayloadProcessor(probe, bitbucketEvent);
 
-
-    BitBucketPPRObservable observable = null;;
-    try {
-      observable = BitBucketPPRObserverFactory.createObservable(bitbucketEvent);
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-
+    BitBucketPPRObservable observable =
+        BitBucketPPRObserverFactory.createObservable(bitbucketEvent);
     pullRequestPayloadProcessor.processPayload(payload, observable);
 
     verify(probe).triggerMatchingJobs(eventCaptor.capture(), actionCaptor.capture(),

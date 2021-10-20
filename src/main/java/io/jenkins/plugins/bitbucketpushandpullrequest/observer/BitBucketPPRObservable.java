@@ -32,7 +32,7 @@ public class BitBucketPPRObservable {
   private List<BitBucketPPRObserver> observers = new ArrayList<>();
 
   public void addObserver(BitBucketPPRObserver observer) {
-      this.observers.add(observer);
+    this.observers.add(observer);
   }
 
   public void removeObserver(BitBucketPPRObserver observer) {
@@ -54,6 +54,10 @@ public class BitBucketPPRObservable {
         logger.log(Level.INFO, "observer or event are null");
       }
     }
+  }
+
+  public List<BitBucketPPRObserver> getObservers() {
+    return observers;
   }
 
 }

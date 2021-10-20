@@ -1,7 +1,7 @@
 /*******************************************************************************
  * The MIT License
  *
- * Copyright (C) 2020, CloudBees, Inc.
+ * Copyright (C) 2021, CloudBees, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -20,39 +20,49 @@
  ******************************************************************************/
 package io.jenkins.plugins.bitbucketpushandpullrequest.model;
 
-import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.DIAGNOSTICS;
-import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.PING;
-import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.PULL_REQUEST_APPROVED;
-import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.PULL_REQUEST_CREATED;
-import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.PULL_REQUEST_CLOUD_EVENT;
-import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.PULL_REQUEST_MERGED;
-import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.PULL_REQUEST_SERVER_APPROVED;
-import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.PULL_REQUEST_SERVER_CREATED;
-import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.PULL_REQUEST_SERVER_EVENT;
-import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.PULL_REQUEST_SERVER_MERGED;
-import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.PULL_REQUEST_SERVER_UPDATED;
-import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.PULL_REQUEST_SERVER_SOURCE_UPDATED;
-import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.PULL_REQUEST_SERVER_COMMENT_CREATED;
-import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.PULL_REQUEST_UPDATED;
-import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.PULL_REQUEST_COMMENT_CREATED;
-import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.PULL_REQUEST_COMMENT_UPDATED;
-import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.PULL_REQUEST_COMMENT_DELETED;
-import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.REPOSITORY_EVENT;
-import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.REPOSITORY_POST;
-import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.REPOSITORY_CLOUD_PUSH;
-import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.REPOSITORY_SERVER_PUSH;
+import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst.DIAGNOSTICS;
+import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst.PING;
+import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst.PULL_REQUEST_APPROVED;
+import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst.PULL_REQUEST_CLOUD_EVENT;
+import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst.PULL_REQUEST_COMMENT_CREATED;
+import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst.PULL_REQUEST_COMMENT_DELETED;
+import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst.PULL_REQUEST_COMMENT_UPDATED;
+import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst.PULL_REQUEST_CREATED;
+import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst.PULL_REQUEST_MERGED;
+import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst.PULL_REQUEST_SERVER_APPROVED;
+import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst.PULL_REQUEST_SERVER_COMMENT_CREATED;
+import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst.PULL_REQUEST_SERVER_CREATED;
+import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst.PULL_REQUEST_SERVER_EVENT;
+import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst.PULL_REQUEST_SERVER_MERGED;
+import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst.PULL_REQUEST_SERVER_SOURCE_UPDATED;
+import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst.PULL_REQUEST_SERVER_UPDATED;
+import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst.PULL_REQUEST_UPDATED;
+import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst.REPOSITORY_CLOUD_PUSH;
+import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst.REPOSITORY_EVENT;
+import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst.REPOSITORY_POST;
+import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst.REPOSITORY_SERVER_PUSH;
 import javax.naming.OperationNotSupportedException;
 
-
+/**
+ * Extracts event and action from the event key sent by Bitbucket and verifies that they are
+ * supported by the plugin.
+ * 
+ * @author cdelmonte
+ * 
+ */
 public class BitBucketPPRHookEvent {
   private String event;
   private String action;
   private String bitbucketEventKey;
 
-  public BitBucketPPRHookEvent(String eventAction) throws OperationNotSupportedException {
-    bitbucketEventKey = eventAction;
-    String[] eventActionPair = eventAction.split(":");
+  public BitBucketPPRHookEvent(String bitbucketEventKey) throws OperationNotSupportedException {
+    this.bitbucketEventKey = bitbucketEventKey;
+    setEventAndAction();
+    checkOperationSupported();
+  }
 
+  private void setEventAndAction() {
+    String[] eventActionPair = bitbucketEventKey.split(":");
     event = eventActionPair[0];
 
     if (eventActionPair.length == 3 && eventActionPair[1].equalsIgnoreCase("reviewer")) {
@@ -62,49 +72,41 @@ public class BitBucketPPRHookEvent {
     } else {
       action = eventActionPair[1];
     }
-
-    checkOperationSupportedException(event, action);
   }
 
-  private void checkOperationSupportedException(String event, String action)
-      throws OperationNotSupportedException {
+  private void checkOperationSupported() throws OperationNotSupportedException {
 
-    boolean error = false;
-
-    if (REPOSITORY_EVENT.equalsIgnoreCase(event)) {
-      if (!(REPOSITORY_CLOUD_PUSH.equalsIgnoreCase(action) || REPOSITORY_POST.equalsIgnoreCase(action)
-          || REPOSITORY_SERVER_PUSH.equalsIgnoreCase(action))) {
-        error = true;
-      }
-    } else if (PULL_REQUEST_CLOUD_EVENT.equalsIgnoreCase(event)
-        || PULL_REQUEST_SERVER_EVENT.equalsIgnoreCase(event)) {
-      if (!(PULL_REQUEST_APPROVED.equalsIgnoreCase(action)
-          || PULL_REQUEST_CREATED.equalsIgnoreCase(action)
-          || PULL_REQUEST_UPDATED.equalsIgnoreCase(action)
-          || PULL_REQUEST_MERGED.equalsIgnoreCase(action)
-          || PULL_REQUEST_COMMENT_CREATED.equalsIgnoreCase(action)
-          || PULL_REQUEST_COMMENT_UPDATED.equalsIgnoreCase(action)
-          || PULL_REQUEST_COMMENT_DELETED.equalsIgnoreCase(action)
-          || PULL_REQUEST_SERVER_CREATED.equalsIgnoreCase(action)
-          || PULL_REQUEST_SERVER_UPDATED.equalsIgnoreCase(action)
-          || PULL_REQUEST_SERVER_SOURCE_UPDATED.equalsIgnoreCase(action)
-          || PULL_REQUEST_SERVER_APPROVED.equalsIgnoreCase(action)
-          || PULL_REQUEST_SERVER_MERGED.equalsIgnoreCase(action)
-          || PULL_REQUEST_SERVER_COMMENT_CREATED.equalsIgnoreCase(action))) {
-        error = true;
-      }
-    } else if (DIAGNOSTICS.equalsIgnoreCase(event)) {
-      if (!PING.equalsIgnoreCase(action)) {
-        error = true;
-      }
-    } else {
-      error = true;
+    if (REPOSITORY_EVENT.equalsIgnoreCase(event) && (REPOSITORY_CLOUD_PUSH.equalsIgnoreCase(action)
+        || REPOSITORY_POST.equalsIgnoreCase(action)
+        || REPOSITORY_SERVER_PUSH.equalsIgnoreCase(action))) {
+      return;
     }
 
-    if (error) {
-      throw new OperationNotSupportedException(
-          "The eventAction " + event + "  " + action + " is not supported.");
+    if (PULL_REQUEST_CLOUD_EVENT.equalsIgnoreCase(event)
+        || PULL_REQUEST_SERVER_EVENT.equalsIgnoreCase(event)
+            && (PULL_REQUEST_APPROVED.equalsIgnoreCase(action)
+                || PULL_REQUEST_CREATED.equalsIgnoreCase(action)
+                || PULL_REQUEST_UPDATED.equalsIgnoreCase(action)
+                || PULL_REQUEST_MERGED.equalsIgnoreCase(action)
+                || PULL_REQUEST_COMMENT_CREATED.equalsIgnoreCase(action)
+                || PULL_REQUEST_COMMENT_UPDATED.equalsIgnoreCase(action)
+                || PULL_REQUEST_COMMENT_DELETED.equalsIgnoreCase(action)
+                || PULL_REQUEST_SERVER_CREATED.equalsIgnoreCase(action)
+                || PULL_REQUEST_SERVER_UPDATED.equalsIgnoreCase(action)
+                || PULL_REQUEST_SERVER_SOURCE_UPDATED.equalsIgnoreCase(action)
+                || PULL_REQUEST_SERVER_APPROVED.equalsIgnoreCase(action)
+                || PULL_REQUEST_SERVER_MERGED.equalsIgnoreCase(action)
+                || PULL_REQUEST_SERVER_COMMENT_CREATED.equalsIgnoreCase(action))) {
+      return;
     }
+
+    if (DIAGNOSTICS.equalsIgnoreCase(event) && PING.equalsIgnoreCase(action)) {
+      return;
+    }
+
+    throw new OperationNotSupportedException(
+        String.format("The event action %s : %s with bitbucket Event Key %s is not supported.",
+            event, action, bitbucketEventKey));
   }
 
   public String getEvent() {
@@ -121,6 +123,7 @@ public class BitBucketPPRHookEvent {
 
   @Override
   public String toString() {
-    return "BitBucketPPREvent [event=" + event + ", action=" + action + "]";
+    return String.format("BitBucketPPREvent [bitbucketEventKey = %s, event = %s, action = %s]",
+        bitbucketEventKey, event, action);
   }
 }

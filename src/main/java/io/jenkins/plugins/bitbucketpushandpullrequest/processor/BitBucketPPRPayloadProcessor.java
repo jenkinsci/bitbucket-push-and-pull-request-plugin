@@ -32,8 +32,8 @@ public abstract class BitBucketPPRPayloadProcessor {
   protected final BitBucketPPRHookEvent bitbucketEvent;
 
 
-  public BitBucketPPRPayloadProcessor(@Nonnull BitBucketPPRJobProbe jobProbe,
-      @Nonnull BitBucketPPRHookEvent bitbucketEvent) {
+  public BitBucketPPRPayloadProcessor(@Nonnull final BitBucketPPRJobProbe jobProbe,
+      @Nonnull final BitBucketPPRHookEvent bitbucketEvent) {
     this.jobProbe = jobProbe;
     this.bitbucketEvent = bitbucketEvent;
   }

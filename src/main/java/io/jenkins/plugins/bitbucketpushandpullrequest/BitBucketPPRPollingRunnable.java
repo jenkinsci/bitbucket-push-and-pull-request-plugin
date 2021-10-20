@@ -21,11 +21,6 @@
 
 package io.jenkins.plugins.bitbucketpushandpullrequest;
 
-import hudson.Util;
-import hudson.model.Job;
-import hudson.scm.PollingResult;
-import hudson.util.StreamTaskListener;
-import jenkins.triggers.SCMTriggerItem;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -33,18 +28,24 @@ import java.text.DateFormat;
 import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.annotation.Nonnull;
+import hudson.Util;
+import hudson.model.Job;
+import hudson.scm.PollingResult;
+import hudson.util.StreamTaskListener;
+import jenkins.triggers.SCMTriggerItem;
 
 public class BitBucketPPRPollingRunnable implements Runnable {
   private Job<?, ?> job;
   private File logFile;
+  private BitBucketPPRPollResultListener bitbucketPollResultListener;
 
   private static final Logger logger =
       Logger.getLogger(BitBucketPPRPollingRunnable.class.getName());
 
-  BitBucketPPRPollResultListener bitbucketPollResultListener;
 
-  public BitBucketPPRPollingRunnable(Job<?, ?> job, File logFile,
-      BitBucketPPRPollResultListener bitbucketPollResultListener) {
+  public BitBucketPPRPollingRunnable(@Nonnull Job<?, ?> job, @Nonnull File logFile,
+      @Nonnull BitBucketPPRPollResultListener bitbucketPollResultListener) {
     this.job = job;
     this.bitbucketPollResultListener = bitbucketPollResultListener;
     this.logFile = logFile;
@@ -54,14 +55,6 @@ public class BitBucketPPRPollingRunnable implements Runnable {
     logger.log(Level.FINE, "Run method called.");
 
     try (StreamTaskListener streamListener = new StreamTaskListener(logFile)) {
-      exec(streamListener);
-    } catch (IOException e) {
-      logger.log(Level.SEVERE, "Failed {0}", e.getMessage());
-    }
-  }
-
-  private void exec(StreamTaskListener streamListener) {
-    try {
       PrintStream logger = streamListener.getLogger();
       long start = System.currentTimeMillis();
       logger.println("Started on " + DateFormat.getDateTimeInstance().format(new Date()));
@@ -70,12 +63,12 @@ public class BitBucketPPRPollingRunnable implements Runnable {
           SCMTriggerItem.SCMTriggerItems.asSCMTriggerItem(job).poll(streamListener);
       logger.println("Done. Took " + Util.getTimeSpanString(System.currentTimeMillis() - start));
       bitbucketPollResultListener.onPollSuccess(pollingResult);
-
+    } catch (IOException e) {
+      logger.log(Level.SEVERE, "Failed {0}", e.getMessage());
     } catch (NullPointerException e) {
       logger.log(Level.SEVERE, "NullPointerException: Failed to record SCM polling {0}",
           e.getMessage());
     } catch (RuntimeException e) {
-      e.printStackTrace(streamListener.error("Failed to record SCM polling"));
       logger.log(Level.SEVERE, "RuntimeException: Failed to record SCM polling {0}",
           e.getMessage());
       bitbucketPollResultListener.onPollError(e);
@@ -83,4 +76,5 @@ public class BitBucketPPRPollingRunnable implements Runnable {
       logger.log(Level.SEVERE, "Failed ", e);
     }
   }
+  
 }
