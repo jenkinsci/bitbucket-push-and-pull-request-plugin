@@ -20,45 +20,53 @@
  ******************************************************************************/
 package io.jenkins.plugins.bitbucketpushandpullrequest.observer;
 
-import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.PULL_REQUEST_CLOUD_EVENT;
-import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.PULL_REQUEST_SERVER_EVENT;
-import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.REPOSITORY_CLOUD_PUSH;
-import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.REPOSITORY_EVENT;
-import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.REPOSITORY_SERVER_PUSH;
+import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst.PULL_REQUEST_CLOUD_EVENT;
+import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst.PULL_REQUEST_SERVER_EVENT;
+import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst.REPOSITORY_CLOUD_PUSH;
+import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst.REPOSITORY_EVENT;
+import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst.REPOSITORY_SERVER_PUSH;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import io.jenkins.plugins.bitbucketpushandpullrequest.exception.BitBucketPPRObserverNotFoundException;
+import javax.annotation.Nonnull;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRHookEvent;
 
 
 public class BitBucketPPRObserverFactory {
   static final Logger logger = Logger.getLogger(BitBucketPPRObserverFactory.class.getName());
 
-  public static BitBucketPPRObservable createObservable(BitBucketPPRHookEvent bitbucketEvent)
-      throws BitBucketPPRObserverNotFoundException {
+  public static BitBucketPPRObservable createObservable(@Nonnull final BitBucketPPRHookEvent bitbucketEvent) {
 
     BitBucketPPRObservable observable = new BitBucketPPRObservable();
 
     if (REPOSITORY_EVENT.equalsIgnoreCase(bitbucketEvent.getEvent())
         && REPOSITORY_CLOUD_PUSH.equalsIgnoreCase(bitbucketEvent.getAction())) {
-      logger.log(Level.INFO, "Add BitBucketPPRPushCloudObserver for {0}",
-          bitbucketEvent.toString());
+      logger.log(Level.FINE, "Add BitBucketPPRPushCloudObserver for {}", bitbucketEvent.toString());
       observable.addObserver(new BitBucketPPRPushCloudObserver());
-    } else if (REPOSITORY_EVENT.equalsIgnoreCase(bitbucketEvent.getEvent())
+    }
+    
+    if (REPOSITORY_EVENT.equalsIgnoreCase(bitbucketEvent.getEvent())
         && REPOSITORY_SERVER_PUSH.equalsIgnoreCase(bitbucketEvent.getAction())) {
-      logger.log(Level.INFO, "Add BitBucketPPRPushServerObserver for {0}",
+      logger.log(Level.FINE, "Add BitBucketPPRPushServerObserver for {}",
           bitbucketEvent.toString());
       observable.addObserver(new BitBucketPPRPushServerObserver());
-    } else if (PULL_REQUEST_CLOUD_EVENT.equals(bitbucketEvent.getEvent())) {
-      logger.log(Level.INFO, "Add BitBucketPPRPullRequestCloudObserver for {0}",
+    }
+    
+    if (PULL_REQUEST_CLOUD_EVENT.equals(bitbucketEvent.getEvent())) {
+      logger.log(Level.FINE, "Add BitBucketPPRPullRequestCloudObserver for {}",
           bitbucketEvent.toString());
       observable.addObserver(new BitBucketPPRPullRequestCloudObserver());
-    } else if (PULL_REQUEST_SERVER_EVENT.equals(bitbucketEvent.getEvent())) {
-      logger.log(Level.INFO, "Add BitBucketPPRPullRequestServerObserver for {0}",
+    } 
+    
+    if (PULL_REQUEST_SERVER_EVENT.equals(bitbucketEvent.getEvent())) {
+      logger.log(Level.FINE, "Add BitBucketPPRPullRequestServerObserver for {}",
           bitbucketEvent.toString());
       observable.addObserver(new BitBucketPPRPullRequestServerObserver());
-    }
-
+    } 
+    
+    if (observable.getObservers().size() < 1)
+      logger.log(Level.FINE, "No observer found for the observable of event {}",
+          bitbucketEvent.toString());
+    
     return observable;
   }
 }

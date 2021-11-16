@@ -56,25 +56,6 @@ public class BitBucketPPRJobProbeTest {
     jobProbe = new BitBucketPPRJobProbe();
   }
 
-  @Test
-  public void testGetRemotesAsList() throws Exception {
-    BitBucketPPRAction bitbucketAction = mock(BitBucketPPRAction.class);
-
-    List<String> remotes = new ArrayList<>();
-    remotes.add("https://some-user@bitbucket.org/theveryjenkins/test.git");
-    remotes.add("git@bitbucket.org:theveryjenkins/test.git");
-    when(bitbucketAction.getScmUrls()).thenReturn(remotes);
-
-    List<URIish> returnedList = remotes.stream().map(a -> {
-      try {
-        return new URIish(a);
-      } catch (URISyntaxException e) {
-        return null;
-      }
-    }).collect(Collectors.toList());
-
-    assertEquals(returnedList, jobProbe.getRemotesAsList(bitbucketAction));
-  }
 
   @Test
   public void testMatchMercurialScm_not() {

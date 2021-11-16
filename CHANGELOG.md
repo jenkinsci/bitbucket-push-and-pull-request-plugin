@@ -1,6 +1,23 @@
 # Change Log
 
 ## 2.7.2 (2021-03-30)
+[Full Changelog](https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/compare/bitbucket-push-and-pull-request-2.7.2...bitbucket-push-and-pull-request-2.7.3)
+
+## News
+- Refactoring
+- Making it possible to use job name a build key 
+
+## Pull requests closed 
+- #197 Refactoring
+- #181 Making it possible to use job name a build key 
+
+## Relevant tickets closed
+- #180 Make it possible to use job's name as build key during back-propagation enhancement
+- #169  Bitbucket Trigger for job is not present
+- #172 bitbucket-push-and-pull-request-plugin webhook is not triggering based push
+
+
+## 2.7.2 (2021-03-30)
 [Full Changelog](https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/compare/bitbucket-push-and-pull-request-2.7.1...bitbucket-push-and-pull-request-2.7.2)
 
 **Implemented enhancements:**

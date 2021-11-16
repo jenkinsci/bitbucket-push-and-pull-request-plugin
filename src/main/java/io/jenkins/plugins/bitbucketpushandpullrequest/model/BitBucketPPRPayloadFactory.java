@@ -21,13 +21,12 @@
 
 package io.jenkins.plugins.bitbucketpushandpullrequest.model;
 
-import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.PULL_REQUEST_CLOUD_EVENT;
-import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.PULL_REQUEST_SERVER_EVENT;
-import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.REPOSITORY_EVENT;
-import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.REPOSITORY_POST;
-import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.REPOSITORY_CLOUD_PUSH;
-import static io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRConstsUtils.REPOSITORY_SERVER_PUSH;
-
+import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst.PULL_REQUEST_CLOUD_EVENT;
+import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst.PULL_REQUEST_SERVER_EVENT;
+import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst.REPOSITORY_CLOUD_PUSH;
+import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst.REPOSITORY_EVENT;
+import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst.REPOSITORY_POST;
+import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst.REPOSITORY_SERVER_PUSH;
 import java.util.logging.Logger;
 
 import javax.naming.OperationNotSupportedException;
@@ -42,27 +41,31 @@ public class BitBucketPPRPayloadFactory {
 
   public static BitBucketPPRPayload getInstance(BitBucketPPRHookEvent bitbucketEvent)
       throws OperationNotSupportedException {
-    BitBucketPPRPayload payload = null;
 
     if (REPOSITORY_EVENT.equalsIgnoreCase(bitbucketEvent.getEvent())) {
       if (REPOSITORY_CLOUD_PUSH.equalsIgnoreCase(bitbucketEvent.getAction())) {
-        payload = new BitBucketPPRCloudPayload();
-      } else if (REPOSITORY_POST.equalsIgnoreCase(bitbucketEvent.getAction())) {
-        logger.warning("Got unexpected old post event, ignored!");
-      } else if (REPOSITORY_SERVER_PUSH.equalsIgnoreCase(bitbucketEvent.getAction())) {
-        payload = new BitBucketPPRServerPayload();
+        return new BitBucketPPRCloudPayload();
       }
-    } else if (PULL_REQUEST_CLOUD_EVENT.equals(bitbucketEvent.getEvent())) {
-      payload = new BitBucketPPRCloudPayload();
-    } else if (PULL_REQUEST_SERVER_EVENT.equals(bitbucketEvent.getEvent())) {
-      payload = new BitBucketPPRServerPayload();
+
+      // @todo: deprecated. It will be removed in version 3.0.0
+      if (REPOSITORY_POST.equalsIgnoreCase(bitbucketEvent.getAction())) {
+        logger.warning("Got unexpected old post event, ignored!");
+      }
+
+      if (REPOSITORY_SERVER_PUSH.equalsIgnoreCase(bitbucketEvent.getAction())) {
+        return new BitBucketPPRServerPayload();
+      }
     }
 
-    if (payload == null) {
-      throw new OperationNotSupportedException(
-          "No processor found for bitbucket event " + bitbucketEvent.getEvent());
+    if (PULL_REQUEST_CLOUD_EVENT.equals(bitbucketEvent.getEvent())) {
+      return new BitBucketPPRCloudPayload();
     }
 
-    return payload;
+    if (PULL_REQUEST_SERVER_EVENT.equals(bitbucketEvent.getEvent())) {
+      return new BitBucketPPRServerPayload();
+    }
+
+    throw new OperationNotSupportedException(
+        String.format("No processor found for bitbucket event %s.", bitbucketEvent.getEvent()));
   }
 }
