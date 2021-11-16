@@ -185,7 +185,7 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
       return;
 
     try {
-      Run<?, ?> startedBuild = (Run<?, ?>) future.waitForStart();
+      Run<?, ?> startedBuild = (Run<?, ?>) f.waitForStart();
       
       logger.info(
           String.format("Triggering %s # %d", job.getName(), startedBuild.getNumber()));
