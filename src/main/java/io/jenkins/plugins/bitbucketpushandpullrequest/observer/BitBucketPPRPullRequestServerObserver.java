@@ -115,11 +115,11 @@ public class BitBucketPPRPullRequestServerObserver extends BitBucketPPRHandlerTe
   public void setBuildStatusInProgress() {
     BitBucketPPRAction bitbucketAction = context.getAction();
     String url = bitbucketAction.getCommitLink();
-    String absoluteUrl = context.getJobAbsoluteUrl();
+    String absoluteUrl = context.getAbsoluteUrl();
 
     String payload = "{\"key\": \"" + computeBitBucketBuildKey(context) + "\", \"url\": \"" + absoluteUrl + "\", \"state\": \"INPROGRESS\" }";
 
-    callClient2(url, payload);
+    callClient(url, payload);
   }
 
   private void callClient(@Nonnull String url, @Nonnull String payload) {
@@ -130,11 +130,4 @@ public class BitBucketPPRPullRequestServerObserver extends BitBucketPPRHandlerTe
     }
   }
 
-  private void callClient2(@Nonnull String url, @Nonnull String payload) {
-    try {
-      BitBucketPPRClientFactory.createClient(BitBucketPPRClientType.SERVER, context).send2(url, payload);
-    } catch (Exception e) {
-      logger.warning(e.getMessage());
-    }
-  }
 }

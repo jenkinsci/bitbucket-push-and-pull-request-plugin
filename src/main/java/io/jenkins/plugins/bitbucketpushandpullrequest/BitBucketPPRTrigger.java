@@ -42,6 +42,7 @@ import hudson.model.Item;
 import hudson.model.Job;
 import hudson.model.Queue;
 import hudson.model.Run;
+import hudson.model.Build;
 import hudson.model.queue.QueueTaskFuture;
 import hudson.plugins.git.RevisionParameterAction;
 import hudson.scm.PollingResult;
@@ -173,9 +174,9 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
     // So we need RevisionParameterAction to distinguish THIS job from all other pending jobs in
     // queue
 
-    Queue.Item item = ParameterizedJobMixIn.scheduleBuild2(job, 5, new CauseAction(cause),
-        bitbucketAction, new RevisionParameterAction(bitbucketAction.getLatestCommit(),
-            new URIish(bitbucketAction.getScmUrls().get(0))));
+   Queue.Item item = ParameterizedJobMixIn.scheduleBuild2(job, 5, new CauseAction(cause),
+     bitbucketAction, new RevisionParameterAction(bitbucketAction.getLatestCommit(),
+        new URIish(bitbucketAction.getScmUrls().get(0))));
 
     QueueTaskFuture<? extends Run<?, ?>> f =
         item != null ? (QueueTaskFuture) item.getFuture() : null;
@@ -184,14 +185,14 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
       return;
 
     try {
-      f.waitForStart();
-      int buildNumber = job.getNextBuildNumber();
+      Run<?, ?> startedBuild = (Run<?, ?>) future.waitForStart();
+      
       logger.info(
-          String.format("SCM changes detected in %s. Triggering # %d", job.getName(), buildNumber));
+          String.format("Triggering %s # %d", job.getName(), startedBuild.getNumber()));
 
-      observable
-          .notifyObservers(BitBucketPPREventFactory.createEvent(BitBucketPPREventType.BUILD_STARTED,
-              new BitBucketPPREventContext(bitbucketAction, scmTrigger, job, buildNumber, filter)));
+      observable.
+        notifyObservers(BitBucketPPREventFactory.createEvent(BitBucketPPREventType.BUILD_STARTED,
+              new BitBucketPPREventContext(bitbucketAction, scmTrigger, startedBuild, filter)));
 
       Run<?, ?> run = (Run<?, ?>) f.get();
 

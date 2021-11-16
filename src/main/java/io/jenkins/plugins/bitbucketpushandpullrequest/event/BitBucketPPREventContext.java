@@ -40,26 +40,12 @@ public class BitBucketPPREventContext {
   private UserRemoteConfig userRemoteConfig;
   private String credentialsId;
   private String url;
-  private Job<?, ?> job;
-  private int buildNumber;
 
   public BitBucketPPREventContext(BitBucketPPRAction action, SCM scmTrigger, Run<?, ?> run,
       BitBucketPPRTriggerFilter filter) throws Exception {
     this.action = action;
     this.scmTrigger = scmTrigger;
     this.run = run;
-    this.filter = filter;
-    this.userRemoteConfig = getUserRemoteConfigs(scmTrigger);
-    this.credentialsId = userRemoteConfig.getCredentialsId();
-    this.url = userRemoteConfig.getUrl();
-  }
-
-  public BitBucketPPREventContext(BitBucketPPRAction action, SCM scmTrigger, Job<?, ?> job,
-      int buildNumber, BitBucketPPRTriggerFilter filter) throws Exception {
-    this.action = action;
-    this.scmTrigger = scmTrigger;
-    this.job = job;
-    this.buildNumber = buildNumber;
     this.filter = filter;
     this.userRemoteConfig = getUserRemoteConfigs(scmTrigger);
     this.credentialsId = userRemoteConfig.getCredentialsId();
@@ -76,18 +62,6 @@ public class BitBucketPPREventContext {
 
     throw new Exception("No Credentials found for run: " + run.getNumber() + " - url: " + url + " - credentialsId: "
         + credentialsId + " - absolute url : " + run.getAbsoluteUrl());
-  }
-
-  public StandardCredentials getCredentialsFromJob() {
-    if (credentialsId != null) {
-      for (StandardCredentials c : CredentialsProvider.lookupCredentials(StandardCredentials.class, job, null,
-          URIRequirementBuilder.fromUri(url).build())) {
-        if (c.getId().equals(credentialsId)) {
-          return c;
-        }
-      }
-    }
-    return null;
   }
 
   public String getUrl() {
@@ -118,12 +92,8 @@ public class BitBucketPPREventContext {
     return run.getAbsoluteUrl();
   }
 
-  public String getJobAbsoluteUrl() {
-    return job.getAbsoluteUrl() + buildNumber;
-  }
-
-  public int getJobNextBuildNumber() {
-    return buildNumber;
+  public int getBuildNumber() {
+    return run.getNumber();
   }
 
   public BitBucketPPRTriggerFilter getFilter() {
@@ -134,10 +104,6 @@ public class BitBucketPPREventContext {
     GitSCM gitSCM = (GitSCM) scm;
     UserRemoteConfig config = gitSCM.getUserRemoteConfigs().get(0);
     return config;
-  }
-
-  public Job<?, ?> getJob() {
-    return job;
   }
 
   @Override
