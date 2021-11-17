@@ -11,7 +11,7 @@
 
 	<groupId>io.jenkins.plugins</groupId>
 	<artifactId>bitbucket-push-and-pull-request</artifactId>
-	<version>2.7.4-SNAPSHOT</version>
+	<version>2.7.4</version>
 	<packaging>hpi</packaging>
 
 	<properties>
@@ -163,7 +163,7 @@
 		<connection>scm:git:git://github.com/jenkinsci/${project.artifactId}-plugin.git</connection>
 		<developerConnection>scm:git:git@github.com:jenkinsci/${project.artifactId}-plugin.git</developerConnection>
 		<url>https://github.com/jenkinsci/${project.artifactId}-plugin</url>
-		<tag>bitbucket-push-and-pull-request-2.7.3</tag>
+		<tag>bitbucket-push-and-pull-request-2.7.4</tag>
 	</scm>
 
 	<repositories>
