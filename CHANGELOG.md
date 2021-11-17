@@ -1,6 +1,21 @@
 # Change Log
 
-## 2.7.2 (2021-03-30)
+## 2.7.4 (2021-11-17)
+[Full Changelog](https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/compare/bitbucket-push-and-pull-request-2.7.3...bitbucket-push-and-pull-request-2.7.4)
+
+## News
+- Fixed following bug: _It happens from time to time that Bitbucket fires different events shortly one after the other for the same repo. In such cases builds have to queue up and the end result is usually that the build status notification gets mixed up for some of the events._
+
+## Pull requests closed 
+- #184 Resolving build key mix-up, by Gozke (tnx)
+
+## Relevant tickets closed
+- #195 [help] Failed pipeline should not decline the PR and just report on the PR
+- #194 One more pipeline starts during PR update/merge
+- #186 HTTP ERROR 403 No valid crumb was included in the request investigating
+- #183 [Bug] Queued up builds send notifications to Bitbucket with mixed up key stale
+
+## 2.7.3 (2021-11-10)
 [Full Changelog](https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/compare/bitbucket-push-and-pull-request-2.7.2...bitbucket-push-and-pull-request-2.7.3)
 
 ## News
