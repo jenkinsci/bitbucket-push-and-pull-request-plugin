@@ -20,13 +20,9 @@
  ******************************************************************************/
 package io.jenkins.plugins.bitbucketpushandpullrequest.client;
 
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.logging.Logger;
-
-import com.cloudbees.jenkins.plugins.sshcredentials.SSHUserPrivateKey;
-import com.cloudbees.plugins.credentials.common.StandardCredentials;
-import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials;
-
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.NotImplementedException;
 import org.apache.http.HttpEntity;
@@ -41,35 +37,43 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
+import org.jenkinsci.plugins.plaincredentials.StringCredentials;
+import com.cloudbees.plugins.credentials.common.StandardCredentials;
+import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials;
+import com.github.scribejava.core.model.Response;
+import io.jenkins.plugins.bitbucketpushandpullrequest.client.api.BitBucketPPROAuth2Api;
 
 public class BitBucketPPRClientCloudVisitor implements BitBucketPPRClientVisitor {
-  private static final Logger logger = Logger.getLogger(BitBucketPPRClientCloudVisitor.class.getName());
+  private static final Logger logger =
+      Logger.getLogger(BitBucketPPRClientCloudVisitor.class.getName());
 
   @Override
-  public void send(StandardCredentials standardCredentials, String url, String payload) {
-    if (standardCredentials instanceof StandardUsernamePasswordCredentials)
-      this.send((StandardUsernamePasswordCredentials) standardCredentials, url, payload);
-    else if (standardCredentials instanceof SSHUserPrivateKey) {
-      this.send((SSHUserPrivateKey) standardCredentials, url, payload);
+  public void send(StandardCredentials credentials, String url, String payload) {
+    if (credentials instanceof StandardUsernamePasswordCredentials)
+      this.send((StandardUsernamePasswordCredentials) credentials, url, payload);
+    else if (credentials instanceof StringCredentials) {
+      this.send((StringCredentials) credentials, url, payload);
     } else
       throw new NotImplementedException("Credentials provider for back propagation not found");
   }
 
-  private void send(StandardUsernamePasswordCredentials standardCredentials, String url, String payload) {
+  private void send(StandardUsernamePasswordCredentials credentials, String url, String payload) {
     logger.info("Set BB StandardUsernamePasswordCredentials for BB Cloud backpropagation");
 
     final org.apache.http.client.CredentialsProvider provider = new BasicCredentialsProvider();
-    String username = standardCredentials.getUsername();
-    String password = standardCredentials.getPassword().getPlainText();
+    String username = credentials.getUsername();
+    String password = credentials.getPassword().getPlainText();
 
     try {
-      final UsernamePasswordCredentials credentials = new UsernamePasswordCredentials(username, password);
-      provider.setCredentials(AuthScope.ANY, credentials);
+      final UsernamePasswordCredentials httpAuthCredentials =
+          new UsernamePasswordCredentials(username, password);
+      provider.setCredentials(AuthScope.ANY, httpAuthCredentials);
       final String auth = username + ":" + password;
       byte[] encodedAuth = Base64.encodeBase64(auth.getBytes(StandardCharsets.ISO_8859_1));
       String authHeader = "Basic " + new String(encodedAuth, StandardCharsets.ISO_8859_1);
 
-      final HttpClient client = HttpClientBuilder.create().setDefaultCredentialsProvider(provider).build();
+      final HttpClient client =
+          HttpClientBuilder.create().setDefaultCredentialsProvider(provider).build();
       final HttpPost request = new HttpPost(url);
       request.setHeader(HttpHeaders.AUTHORIZATION, authHeader);
       request.setEntity(new StringEntity(payload, ContentType.APPLICATION_JSON));
@@ -78,14 +82,24 @@ public class BitBucketPPRClientCloudVisitor implements BitBucketPPRClientVisitor
 
       HttpEntity responseEntity = response.getEntity();
       final String result = responseEntity == null ? "empty" : EntityUtils.toString(responseEntity);
-      logger.info("Result of the backpropagation is: " + result + ", with status code: " + statusCode);
+      logger.info(
+          "Result of the backpropagation is: " + result + ", with status code: " + statusCode);
     } catch (Throwable t) {
       logger.warning("Error during backpropagation to BB Cloud: " + t.getMessage());
     }
   }
 
-  private void send(SSHUserPrivateKey standardCredentials, String url, String payload) {
 
-    throw new NotImplementedException("This authentication method is not supported by the BB Cloud Rest API.");
+  private void send(StringCredentials credentials, String url, String payload) {
+    try {
+      BitBucketPPROAuth2Api service = new BitBucketPPROAuth2Api();
+      Response response = service.sendRequest(url, payload, credentials);
+
+      logger.info("Result of the backpropagation is: " + response.getBody() + ", with status code: "
+          + response.getCode());
+    } catch (IOException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
   }
 }
