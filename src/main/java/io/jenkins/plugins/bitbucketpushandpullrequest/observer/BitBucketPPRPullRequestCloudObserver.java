@@ -50,11 +50,11 @@ public class BitBucketPPRPullRequestCloudObserver extends BitBucketPPRHandlerTem
     if (!context.getFilter().shouldSendApprove()) {
       return;
     }
-
-    Result result = context.getRun().getResult();
-
-    BitBucketPPRAction bitbucketAction = context.getAction();
+    
+    Result result = context.getRun().getResult();    
     String approved = result == Result.SUCCESS ? "true" : "false";
+    
+    BitBucketPPRAction bitbucketAction = context.getAction();
     String url = result == Result.SUCCESS ? bitbucketAction.getLinkApprove()
         : result == Result.FAILURE ? bitbucketAction.getLinkDecline() : null;
 
@@ -65,8 +65,7 @@ public class BitBucketPPRPullRequestCloudObserver extends BitBucketPPRHandlerTem
 
     Map<String, String> map = new HashMap<>();
     map.put("approved", approved);
-    map.put("url", context.getAbsoluteUrl());
-
+    
     callClient(url, map);
   }
 
