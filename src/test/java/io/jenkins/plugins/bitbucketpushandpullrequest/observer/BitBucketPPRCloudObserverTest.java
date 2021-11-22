@@ -7,8 +7,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-
+import java.util.Map;
 import javax.naming.OperationNotSupportedException;
 
 import com.google.gson.Gson;
@@ -80,16 +81,21 @@ public class BitBucketPPRCloudObserverTest {
     Mockito.when(event.getContext()).thenReturn(context);
     Mockito.doReturn(config).when(spyObserver).getGlobalConfig();
 
+    String url =
+        "https://api.bitbucket.org/2.0/repositories/some-repository/some-repo/commit/09c4367c5bdbef7d7a28ba4cc2638488c2088d6b/statuses/build";
+    Map<String, String> map = new HashMap<>();
+    map.put("key", spyObserver.computeBitBucketBuildKey(context));
+    map.put("state", "INPROGRESS");
+    map.put("url", context.getAbsoluteUrl());
+
     spyObserver.getNotification(event);
     spyObserver.setBuildStatusInProgress();
     Mockito.verify(spyObserver).setBuildStatusInProgress();
-    Mockito.verify(spyObserver).callClient(
-        "https://api.bitbucket.org/2.0/repositories/some-repository/some-repo/commit/09c4367c5bdbef7d7a28ba4cc2638488c2088d6b/statuses/build",
-        "{\"key\": \"12\", \"url\": \"https://someURL\", \"state\": \"INPROGRESS\" }");
+    Mockito.verify(spyObserver).callClient(url, map);
   }
 
   @Test
-  public void testComputeBitBucketBuildKeyForInProgressBuild(){
+  public void testComputeBitBucketBuildKeyForInProgressBuild() {
     BitBucketPPRPushCloudObserver spyObserver = Mockito.spy(BitBucketPPRPushCloudObserver.class);
     BitBucketPPREventContext context = Mockito.mock(BitBucketPPREventContext.class);
     BitBucketPPRPluginConfig config = Mockito.mock(BitBucketPPRPluginConfig.class);
@@ -147,5 +153,5 @@ public class BitBucketPPRCloudObserverTest {
 
     // Then the the job name shall be the key
     assertEquals(jobName, spyObserver.computeBitBucketBuildKey(context));
-    }
   }
+}

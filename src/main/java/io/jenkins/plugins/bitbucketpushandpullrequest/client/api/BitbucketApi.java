@@ -4,9 +4,7 @@ import com.github.scribejava.core.builder.api.DefaultApi20;
 
 public class BitbucketApi extends DefaultApi20 {
 
-  public BitbucketApi() { 
-    /* TODO document why this constructor is empty */ 
-  }
+  public BitbucketApi() { }
 
   private static class InstanceHolder {
     private static final BitbucketApi INSTANCE = new BitbucketApi();
@@ -23,6 +21,6 @@ public class BitbucketApi extends DefaultApi20 {
 
   @Override
   protected String getAuthorizationBaseUrl() {
-    return "https://bitbucket.org/site/oauth2/access_token";
+    return "https://bitbucket.org/site/oauth2/authorize";
   }
 }

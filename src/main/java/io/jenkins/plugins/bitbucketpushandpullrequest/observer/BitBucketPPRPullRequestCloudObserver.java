@@ -1,7 +1,7 @@
 /*******************************************************************************
  * The MIT License
  * 
- * Copyright (C) 2020, CloudBees, Inc.
+ * Copyright (C) 2021, CloudBees, Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -20,19 +20,23 @@
  ******************************************************************************/
 package io.jenkins.plugins.bitbucketpushandpullrequest.observer;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Logger;
-import javax.annotation.Nonnull;
 import hudson.model.Result;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
-import io.jenkins.plugins.bitbucketpushandpullrequest.client.BitBucketPPRClientFactory;
 import io.jenkins.plugins.bitbucketpushandpullrequest.client.BitBucketPPRClientType;
 import io.jenkins.plugins.bitbucketpushandpullrequest.event.BitBucketPPREvent;
-import io.jenkins.plugins.bitbucketpushandpullrequest.event.BitBucketPPREventContext;
 
-public class BitBucketPPRPullRequestCloudObserver extends BitBucketPPRHandlerTemplate implements BitBucketPPRObserver {
-  static final Logger logger = Logger.getLogger(BitBucketPPRPullRequestCloudObserver.class.getName());
+public class BitBucketPPRPullRequestCloudObserver extends BitBucketPPRHandlerTemplate
+    implements BitBucketPPRObserver {
+  static final Logger logger =
+      Logger.getLogger(BitBucketPPRPullRequestCloudObserver.class.getName());
 
-  BitBucketPPREventContext context;
+  public BitBucketPPRPullRequestCloudObserver() {
+    super();
+    clientType = BitBucketPPRClientType.CLOUD;
+  }
 
   @Override
   public void getNotification(BitBucketPPREvent event) {
@@ -47,34 +51,23 @@ public class BitBucketPPRPullRequestCloudObserver extends BitBucketPPRHandlerTem
       return;
     }
 
-    try {
-      Result result = context.getRun().getResult();
-      logger.info(() -> "The result is " + result);
+    Result result = context.getRun().getResult();
 
-      BitBucketPPRAction bitbucketAction = context.getAction();
-      String url = null;
-      String payload = null;
-      if (result == Result.SUCCESS) {
-        url = bitbucketAction.getLinkApprove();
-        payload = "{ \"approved\": true }";
-      } else if (result == Result.FAILURE) {
-        url = bitbucketAction.getLinkDecline();
-        payload = "{ \"approved\": false }";
-      }
-      if (url == null) {
-        logger.info(() -> "Cannot set URL for approved.");
-        return;
-      }
+    BitBucketPPRAction bitbucketAction = context.getAction();
+    String approved = result == Result.SUCCESS ? "true" : "false";
+    String url = result == Result.SUCCESS ? bitbucketAction.getLinkApprove()
+        : result == Result.FAILURE ? bitbucketAction.getLinkDecline() : null;
 
-      BitBucketPPRClientFactory.createClient(BitBucketPPRClientType.CLOUD, context).send(url, payload);
-
-    } catch (NullPointerException e) {
-      logger.warning(e.getMessage());
-    } catch (InterruptedException e) {
-      logger.warning(e.getMessage());
-    } catch (Exception e) {
-      logger.warning(e.getMessage());
+    if (url == null) {
+      logger.warning("URL for approved not found in Bitbucket payload.");
+      return;
     }
+
+    Map<String, String> map = new HashMap<>();
+    map.put("approved", approved);
+    map.put("url", context.getAbsoluteUrl());
+
+    callClient(url, map);
   }
 
   @Override
@@ -82,33 +75,27 @@ public class BitBucketPPRPullRequestCloudObserver extends BitBucketPPRHandlerTem
     BitBucketPPRAction bitbucketAction = context.getAction();
     String url = bitbucketAction.getCommitLink() + "/statuses/build";
     Result result = context.getRun().getResult();
+    String state =
+        result == Result.SUCCESS ? "SUCCESSFUL" : result == Result.ABORTED ? "STOPPED" : "FAILED";
 
-    String payload = "{\"key\": \"" + computeBitBucketBuildKey(context) + "\", \"url\": \"" + context.getAbsoluteUrl()
-        + "\", ";
-    payload += result == Result.SUCCESS ? "\"state\": \"SUCCESSFUL\""
-        : result == Result.ABORTED ? "\"state\": \"STOPPED\"" : "\"state\": \"FAILED\"";
-    payload += " }";
+    Map<String, String> map = new HashMap<>();
+    map.put("key", computeBitBucketBuildKey(context));
+    map.put("url", context.getAbsoluteUrl());
+    map.put("state", state);
 
-    callClient(url, payload);
+    callClient(url, map);
   }
 
   @Override
   public void setBuildStatusInProgress() {
     BitBucketPPRAction bitbucketAction = context.getAction();
     String url = bitbucketAction.getCommitLink() + "/statuses/build";
-    String absoluteUrl = context.getAbsoluteUrl();
 
-    String payload = "{\"key\": \"" + computeBitBucketBuildKey(context) + "\", \"url\": \"" + absoluteUrl + "\", \"state\": \"INPROGRESS\" }";
+    Map<String, String> map = new HashMap<>();
+    map.put("key", computeBitBucketBuildKey(context));
+    map.put("url", context.getAbsoluteUrl());
+    map.put("state", "INPROGRESS");
 
-    callClient(url, payload);
+    callClient(url, map);
   }
-
-  private void callClient(@Nonnull String url, @Nonnull String payload) {
-    try {
-      BitBucketPPRClientFactory.createClient(BitBucketPPRClientType.CLOUD, context).send(url, payload);
-    } catch (Exception e) {
-      logger.warning(e.getMessage());
-    }
-  }
-
 }
