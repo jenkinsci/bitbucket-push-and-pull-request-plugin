@@ -40,6 +40,7 @@ import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
 import com.cloudbees.plugins.credentials.CredentialsMatchers;
+import com.cloudbees.plugins.credentials.common.StandardCredentials;
 import com.cloudbees.plugins.credentials.common.StandardListBoxModel;
 import com.cloudbees.plugins.credentials.domains.DomainRequirement;
 import hudson.Extension;
@@ -297,7 +298,7 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
       }
 
       return new StandardListBoxModel().includeEmptyValue()
-          .includeMatchingAs(ACL.SYSTEM, Jenkins.getInstance(), StringCredentials.class,
+          .includeMatchingAs(ACL.SYSTEM, Jenkins.getInstance(), StandardCredentials.class,
               Collections.<DomainRequirement>emptyList(), CredentialsMatchers.always())
           .includeCurrentValue(credentialsId);
     }

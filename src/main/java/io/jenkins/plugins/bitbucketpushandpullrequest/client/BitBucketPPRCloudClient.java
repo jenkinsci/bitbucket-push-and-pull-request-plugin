@@ -20,17 +20,12 @@
  ******************************************************************************/
 package io.jenkins.plugins.bitbucketpushandpullrequest.client;
 
-import io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRUtils;
 import io.jenkins.plugins.bitbucketpushandpullrequest.event.BitBucketPPREventContext;
 
 
 public class BitBucketPPRCloudClient implements BitBucketPPRClient {
   private BitBucketPPREventContext context;
   private BitBucketPPRClientVisitor visitor;
-
-  {
-    System.setErr(BitBucketPPRUtils.createLoggingProxyForErrors(System.err));
-  }
 
   public BitBucketPPRCloudClient(BitBucketPPREventContext context) {
     this.context = context;

@@ -20,7 +20,6 @@
  ******************************************************************************/
 package io.jenkins.plugins.bitbucketpushandpullrequest.event;
 
-import org.jenkinsci.plugins.plaincredentials.StringCredentials;
 import com.cloudbees.plugins.credentials.CredentialsProvider;
 import com.cloudbees.plugins.credentials.common.StandardCredentials;
 import com.cloudbees.plugins.credentials.domains.URIRequirementBuilder;
@@ -53,16 +52,6 @@ public class BitBucketPPREventContext {
     this.url = userRemoteConfig.getUrl();
   }
 
-  public StringCredentials getSecretTextCredentials() throws Exception {
-    final StringCredentials credentials = CredentialsProvider.findCredentialById(getCredentialsId(),
-        StringCredentials.class, run, URIRequirementBuilder.fromUri(url).build());
-    if (credentials != null) {
-      return credentials;
-    }
-    throw new Exception("No Credentials found for run: " + run.getNumber() + " - url: " + url
-        + " - credentialsId: " + getCredentialsId() + " - absolute url : " + run.getAbsoluteUrl());
-  }
-
   public StandardCredentials getStandardCredentials() throws Exception {
     final StandardCredentials credentials =
         CredentialsProvider.findCredentialById(getCredentialsId(), StandardCredentials.class, run,
@@ -70,8 +59,9 @@ public class BitBucketPPREventContext {
     if (credentials != null) {
       return credentials;
     }
-    throw new Exception("No Credentials found for run: " + run.getNumber() + " - url: " + url
-        + " - credentialsId: " + getCredentialsId() + " - absolute url : " + run.getAbsoluteUrl());
+    throw new Exception(String.format(
+        "No Credentials found for run: %s - url: %s - credentialsId: %s - absolute url : %s",
+        run.getNumber(), url, getCredentialsId(), run.getAbsoluteUrl()));
   }
 
   protected BitBucketPPRPluginConfig getGlobalConfig() {
