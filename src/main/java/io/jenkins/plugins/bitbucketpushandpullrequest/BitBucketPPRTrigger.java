@@ -30,10 +30,19 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Logger;
+import javax.annotation.CheckForNull;
 import org.apache.commons.jelly.XMLOutput;
 import org.eclipse.jgit.transport.URIish;
 import org.jenkinsci.Symbol;
+import org.jenkinsci.plugins.plaincredentials.StringCredentials;
+import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.DataBoundSetter;
+import org.kohsuke.stapler.QueryParameter;
+import com.cloudbees.plugins.credentials.CredentialsMatchers;
+import com.cloudbees.plugins.credentials.common.StandardCredentials;
+import com.cloudbees.plugins.credentials.common.StandardListBoxModel;
+import com.cloudbees.plugins.credentials.domains.DomainRequirement;
 import hudson.Extension;
 import hudson.Util;
 import hudson.console.AnnotatedLargeText;
@@ -47,8 +56,10 @@ import hudson.model.queue.QueueTaskFuture;
 import hudson.plugins.git.RevisionParameterAction;
 import hudson.scm.PollingResult;
 import hudson.scm.SCM;
+import hudson.security.ACL;
 import hudson.triggers.Trigger;
 import hudson.triggers.TriggerDescriptor;
+import hudson.util.ListBoxModel;
 import hudson.util.SequentialExecutionQueue;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.cause.BitBucketPPRTriggerCause;
@@ -77,6 +88,8 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
   private static final Logger logger = Logger.getLogger(BitBucketPPRTrigger.class.getName());
   private List<BitBucketPPRTriggerFilter> triggers;
   public static final boolean ALLOW_HOOKURL_OVERRIDE = true;
+  public String credentialsId;
+
 
   {
     System.setErr(BitBucketPPRUtils.createLoggingProxyForErrors(System.err));
@@ -85,6 +98,11 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
   @DataBoundConstructor
   public BitBucketPPRTrigger(List<BitBucketPPRTriggerFilter> triggers) {
     this.triggers = triggers;
+  }
+
+  @DataBoundSetter
+  public void setCredentialsId(@CheckForNull String credentialsId) {
+    this.credentialsId = credentialsId;
   }
 
   /**
@@ -174,9 +192,9 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
     // So we need RevisionParameterAction to distinguish THIS job from all other pending jobs in
     // queue
 
-   Queue.Item item = ParameterizedJobMixIn.scheduleBuild2(job, 5, new CauseAction(cause),
-     bitbucketAction, new RevisionParameterAction(bitbucketAction.getLatestCommit(),
-        new URIish(bitbucketAction.getScmUrls().get(0))));
+    Queue.Item item = ParameterizedJobMixIn.scheduleBuild2(job, 5, new CauseAction(cause),
+        bitbucketAction, new RevisionParameterAction(bitbucketAction.getLatestCommit(),
+            new URIish(bitbucketAction.getScmUrls().get(0))));
 
     QueueTaskFuture<? extends Run<?, ?>> f =
         item != null ? (QueueTaskFuture) item.getFuture() : null;
@@ -186,20 +204,19 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
 
     try {
       Run<?, ?> startedBuild = (Run<?, ?>) f.waitForStart();
-      
-      logger.info(
-          String.format("Triggering %s # %d", job.getName(), startedBuild.getNumber()));
 
-      observable.
-        notifyObservers(BitBucketPPREventFactory.createEvent(BitBucketPPREventType.BUILD_STARTED,
-              new BitBucketPPREventContext(bitbucketAction, scmTrigger, startedBuild, filter)));
+      logger.info(String.format("Triggering %s # %d", job.getName(), startedBuild.getNumber()));
+
+      observable.notifyObservers(BitBucketPPREventFactory.createEvent(
+          BitBucketPPREventType.BUILD_STARTED,
+          new BitBucketPPREventContext(this, bitbucketAction, scmTrigger, startedBuild, filter)));
 
       Run<?, ?> run = (Run<?, ?>) f.get();
 
       if (f.isDone()) {
         observable.notifyObservers(
             BitBucketPPREventFactory.createEvent(BitBucketPPREventType.BUILD_FINISHED,
-                new BitBucketPPREventContext(bitbucketAction, scmTrigger, run, filter)));
+                new BitBucketPPREventContext(this, bitbucketAction, scmTrigger, run, filter)));
       }
 
     } catch (InterruptedException | ExecutionException e) {
@@ -272,6 +289,20 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
     private final SequentialExecutionQueue queue =
         new SequentialExecutionQueue(Jenkins.MasterComputer.threadPoolForRemoting);
 
+    public ListBoxModel doFillCredentialsIdItems(@AncestorInPath Item context,
+        @QueryParameter String remote, @QueryParameter String credentialsId) {
+
+      if (context == null && !Jenkins.get().hasPermission(Jenkins.ADMINISTER)
+          || context != null && !context.hasPermission(Item.EXTENDED_READ)) {
+        return new StandardListBoxModel().includeCurrentValue(credentialsId);
+      }
+
+      return new StandardListBoxModel().includeEmptyValue()
+          .includeMatchingAs(ACL.SYSTEM, Jenkins.getInstance(), StandardCredentials.class,
+              Collections.<DomainRequirement>emptyList(), CredentialsMatchers.always())
+          .includeCurrentValue(credentialsId);
+    }
+
     @Override
     public boolean isApplicable(Item item) {
       return item instanceof Job && SCMTriggerItem.SCMTriggerItems.asSCMTriggerItem(item) != null
@@ -288,5 +319,6 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
       // fancy
       return Jenkins.get().getDescriptorList(BitBucketPPRTriggerFilter.class);
     }
+
   }
 }

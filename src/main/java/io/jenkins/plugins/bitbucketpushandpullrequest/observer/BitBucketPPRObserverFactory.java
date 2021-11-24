@@ -34,39 +34,38 @@ import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRHookEven
 public class BitBucketPPRObserverFactory {
   static final Logger logger = Logger.getLogger(BitBucketPPRObserverFactory.class.getName());
 
-  public static BitBucketPPRObservable createObservable(@Nonnull final BitBucketPPRHookEvent bitbucketEvent) {
+  private BitBucketPPRObserverFactory() {}
+
+  public static BitBucketPPRObservable createObservable(
+      @Nonnull final BitBucketPPRHookEvent bitbucketEvent) {
 
     BitBucketPPRObservable observable = new BitBucketPPRObservable();
 
     if (REPOSITORY_EVENT.equalsIgnoreCase(bitbucketEvent.getEvent())
         && REPOSITORY_CLOUD_PUSH.equalsIgnoreCase(bitbucketEvent.getAction())) {
-      logger.log(Level.FINE, "Add BitBucketPPRPushCloudObserver for {}", bitbucketEvent.toString());
+      logger.log(Level.FINE, "Add BitBucketPPRPushCloudObserver for {}", bitbucketEvent);
       observable.addObserver(new BitBucketPPRPushCloudObserver());
     }
-    
+
     if (REPOSITORY_EVENT.equalsIgnoreCase(bitbucketEvent.getEvent())
         && REPOSITORY_SERVER_PUSH.equalsIgnoreCase(bitbucketEvent.getAction())) {
-      logger.log(Level.FINE, "Add BitBucketPPRPushServerObserver for {}",
-          bitbucketEvent.toString());
+      logger.log(Level.FINE, "Add BitBucketPPRPushServerObserver for {}", bitbucketEvent);
       observable.addObserver(new BitBucketPPRPushServerObserver());
     }
-    
+
     if (PULL_REQUEST_CLOUD_EVENT.equals(bitbucketEvent.getEvent())) {
-      logger.log(Level.FINE, "Add BitBucketPPRPullRequestCloudObserver for {}",
-          bitbucketEvent.toString());
+      logger.log(Level.FINE, "Add BitBucketPPRPullRequestCloudObserver for {}", bitbucketEvent);
       observable.addObserver(new BitBucketPPRPullRequestCloudObserver());
-    } 
-    
+    }
+
     if (PULL_REQUEST_SERVER_EVENT.equals(bitbucketEvent.getEvent())) {
-      logger.log(Level.FINE, "Add BitBucketPPRPullRequestServerObserver for {}",
-          bitbucketEvent.toString());
+      logger.log(Level.FINE, "Add BitBucketPPRPullRequestServerObserver for {}", bitbucketEvent);
       observable.addObserver(new BitBucketPPRPullRequestServerObserver());
-    } 
-    
-    if (observable.getObservers().size() < 1)
-      logger.log(Level.FINE, "No observer found for the observable of event {}",
-          bitbucketEvent.toString());
-    
+    }
+
+    if (observable.getObservers().isEmpty())
+      logger.log(Level.FINE, "No observer found for the observable of event {}", bitbucketEvent);
+
     return observable;
   }
 }

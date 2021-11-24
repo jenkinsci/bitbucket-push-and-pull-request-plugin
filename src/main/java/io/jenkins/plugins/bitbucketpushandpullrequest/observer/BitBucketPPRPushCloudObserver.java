@@ -1,7 +1,7 @@
 /*******************************************************************************
  * The MIT License
  * 
- * Copyright (C) 2020, CloudBees, Inc.
+ * Copyright (C) 2021, CloudBees, Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -20,27 +20,23 @@
  ******************************************************************************/
 package io.jenkins.plugins.bitbucketpushandpullrequest.observer;
 
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Logger;
-import javax.annotation.Nonnull;
 import hudson.model.Result;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
-import io.jenkins.plugins.bitbucketpushandpullrequest.client.BitBucketPPRClientFactory;
 import io.jenkins.plugins.bitbucketpushandpullrequest.client.BitBucketPPRClientType;
-import io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRUtils;
 import io.jenkins.plugins.bitbucketpushandpullrequest.event.BitBucketPPREvent;
-import io.jenkins.plugins.bitbucketpushandpullrequest.event.BitBucketPPREventContext;
 
 public class BitBucketPPRPushCloudObserver extends BitBucketPPRHandlerTemplate
     implements BitBucketPPRObserver {
   static final Logger logger = Logger.getLogger(BitBucketPPRPushCloudObserver.class.getName());
 
-  private BitBucketPPREventContext context;
-
-  {
-    System.setErr(BitBucketPPRUtils.createLoggingProxyForErrors(System.err));
+  public BitBucketPPRPushCloudObserver() {
+    super();
+    clientType = BitBucketPPRClientType.CLOUD;
   }
-  
+
   @Override
   public void getNotification(BitBucketPPREvent event) {
     context = event.getContext();
@@ -50,50 +46,28 @@ public class BitBucketPPRPushCloudObserver extends BitBucketPPRHandlerTemplate
 
   @Override
   public void setBuildStatusOnFinished() {
-    try {
-      BitBucketPPRAction bitbucketAction = context.getAction();
-      List<String> commitLinks = bitbucketAction.getCommitLinks();
-      Result result = context.getRun().getResult();
-      String absoluteUrl = context.getAbsoluteUrl();
+    BitBucketPPRAction bitbucketAction = context.getAction();
+    Result result = context.getRun().getResult();
+    String state =
+        result == Result.SUCCESS ? "SUCCESSFUL" : result == Result.ABORTED ? "STOPPED" : "FAILED";
 
-      for (String link : commitLinks) {
-        String url = link + "/statuses/build";
-        String payload = "{\"key\": \"" + computeBitBucketBuildKey(context) + "\", \"url\": \"" + absoluteUrl + "\", ";
-        payload += result == Result.SUCCESS ? "\"state\": \"SUCCESSFUL\""
-            : result == Result.ABORTED ? "\"state\": \"STOPPED\"" : "\"state\": \"FAILED\"";
-        payload += " }";
-
-        callClient(url, payload);
-      }
-      logger.info("BB build status was set on 'finished'.");
-    } catch (Throwable e) {
-      logger.warning("Tried to set BB Build Status on 'finished' using backprogation but " + e.getMessage());
-    }
+    Map<String, String> map = new HashMap<>();
+    map.put("key", computeBitBucketBuildKey(context));
+    map.put("url", context.getAbsoluteUrl());
+    map.put("state", state);
+    
+    bitbucketAction.getCommitLinks().forEach(l -> callClient(l.concat("/statuses/build"), map));
   }
 
   @Override
   public void setBuildStatusInProgress() {
-    try {
-      BitBucketPPRAction bitbucketAction = context.getAction();
-      List<String> commitLinks = bitbucketAction.getCommitLinks();
-      String absoluteUrl = context.getAbsoluteUrl();
+    BitBucketPPRAction bitbucketAction = context.getAction();
 
-      for (String link : commitLinks) {
-        String url = link + "/statuses/build";
-        String payload = "{\"key\": \"" + computeBitBucketBuildKey(context) + "\", \"url\": \"" + absoluteUrl
-            + "\", \"state\": \"INPROGRESS\" }";
+    Map<String, String> map = new HashMap<>();
+    map.put("key", computeBitBucketBuildKey(context));
+    map.put("url", context.getAbsoluteUrl());
+    map.put("state", "INPROGRESS");
 
-        callClient(url, payload);
-      }
-      logger.info("BB build status was set on 'in progress'.");
-    } catch (Throwable e) {
-      logger.warning("Tried to set BB Build Status on 'in progress' using backprogation but " + e.getMessage());
-    }
+    bitbucketAction.getCommitLinks().forEach(l -> callClient(l.concat("/statuses/build"), map));
   }
-
-  public void callClient(@Nonnull String url, @Nonnull String payload) throws Throwable {
-    BitBucketPPRClientFactory.createClient(BitBucketPPRClientType.CLOUD,context)
-        .send(url, payload);
-  }
-
 }

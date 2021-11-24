@@ -23,13 +23,13 @@ package io.jenkins.plugins.bitbucketpushandpullrequest.event;
 import com.cloudbees.plugins.credentials.CredentialsProvider;
 import com.cloudbees.plugins.credentials.common.StandardCredentials;
 import com.cloudbees.plugins.credentials.domains.URIRequirementBuilder;
-
-import hudson.model.Job;
 import hudson.model.Run;
 import hudson.plugins.git.GitSCM;
 import hudson.plugins.git.UserRemoteConfig;
 import hudson.scm.SCM;
+import io.jenkins.plugins.bitbucketpushandpullrequest.BitBucketPPRTrigger;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
+import io.jenkins.plugins.bitbucketpushandpullrequest.config.BitBucketPPRPluginConfig;
 import io.jenkins.plugins.bitbucketpushandpullrequest.filter.BitBucketPPRTriggerFilter;
 
 public class BitBucketPPREventContext {
@@ -38,30 +38,34 @@ public class BitBucketPPREventContext {
   private BitBucketPPRAction action;
   private BitBucketPPRTriggerFilter filter;
   private UserRemoteConfig userRemoteConfig;
-  private String credentialsId;
   private String url;
+  private BitBucketPPRTrigger trigger;
 
-  public BitBucketPPREventContext(BitBucketPPRAction action, SCM scmTrigger, Run<?, ?> run,
-      BitBucketPPRTriggerFilter filter) throws Exception {
+  public BitBucketPPREventContext(BitBucketPPRTrigger trigger, BitBucketPPRAction action,
+      SCM scmTrigger, Run<?, ?> run, BitBucketPPRTriggerFilter filter) throws Exception {
     this.action = action;
     this.scmTrigger = scmTrigger;
     this.run = run;
     this.filter = filter;
     this.userRemoteConfig = getUserRemoteConfigs(scmTrigger);
-    this.credentialsId = userRemoteConfig.getCredentialsId();
+    this.trigger = trigger;
     this.url = userRemoteConfig.getUrl();
   }
 
   public StandardCredentials getStandardCredentials() throws Exception {
-    final StandardCredentials credentials = CredentialsProvider.findCredentialById(credentialsId,
-        StandardCredentials.class, run, URIRequirementBuilder.fromUri(url).build());
-
+    final StandardCredentials credentials =
+        CredentialsProvider.findCredentialById(getCredentialsId(), StandardCredentials.class, run,
+            URIRequirementBuilder.fromUri(url).build());
     if (credentials != null) {
       return credentials;
     }
+    throw new Exception(String.format(
+        "No Credentials found for run: %s - url: %s - credentialsId: %s - absolute url : %s",
+        run.getNumber(), url, getCredentialsId(), run.getAbsoluteUrl()));
+  }
 
-    throw new Exception("No Credentials found for run: " + run.getNumber() + " - url: " + url + " - credentialsId: "
-        + credentialsId + " - absolute url : " + run.getAbsoluteUrl());
+  protected BitBucketPPRPluginConfig getGlobalConfig() {
+    return BitBucketPPRPluginConfig.getInstance();
   }
 
   public String getUrl() {
@@ -69,7 +73,13 @@ public class BitBucketPPREventContext {
   }
 
   public String getCredentialsId() {
-    return credentialsId;
+    if (trigger.credentialsId != null)
+      return trigger.credentialsId;
+    if (getGlobalConfig().credentialsId != null)
+      return getGlobalConfig().credentialsId;
+    if (userRemoteConfig.getCredentialsId() != null)
+      return userRemoteConfig.getCredentialsId();
+    return "";
   }
 
   public UserRemoteConfig getUserRemoteConfig() {
@@ -108,8 +118,8 @@ public class BitBucketPPREventContext {
 
   @Override
   public String toString() {
-    return "BitBucketPPREventContext [action=" + action + ", credentialsId=" + credentialsId + ", filter=" + filter
-        + ", run=" + run + ", scmTrigger=" + scmTrigger + ", url=" + url + ", userRemoteConfig=" + userRemoteConfig
-        + "]";
+    return "BitBucketPPREventContext [scmTrigger=" + scmTrigger + ", run=" + run + ", action="
+        + action + ", filter=" + filter + ", userRemoteConfig=" + userRemoteConfig + ", url=" + url
+        + ", trigger=" + trigger + "]";
   }
 }
