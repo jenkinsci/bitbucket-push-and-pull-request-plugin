@@ -60,6 +60,13 @@ jobs:
     #    and modify them (or add more) to build your code if your project
     #    uses a compiled language
 
+    - name: Setup Java JDK
+      uses: actions/setup-java@v2.3.1
+      with:
+        java-version: 8
+        distribution: jdk
+        cache: maven
+
     #- run: |
     #   make bootstrap
     #   make release
