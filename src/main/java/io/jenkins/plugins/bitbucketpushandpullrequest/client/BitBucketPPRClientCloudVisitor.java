@@ -57,7 +57,10 @@ public class BitBucketPPRClientCloudVisitor implements BitBucketPPRClientVisitor
       throw new NotImplementedException("Credentials provider for state notification not found");
   }
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> master
   private void send(StandardUsernamePasswordCredentials credentials, String url, String payload) {
     logger.info("Set BB StandardUsernamePasswordCredentials for BB Cloud backpropagation");
 
@@ -90,11 +93,20 @@ public class BitBucketPPRClientCloudVisitor implements BitBucketPPRClientVisitor
     }
   }
 
+<<<<<<< HEAD
   private void send(StringCredentials credentials, String url, String payload) {
     try {
       BitBucketPPROAuth2Api service = new BitBucketPPROAuth2Api();
       Response response = service.sendRequest(url, payload, credentials);
 
+=======
+
+  private void send(StringCredentials credentials, String url, String payload) {
+    try {
+      BitBucketPPROAuth2Api service = new BitBucketPPROAuth2Api();
+      Response response = service.sendRequest(url, payload, credentials);
+
+>>>>>>> master
       logger.info("Result of the backpropagation is: " + response.getBody() + ", with status code: "
           + response.getCode());
     } catch (IOException e) {

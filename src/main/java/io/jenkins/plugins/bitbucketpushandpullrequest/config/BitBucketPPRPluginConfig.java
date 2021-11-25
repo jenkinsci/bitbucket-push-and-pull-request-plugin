@@ -4,13 +4,20 @@ import static org.apache.commons.lang3.StringUtils.isEmpty;
 import java.util.Collections;
 import java.util.logging.Logger;
 import javax.annotation.CheckForNull;
+<<<<<<< HEAD
+=======
+import org.jenkinsci.plugins.plaincredentials.StringCredentials;
+>>>>>>> master
 import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
 import com.cloudbees.plugins.credentials.CredentialsMatchers;
+<<<<<<< HEAD
 import com.cloudbees.plugins.credentials.common.StandardCredentials;
 
+=======
+>>>>>>> master
 import com.cloudbees.plugins.credentials.common.StandardListBoxModel;
 import com.cloudbees.plugins.credentials.domains.DomainRequirement;
 import hudson.Extension;
@@ -34,6 +41,8 @@ public class BitBucketPPRPluginConfig extends GlobalConfiguration {
   public boolean notifyBitBucket;
 
   public boolean useJobNameAsBuildKey;
+  
+  public String credentialsId;
 
   public String credentialsId;
 
@@ -109,7 +118,11 @@ public class BitBucketPPRPluginConfig extends GlobalConfiguration {
     }
 
     return new StandardListBoxModel().includeEmptyValue()
+<<<<<<< HEAD
         .includeMatchingAs(ACL.SYSTEM, Jenkins.getInstance(), StandardCredentials.class,
+=======
+        .includeMatchingAs(ACL.SYSTEM, Jenkins.getInstance(), StringCredentials.class,
+>>>>>>> master
             Collections.<DomainRequirement>emptyList(), CredentialsMatchers.always())
         .includeCurrentValue(credentialsId);
 
