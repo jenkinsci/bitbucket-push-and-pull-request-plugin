@@ -18,9 +18,9 @@
  * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  ******************************************************************************/
-package io.jenkins.plugins.bitbucketpushandpullrequest.util;
+package io.jenkins.plugins.bitbucketpushandpullrequest.common;
 
-public final class BitBucketPPRConstsUtils {
+public final class BitBucketPPRConst {
   public static final String HOOK_URL = "bitbucket-hook";
   public static final String USER_AGENT = "Bitbucket-Webhooks/2.0";
 
@@ -54,8 +54,13 @@ public final class BitBucketPPRConstsUtils {
 
   public static final String PULL_REQUEST_REVIEWER = "REVIEWER";
   public static final String PULL_REQUEST_PARTICIPANT = "PARTICIPANT";
+  public static final String DEPRECATED_X_HEADER_REPO_POST = "repo:post";
+  public static final String X_EVENT_KEY = "x-event-key";
+  public static final String PAYLOAD_PFX = "payload=";
+  public static final String APPLICATION_X_WWW_FORM_URLENCODED =
+      "application/x-www-form-urlencoded";
 
-  private BitBucketPPRConstsUtils() {
+  private BitBucketPPRConst() {
     throw new AssertionError();
   }
 }
