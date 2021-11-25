@@ -21,97 +21,67 @@
 package io.jenkins.plugins.bitbucketpushandpullrequest.client;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
+import java.util.concurrent.ExecutionException;
+import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.NotImplementedException;
 import org.apache.http.HttpEntity;
-import org.apache.http.HttpHeaders;
 import org.apache.http.HttpResponse;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
 import org.jenkinsci.plugins.plaincredentials.StringCredentials;
 import com.cloudbees.plugins.credentials.common.StandardCredentials;
 import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials;
 import com.github.scribejava.core.model.Response;
-import io.jenkins.plugins.bitbucketpushandpullrequest.client.api.BitBucketPPROAuth2Api;
+import io.jenkins.plugins.bitbucketpushandpullrequest.client.api.BitBucketPPRBasicAuthApiConsumer;
+import io.jenkins.plugins.bitbucketpushandpullrequest.client.api.BitBucketPPROAuth2ApiConsumer;
 
 public class BitBucketPPRClientCloudVisitor implements BitBucketPPRClientVisitor {
   private static final Logger logger =
       Logger.getLogger(BitBucketPPRClientCloudVisitor.class.getName());
 
   @Override
-  public void send(StandardCredentials credentials, String url, String payload) {
+  public void send(StandardCredentials credentials, String url, String payload)
+      throws InterruptedException {
     if (credentials instanceof StandardUsernamePasswordCredentials)
-      this.send((StandardUsernamePasswordCredentials) credentials, url, payload);
+      try {
+        final HttpResponse response =
+            this.send((StandardUsernamePasswordCredentials) credentials, url, payload);
+        HttpEntity responseEntity = response.getEntity();
+        final String responseBody =
+            responseEntity == null ? "empty" : EntityUtils.toString(responseEntity);
+
+        logger.log(Level.FINEST, "Result of the status notification is: {0}, with status code: {1}",
+            new Object[] {responseBody, response.getStatusLine().getStatusCode()});
+      } catch (IOException e) {
+        logger.log(Level.WARNING, "Error during state notification: {} ", e.getMessage());
+      }
     else if (credentials instanceof StringCredentials) {
-      this.send((StringCredentials) credentials, url, payload);
+      try {
+        Response response = this.send((StringCredentials) credentials, url, payload);
+
+        logger.log(Level.FINEST, "Result of the state notification is: {0}, with status code: {1}",
+            new Object[] {response.getBody(), response.getCode()});
+      } catch (ExecutionException | IOException e) {
+        logger.log(Level.WARNING, "Error during state notification: {} ", e.getMessage());
+      } catch(InterruptedException e) {
+        throw e;
+      }
     } else
       throw new NotImplementedException("Credentials provider for state notification not found");
   }
 
-<<<<<<< HEAD
+  private HttpResponse send(StandardUsernamePasswordCredentials credentials, String url,
+      String payload) throws IOException {
 
-=======
->>>>>>> master
-  private void send(StandardUsernamePasswordCredentials credentials, String url, String payload) {
-    logger.info("Set BB StandardUsernamePasswordCredentials for BB Cloud backpropagation");
-
-    final org.apache.http.client.CredentialsProvider provider = new BasicCredentialsProvider();
-    String username = credentials.getUsername();
-    String password = credentials.getPassword().getPlainText();
-
-    try {
-      final UsernamePasswordCredentials httpAuthCredentials =
-          new UsernamePasswordCredentials(username, password);
-      provider.setCredentials(AuthScope.ANY, httpAuthCredentials);
-      final String auth = username + ":" + password;
-      byte[] encodedAuth = Base64.encodeBase64(auth.getBytes(StandardCharsets.ISO_8859_1));
-      String authHeader = "Basic " + new String(encodedAuth, StandardCharsets.ISO_8859_1);
-
-      final HttpClient client =
-          HttpClientBuilder.create().setDefaultCredentialsProvider(provider).build();
-      final HttpPost request = new HttpPost(url);
-      request.setHeader(HttpHeaders.AUTHORIZATION, authHeader);
-      request.setEntity(new StringEntity(payload, ContentType.APPLICATION_JSON));
-      final HttpResponse response = client.execute(request);
-      final int statusCode = response.getStatusLine().getStatusCode();
-
-      HttpEntity responseEntity = response.getEntity();
-      final String result = responseEntity == null ? "empty" : EntityUtils.toString(responseEntity);
-      logger.info(
-          "Result of the backpropagation is: " + result + ", with status code: " + statusCode);
-    } catch (Throwable t) {
-      logger.warning("Error during backpropagation to BB Cloud: " + t.getMessage());
-    }
+    BitBucketPPRBasicAuthApiConsumer api = new BitBucketPPRBasicAuthApiConsumer();
+    return api.send(credentials, url, payload);
   }
 
-<<<<<<< HEAD
-  private void send(StringCredentials credentials, String url, String payload) {
-    try {
-      BitBucketPPROAuth2Api service = new BitBucketPPROAuth2Api();
-      Response response = service.sendRequest(url, payload, credentials);
-
-=======
-
-  private void send(StringCredentials credentials, String url, String payload) {
-    try {
-      BitBucketPPROAuth2Api service = new BitBucketPPROAuth2Api();
-      Response response = service.sendRequest(url, payload, credentials);
-
->>>>>>> master
-      logger.info("Result of the backpropagation is: " + response.getBody() + ", with status code: "
-          + response.getCode());
-    } catch (IOException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    }
+  private Response send(StringCredentials credentials, String url, String payload)
+      throws InterruptedException, ExecutionException, IOException {
+    logger.finest("Set BB StringCredentials for BB Cloud state notification");
+    
+    BitBucketPPROAuth2ApiConsumer api = new BitBucketPPROAuth2ApiConsumer();
+    return api.send(credentials, url, payload);
   }
 }

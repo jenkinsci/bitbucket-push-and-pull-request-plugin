@@ -34,19 +34,12 @@ import javax.annotation.CheckForNull;
 import org.apache.commons.jelly.XMLOutput;
 import org.eclipse.jgit.transport.URIish;
 import org.jenkinsci.Symbol;
-<<<<<<< HEAD
-=======
-import org.jenkinsci.plugins.plaincredentials.StringCredentials;
->>>>>>> master
 import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
 import com.cloudbees.plugins.credentials.CredentialsMatchers;
-<<<<<<< HEAD
 import com.cloudbees.plugins.credentials.common.StandardCredentials;
-=======
->>>>>>> master
 import com.cloudbees.plugins.credentials.common.StandardListBoxModel;
 import com.cloudbees.plugins.credentials.domains.DomainRequirement;
 import hudson.Extension;
@@ -303,11 +296,7 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
       }
 
       return new StandardListBoxModel().includeEmptyValue()
-<<<<<<< HEAD
           .includeMatchingAs(ACL.SYSTEM, Jenkins.getInstance(), StandardCredentials.class,
-=======
-          .includeMatchingAs(ACL.SYSTEM, Jenkins.getInstance(), StringCredentials.class,
->>>>>>> master
               Collections.<DomainRequirement>emptyList(), CredentialsMatchers.always())
           .includeCurrentValue(credentialsId);
     }

@@ -10,7 +10,7 @@ import com.github.scribejava.core.model.OAuthRequest;
 import com.github.scribejava.core.model.Response;
 import com.github.scribejava.core.model.Verb;
 import com.github.scribejava.core.oauth.OAuth20Service;
-import io.jenkins.plugins.bitbucketpushandpullrequest.client.BitBucketPPRClientCloudVisitor;
+
 
 public class BitBucketPPROAuth2ApiConsumer {
   private static final Logger logger =
@@ -21,7 +21,7 @@ public class BitBucketPPROAuth2ApiConsumer {
     logger.finest("Set BB StringCredentials for BB Cloud state notification");
 
     OAuth20Service service = new ServiceBuilder(credentials.getId())
-        .apiSecret(credentials.getSecret().getPlainText()).build(BitbucketPPROAuth2Api.instance());
+        .apiSecret(credentials.getSecret().getPlainText()).build(BitBucketPPROAuth2Api.instance());
 
     OAuth2AccessToken token = service.getAccessTokenClientCredentialsGrant();
     OAuthRequest request = new OAuthRequest(Verb.POST, url);
