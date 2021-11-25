@@ -1,42 +1,30 @@
 package io.jenkins.plugins.bitbucketpushandpullrequest.client.api;
 
-import java.io.IOException;
-import java.util.concurrent.ExecutionException;
-import org.jenkinsci.plugins.plaincredentials.StringCredentials;
-import com.github.scribejava.core.builder.ServiceBuilder;
-import com.github.scribejava.core.model.OAuth2AccessToken;
-import com.github.scribejava.core.model.OAuthRequest;
-import com.github.scribejava.core.model.Response;
-import com.github.scribejava.core.model.Verb;
-import com.github.scribejava.core.oauth.OAuth20Service;
+import com.github.scribejava.core.builder.api.DefaultApi20;
 
-public class BitBucketPPROAuth2Api {
+public class BitBucketPPROAuth2Api extends DefaultApi20 {
 
-  public Response sendRequest(String url, String payload, StringCredentials credentials) {
-    try {
-      OAuth20Service service = new ServiceBuilder(credentials.getId())
-          .apiSecret(credentials.getSecret().getPlainText()).build(BitbucketApi.instance());
-      
-      OAuth2AccessToken token = service.getAccessTokenClientCredentialsGrant();
-      OAuthRequest request = new OAuthRequest(Verb.POST, url);
-      request.addHeader("Content-Type", "application/json;charset=UTF-8");
-      // request.addPayload(MAPPER.writeValueAsString(payload));
-      request.setPayload(payload);
-      service.signRequest(token, request);
-      
-      return service.execute(request);
 
-    } catch (InterruptedException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    } catch (ExecutionException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    } catch (IOException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    }
-
-    return null;
+  public BitBucketPPROAuth2Api()   { 
+    /* TODO document why this constructor is empty */ 
   }
+
+  private static class InstanceHolder {
+    private static final BitBucketPPROAuth2Api INSTANCE = new BitBucketPPROAuth2Api();
+  }
+
+  public static BitBucketPPROAuth2Api instance() {
+    return InstanceHolder.INSTANCE;
+  }
+
+  @Override
+  public String getAccessTokenEndpoint() {
+    return "https://bitbucket.org/site/oauth2/access_token";
+  }
+
+  @Override
+  protected String getAuthorizationBaseUrl() {
+    return "https://bitbucket.org/site/oauth2/access_token";
+  }
+
 }
