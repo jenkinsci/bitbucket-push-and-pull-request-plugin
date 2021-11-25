@@ -20,9 +20,10 @@
  ******************************************************************************/
 package io.jenkins.plugins.bitbucketpushandpullrequest.client;
 
+import java.io.IOException;
 import com.cloudbees.plugins.credentials.common.StandardCredentials;
 
 public interface BitBucketPPRClientVisitor {
-  public void send(StandardCredentials standardCredentials, String url, String payload);
+  public void send(StandardCredentials standardCredentials, String url, String payload) throws InterruptedException, IOException;
 
 }

@@ -2,17 +2,15 @@ package io.jenkins.plugins.bitbucketpushandpullrequest.client.api;
 
 import com.github.scribejava.core.builder.api.DefaultApi20;
 
-public class BitbucketApi extends DefaultApi20 {
+public class BitbucketPPROAuth2Api extends DefaultApi20 {
 
-  public BitbucketApi() { 
-    /* TODO document why this constructor is empty */ 
-  }
+  public BitbucketPPROAuth2Api() { }
 
   private static class InstanceHolder {
-    private static final BitbucketApi INSTANCE = new BitbucketApi();
+    private static final BitbucketPPROAuth2Api INSTANCE = new BitbucketPPROAuth2Api();
   }
 
-  public static BitbucketApi instance() {
+  public static BitbucketPPROAuth2Api instance() {
     return InstanceHolder.INSTANCE;
   }
 
@@ -23,6 +21,6 @@ public class BitbucketApi extends DefaultApi20 {
 
   @Override
   protected String getAuthorizationBaseUrl() {
-    return "https://bitbucket.org/site/oauth2/access_token";
+    return "https://bitbucket.org/site/oauth2/authorize";
   }
 }

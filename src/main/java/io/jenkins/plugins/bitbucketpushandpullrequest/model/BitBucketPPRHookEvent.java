@@ -20,7 +20,6 @@
  ******************************************************************************/
 package io.jenkins.plugins.bitbucketpushandpullrequest.model;
 
-
 import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst.DIAGNOSTICS;
 import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst.PING;
 import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst.PULL_REQUEST_APPROVED;
@@ -84,7 +83,6 @@ public class BitBucketPPRHookEvent {
         || REPOSITORY_POST.equalsIgnoreCase(action)
         || REPOSITORY_SERVER_PUSH.equalsIgnoreCase(action))) {
       return;
-
     }
 
     if (PULL_REQUEST_CLOUD_EVENT.equalsIgnoreCase(event)

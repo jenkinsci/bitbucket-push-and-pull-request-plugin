@@ -22,7 +22,6 @@
 
 package io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.server;
 
-
 import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst.PULL_REQUEST_SERVER_APPROVED;
 import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst.PULL_REQUEST_SERVER_COMMENT_CREATED;
 import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst.PULL_REQUEST_SERVER_CREATED;

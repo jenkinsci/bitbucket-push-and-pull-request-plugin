@@ -28,10 +28,6 @@ public class BitBucketPPRCloudClient implements BitBucketPPRClient {
   private BitBucketPPREventContext context;
   private BitBucketPPRClientVisitor visitor;
 
-  {
-    System.setErr(BitBucketPPRUtils.createLoggingProxyForErrors(System.err));
-  }
-
   public BitBucketPPRCloudClient(BitBucketPPREventContext context) {
     this.context = context;
   }

@@ -57,6 +57,7 @@ public final class BitBucketPPRConst {
   public static final String DEPRECATED_X_HEADER_REPO_POST = "repo:post";
   public static final String X_EVENT_KEY = "x-event-key";
   public static final String PAYLOAD_PFX = "payload=";
+
   public static final String APPLICATION_X_WWW_FORM_URLENCODED =
       "application/x-www-form-urlencoded";
 

@@ -20,75 +20,72 @@
  ******************************************************************************/
 package io.jenkins.plugins.bitbucketpushandpullrequest.client;
 
-import java.nio.charset.StandardCharsets;
+import java.io.IOException;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.util.concurrent.ExecutionException;
+import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import com.cloudbees.jenkins.plugins.sshcredentials.SSHUserPrivateKey;
-import com.cloudbees.plugins.credentials.common.StandardCredentials;
-import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials;
-
-import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.NotImplementedException;
 import org.apache.http.HttpEntity;
-import org.apache.http.HttpHeaders;
 import org.apache.http.HttpResponse;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
+import org.jenkinsci.plugins.plaincredentials.StringCredentials;
+import com.cloudbees.plugins.credentials.common.StandardCredentials;
+import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials;
+import io.jenkins.plugins.bitbucketpushandpullrequest.client.api.BitBucketPPRBasicAuthApiConsumer;
+import io.jenkins.plugins.bitbucketpushandpullrequest.client.api.BitBucketPPRBearerAuthorizationApiConsumer;
 
 public class BitBucketPPRClientServerVisitor implements BitBucketPPRClientVisitor {
-  private static final Logger logger = Logger.getLogger(BitBucketPPRClientServerVisitor.class.getName());
+  private static final Logger logger =
+      Logger.getLogger(BitBucketPPRClientServerVisitor.class.getName());
 
   @Override
-  public void send(StandardCredentials standardCredentials, String url, String payload) {
-    if (standardCredentials instanceof StandardUsernamePasswordCredentials)
-      this.send((StandardUsernamePasswordCredentials) standardCredentials, url, payload);
-    else if (standardCredentials instanceof SSHUserPrivateKey) {
-      this.send((SSHUserPrivateKey) standardCredentials, url, payload);
-    } else
-      throw new NotImplementedException("Credentials provider for backpropagation not found");
+  public void send(StandardCredentials credentials, String url, String payload)
+      throws InterruptedException {
+    if (credentials instanceof StandardUsernamePasswordCredentials)
+      try {
+        final HttpResponse response =
+            this.send((StandardUsernamePasswordCredentials) credentials, url, payload);
+        HttpEntity responseEntity = response.getEntity();
+        final String responseBody =
+            responseEntity == null ? "empty" : EntityUtils.toString(responseEntity);
+
+        logger.log(Level.FINEST, "Result of the status notification is: {0}, with status code: {1}",
+            new Object[] {responseBody, response.getStatusLine().getStatusCode()});
+      } catch (IOException e) {
+        logger.log(Level.WARNING, "Error during state notification: {} ", e.getMessage());
+      }
+    else if (credentials instanceof StringCredentials)
+      try {
+        HttpResponse response = this.send((StringCredentials) credentials, url, payload);
+        logger.log(Level.FINEST, "Result of the state notification is: {0}, with status code: {1}",
+            new Object[] {response.getEntity().getContent(),
+                response.getStatusLine().getStatusCode()});
+      } catch (ExecutionException | IOException | KeyManagementException | NoSuchAlgorithmException
+          | KeyStoreException e) {
+        logger.log(Level.WARNING, "Error du" + "ring state notification: {} ", e.getMessage());
+      } catch (InterruptedException e) {
+        throw e;
+      }
+    else
+      throw new NotImplementedException("Credentials provider for state notification not found");
   }
 
-  private void send(StandardUsernamePasswordCredentials standardCredentials, String url, String payload) {
-    logger.fine("Set BB StandardUsernamePasswordCredentials for backpropagation");
-    logger.fine("Url for backpropagation " + url + " with payload " + payload);
-
-    final org.apache.http.client.CredentialsProvider provider = new BasicCredentialsProvider();
-    String username = standardCredentials.getUsername();
-    String password = standardCredentials.getPassword().getPlainText();
-
-    try {
-      final UsernamePasswordCredentials credentials = new UsernamePasswordCredentials(username, password);
-      provider.setCredentials(AuthScope.ANY, credentials);
-      final String auth = username + ":" + password;
-
-      byte[] encodedAuth = Base64.encodeBase64(auth.getBytes(StandardCharsets.ISO_8859_1));
-      String authHeader = "Basic " + new String(encodedAuth, StandardCharsets.ISO_8859_1);
-
-      final HttpClient client = HttpClientBuilder.create().setDefaultCredentialsProvider(provider).build();
-      final HttpPost request = new HttpPost(url);
-      request.setHeader(HttpHeaders.AUTHORIZATION, authHeader);
-      request.setHeader("X-Atlassian-Token", "nocheck");
-
-      request.setEntity(new StringEntity(payload, ContentType.APPLICATION_JSON));
-      final HttpResponse response = client.execute(request);
-      final int statusCode = response.getStatusLine().getStatusCode();
-
-      HttpEntity responseEntity = response.getEntity();
-      final String result = responseEntity == null ? "no content" : EntityUtils.toString(responseEntity);
-      logger.fine("Result of the backpropagation is: " + result + " , with status code: " + statusCode);
-    } catch (Throwable t) {
-      logger.warning("An error occurred during the backpropagation: " + t.getMessage());
-    }
+  private HttpResponse send(StandardUsernamePasswordCredentials credentials, String url,
+      String payload) throws IOException {
+    BitBucketPPRBasicAuthApiConsumer api = new BitBucketPPRBasicAuthApiConsumer();
+    return api.send(credentials, url, payload);
   }
 
-  private void send(SSHUserPrivateKey standardCredentials, String url, String payload) {
-    throw new NotImplementedException("This authentication method is not suported by the BitBucket Server Rest API.");
+  private HttpResponse send(StringCredentials credentials, String url, String payload)
+      throws InterruptedException, ExecutionException, IOException, KeyManagementException,
+      NoSuchAlgorithmException, KeyStoreException {
+    logger.finest("Set BB StringCredentials for BB Server state notification");
+
+    BitBucketPPRBearerAuthorizationApiConsumer api =
+        new BitBucketPPRBearerAuthorizationApiConsumer();
+    return api.send(credentials, url, payload);
   }
 }
