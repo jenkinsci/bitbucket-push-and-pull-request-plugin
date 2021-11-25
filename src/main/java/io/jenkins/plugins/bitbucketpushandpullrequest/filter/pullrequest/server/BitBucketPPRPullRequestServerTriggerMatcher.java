@@ -1,7 +1,7 @@
 /*******************************************************************************
  * The MIT License
  *
- * Copyright (C) 2020, CloudBees, Inc.
+ * Copyright (C) 2021, CloudBees, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -25,6 +25,7 @@ package io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.server
 import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst.PULL_REQUEST_SERVER_APPROVED;
 import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst.PULL_REQUEST_SERVER_COMMENT_CREATED;
 import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst.PULL_REQUEST_SERVER_CREATED;
+import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst.PULL_REQUEST_SERVER_DECLINED;
 import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst.PULL_REQUEST_SERVER_MERGED;
 import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst.PULL_REQUEST_SERVER_SOURCE_UPDATED;
 import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst.PULL_REQUEST_SERVER_UPDATED;
@@ -52,6 +53,9 @@ public class BitBucketPPRPullRequestServerTriggerMatcher
                 .getActionFilter() instanceof BitBucketPPRPullRequestServerCreatedActionFilter)
         || (PULL_REQUEST_SERVER_MERGED.equalsIgnoreCase(bitbucketEvent.getAction()) && triggerFilter
             .getActionFilter() instanceof BitBucketPPRPullRequestServerMergedActionFilter)
+        || (PULL_REQUEST_SERVER_DECLINED.equalsIgnoreCase(bitbucketEvent.getAction())
+            && triggerFilter
+                .getActionFilter() instanceof BitBucketPPRPullRequestServerDeclinedActionFilter)
         || (PULL_REQUEST_SERVER_COMMENT_CREATED.equals(bitbucketEvent.getAction()) && triggerFilter
             .getActionFilter() instanceof BitBucketPPRPullRequestServerCommentCreatedActionFilter);
   }

@@ -38,6 +38,7 @@ public final class BitBucketPPRConst {
   public static final String PULL_REQUEST_APPROVED = "approved";
   public static final String PULL_REQUEST_UPDATED = "updated";
   public static final String PULL_REQUEST_MERGED = "fulfilled";
+  public static final String PULL_REQUEST_DECLINED = "rejected";
   public static final String PULL_REQUEST_COMMENT_CREATED = "comment_created";
   public static final String PULL_REQUEST_COMMENT_UPDATED = "comment_updated";
   public static final String PULL_REQUEST_COMMENT_DELETED = "comment_deleted";
@@ -48,6 +49,7 @@ public final class BitBucketPPRConst {
   public static final String PULL_REQUEST_SERVER_UPDATED = "modified";
   public static final String PULL_REQUEST_SERVER_SOURCE_UPDATED = "from_ref_updated";
   public static final String PULL_REQUEST_SERVER_MERGED = "merged";
+  public static final String PULL_REQUEST_SERVER_DECLINED = "declined";
   public static final String PULL_REQUEST_SERVER_COMMENT_CREATED = "comment:added";
 
   public static final String PULL_REQUEST_REVIEWER = "REVIEWER";
@@ -55,7 +57,9 @@ public final class BitBucketPPRConst {
   public static final String DEPRECATED_X_HEADER_REPO_POST = "repo:post";
   public static final String X_EVENT_KEY = "x-event-key";
   public static final String PAYLOAD_PFX = "payload=";
-  public static final String APPLICATION_X_WWW_FORM_URLENCODED = "application/x-www-form-urlencoded";
+
+  public static final String APPLICATION_X_WWW_FORM_URLENCODED =
+      "application/x-www-form-urlencoded";
 
   private BitBucketPPRConst() {
     throw new AssertionError();

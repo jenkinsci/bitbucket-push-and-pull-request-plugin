@@ -18,27 +18,25 @@
  * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  ******************************************************************************/
-package io.jenkins.plugins.bitbucketpushandpullrequest.client;
 
-import io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRUtils;
-import io.jenkins.plugins.bitbucketpushandpullrequest.event.BitBucketPPREventContext;
+package io.jenkins.plugins.bitbucketpushandpullrequest.cause.pullrequest.cloud;
 
-public class BitBucketPPRServerClient implements BitBucketPPRClient {
+import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
+import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRHookEvent;
 
-  private BitBucketPPREventContext context;
-  private BitBucketPPRClientVisitor visitor;
+import java.io.File;
+import java.io.IOException;
 
-  public BitBucketPPRServerClient(BitBucketPPREventContext context) {
-    this.context = context;
+
+public class BitBucketPPRPullRequestDeclinedCause extends BitBucketPPRPullRequestCause {
+  public BitBucketPPRPullRequestDeclinedCause(File pollingLog, BitBucketPPRAction bitbucketAction, BitBucketPPRHookEvent bitBucketEvent)
+      throws IOException {
+    super(pollingLog, bitbucketAction, bitBucketEvent);
   }
 
   @Override
-  public void send(final String url, String payload) throws Exception {
-    visitor.send(context.getStandardCredentials(), url, payload);
-  }
-
-  @Override
-  public void accept(BitBucketPPRClientVisitor visitor) {
-    this.visitor = visitor;
+  public String getShortDescription() {
+    String pusher = bitbucketAction.getUser() != null ? bitbucketAction.getUser() : "";
+    return "Started by user " + pusher + ": Bitbucket PPR: pull request declined";
   }
 }

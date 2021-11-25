@@ -91,6 +91,7 @@ public class BitBucketPPRCloudObserverTest {
     spyObserver.getNotification(event);
     spyObserver.setBuildStatusInProgress();
     Mockito.verify(spyObserver).setBuildStatusInProgress();
+
     Mockito.verify(spyObserver).callClient(url, map);
   }
 

@@ -10,7 +10,6 @@ import com.github.scribejava.core.model.OAuthRequest;
 import com.github.scribejava.core.model.Response;
 import com.github.scribejava.core.model.Verb;
 import com.github.scribejava.core.oauth.OAuth20Service;
-import io.jenkins.plugins.bitbucketpushandpullrequest.client.BitBucketPPRClientCloudVisitor;
 
 public class BitBucketPPROAuth2ApiConsumer {
   private static final Logger logger =

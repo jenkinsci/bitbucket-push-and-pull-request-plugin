@@ -20,6 +20,7 @@
  ******************************************************************************/
 package io.jenkins.plugins.bitbucketpushandpullrequest.client;
 
+import io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRUtils;
 import io.jenkins.plugins.bitbucketpushandpullrequest.event.BitBucketPPREventContext;
 
 

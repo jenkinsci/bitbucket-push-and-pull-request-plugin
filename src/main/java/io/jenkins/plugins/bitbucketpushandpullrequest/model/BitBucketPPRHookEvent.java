@@ -28,10 +28,12 @@ import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPR
 import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst.PULL_REQUEST_COMMENT_DELETED;
 import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst.PULL_REQUEST_COMMENT_UPDATED;
 import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst.PULL_REQUEST_CREATED;
+import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst.PULL_REQUEST_DECLINED;
 import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst.PULL_REQUEST_MERGED;
 import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst.PULL_REQUEST_SERVER_APPROVED;
 import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst.PULL_REQUEST_SERVER_COMMENT_CREATED;
 import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst.PULL_REQUEST_SERVER_CREATED;
+import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst.PULL_REQUEST_SERVER_DECLINED;
 import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst.PULL_REQUEST_SERVER_EVENT;
 import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst.PULL_REQUEST_SERVER_MERGED;
 import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst.PULL_REQUEST_SERVER_SOURCE_UPDATED;
@@ -76,6 +78,7 @@ public class BitBucketPPRHookEvent {
 
   private void checkOperationSupported() throws OperationNotSupportedException {
 
+
     if (REPOSITORY_EVENT.equalsIgnoreCase(event) && (REPOSITORY_CLOUD_PUSH.equalsIgnoreCase(action)
         || REPOSITORY_POST.equalsIgnoreCase(action)
         || REPOSITORY_SERVER_PUSH.equalsIgnoreCase(action))) {
@@ -90,12 +93,14 @@ public class BitBucketPPRHookEvent {
                 || PULL_REQUEST_MERGED.equalsIgnoreCase(action)
                 || PULL_REQUEST_COMMENT_CREATED.equalsIgnoreCase(action)
                 || PULL_REQUEST_COMMENT_UPDATED.equalsIgnoreCase(action)
+                || PULL_REQUEST_DECLINED.equalsIgnoreCase(action)
                 || PULL_REQUEST_COMMENT_DELETED.equalsIgnoreCase(action)
                 || PULL_REQUEST_SERVER_CREATED.equalsIgnoreCase(action)
                 || PULL_REQUEST_SERVER_UPDATED.equalsIgnoreCase(action)
                 || PULL_REQUEST_SERVER_SOURCE_UPDATED.equalsIgnoreCase(action)
                 || PULL_REQUEST_SERVER_APPROVED.equalsIgnoreCase(action)
                 || PULL_REQUEST_SERVER_MERGED.equalsIgnoreCase(action)
+                || PULL_REQUEST_SERVER_DECLINED.equalsIgnoreCase(action)
                 || PULL_REQUEST_SERVER_COMMENT_CREATED.equalsIgnoreCase(action))) {
       return;
     }

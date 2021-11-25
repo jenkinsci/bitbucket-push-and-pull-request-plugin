@@ -1,44 +1,42 @@
 /*******************************************************************************
  * The MIT License
- * 
+ *
  * Copyright (C) 2020, CloudBees, Inc.
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
  * including without limitation the rights to use, copy, modify, merge, publish, distribute,
  * sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in all copies or
  * substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT
  * NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
  * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  ******************************************************************************/
-package io.jenkins.plugins.bitbucketpushandpullrequest.client;
 
-import io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRUtils;
-import io.jenkins.plugins.bitbucketpushandpullrequest.event.BitBucketPPREventContext;
+package io.jenkins.plugins.bitbucketpushandpullrequest.cause.pullrequest.server;
 
-public class BitBucketPPRServerClient implements BitBucketPPRClient {
+import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
+import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRHookEvent;
 
-  private BitBucketPPREventContext context;
-  private BitBucketPPRClientVisitor visitor;
+import java.io.File;
+import java.io.IOException;
 
-  public BitBucketPPRServerClient(BitBucketPPREventContext context) {
-    this.context = context;
+
+public class BitBucketPPRPullRequestServerDeclinedCause extends BitBucketPPRPullRequestServerCause {
+  public BitBucketPPRPullRequestServerDeclinedCause(File pollingLog,
+                                                    BitBucketPPRAction bitbucketAction, BitBucketPPRHookEvent bitBucketEvent) throws IOException {
+    super(pollingLog, bitbucketAction, bitBucketEvent);
   }
 
   @Override
-  public void send(final String url, String payload) throws Exception {
-    visitor.send(context.getStandardCredentials(), url, payload);
-  }
-
-  @Override
-  public void accept(BitBucketPPRClientVisitor visitor) {
-    this.visitor = visitor;
+  public String getShortDescription() {
+    String pusher = bitbucketAction.getUser() != null ? bitbucketAction.getUser() : "";
+    return "Started by user " + pusher + ": Bitbucket PPR: pull request declined";
   }
 }

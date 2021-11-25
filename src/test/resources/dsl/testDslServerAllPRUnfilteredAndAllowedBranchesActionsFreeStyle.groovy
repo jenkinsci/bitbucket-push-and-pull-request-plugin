@@ -6,12 +6,14 @@ freeStyleJob('test-job') {
       pullRequestServerSourceUpdatedAction()
       pullRequestServerApprovedAction(false)
       pullRequestServerMergedAction()
-      
+      pullRequestServerDeclinedAction()
+
       pullRequestServerCreatedAction("*")
       pullRequestServerUpdatedAction("*")
       pullRequestServerSourceUpdatedAction("*")
       pullRequestServerApprovedAction(false, "*")
       pullRequestServerMergedAction("*")
+      pullRequestServerDeclinedAction("*")
     }
   }
 }

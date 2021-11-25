@@ -1,7 +1,7 @@
 /*******************************************************************************
  * The MIT License
  * 
- * Copyright (C) 2020, CloudBees, Inc.
+ * Copyright (C) 2021, CloudBees, Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -22,11 +22,13 @@
 
 package io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.cloud;
 
+
 import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst.PULL_REQUEST_APPROVED;
 import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst.PULL_REQUEST_COMMENT_CREATED;
 import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst.PULL_REQUEST_COMMENT_DELETED;
 import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst.PULL_REQUEST_COMMENT_UPDATED;
 import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst.PULL_REQUEST_CREATED;
+import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst.PULL_REQUEST_DECLINED;
 import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst.PULL_REQUEST_MERGED;
 import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst.PULL_REQUEST_UPDATED;
 import io.jenkins.plugins.bitbucketpushandpullrequest.filter.BitBucketPPREventTriggerMatcher;
@@ -52,6 +54,8 @@ public class BitBucketPPRPullRequestTriggerMatcher implements BitBucketPPREventT
         || PULL_REQUEST_COMMENT_DELETED.equals(bitbucketEvent.getAction()) && triggerFilter
             .getActionFilter() instanceof BitBucketPPRPullRequestCommentDeletedActionFilter
         || PULL_REQUEST_MERGED.equals(bitbucketEvent.getAction())
-            && triggerFilter.getActionFilter() instanceof BitBucketPPRPullRequestMergedActionFilter;
+            && triggerFilter.getActionFilter() instanceof BitBucketPPRPullRequestMergedActionFilter
+        || PULL_REQUEST_DECLINED.equals(bitbucketEvent.getAction()) && triggerFilter
+            .getActionFilter() instanceof BitBucketPPRPullRequestDeclinedActionFilter;
   }
 }
