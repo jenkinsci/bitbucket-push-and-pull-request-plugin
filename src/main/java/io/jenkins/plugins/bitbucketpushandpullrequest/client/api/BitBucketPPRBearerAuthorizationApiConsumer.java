@@ -8,6 +8,7 @@ import java.util.logging.Logger;
 import javax.net.ssl.SSLContext;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.config.Registry;
 import org.apache.http.config.RegistryBuilder;
@@ -23,14 +24,16 @@ import org.apache.http.impl.conn.BasicHttpClientConnectionManager;
 import org.apache.http.ssl.SSLContexts;
 import org.apache.http.ssl.TrustStrategy;
 import org.jenkinsci.plugins.plaincredentials.StringCredentials;
+import com.github.scribejava.core.model.Verb;
 
 public class BitBucketPPRBearerAuthorizationApiConsumer {
 
   private static final Logger logger =
       Logger.getLogger(BitBucketPPRBearerAuthorizationApiConsumer.class.getName());
 
-  public HttpResponse send(StringCredentials credentials, String url, String payload)
-      throws IOException, KeyManagementException, NoSuchAlgorithmException, KeyStoreException {
+  public HttpResponse send(StringCredentials credentials, Verb verb, String url, String payload)
+      throws IOException, KeyManagementException, NoSuchAlgorithmException, KeyStoreException,
+      NoSuchMethodException {
     logger.finest("Use BB Bearer Authorization for state notification");
 
     TrustStrategy acceptingTrustStrategy = (cert, authType) -> true;
@@ -50,11 +53,21 @@ public class BitBucketPPRBearerAuthorizationApiConsumer {
 
     String authHeader = "Bearer ".concat(credentials.getSecret().getPlainText());
 
-    final HttpPost request = new HttpPost(url);
-    request.setHeader(HttpHeaders.AUTHORIZATION, authHeader);
-    request.setHeader("X-Atlassian-Token", "nocheck");
-    request.setEntity(new StringEntity(payload, ContentType.APPLICATION_JSON));
+    if (verb == Verb.POST) {
+      final HttpPost request = new HttpPost(url);
+      request.setHeader(HttpHeaders.AUTHORIZATION, authHeader);
+      request.setHeader("X-Atlassian-Token", "nocheck");
+      request.setEntity(new StringEntity(payload, ContentType.APPLICATION_JSON));
+      return httpClient.execute(request);
+    }
 
-    return httpClient.execute(request);
+    if (verb == Verb.DELETE) {
+      final HttpDelete request = new HttpDelete(url);
+      request.setHeader(HttpHeaders.AUTHORIZATION, authHeader);
+      request.setHeader("X-Atlassian-Token", "nocheck");
+      return httpClient.execute(request);
+    }
+
+    throw new NoSuchMethodException();
   }
 }

@@ -20,6 +20,7 @@
  ******************************************************************************/
 package io.jenkins.plugins.bitbucketpushandpullrequest.client;
 
+import com.github.scribejava.core.model.Verb;
 import io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRUtils;
 import io.jenkins.plugins.bitbucketpushandpullrequest.event.BitBucketPPREventContext;
 
@@ -40,5 +41,10 @@ public class BitBucketPPRServerClient implements BitBucketPPRClient {
   @Override
   public void accept(BitBucketPPRClientVisitor visitor) {
     this.visitor = visitor;
+  }
+
+  @Override
+  public void send(Verb verb, String url, String payload) throws Exception {
+    visitor.send(context.getStandardCredentials(), verb, url, payload);
   }
 }

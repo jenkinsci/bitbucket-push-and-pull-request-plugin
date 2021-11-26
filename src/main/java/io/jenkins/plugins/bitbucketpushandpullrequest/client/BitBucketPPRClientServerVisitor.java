@@ -34,6 +34,7 @@ import org.apache.http.util.EntityUtils;
 import org.jenkinsci.plugins.plaincredentials.StringCredentials;
 import com.cloudbees.plugins.credentials.common.StandardCredentials;
 import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials;
+import com.github.scribejava.core.model.Verb;
 import io.jenkins.plugins.bitbucketpushandpullrequest.client.api.BitBucketPPRBasicAuthApiConsumer;
 import io.jenkins.plugins.bitbucketpushandpullrequest.client.api.BitBucketPPRBearerAuthorizationApiConsumer;
 
@@ -43,11 +44,18 @@ public class BitBucketPPRClientServerVisitor implements BitBucketPPRClientVisito
 
   @Override
   public void send(StandardCredentials credentials, String url, String payload)
-      throws InterruptedException {
+      throws InterruptedException, NoSuchMethodException {
+    send(credentials, Verb.POST, url, payload);
+  }
+
+  @Override
+  public void send(StandardCredentials credentials, Verb verb, String url, String payload)
+      throws InterruptedException, NoSuchMethodException {
+
     if (credentials instanceof StandardUsernamePasswordCredentials)
       try {
         final HttpResponse response =
-            this.send((StandardUsernamePasswordCredentials) credentials, url, payload);
+            this.send((StandardUsernamePasswordCredentials) credentials, verb, url, payload);
         HttpEntity responseEntity = response.getEntity();
         final String responseBody =
             responseEntity == null ? "empty" : EntityUtils.toString(responseEntity);
@@ -59,7 +67,7 @@ public class BitBucketPPRClientServerVisitor implements BitBucketPPRClientVisito
       }
     else if (credentials instanceof StringCredentials)
       try {
-        HttpResponse response = this.send((StringCredentials) credentials, url, payload);
+        HttpResponse response = this.send((StringCredentials) credentials, verb, url, payload);
         logger.log(Level.FINEST, "Result of the state notification is: {0}, with status code: {1}",
             new Object[] {response.getEntity().getContent(),
                 response.getStatusLine().getStatusCode()});
@@ -73,19 +81,19 @@ public class BitBucketPPRClientServerVisitor implements BitBucketPPRClientVisito
       throw new NotImplementedException("Credentials provider for state notification not found");
   }
 
-  private HttpResponse send(StandardUsernamePasswordCredentials credentials, String url,
-      String payload) throws IOException {
+  private HttpResponse send(StandardUsernamePasswordCredentials credentials, Verb verb, String url,
+      String payload) throws IOException, NoSuchMethodException {
     BitBucketPPRBasicAuthApiConsumer api = new BitBucketPPRBasicAuthApiConsumer();
-    return api.send(credentials, url, payload);
+    return api.send(credentials, verb, url, payload);
   }
 
-  private HttpResponse send(StringCredentials credentials, String url, String payload)
+  private HttpResponse send(StringCredentials credentials, Verb verb, String url, String payload)
       throws InterruptedException, ExecutionException, IOException, KeyManagementException,
-      NoSuchAlgorithmException, KeyStoreException {
+      NoSuchAlgorithmException, KeyStoreException, NoSuchMethodException {
     logger.finest("Set BB StringCredentials for BB Server state notification");
 
     BitBucketPPRBearerAuthorizationApiConsumer api =
         new BitBucketPPRBearerAuthorizationApiConsumer();
-    return api.send(credentials, url, payload);
+    return api.send(credentials, verb, url, payload);
   }
 }

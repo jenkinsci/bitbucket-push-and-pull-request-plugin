@@ -22,8 +22,13 @@ package io.jenkins.plugins.bitbucketpushandpullrequest.client;
 
 import java.io.IOException;
 import com.cloudbees.plugins.credentials.common.StandardCredentials;
+import com.github.scribejava.core.model.Verb;
 
 public interface BitBucketPPRClientVisitor {
-  public void send(StandardCredentials standardCredentials, String url, String payload) throws InterruptedException, IOException;
+  public void send(StandardCredentials credentials, String url, String payload)
+      throws InterruptedException, IOException, NoSuchMethodException;
+
+  public void send(StandardCredentials credentials, Verb verb, String url, String payload)
+      throws InterruptedException, NoSuchMethodException;
 
 }

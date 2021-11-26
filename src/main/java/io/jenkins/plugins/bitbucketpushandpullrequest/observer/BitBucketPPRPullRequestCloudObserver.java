@@ -23,6 +23,7 @@ package io.jenkins.plugins.bitbucketpushandpullrequest.observer;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
+import com.github.scribejava.core.model.Verb;
 import hudson.model.Result;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.client.BitBucketPPRClientType;
@@ -52,29 +53,30 @@ public class BitBucketPPRPullRequestCloudObserver extends BitBucketPPRHandlerTem
     }
 
     Result result = context.getRun().getResult();
-    String approved = result == Result.SUCCESS ? "true" : "false";
 
     BitBucketPPRAction bitbucketAction = context.getAction();
-    
+    Verb verb = Verb.POST;
+    Map<String, String> map = new HashMap<>();
+
     String url = null;
-    if (result == Result.SUCCESS && context.getFilter().shouldSendApprove()) {
-      url = bitbucketAction.getLinkApprove();      
+    if (context.getFilter().shouldSendApprove()) {
+      url = bitbucketAction.getLinkApprove();
+
+      if (result == Result.FAILURE) {
+        verb = Verb.DELETE;
+      }
     }
-    
+
     if (result == Result.FAILURE && context.getFilter().shouldSendDecline()) {
-      url = bitbucketAction.getLinkDecline();      
+      url = bitbucketAction.getLinkDecline();
     }
-    
+
     if (url == null) {
       logger.warning("URL for approved not found in Bitbucket payload.");
       return;
     }
 
-    // @todo verify if it is right
-    Map<String, String> map = new HashMap<>();
-    map.put("approved", approved);
-
-    callClient(url, map);
+    callClient(verb, url, map);
   }
 
   @Override
