@@ -20,15 +20,9 @@
     </f:entry>
     <f:entry>
       <f:checkbox name="isToApprove"
-          title="Let Jenkins approve the event on BitBucket"
+          title="Let Jenkins approve or unapprove the commit on BitBucket"
           checked="${instance.isToApprove}">
       </f:checkbox>
-    </f:entry>
-    <f:entry>
-        <f:checkbox name="isToDecline"
-                    title="Let Jenkins decline the event on BitBucket if the build fails"
-                    checked="${instance.isToDecline}">
-        </f:checkbox>
     </f:entry>
     <f:entry title="Allowed Branches" field="allowed">
   		<f:textbox field="allowedBranches" />

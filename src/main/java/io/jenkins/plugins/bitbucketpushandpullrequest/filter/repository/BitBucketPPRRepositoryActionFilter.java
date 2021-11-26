@@ -49,6 +49,8 @@ public abstract class BitBucketPPRRepositoryActionFilter
 
   public abstract boolean shouldSendApprove();
   
-  public abstract boolean shouldSendDecline();
+  public boolean shouldSendDecline() {
+    return false;
+  }
 
 }

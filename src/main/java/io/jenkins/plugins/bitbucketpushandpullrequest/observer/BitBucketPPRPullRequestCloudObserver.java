@@ -55,28 +55,23 @@ public class BitBucketPPRPullRequestCloudObserver extends BitBucketPPRHandlerTem
     Result result = context.getRun().getResult();
 
     BitBucketPPRAction bitbucketAction = context.getAction();
-    Verb verb = Verb.POST;
     Map<String, String> map = new HashMap<>();
 
     String url = null;
     if (context.getFilter().shouldSendApprove()) {
       url = bitbucketAction.getLinkApprove();
+      Verb verb = Verb.POST;
 
       if (result == Result.FAILURE) {
         verb = Verb.DELETE;
       }
+      callClient(verb, url, map);
     }
 
     if (result == Result.FAILURE && context.getFilter().shouldSendDecline()) {
       url = bitbucketAction.getLinkDecline();
+      callClient(Verb.POST, url, map);
     }
-
-    if (url == null) {
-      logger.warning("URL for approved not found in Bitbucket payload.");
-      return;
-    }
-
-    callClient(verb, url, map);
   }
 
   @Override

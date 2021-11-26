@@ -40,7 +40,6 @@ public class BitBucketPPRPullRequestServerMergedActionFilter
 
   public String allowedBranches;
   public boolean isToApprove;
-  public boolean isToDecline;
 
   @DataBoundConstructor
   public BitBucketPPRPullRequestServerMergedActionFilter() {}
@@ -57,11 +56,6 @@ public class BitBucketPPRPullRequestServerMergedActionFilter
   @DataBoundSetter
   public void setIsToApprove(boolean isToApprove) {
     this.isToApprove = isToApprove;
-  }
-  
-  @DataBoundSetter
-  public void setIsToDecline(boolean isToDecline) {
-    this.isToDecline = isToDecline;
   }
 
   @Override
@@ -94,7 +88,7 @@ public class BitBucketPPRPullRequestServerMergedActionFilter
 
   @Override
   public boolean shouldSendDecline() {
-    return isToDecline;
+    return false;
   }
   
 }

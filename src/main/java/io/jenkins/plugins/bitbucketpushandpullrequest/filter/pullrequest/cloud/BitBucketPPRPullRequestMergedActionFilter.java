@@ -36,7 +36,6 @@ import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRHookEven
 public class BitBucketPPRPullRequestMergedActionFilter extends BitBucketPPRPullRequestActionFilter {
   public String allowedBranches;
   public boolean isToApprove;
-  public boolean isToDecline;
 
   @DataBoundConstructor
   public BitBucketPPRPullRequestMergedActionFilter() {}
@@ -53,11 +52,6 @@ public class BitBucketPPRPullRequestMergedActionFilter extends BitBucketPPRPullR
   @DataBoundSetter
   public void setIsToApprove(boolean isToApprove) {
     this.isToApprove = isToApprove;
-  }
-  
-  @DataBoundSetter
-  public void setIsToDecline(boolean isToDecline) {
-    this.isToDecline = isToDecline;
   }
   
   @Override
@@ -79,7 +73,7 @@ public class BitBucketPPRPullRequestMergedActionFilter extends BitBucketPPRPullR
   
   @Override
   public boolean shouldSendDecline() {
-    return isToDecline;
+    return false;
   }
 
   @Extension
