@@ -40,4 +40,6 @@ public abstract class BitBucketPPRTriggerFilter extends AbstractDescribableImpl<
   public abstract boolean shouldTriggerAlsoIfNothingChanged();
 
   public abstract boolean shouldSendApprove();
+  
+  public abstract boolean shouldSendDecline();
 }

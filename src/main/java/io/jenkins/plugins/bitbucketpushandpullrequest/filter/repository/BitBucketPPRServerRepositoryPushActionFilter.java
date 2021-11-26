@@ -47,6 +47,7 @@ public class BitBucketPPRServerRepositoryPushActionFilter
   public boolean triggerAlsoIfNothingChanged;
   public String allowedBranches;
   public boolean isToApprove;
+  public boolean isToDecline;
 
   @DataBoundConstructor
   public BitBucketPPRServerRepositoryPushActionFilter(boolean triggerAlsoIfTagPush,
@@ -64,6 +65,11 @@ public class BitBucketPPRServerRepositoryPushActionFilter
   @DataBoundSetter
   public void setIsToApprove(boolean isToApprove) {
     this.isToApprove = isToApprove;
+  }
+  
+  @DataBoundSetter
+  public void setIsToDecline(boolean isToDecline) {
+    this.isToDecline = isToDecline;
   }
 
   @Override
@@ -127,5 +133,10 @@ public class BitBucketPPRServerRepositoryPushActionFilter
   @Override
   public boolean shouldSendApprove() {
     return isToApprove;
+  }
+
+  @Override
+  public boolean shouldSendDecline() {
+    return isToDecline;
   }
 }

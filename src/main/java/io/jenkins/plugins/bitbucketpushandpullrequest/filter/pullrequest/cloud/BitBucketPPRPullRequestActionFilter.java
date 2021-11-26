@@ -46,4 +46,6 @@ public abstract class BitBucketPPRPullRequestActionFilter
       BitBucketPPRAction pullRequestAction, BitBucketPPRHookEvent bitBucketEvent) throws IOException;
 
   public abstract boolean shouldSendApprove();
+
+  public abstract boolean shouldSendDecline();
 }

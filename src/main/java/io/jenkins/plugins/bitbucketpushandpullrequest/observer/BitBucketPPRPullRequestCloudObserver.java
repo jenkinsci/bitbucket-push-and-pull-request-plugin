@@ -46,26 +46,34 @@ public class BitBucketPPRPullRequestCloudObserver extends BitBucketPPRHandlerTem
   }
 
   @Override
-  public void setApproved() {
-    if (!context.getFilter().shouldSendApprove()) {
+  public void setApprovedOrDeclined() {
+    if (!(context.getFilter().shouldSendApprove() || context.getFilter().shouldSendDecline())) {
       return;
     }
-    
-    Result result = context.getRun().getResult();    
-    String approved = result == Result.SUCCESS ? "true" : "false";
-    
-    BitBucketPPRAction bitbucketAction = context.getAction();
-    String url = result == Result.SUCCESS ? bitbucketAction.getLinkApprove()
-        : result == Result.FAILURE ? bitbucketAction.getLinkDecline() : null;
 
+    Result result = context.getRun().getResult();
+    String approved = result == Result.SUCCESS ? "true" : "false";
+
+    BitBucketPPRAction bitbucketAction = context.getAction();
+    
+    String url = null;
+    if (result == Result.SUCCESS && context.getFilter().shouldSendApprove()) {
+      url = bitbucketAction.getLinkApprove();      
+    }
+    
+    if (result == Result.FAILURE && context.getFilter().shouldSendDecline()) {
+      url = bitbucketAction.getLinkDecline();      
+    }
+    
     if (url == null) {
       logger.warning("URL for approved not found in Bitbucket payload.");
       return;
     }
 
+    // @todo verify if it is right
     Map<String, String> map = new HashMap<>();
     map.put("approved", approved);
-    
+
     callClient(url, map);
   }
 

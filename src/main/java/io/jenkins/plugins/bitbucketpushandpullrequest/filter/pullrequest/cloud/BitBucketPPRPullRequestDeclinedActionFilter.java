@@ -64,6 +64,11 @@ public class BitBucketPPRPullRequestDeclinedActionFilter extends BitBucketPPRPul
     return false;
   }
 
+  @Override
+  public boolean shouldSendDecline() {
+    return false;
+  }
+  
   @Extension
   public static class ActionFilterDescriptorImpl extends BitBucketPPRPullRequestActionDescriptor {
 

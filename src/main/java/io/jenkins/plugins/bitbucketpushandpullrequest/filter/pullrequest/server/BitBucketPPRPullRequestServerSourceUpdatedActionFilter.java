@@ -36,7 +36,8 @@ import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRHookEven
 public class BitBucketPPRPullRequestServerSourceUpdatedActionFilter extends BitBucketPPRPullRequestServerActionFilter {
 
   public String allowedBranches;
-  boolean isToApprove;
+  public boolean isToApprove;
+  public boolean isToDecline;
 
   @DataBoundConstructor
   public BitBucketPPRPullRequestServerSourceUpdatedActionFilter() {
@@ -54,6 +55,11 @@ public class BitBucketPPRPullRequestServerSourceUpdatedActionFilter extends BitB
   @DataBoundSetter
   public void setIsToApprove(boolean isToApprove) {
     this.isToApprove = isToApprove;
+  }
+  
+  @DataBoundSetter
+  public void setIsToDecline(boolean isToDecline) {
+    this.isToDecline = isToDecline;
   }
 
   @Override
@@ -80,5 +86,10 @@ public class BitBucketPPRPullRequestServerSourceUpdatedActionFilter extends BitB
   @Override
   public boolean shouldSendApprove() {
     return isToApprove;
+  }
+
+  @Override
+  public boolean shouldSendDecline() {
+    return isToDecline;
   }
 }

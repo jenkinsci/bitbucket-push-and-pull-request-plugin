@@ -50,15 +50,17 @@ public abstract class BitBucketPPRHandlerTemplate {
       case BUILD_FINISHED:
         if (config.shouldNotifyBitBucket()) {
           setBuildStatusOnFinished();
-          setApproved();
+          setApprovedOrDeclined();
         }
         break;
       default:
         throw new Exception();
     }
   }
-
-  public void setApproved() {
+  
+  
+  // @todo: do we need it also for pushs?
+  public void setApprovedOrDeclined() {
     return;
   }
 

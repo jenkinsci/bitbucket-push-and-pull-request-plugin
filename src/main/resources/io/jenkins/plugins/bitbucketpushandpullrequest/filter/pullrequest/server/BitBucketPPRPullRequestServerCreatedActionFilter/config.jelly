@@ -9,4 +9,10 @@
           checked="${instance.isToApprove}">
       </f:checkbox>
     </f:entry>
+    <f:entry>
+        <f:checkbox name="isToDecline"
+            title="Let Jenkins decline the event on BitBucket if the build fails"
+            checked="${instance.isToDecline}">
+        </f:checkbox>
+    </f:entry>
 </j:jelly>

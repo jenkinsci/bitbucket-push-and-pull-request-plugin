@@ -82,4 +82,9 @@ public class BitBucketPPRRepositoryTriggerFilter extends BitBucketPPRTriggerFilt
   public boolean shouldTriggerAlsoIfNothingChanged() {
     return actionFilter.shouldTriggerAlsoIfNothingChanged();
   }
+
+  @Override
+  public boolean shouldSendDecline() {
+    return actionFilter.shouldSendDecline();
+  }
 }

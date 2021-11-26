@@ -48,4 +48,7 @@ public abstract class BitBucketPPRRepositoryActionFilter
   public abstract boolean shouldTriggerAlsoIfNothingChanged();
 
   public abstract boolean shouldSendApprove();
+  
+  public abstract boolean shouldSendDecline();
+
 }

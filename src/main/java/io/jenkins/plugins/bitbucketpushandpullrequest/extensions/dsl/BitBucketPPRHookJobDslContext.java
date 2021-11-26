@@ -84,6 +84,20 @@ public class BitBucketPPRHookJobDslContext implements Context {
     triggers.add(repositoryTriggerFilter);
   }
 
+  public void repositoryPushAction(boolean triggerAlsoIfTagPush,
+      boolean triggerAlsoIfNothingChanged, String allowedBranches, boolean isToApprove,
+      boolean triggerOnlyIfTagPush, boolean isToDecline) {
+    BitBucketPPRRepositoryPushActionFilter repositoryPushActionFilter =
+        new BitBucketPPRRepositoryPushActionFilter(triggerAlsoIfTagPush,
+            triggerAlsoIfNothingChanged, allowedBranches);
+    repositoryPushActionFilter.setIsToApprove(isToApprove);
+    repositoryPushActionFilter.setIsToDecline(isToDecline);
+    repositoryPushActionFilter.setTriggerOnlyIfTagPush(triggerOnlyIfTagPush);
+    BitBucketPPRRepositoryTriggerFilter repositoryTriggerFilter =
+        new BitBucketPPRRepositoryTriggerFilter(repositoryPushActionFilter);
+    triggers.add(repositoryTriggerFilter);
+  }
+
   public void pullRequestApprovedAction(boolean onlyIfReviewersApproved, String allowedBranches) {
     BitBucketPPRPullRequestApprovedActionFilter pullRequestApprovedActionFilter =
         new BitBucketPPRPullRequestApprovedActionFilter(onlyIfReviewersApproved);
@@ -101,12 +115,12 @@ public class BitBucketPPRHookJobDslContext implements Context {
     triggers.add(pullRequestTriggerFilter);
   }
 
+  @Deprecated
   public void pullRequestApprovedAction(boolean onlyIfReviewersApproved, String allowedBranches,
       boolean isToApprove) {
     BitBucketPPRPullRequestApprovedActionFilter pullRequestApprovedActionFilter =
         new BitBucketPPRPullRequestApprovedActionFilter(onlyIfReviewersApproved);
     pullRequestApprovedActionFilter.setAllowedBranches(allowedBranches);
-    pullRequestApprovedActionFilter.setIsToApprove(isToApprove);
     BitBucketPPRPullRequestTriggerFilter pullRequestTriggerFilter =
         new BitBucketPPRPullRequestTriggerFilter(pullRequestApprovedActionFilter);
     triggers.add(pullRequestTriggerFilter);
@@ -139,6 +153,18 @@ public class BitBucketPPRHookJobDslContext implements Context {
     triggers.add(pullRequestTriggerFilter);
   }
 
+  public void pullRequestCreatedAction(String allowedBranches, boolean isToApprove,
+      boolean isToDecline) {
+    BitBucketPPRPullRequestCreatedActionFilter pullRequestCreatedActionFilter =
+        new BitBucketPPRPullRequestCreatedActionFilter();
+    pullRequestCreatedActionFilter.setAllowedBranches(allowedBranches);
+    pullRequestCreatedActionFilter.setIsToApprove(isToApprove);
+    pullRequestCreatedActionFilter.setIsToDecline(isToDecline);
+    BitBucketPPRPullRequestTriggerFilter pullRequestTriggerFilter =
+        new BitBucketPPRPullRequestTriggerFilter(pullRequestCreatedActionFilter);
+    triggers.add(pullRequestTriggerFilter);
+  }
+
   public void pullRequestUpdatedAction() {
     BitBucketPPRPullRequestUpdatedActionFilter pullRequestUpdatedActionFilter =
         new BitBucketPPRPullRequestUpdatedActionFilter();
@@ -161,6 +187,18 @@ public class BitBucketPPRHookJobDslContext implements Context {
         new BitBucketPPRPullRequestUpdatedActionFilter();
     pullRequestUpdatedActionFilter.setAllowedBranches(allowedBranches);
     pullRequestUpdatedActionFilter.setIsToApprove(isToApprove);
+    BitBucketPPRPullRequestTriggerFilter pullRequestTriggerFilter =
+        new BitBucketPPRPullRequestTriggerFilter(pullRequestUpdatedActionFilter);
+    triggers.add(pullRequestTriggerFilter);
+  }
+
+  public void pullRequestUpdatedAction(String allowedBranches, boolean isToApprove,
+      boolean isToDecline) {
+    BitBucketPPRPullRequestUpdatedActionFilter pullRequestUpdatedActionFilter =
+        new BitBucketPPRPullRequestUpdatedActionFilter();
+    pullRequestUpdatedActionFilter.setAllowedBranches(allowedBranches);
+    pullRequestUpdatedActionFilter.setIsToApprove(isToApprove);
+    pullRequestUpdatedActionFilter.setIsToDecline(isToDecline);
     BitBucketPPRPullRequestTriggerFilter pullRequestTriggerFilter =
         new BitBucketPPRPullRequestTriggerFilter(pullRequestUpdatedActionFilter);
     triggers.add(pullRequestTriggerFilter);
@@ -193,20 +231,32 @@ public class BitBucketPPRHookJobDslContext implements Context {
     triggers.add(pullRequestTriggerFilter);
   }
 
+  public void pullRequestMergedAction(String allowedBranches, boolean isToApprove,
+      boolean isToDecline) {
+    BitBucketPPRPullRequestMergedActionFilter pullRequestMergedActionFilter =
+        new BitBucketPPRPullRequestMergedActionFilter();
+    pullRequestMergedActionFilter.setAllowedBranches(allowedBranches);
+    pullRequestMergedActionFilter.setIsToApprove(isToApprove);
+    pullRequestMergedActionFilter.setIsToDecline(isToDecline);
+    BitBucketPPRPullRequestTriggerFilter pullRequestTriggerFilter =
+        new BitBucketPPRPullRequestTriggerFilter(pullRequestMergedActionFilter);
+    triggers.add(pullRequestTriggerFilter);
+  }
+
   public void pullRequestDeclinedAction() {
     BitBucketPPRPullRequestDeclinedActionFilter pullRequestDeclinedActionFilter =
-            new BitBucketPPRPullRequestDeclinedActionFilter();
+        new BitBucketPPRPullRequestDeclinedActionFilter();
     BitBucketPPRPullRequestTriggerFilter pullRequestTriggerFilter =
-            new BitBucketPPRPullRequestTriggerFilter(pullRequestDeclinedActionFilter);
+        new BitBucketPPRPullRequestTriggerFilter(pullRequestDeclinedActionFilter);
     triggers.add(pullRequestTriggerFilter);
   }
 
   public void pullRequestDeclinedAction(String allowedBranches) {
     BitBucketPPRPullRequestDeclinedActionFilter pullRequestDeclinedActionFilter =
-            new BitBucketPPRPullRequestDeclinedActionFilter();
+        new BitBucketPPRPullRequestDeclinedActionFilter();
     pullRequestDeclinedActionFilter.setAllowedBranches(allowedBranches);
     BitBucketPPRPullRequestTriggerFilter pullRequestTriggerFilter =
-            new BitBucketPPRPullRequestTriggerFilter(pullRequestDeclinedActionFilter);
+        new BitBucketPPRPullRequestTriggerFilter(pullRequestDeclinedActionFilter);
     triggers.add(pullRequestTriggerFilter);
   }
 
@@ -315,6 +365,20 @@ public class BitBucketPPRHookJobDslContext implements Context {
     triggers.add(repositoryServerTriggerFilter);
   }
 
+  public void repositoryServerPushAction(boolean triggerAlsoIfTagPush,
+      boolean triggerAlsoIfNothingChanged, String allowedBranches, boolean isToApprove,
+      boolean triggerOnlyIfTagPush, boolean isToDecline) {
+    BitBucketPPRServerRepositoryPushActionFilter repositoryServerPushActionFilter =
+        new BitBucketPPRServerRepositoryPushActionFilter(triggerAlsoIfTagPush,
+            triggerAlsoIfNothingChanged, allowedBranches);
+    repositoryServerPushActionFilter.setIsToApprove(isToApprove);
+    repositoryServerPushActionFilter.setIsToDecline(isToDecline);
+    repositoryServerPushActionFilter.setTriggerOnlyIfTagPush(triggerOnlyIfTagPush);
+    BitBucketPPRRepositoryTriggerFilter repositoryServerTriggerFilter =
+        new BitBucketPPRRepositoryTriggerFilter(repositoryServerPushActionFilter);
+    triggers.add(repositoryServerTriggerFilter);
+  }
+
   public void pullRequestServerApprovedAction(boolean onlyIfReviewersApproved) {
     BitBucketPPRPullRequestServerApprovedActionFilter pullRequestServerApprovedActionFilter =
         new BitBucketPPRPullRequestServerApprovedActionFilter(onlyIfReviewersApproved);
@@ -332,13 +396,14 @@ public class BitBucketPPRHookJobDslContext implements Context {
         new BitBucketPPRPullRequestServerTriggerFilter(pullRequestServerApprovedActionFilter);
     triggers.add(pullRequestServerTriggerFilter);
   }
-
+  
+  
+  @Deprecated
   public void pullRequestServerApprovedAction(boolean onlyIfReviewersApproved,
       String allowedBranches, boolean isToApprove) {
     BitBucketPPRPullRequestServerApprovedActionFilter pullRequestServerApprovedActionFilter =
         new BitBucketPPRPullRequestServerApprovedActionFilter(onlyIfReviewersApproved);
     pullRequestServerApprovedActionFilter.setAllowedBranches(allowedBranches);
-    pullRequestServerApprovedActionFilter.setIsToApprove(isToApprove);
     BitBucketPPRPullRequestServerTriggerFilter pullRequestServerTriggerFilter =
         new BitBucketPPRPullRequestServerTriggerFilter(pullRequestServerApprovedActionFilter);
     triggers.add(pullRequestServerTriggerFilter);
@@ -370,6 +435,17 @@ public class BitBucketPPRHookJobDslContext implements Context {
         new BitBucketPPRPullRequestServerTriggerFilter(pullRequestServerCreatedActionFilter);
     triggers.add(pullRequestServerTriggerFilter);
   }
+  
+  public void pullRequestServerCreatedAction(String allowedBranches, boolean isToApprove, boolean isToDecline) {
+    BitBucketPPRPullRequestServerCreatedActionFilter pullRequestServerCreatedActionFilter =
+        new BitBucketPPRPullRequestServerCreatedActionFilter();
+    pullRequestServerCreatedActionFilter.setAllowedBranches(allowedBranches);
+    pullRequestServerCreatedActionFilter.setIsToApprove(isToApprove);
+    pullRequestServerCreatedActionFilter.setIsToDecline(isToDecline);
+    BitBucketPPRPullRequestServerTriggerFilter pullRequestServerTriggerFilter =
+        new BitBucketPPRPullRequestServerTriggerFilter(pullRequestServerCreatedActionFilter);
+    triggers.add(pullRequestServerTriggerFilter);
+  }
 
   public void pullRequestServerUpdatedAction() {
     BitBucketPPRPullRequestServerUpdatedActionFilter pullRequestUpdatedServerActionFilter =
@@ -393,6 +469,17 @@ public class BitBucketPPRHookJobDslContext implements Context {
         new BitBucketPPRPullRequestServerUpdatedActionFilter();
     pullRequestUpdatedServerActionFilter.setAllowedBranches(allowedBranches);
     pullRequestUpdatedServerActionFilter.setIsToApprove(isToApprove);
+    BitBucketPPRPullRequestServerTriggerFilter pullRequestServerTriggerFilter =
+        new BitBucketPPRPullRequestServerTriggerFilter(pullRequestUpdatedServerActionFilter);
+    triggers.add(pullRequestServerTriggerFilter);
+  }
+  
+  public void pullRequestServerUpdatedAction(String allowedBranches, boolean isToApprove, boolean isToDecline) {
+    BitBucketPPRPullRequestServerUpdatedActionFilter pullRequestUpdatedServerActionFilter =
+        new BitBucketPPRPullRequestServerUpdatedActionFilter();
+    pullRequestUpdatedServerActionFilter.setAllowedBranches(allowedBranches);
+    pullRequestUpdatedServerActionFilter.setIsToApprove(isToApprove);
+    pullRequestUpdatedServerActionFilter.setIsToApprove(isToDecline);
     BitBucketPPRPullRequestServerTriggerFilter pullRequestServerTriggerFilter =
         new BitBucketPPRPullRequestServerTriggerFilter(pullRequestUpdatedServerActionFilter);
     triggers.add(pullRequestServerTriggerFilter);
@@ -424,6 +511,17 @@ public class BitBucketPPRHookJobDslContext implements Context {
         new BitBucketPPRPullRequestServerTriggerFilter(pullRequestServerSourceUpdatedActionFilter);
     triggers.add(pullRequestServerTriggerFilter);
   }
+  
+  public void pullRequestServerSourceUpdatedAction(String allowedBranches, boolean isToApprove, boolean isToDecline) {
+    BitBucketPPRPullRequestServerSourceUpdatedActionFilter pullRequestServerSourceUpdatedActionFilter =
+        new BitBucketPPRPullRequestServerSourceUpdatedActionFilter();
+    pullRequestServerSourceUpdatedActionFilter.setAllowedBranches(allowedBranches);
+    pullRequestServerSourceUpdatedActionFilter.setIsToApprove(isToApprove);
+    pullRequestServerSourceUpdatedActionFilter.setIsToApprove(isToDecline);
+    BitBucketPPRPullRequestServerTriggerFilter pullRequestServerTriggerFilter =
+        new BitBucketPPRPullRequestServerTriggerFilter(pullRequestServerSourceUpdatedActionFilter);
+    triggers.add(pullRequestServerTriggerFilter);
+  }
 
   public void pullRequestServerMergedAction() {
     BitBucketPPRPullRequestServerMergedActionFilter pullRequestServerMegedActionFilter =
@@ -451,21 +549,32 @@ public class BitBucketPPRHookJobDslContext implements Context {
         new BitBucketPPRPullRequestServerTriggerFilter(pullRequestServerMergedActionFilter);
     triggers.add(pullRequestServerTriggerFilter);
   }
+  
+  public void pullRequestServerMergedAction(String allowedBranches, boolean isToApprove, boolean isToDecline) {
+    BitBucketPPRPullRequestServerMergedActionFilter pullRequestServerMergedActionFilter =
+        new BitBucketPPRPullRequestServerMergedActionFilter();
+    pullRequestServerMergedActionFilter.setAllowedBranches(allowedBranches);
+    pullRequestServerMergedActionFilter.setIsToApprove(isToApprove);
+    pullRequestServerMergedActionFilter.setIsToApprove(isToDecline);
+    BitBucketPPRPullRequestServerTriggerFilter pullRequestServerTriggerFilter =
+        new BitBucketPPRPullRequestServerTriggerFilter(pullRequestServerMergedActionFilter);
+    triggers.add(pullRequestServerTriggerFilter);
+  }
 
   public void pullRequestServerDeclinedAction() {
     BitBucketPPRPullRequestServerDeclinedActionFilter pullRequestServerDeclinedActionFilter =
-            new BitBucketPPRPullRequestServerDeclinedActionFilter();
+        new BitBucketPPRPullRequestServerDeclinedActionFilter();
     BitBucketPPRPullRequestServerTriggerFilter pullRequestServerTriggerFilter =
-            new BitBucketPPRPullRequestServerTriggerFilter(pullRequestServerDeclinedActionFilter);
+        new BitBucketPPRPullRequestServerTriggerFilter(pullRequestServerDeclinedActionFilter);
     triggers.add(pullRequestServerTriggerFilter);
   }
 
   public void pullRequestServerDeclinedAction(String allowedBranches) {
     BitBucketPPRPullRequestServerDeclinedActionFilter pullRequestServerDeclinedActionFilter =
-            new BitBucketPPRPullRequestServerDeclinedActionFilter();
+        new BitBucketPPRPullRequestServerDeclinedActionFilter();
     pullRequestServerDeclinedActionFilter.setAllowedBranches(allowedBranches);
     BitBucketPPRPullRequestServerTriggerFilter pullRequestServerTriggerFilter =
-            new BitBucketPPRPullRequestServerTriggerFilter(pullRequestServerDeclinedActionFilter);
+        new BitBucketPPRPullRequestServerTriggerFilter(pullRequestServerDeclinedActionFilter);
     triggers.add(pullRequestServerTriggerFilter);
   }
 

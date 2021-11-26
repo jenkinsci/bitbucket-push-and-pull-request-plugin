@@ -53,6 +53,11 @@ public class BitBucketPPRPullRequestTriggerFilter extends BitBucketPPRTriggerFil
   public boolean shouldSendApprove() {
     return actionFilter.shouldSendApprove();
   }
+  
+  @Override
+  public boolean shouldSendDecline() {
+    return actionFilter.shouldSendDecline();
+  }
 
   @Override
   public BitBucketPPRTriggerCause getCause(File pollingLog, BitBucketPPRAction action, BitBucketPPRHookEvent bitBucketEvent)

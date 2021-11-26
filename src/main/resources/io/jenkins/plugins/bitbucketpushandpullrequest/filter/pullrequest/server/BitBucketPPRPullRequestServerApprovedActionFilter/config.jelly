@@ -2,15 +2,9 @@
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:f="/lib/form">
     <f:entry>
         <f:checkbox name="triggerOnlyIfAllReviewersApproved"
-                    title="Trigger only if all reviewers have approved"
-                    checked="${instance.triggerOnlyIfAllReviewersApproved}">
+            title="Trigger only if all reviewers have approved"
+            checked="${instance.triggerOnlyIfAllReviewersApproved}">
         </f:checkbox>
-    </f:entry>
-    <f:entry>
-      <f:checkbox name="isToApprove"
-          title="Let Jenkins approve the event on BitBucket"
-          checked="${instance.isToApprove}">
-      </f:checkbox>
     </f:entry>
     <f:entry title="Allowed Branches" field="allowed">
   		<f:textbox field="allowedBranches" />
