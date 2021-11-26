@@ -38,6 +38,7 @@ public class BitBucketPPRPullRequestCreatedActionFilter
 
   public String allowedBranches;
   public boolean isToApprove;
+  public boolean isToDecline;
 
   @DataBoundConstructor
   public BitBucketPPRPullRequestCreatedActionFilter() {}
@@ -55,6 +56,11 @@ public class BitBucketPPRPullRequestCreatedActionFilter
   public void setIsToApprove(boolean isToApprove) {
     this.isToApprove = isToApprove;
   }
+  
+  @DataBoundSetter
+  public void setIsToDecline(boolean isToDecline) {
+    this.isToDecline = isToDecline;
+  }
 
   @Override
   public boolean shouldTriggerBuild(BitBucketPPRAction bitbucketAction) {
@@ -71,6 +77,11 @@ public class BitBucketPPRPullRequestCreatedActionFilter
   @Override
   public boolean shouldSendApprove() {
     return isToApprove;
+  }
+  
+  @Override
+  public boolean shouldSendDecline() {
+    return isToDecline;
   }
 
   @Extension

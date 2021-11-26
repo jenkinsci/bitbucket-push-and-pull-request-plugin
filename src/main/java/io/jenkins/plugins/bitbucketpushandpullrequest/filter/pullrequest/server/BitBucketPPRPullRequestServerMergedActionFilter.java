@@ -85,4 +85,10 @@ public class BitBucketPPRPullRequestServerMergedActionFilter
   public boolean shouldSendApprove() {
     return isToApprove;
   }
+
+  @Override
+  public boolean shouldSendDecline() {
+    return false;
+  }
+  
 }

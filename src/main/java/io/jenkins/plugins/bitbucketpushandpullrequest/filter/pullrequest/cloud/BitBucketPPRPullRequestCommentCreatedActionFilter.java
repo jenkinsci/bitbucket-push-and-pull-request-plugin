@@ -79,6 +79,11 @@ public class BitBucketPPRPullRequestCommentCreatedActionFilter
   public boolean shouldSendApprove() {
     return false;
   }
+  
+  @Override
+  public boolean shouldSendDecline() {
+    return false;
+  }
 
   public boolean hasInComment(String comment, EnvVars vars) {
     return BitBucketPPRUtils.matchWithRegex(comment, commentFilter, vars);

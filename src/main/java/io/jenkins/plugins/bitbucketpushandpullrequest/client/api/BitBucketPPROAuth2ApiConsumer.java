@@ -15,7 +15,7 @@ public class BitBucketPPROAuth2ApiConsumer {
   private static final Logger logger =
       Logger.getLogger(BitBucketPPROAuth2ApiConsumer.class.getName());
 
-  public Response send(StringCredentials credentials, String url, String payload)
+  public Response send(StringCredentials credentials, Verb verb, String url, String payload)
       throws InterruptedException, ExecutionException, IOException {
     logger.finest("Set BB StringCredentials for BB Cloud state notification");
 
@@ -23,9 +23,13 @@ public class BitBucketPPROAuth2ApiConsumer {
         .apiSecret(credentials.getSecret().getPlainText()).build(BitbucketPPROAuth2Api.instance());
 
     OAuth2AccessToken token = service.getAccessTokenClientCredentialsGrant();
-    OAuthRequest request = new OAuthRequest(Verb.POST, url);
+    OAuthRequest request = new OAuthRequest(verb, url);
     request.addHeader("Content-Type", "application/json;charset=UTF-8");
-    request.setPayload(payload);
+
+    if (verb == Verb.POST) {
+      request.setPayload(payload);
+    }
+
     service.signRequest(token, request);
 
     return service.execute(request);

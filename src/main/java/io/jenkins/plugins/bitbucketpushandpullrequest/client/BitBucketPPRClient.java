@@ -20,8 +20,10 @@
  ******************************************************************************/
 package io.jenkins.plugins.bitbucketpushandpullrequest.client;
 
+import com.github.scribejava.core.model.Verb;
+
 public interface BitBucketPPRClient {
   public void send(String url, String payload) throws Exception;
-
+  public void send(Verb verb, String url, String payload) throws Exception;
   public void accept(BitBucketPPRClientVisitor visitor);
 }

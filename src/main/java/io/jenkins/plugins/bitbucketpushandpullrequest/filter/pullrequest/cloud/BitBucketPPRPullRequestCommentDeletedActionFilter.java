@@ -66,6 +66,11 @@ public class BitBucketPPRPullRequestCommentDeletedActionFilter
   public boolean shouldSendApprove() {
     return false;
   }
+  
+  @Override
+  public boolean shouldSendDecline() {
+    return false;
+  }
 
   @Extension
   public static class ActionFilterDescriptorImpl extends BitBucketPPRPullRequestActionDescriptor {

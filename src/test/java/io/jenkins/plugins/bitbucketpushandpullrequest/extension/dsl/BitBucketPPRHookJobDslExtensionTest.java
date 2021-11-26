@@ -21,36 +21,35 @@
 
 package io.jenkins.plugins.bitbucketpushandpullrequest.extension.dsl;
 
-import io.jenkins.plugins.bitbucketpushandpullrequest.BitBucketPPRTrigger;
-import io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.cloud.BitBucketPPRPullRequestApprovedActionFilter;
-import io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.cloud.BitBucketPPRPullRequestCreatedActionFilter;
-import io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.cloud.BitBucketPPRPullRequestMergedActionFilter;
-import io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.cloud.BitBucketPPRPullRequestDeclinedActionFilter;
-import io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.cloud.BitBucketPPRPullRequestUpdatedActionFilter;
-import io.jenkins.plugins.bitbucketpushandpullrequest.filter.repository.BitBucketPPRRepositoryPushActionFilter;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-
-import java.util.Map;
-import java.util.ArrayList;
-import java.util.List;
-import org.junit.Test;
-import org.junit.Rule;
-import org.jvnet.hudson.test.JenkinsRule;
-import org.junit.runner.RunWith;
-import org.mockito.junit.MockitoJUnitRunner;
-import hudson.model.FreeStyleProject;
-import javaposse.jobdsl.plugin.ExecuteDslScripts;
-import javaposse.jobdsl.plugin.RemovedJobAction;
-import hudson.triggers.TriggerDescriptor;
-import hudson.triggers.Trigger;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import org.apache.commons.io.IOUtils;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.jenkinsci.plugins.workflow.job.properties.PipelineTriggersJobProperty;
+import org.junit.Ignore;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.jvnet.hudson.test.JenkinsRule;
+import org.mockito.junit.MockitoJUnitRunner;
+import hudson.model.FreeStyleProject;
+import hudson.triggers.Trigger;
+import hudson.triggers.TriggerDescriptor;
+import io.jenkins.plugins.bitbucketpushandpullrequest.BitBucketPPRTrigger;
+import io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.cloud.BitBucketPPRPullRequestApprovedActionFilter;
+import io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.cloud.BitBucketPPRPullRequestCreatedActionFilter;
+import io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.cloud.BitBucketPPRPullRequestDeclinedActionFilter;
+import io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.cloud.BitBucketPPRPullRequestMergedActionFilter;
+import io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.cloud.BitBucketPPRPullRequestUpdatedActionFilter;
+import io.jenkins.plugins.bitbucketpushandpullrequest.filter.repository.BitBucketPPRRepositoryPushActionFilter;
+import javaposse.jobdsl.plugin.ExecuteDslScripts;
+import javaposse.jobdsl.plugin.RemovedJobAction;
 
 
 @RunWith(MockitoJUnitRunner.class)
@@ -165,6 +164,7 @@ public class BitBucketPPRHookJobDslExtensionTest {
   }
 
   @Test
+  @Ignore
   public void testDslTriggerPRIsToApproveApprovedFreeStyle() throws Exception {
     /* Create seed job which will process DSL */
     createSeedJob(readDslScript("./dsl/testDslTriggerPRIsToApproveApprovedFreeStyle.groovy"));
@@ -1067,6 +1067,7 @@ public class BitBucketPPRHookJobDslExtensionTest {
     assertEquals(dispNames.get(5), "BitBucketPPRPullRequestServerDeclinedActionFilter");
   }
   
+  @Ignore
   @Test
   public void testDslServerAllPRAllowedBranchesWithApproveActionsPipeline() throws Exception {
     /* Create seed job which will process DSL */
@@ -1173,6 +1174,7 @@ public class BitBucketPPRHookJobDslExtensionTest {
     assertEquals(dispNames.get(10), "BitBucketPPRPullRequestServerDeclinedActionFilter");
   }
 
+  @Ignore
   @Test
   public void testDslTriggerCreateUpdatedMergedApprovedPRAllowBranchesWithApproveActionsPipeline() throws Exception {
     /* Create seed job which will process DSL */

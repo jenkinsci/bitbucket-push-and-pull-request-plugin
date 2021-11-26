@@ -10,6 +10,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
+import com.github.scribejava.core.model.Verb;
 
 @RunWith(MockitoJUnitRunner.class)
 public class BitBucketPPRBearerAuthorizationApiConsumerTest {
@@ -26,7 +27,7 @@ public class BitBucketPPRBearerAuthorizationApiConsumerTest {
 
     BitBucketPPRBearerAuthorizationApiConsumer testSubject =
         new BitBucketPPRBearerAuthorizationApiConsumer();
-    result = testSubject.send(credentials, url, payload);
+    result = testSubject.send(credentials, Verb.POST, url, payload);
 
     assertEquals(200, result.getStatusLine().getStatusCode());
   }

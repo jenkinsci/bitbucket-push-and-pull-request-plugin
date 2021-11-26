@@ -70,6 +70,11 @@ public class BitBucketPPRPullRequestMergedActionFilter extends BitBucketPPRPullR
   public boolean shouldSendApprove() {
     return isToApprove;
   }
+  
+  @Override
+  public boolean shouldSendDecline() {
+    return false;
+  }
 
   @Extension
   public static class ActionFilterDescriptorImpl extends BitBucketPPRPullRequestActionDescriptor {

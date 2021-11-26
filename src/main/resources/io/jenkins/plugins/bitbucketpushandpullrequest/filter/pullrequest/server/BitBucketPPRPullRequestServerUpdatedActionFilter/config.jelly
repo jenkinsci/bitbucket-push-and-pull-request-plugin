@@ -5,8 +5,14 @@
 	  </f:entry>
     <f:entry>
       <f:checkbox name="isToApprove"
-          title="Let Jenkins approve the event on BitBucket"
+          title="Let Jenkins approve or unapprove the pull request on BitBucket"
           checked="${instance.isToApprove}">
       </f:checkbox>
+    </f:entry>
+    <f:entry>
+        <f:checkbox name="isToDecline"
+            title="Let Jenkins decline the pull request on BitBucket if the build fails"
+            checked="${instance.isToDecline}">
+        </f:checkbox>
     </f:entry>
 </j:jelly>
