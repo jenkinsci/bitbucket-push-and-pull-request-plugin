@@ -9,11 +9,37 @@
 
 <img src="docs/img/logo-head.svg" width="192">
 
+- [Bitbucket Push and Pull Request Plugin](#bitbucket-push-and-pull-request-plugin)
+- [Introduction](#introduction)
+- [Before you start](#before-you-start)
+- [Configuration](#configuration)
+  - [Configure the webhook](#configure-the-webhook)
+    - [Configure the Global Configurations of the Plugin](#configure-the-global-configurations-of-the-plugin)
+  - [Configure your Jenkins job](#configure-your-jenkins-job)
+    - [Authentication for state notification and generally when using the Bitbucket REST API](#authentication-for-state-notification-and-generally-when-using-the-bitbucket-rest-api)
+  - [Bitbucket Events supported by the plugin](#bitbucket-events-supported-by-the-plugin)
+    - [Some examples](#some-examples)
+- [Troubleshooting: Some important aspects to keep in mind](#troubleshooting-some-important-aspects-to-keep-in-mind)
+    - [About the initialization of the plugin](#about-the-initialization-of-the-plugin)
+    - [About the filters on the branches](#about-the-filters-on-the-branches)
+    - [About the build state propagation and the approve set by Jenkins on BitBucket](#about-the-build-state-propagation-and-the-approve-set-by-jenkins-on-bitbucket)
+- [Environment variables](#environment-variables)
+- [Dsl Job actions for Bitbucket Push and Pull Request Trigger](#dsl-job-actions-for-bitbucket-push-and-pull-request-trigger)
+- [Dsl Job snippets](#dsl-job-snippets)
+    - [Valid for freestyle jobs and pipeline jobs (until job-dsl plugin v1.76, deprecated in v1.77 for pipeline jobs)](#valid-for-freestyle-jobs-and-pipeline-jobs-until-job-dsl-plugin-v176-deprecated-in-v177-for-pipeline-jobs)
+    - [Valid for pipeline with job-dsl 1.77+ (and before)](#valid-for-pipeline-with-job-dsl-177-and-before)
+    - [Second (more verbose) valid dsl for freestyle jobs](#second-more-verbose-valid-dsl-for-freestyle-jobs)
+- [Pipeline script](#pipeline-script)
+- [Thanks and Acknowledgments](#thanks-and-acknowledgments)
+
+
+# Introduction
+
 Plugin for Jenkins **v2.138.2 or later**, that triggers builds on Bitbucket's push and pull requests events.
 
 The new features introduced by Bitbucket Push and Pull Request 2.x.x are:
 
-- build state propagation
+- build state notification
 - support of pull requests for Bitbucket cloud (rest api v2.x+ with mercurial and git) and bitbucket Server (5.14+ with git)
 - support of pushs for Bitbucket cloud (rest api v2.x+ with mercurial and git) and Bitbucket server (5.14+ with git)
 - usage of Gson instead of net.sf.json.JSONObject
@@ -24,7 +50,8 @@ Bitbucket Push and Pull Request supports the
 - Bitbucket cloud rest api v2.x+ and later (with git and mercurial repos)
 - Bitbucket server 5.14+ and later (with git repos)
 
-**Before you start**
+ # Before you start
+
 Bitbucket Push And Pull Request Plugin will not work if the old Bitbucket plugin <https://plugins.jenkins.io/bitbucket> is still installed. So, please de-install from Jenkins the previous Bitbucket plugin if you want to use this new one.
 
 Reason is: both plugins use the same webhook endpoint and Jenkins gives priority to the old Bitbucket plugin, due to the lexical ordering used by Stapler to dispatch the request.
@@ -35,9 +62,9 @@ In case you want to use both plugins on the same Jenkins instance, you must:
 - After that, restart Jenkins
 - and configure the Bitbucket Cloud / Server webhooks accordingly to the new webhook endpoint (in our example: "bitbucket-ppr-webhook")
 
-## Configuration
+# Configuration
 
-### Configure the webhook
+## Configure the webhook
 
 Configure your Bitbucket repository adding a webhook in the settings page. In the URL field (see image, at point A) add your JENKINS_URL followed by "/bitbucket-hook/" (for example <https://my-jenkins.on-my-planet-far-away.com/bitbucket-hook/>) Credentials for the webhook endpoint are not required, the trailing slash is mandatory.
 
@@ -45,20 +72,6 @@ For more specific infos about managing webhooks please consult:
 
 - <https://confluence.atlassian.com/bitbucket/manage-webhooks-735643732.html>. (Bitbucket Cloud)
 - <https://confluence.atlassian.com/bitbucketserver/managing-webhooks-in-bitbucket-server-938025878.html>. (Bitbucket Server)
-
-### Configure your Jenkins job
-
-1. Configure the Bitbucket Repository under the Source Code Management with your credentials. For git:
-![example config git](docs/img/conf_git.png)
-In case you are using Mercurial instead of git, configure it as follows:
-![exampel config mercurial](docs/img/conf_mercurial.png)
-_Please note: the branch, related to the events which trigger the builds, must be specified in the field Revision._
-
-2. Now activate the plugin in your job selecting the "Build with Bitbucket Push and Pull Request Plugin" option in the Build Triggers pane.
-![example config jenkins bb ppr 1](docs/img/example_config_jenkins_bb_ppr_1.png)
-![example config jenkins bb ppr 2](docs/img/example_config_jenkins_bb_ppr_2.png)
-![example config jenkins bb ppr 3](docs/img/example_config_jenkins_bb_ppr_3.png)
-![example config jenkins bb ppr 4](docs/img/example_config_jenkins_bb_ppr_4.png)
 
 ### Configure the Global Configurations of the Plugin
 
@@ -70,32 +83,54 @@ in the __Jenkins Global Configurations__:
 
 3. you can choose what build key to use for build status propagation
 
+4. you can set global credentials used by the plugin for the state notification
+
 ![example global config jenkins bb ppr 1](docs/img/global-config.png)
 
-## Environment variables
+## Configure your Jenkins job
 
-NAME | VALUE | SCOPE | BB TYPE | NOTES
---- | :-- | :--- | :--- | ---
-BITBUCKET_TARGET_BRANCH | target branch | PR + P | C + S |
-BITBUCKET_ACTOR | actor name | PR + P | C + S |
-BITBUCKET_PAYLOAD | Complete payload as json string | PR + P | C + S |
-BITBUCKET_X_EVENT | x-event which triggered the plugin | PR + P | C + S |
-BITBUCKET_SOURCE_BRANCH | source branch | PR | C + S |
-BITBUCKET_PULL_REQUEST_TITLE | PR title | PR | C + S |
-BITBUCKET_PULL_REQUEST_ID | id | PR | C + S |
-BITBUCKET_PULL_REQUEST_LINK | link | PR | C + S |
-BITBUCKET_PULL_REQUEST_DESCRIPTION | PR description | PR | C + S |
-BITBUCKET_PULL_REQUEST_COMMENT_TEXT | Comment of BB Cloud Pull Request | PR | C + S |
-BITBUCKET_PULL_REQUEST_LATEST_COMMIT_FROM_SOURCE_BRANCH | Latest commit hash on the source branch | PR | C + S | 
-BITBUCKET_PULL_REQUEST_LATEST_COMMIT_FROM_TARGET_BRANCH | Latest commit hash on the target branch | PR | C + S | 
-BITBUCKET_REPOSITORY_UUID | Repository identifier | P | C |
-BITBUCKET_REPOSITORY_ID | Repository identifier | P | S |
-BITBUCKET_REPOSITORY_URL | Repository URL | PR | C |
-REPOSITORY_LINK | Repository link | P | C | Deprecated: to remove in 2.6
-REPOSITORY_NAME | Repository name | P | S | Deprecated: to remove in 2.6
+1. Configure the Bitbucket Repository under the Source Code Management with your credentials. For git:
+![example config git](docs/img/conf_git.png)
+In case you are using Mercurial instead of git, configure it as follows:
+![exampel config mercurial](docs/img/conf_mercurial.png)
+_Please note: the branch, related to the events which trigger the builds, must be specified in the field Revision._
+
+2. Now activate the plugin in your job selecting the "Build with Bitbucket Push and Pull Request Plugin" option in the Build Triggers pane.
+
+### Authentication for state notification and generally when using the Bitbucket REST API
+
+TYPE | BB CLOUD | BB SERVER | JENKINS CREDENTIALS | NOTES
+--- | :-- | :---  | :--- | ---
+Username & Password | X | X | Username with password| deprecated by bbc, will be removed in march 2022
+HTTP access token | - | X | Secret Text | [learn more about HTTP tokens](https://confluence.atlassian.com/bitbucketserver/http-access-tokens-939515499.html)
+OAuth consumers  | X | - | Secret Text | [learn more about Oauth Consumers](https://support.atlassian.com/bitbucket-cloud/docs/use-oauth-on-bitbucket-cloud/)
+
+1. you can set globally the credentials used by the plugin for the state notification
+2. you can set for each job the credentials used by the plugin for the state notification, overwriting the global credentials
+3. you you don't set nothing the plugin will try to use the credentials used by the git plugin
+
+## Bitbucket Events supported by the plugin
+
+FILTER | BB CLOUD | BB SERVER | NOTES
+--- | :-- | :---  | ---
+Pull Request Created | X | X |
+Pull Request Updated | X | X |
+Pull Request Declined | X | X |
+Pull Request Merged | X | X |
+Push | X | X |
+Comment Created | X | X |
+Comment Updated | X | - | If a user updates the same comment with not much time in between, Bitbucket only sends the event request the first time the comment is updated.
+Comment Deleted | X | - |
+
+### Some examples
+
+![example config jenkins bb ppr 1](docs/img/example_config_jenkins_bb_ppr_1.png)
+![example config jenkins bb ppr 2](docs/img/example_config_jenkins_bb_ppr_2.png)
+![example config jenkins bb ppr 3](docs/img/example_config_jenkins_bb_ppr_3.png)
+![example config jenkins bb ppr 4](docs/img/example_config_jenkins_bb_ppr_4.png)
 
 
-## Troubleshooting: Some important aspects to keep in mind
+# Troubleshooting: Some important aspects to keep in mind
 
 ### About the initialization of the plugin
 
@@ -128,7 +163,30 @@ The reason for that is the wish to guarantee consistency between the two plugins
 
 The only limit of this solution is that **the build status propagation will work only if you are using**, for the git plugin, **credentials of the kind: "Username with Password"**.
 
-## Dsl Job actions for Bitbucket Push and Pull Request Trigger
+
+# Environment variables
+
+NAME | VALUE | SCOPE | BB TYPE | NOTES
+--- | :-- | :--- | :--- | ---
+BITBUCKET_TARGET_BRANCH | target branch | PR + P | C + S |
+BITBUCKET_ACTOR | actor name | PR + P | C + S |
+BITBUCKET_PAYLOAD | Complete payload as json string | PR + P | C + S |
+BITBUCKET_X_EVENT | x-event which triggered the plugin | PR + P | C + S |
+BITBUCKET_SOURCE_BRANCH | source branch | PR | C + S |
+BITBUCKET_PULL_REQUEST_TITLE | PR title | PR | C + S |
+BITBUCKET_PULL_REQUEST_ID | id | PR | C + S |
+BITBUCKET_PULL_REQUEST_LINK | link | PR | C + S |
+BITBUCKET_PULL_REQUEST_DESCRIPTION | PR description | PR | C + S |
+BITBUCKET_PULL_REQUEST_COMMENT_TEXT | Comment of BB Cloud Pull Request | PR | C + S |
+BITBUCKET_PULL_REQUEST_LATEST_COMMIT_FROM_SOURCE_BRANCH | Latest commit hash on the source branch | PR | C + S | 
+BITBUCKET_PULL_REQUEST_LATEST_COMMIT_FROM_TARGET_BRANCH | Latest commit hash on the target branch | PR | C + S | 
+BITBUCKET_REPOSITORY_UUID | Repository identifier | P | C |
+BITBUCKET_REPOSITORY_ID | Repository identifier | P | S |
+BITBUCKET_REPOSITORY_URL | Repository URL | PR | C |
+REPOSITORY_LINK | Repository link | P | C | Deprecated: to remove in 2.6
+REPOSITORY_NAME | Repository name | P | S | Deprecated: to remove in 2.6
+
+# Dsl Job actions for Bitbucket Push and Pull Request Trigger
 
 ```groovy
 bitbucketTriggers {
@@ -203,7 +261,7 @@ bitbucketTriggers {
 }
 ```
 
-## Dsl Job snippets
+# Dsl Job snippets
 
 ### Valid for freestyle jobs and pipeline jobs (until job-dsl plugin v1.76, deprecated in v1.77 for pipeline jobs)
 
@@ -1028,7 +1086,7 @@ freeStyleJob('test-job') {
 }
 ```
 
-## Pipeline script
+# Pipeline script
 
 Example of pipeline code for building on pull-request and push events.
 
@@ -1111,11 +1169,7 @@ pipeline {
 }
 ```
 
-## Thanks and Acknowledgments
+# Thanks and Acknowledgments
 
 This plugin is originally based on the Sazo's fork (<https://github.com/sazo/bitbucket-plugin>)
 of the Bitbucket plugin: <https://plugins.jenkins.io/bitbucket>.
-
-## Sponsored By
-
-![Silpion](./docs/img/silpion_logo.png)
