@@ -57,7 +57,8 @@ public class BitBucketPPRBearerAuthorizationApiConsumer {
       final HttpPost request = new HttpPost(url);
       request.setHeader(HttpHeaders.AUTHORIZATION, authHeader);
       request.setHeader("X-Atlassian-Token", "nocheck");
-      request.setEntity(new StringEntity(payload, ContentType.APPLICATION_JSON));
+      if (!payload.isEmpty())
+        request.setEntity(new StringEntity(payload, ContentType.APPLICATION_JSON));
       return httpClient.execute(request);
     }
 

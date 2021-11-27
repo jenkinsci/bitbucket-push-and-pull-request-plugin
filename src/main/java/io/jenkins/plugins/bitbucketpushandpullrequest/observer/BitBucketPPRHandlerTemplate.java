@@ -40,7 +40,7 @@ public abstract class BitBucketPPRHandlerTemplate {
 
   protected BitBucketPPREventContext context;
   protected BitBucketPPRClientType clientType;
-  
+
   public void run(BitBucketPPREventType eventType) throws Exception {
     BitBucketPPRPluginConfig config = getGlobalConfig();
     switch (eventType) {
@@ -59,8 +59,8 @@ public abstract class BitBucketPPRHandlerTemplate {
         throw new Exception();
     }
   }
-  
-  
+
+
   // @todo: do we need it also for pushs?
   public void setApprovedOrDeclined() {
     return;
@@ -96,12 +96,13 @@ public abstract class BitBucketPPRHandlerTemplate {
       logger.warning(e.getMessage());
     }
   }
-  
-  protected void callClient(@Nonnull Verb verb, @Nonnull String url, @Nonnull Map<String, String> payload) {
+
+  protected void callClient(@Nonnull Verb verb, @Nonnull String url,
+      @Nonnull Map<String, String> payload) {
     ObjectMapper objectMapper = new ObjectMapper();
 
     try {
-      String jsonPayload = objectMapper.writeValueAsString(payload);
+      String jsonPayload = payload.isEmpty() ? "" : objectMapper.writeValueAsString(payload);
       BitBucketPPRClientFactory.createClient(clientType, context).send(verb, url, jsonPayload);
     } catch (JsonProcessingException e) {
       logger.log(Level.WARNING, "Cannot create payload: {}", e.getMessage());
