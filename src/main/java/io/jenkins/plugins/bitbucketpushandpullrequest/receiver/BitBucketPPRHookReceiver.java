@@ -72,13 +72,7 @@ public class BitBucketPPRHookReceiver implements UnprotectedRootAction {
         writeSuccessResponse(response, "Bitbuckt PPR Plugin: request received successfully.");
       } catch (IOException e) {
         throw new IOException();
-      } catch (InputStreamException e) {
-        writeFailResponse(response, "Bitbuckt PPR Plugin: request failed.");
-      } catch (JsonSyntaxException e) {
-        writeFailResponse(response, "Bitbuckt PPR Plugin: request failed.");
-      } catch (OperationNotSupportedException e) {
-        writeFailResponse(response, "Bitbuckt PPR Plugin: request failed.");
-      } catch (Exception e) {
+      } catch (InputStreamException | JsonSyntaxException | OperationNotSupportedException e) {
         writeFailResponse(response, "Bitbuckt PPR Plugin: request failed.");
       }
     }
