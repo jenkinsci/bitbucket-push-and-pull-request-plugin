@@ -22,7 +22,6 @@
 - [Troubleshooting: Some important aspects to keep in mind](#troubleshooting-some-important-aspects-to-keep-in-mind)
     - [About the initialization of the plugin](#about-the-initialization-of-the-plugin)
     - [About the filters on the branches](#about-the-filters-on-the-branches)
-    - [About the build state propagation and the approve set by Jenkins on BitBucket](#about-the-build-state-propagation-and-the-approve-set-by-jenkins-on-bitbucket)
 - [Environment variables](#environment-variables)
 - [Dsl Job actions for Bitbucket Push and Pull Request Trigger](#dsl-job-actions-for-bitbucket-push-and-pull-request-trigger)
 - [Dsl Job snippets](#dsl-job-snippets)
