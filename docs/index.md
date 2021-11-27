@@ -22,7 +22,6 @@
 - [Troubleshooting: Some important aspects to keep in mind](#troubleshooting-some-important-aspects-to-keep-in-mind)
     - [About the initialization of the plugin](#about-the-initialization-of-the-plugin)
     - [About the filters on the branches](#about-the-filters-on-the-branches)
-    - [About the build state propagation and the approve set by Jenkins on BitBucket](#about-the-build-state-propagation-and-the-approve-set-by-jenkins-on-bitbucket)
 - [Environment variables](#environment-variables)
 - [Dsl Job actions for Bitbucket Push and Pull Request Trigger](#dsl-job-actions-for-bitbucket-push-and-pull-request-trigger)
 - [Dsl Job snippets](#dsl-job-snippets)
@@ -156,12 +155,6 @@ The reason for that is the wish to guarantee consistency between the two plugins
 - As you see from the code: `return matches(allowedBranches, bitbucketAction.getTargetBranch(), null);`, the matching is between the string you specified (`allowedBranches`) and the **target branch** specified in the payload sent from BitBucket (`bitbucketAction.getTargetBranch()`). This means that **The filter is not on the source branch, but on the target branch.**
 
 - You can find al lot of examples in this test class: [BitBucketPPRPullRequestCreatedActionFilterTest.java](https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/blob/master/src/test/java/io/jenkins/plugins/bitbucketpushandpullrequest/filter/pullrequest/cloud/BitBucketPPRPullRequestCreatedActionFilterTest.java)
-
-### About the build state propagation and the approve set by Jenkins on BitBucket
-
-- Actually, the bitbucket credentials needed for the state propagation are the ones provided in the git plugin configuration for the job. That means, that you don't need to give other credentials: **it should work out of the box**.
-
-The only limit of this solution is that **the build status propagation will work only if you are using**, for the git plugin, **credentials of the kind: "Username with Password"**.
 
 
 # Environment variables
