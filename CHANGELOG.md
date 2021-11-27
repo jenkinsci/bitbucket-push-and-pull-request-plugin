@@ -1,5 +1,25 @@
 # Change Log
 
+## 2.8.0 (2021-11-27)
+[Full Changelog](https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/compare/bitbucket-push-and-pull-request-2.7.3...bitbucket-push-and-pull-request-2.7.4)
+
+## News
+- Added dedicated credentials for at global and at job level to use the Bitbucket Rest API
+- Added Action for the event "Pull Request Declined"
+- Distinction between "unapprove if job fails" and "decline if job fails"
+
+## Relevant Pull requests closed 
+- #225 Feature/update readme
+- #221 decline on fail 
+- #219 Gozke feature/173 trigger on pr decline
+- #206 Feature/consumer auth
+
+## Relevant tickets closed
+- #220 add a trigger action for denied PR
+- #214 Support ssh-keys to propagate build status to Bitbucket
+- #199 Don't decline PRs whenever jenkins job is failed
+- #195 Failed pipeline should not decline the PR and just report on the PR
+
 ## 2.7.4 (2021-11-17)
 [Full Changelog](https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/compare/bitbucket-push-and-pull-request-2.7.3...bitbucket-push-and-pull-request-2.7.4)
 
