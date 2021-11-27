@@ -26,6 +26,7 @@ public class BitBucketPPROAuth2ApiConsumer {
     OAuthRequest request = new OAuthRequest(verb, url);
     request.addHeader("Content-Type", "application/json;charset=UTF-8");
 
+
     if (verb == Verb.POST && !payload.isEmpty()) {
       request.setPayload(payload);
     }

@@ -60,7 +60,6 @@ public abstract class BitBucketPPRHandlerTemplate {
     }
   }
 
-
   // @todo: do we need it also for pushs?
   public void setApprovedOrDeclined() {
     return;
