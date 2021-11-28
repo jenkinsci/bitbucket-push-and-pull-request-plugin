@@ -1,7 +1,16 @@
 # Change Log
 
+## 2.8.1 (2021-11-28)
+[Full Changelog](https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/compare/bitbucket-push-and-pull-request-2.8.0...bitbucket-push-and-pull-request-2.8.1)
+
+## News
+- Bug fix for state notification
+
+## Relevant Pull requests closed 
+#238 fix
+
 ## 2.8.0 (2021-11-27)
-[Full Changelog](https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/compare/bitbucket-push-and-pull-request-2.7.3...bitbucket-push-and-pull-request-2.7.4)
+[Full Changelog](https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/compare/bitbucket-push-and-pull-request-2.7.4...bitbucket-push-and-pull-request-2.8.0)
 
 ## News
 - Added dedicated credentials for at global and at job level to use the Bitbucket Rest API
