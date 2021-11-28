@@ -6,6 +6,7 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.util.logging.Logger;
 import javax.net.ssl.SSLContext;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpDelete;
@@ -58,7 +59,7 @@ public class BitBucketPPRBearerAuthorizationApiConsumer {
       request.setHeader(HttpHeaders.AUTHORIZATION, authHeader);
       request.setHeader("X-Atlassian-Token", "nocheck");
 
-      if (!payload.isEmpty())
+      if (StringUtils.isNotBlank(payload))
         request.setEntity(new StringEntity(payload, ContentType.APPLICATION_JSON));
 
       request.setEntity(new StringEntity(payload, ContentType.APPLICATION_JSON));

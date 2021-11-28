@@ -20,6 +20,7 @@
  ******************************************************************************/
 package io.jenkins.plugins.bitbucketpushandpullrequest.event;
 
+import org.apache.commons.lang3.StringUtils;
 import org.jenkinsci.plugins.plaincredentials.StringCredentials;
 import com.cloudbees.plugins.credentials.CredentialsProvider;
 import com.cloudbees.plugins.credentials.common.StandardCredentials;
@@ -83,11 +84,11 @@ public class BitBucketPPREventContext {
   }
 
   public String getCredentialsId() {
-    if (trigger.credentialsId != null)
+    if (StringUtils.isNotBlank(trigger.credentialsId))
       return trigger.credentialsId;
-    if (getGlobalConfig().credentialsId != null)
+    if (StringUtils.isNotBlank(getGlobalConfig().credentialsId))
       return getGlobalConfig().credentialsId;
-    if (userRemoteConfig.getCredentialsId() != null)
+    if (StringUtils.isNotBlank(userRemoteConfig.getCredentialsId()))
       return userRemoteConfig.getCredentialsId();
     return "";
   }
