@@ -3,6 +3,7 @@ package io.jenkins.plugins.bitbucketpushandpullrequest.client.api;
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Logger;
+import org.apache.commons.lang3.StringUtils;
 import org.jenkinsci.plugins.plaincredentials.StringCredentials;
 import com.github.scribejava.core.builder.ServiceBuilder;
 import com.github.scribejava.core.model.OAuth2AccessToken;
@@ -27,7 +28,7 @@ public class BitBucketPPROAuth2ApiConsumer {
     request.addHeader("Content-Type", "application/json;charset=UTF-8");
 
 
-    if (verb == Verb.POST && !payload.isEmpty()) {
+    if (verb == Verb.POST && StringUtils.isNotBlank(payload)) {
       request.setPayload(payload);
     }
 

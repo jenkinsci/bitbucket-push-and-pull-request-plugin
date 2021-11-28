@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.logging.Logger;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpResponse;
 import org.apache.http.auth.AuthScope;
@@ -43,11 +44,10 @@ public class BitBucketPPRBasicAuthApiConsumer {
       final HttpPost request = new HttpPost(url);
       request.setHeader(HttpHeaders.AUTHORIZATION, authHeader);
       request.setHeader("X-Atlassian-Token", "nocheck");
-      
-      if (!payload.isEmpty())
+
+      if (StringUtils.isNotBlank(payload))
         request.setEntity(new StringEntity(payload, ContentType.APPLICATION_JSON));
-      
-      request.setEntity(new StringEntity(payload, ContentType.APPLICATION_JSON));
+
       return client.execute(request);
     }
 
