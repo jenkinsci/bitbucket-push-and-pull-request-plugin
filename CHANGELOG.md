@@ -1,5 +1,24 @@
 # Change Log
 
+
+
+## 2.8.2-beta-1 (2022-05-08)
+## Beta release - See [official documentation](https://www.jenkins.io/doc/developer/publishing/releasing-experimental-updates/)
+
+## What's Changed
+* Replace git.io with expanded URLs by @MarkEWaite in https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/pull/253
+* Bitbuckt PPR Plugin: request failed. #243 , jenkins pipeline job not… by @cdelmonte-zg in https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/pull/255
+
+## Fixed Bugs
+- #241 Jenkins pipeline job not triggered on created pull request 
+- #243 Bitbuckt PPR Plugin: request failed.
+- [JENKINS-67917 ](https://issues.jenkins.io/browse/JENKINS-67917)
+
+## New Contributors
+* @MarkEWaite made their first contribution in https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/pull/253
+
+**Full Changelog**: https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/compare/bitbucket-push-and-pull-request-2.8.1...bitbucket-push-and-pull-request-2.8.2-beta-1
+
 ## 2.8.1 (2021-11-28)
 [Full Changelog](https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/compare/bitbucket-push-and-pull-request-2.8.0...bitbucket-push-and-pull-request-2.8.1)
 
