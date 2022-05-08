@@ -90,11 +90,6 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
   public static final boolean ALLOW_HOOKURL_OVERRIDE = true;
   public String credentialsId;
 
-
-  {
-    System.setErr(BitBucketPPRUtils.createLoggingProxyForErrors(System.err));
-  }
-
   @DataBoundConstructor
   public BitBucketPPRTrigger(List<BitBucketPPRTriggerFilter> triggers) {
     this.triggers = triggers;

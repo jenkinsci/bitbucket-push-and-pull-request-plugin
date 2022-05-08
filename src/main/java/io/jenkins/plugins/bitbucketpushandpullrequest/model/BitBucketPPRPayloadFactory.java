@@ -27,6 +27,7 @@ import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPR
 import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst.REPOSITORY_EVENT;
 import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst.REPOSITORY_POST;
 import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst.REPOSITORY_SERVER_PUSH;
+import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst.DIAGNOSTICS;
 import java.util.logging.Logger;
 
 import javax.naming.OperationNotSupportedException;
@@ -64,6 +65,11 @@ public class BitBucketPPRPayloadFactory {
     if (PULL_REQUEST_SERVER_EVENT.equals(bitbucketEvent.getEvent())) {
       return new BitBucketPPRServerPayload();
     }
+    
+    if (DIAGNOSTICS.equals(bitbucketEvent.getEvent())) {
+      return new BitBucketPPRServerPayload();
+    }
+
 
     throw new OperationNotSupportedException(
         String.format("No processor found for bitbucket event %s.", bitbucketEvent.getEvent()));
