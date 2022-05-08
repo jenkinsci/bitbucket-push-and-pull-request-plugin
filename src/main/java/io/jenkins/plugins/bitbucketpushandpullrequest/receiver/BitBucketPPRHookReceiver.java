@@ -1,7 +1,7 @@
 /*******************************************************************************
  * The MIT License
  * 
- * Copyright (C) 2021, CloudBees, Inc.
+ * Copyright (C) 2022, CloudBees, Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -46,6 +46,7 @@ import io.jenkins.plugins.bitbucketpushandpullrequest.exception.InputStreamExcep
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRHookEvent;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayloadFactory;
+import io.jenkins.plugins.bitbucketpushandpullrequest.observer.BitBucketPPRObservable;
 import io.jenkins.plugins.bitbucketpushandpullrequest.observer.BitBucketPPRObserverFactory;
 import io.jenkins.plugins.bitbucketpushandpullrequest.processor.BitBucketPPRPayloadProcessorFactory;
 
@@ -63,16 +64,19 @@ public class BitBucketPPRHookReceiver implements UnprotectedRootAction {
 
   public void doIndex(@Nonnull StaplerRequest request, @Nonnull StaplerResponse response)
       throws IOException {
-    if (request.getRequestURI().contains("/" + getUrlName() + "/")
+    if (request.getRequestURI().toLowerCase().contains("/" + getUrlName() + "/")
         && request.getMethod().equalsIgnoreCase("POST")) {
       logger.log(Level.INFO, "Received POST request over Bitbucket hook");
 
-      try {
-        process(request, response);
+      try { 
+        BitBucketPPRHookEvent bitbucketEvent = getBitbucketEvent(request);    
+        BitBucketPPRPayload payload = getPayload(getInputStream(request), bitbucketEvent);
+        BitBucketPPRObservable observable = BitBucketPPRObserverFactory.createObservable(bitbucketEvent);
+        
         writeSuccessResponse(response, "Bitbuckt PPR Plugin: request received successfully.");
-      } catch (IOException e) {
-        throw new IOException();
-      } catch (InputStreamException | JsonSyntaxException | OperationNotSupportedException e) {
+        
+        BitBucketPPRPayloadProcessorFactory.createProcessor(bitbucketEvent).processPayload(payload, observable);
+      } catch (IOException | InputStreamException | JsonSyntaxException | OperationNotSupportedException e) {
         writeFailResponse(response, "Bitbuckt PPR Plugin: request failed.");
       }
     }
@@ -100,15 +104,6 @@ public class BitBucketPPRHookReceiver implements UnprotectedRootAction {
     out.close();
   }
 
-  void process(@Nonnull StaplerRequest request, @Nonnull StaplerResponse response)
-      throws IOException, JsonSyntaxException, OperationNotSupportedException,
-      InputStreamException {
-    BitBucketPPRHookEvent bitbucketEvent = getBitbucketEvent(request);
-    BitBucketPPRPayload payload = getPayload(response, getInputStream(request), bitbucketEvent);
-    BitBucketPPRPayloadProcessorFactory.createProcessor(bitbucketEvent).processPayload(payload,
-        BitBucketPPRObserverFactory.createObservable(bitbucketEvent));
-  }
-
   String getInputStream(@Nonnull StaplerRequest request) throws IOException, InputStreamException {
     String inputStream = IOUtils.toString(request.getInputStream());
     if (StringUtils.isBlank(inputStream)) {
@@ -118,12 +113,12 @@ public class BitBucketPPRHookReceiver implements UnprotectedRootAction {
     return decodeInputStream(inputStream, request.getContentType());
   }
 
-  BitBucketPPRPayload getPayload(@Nonnull StaplerResponse response, @Nonnull final String inputStream,
+  BitBucketPPRPayload getPayload(@Nonnull final String inputStream,
       @Nonnull BitBucketPPRHookEvent bitbucketEvent)
       throws JsonSyntaxException, OperationNotSupportedException {
     BitBucketPPRPayload pl = new Gson().fromJson(inputStream,
         BitBucketPPRPayloadFactory.getInstance(bitbucketEvent).getClass());
-    logger.log(Level.FINEST, "the payload is: {}", pl.toString());
+    logger.log(Level.FINEST, "the payload is: {}", pl);
     return pl;
   }
 
@@ -161,6 +156,6 @@ public class BitBucketPPRHookReceiver implements UnprotectedRootAction {
 
   @Override
   public String getUrlName() {
-    return globalConfig.isHookUrlSet() ? globalConfig.getHookUrl() : HOOK_URL;
+    return (globalConfig.isHookUrlSet() ? globalConfig.getHookUrl() : HOOK_URL).toLowerCase();
   }
 }

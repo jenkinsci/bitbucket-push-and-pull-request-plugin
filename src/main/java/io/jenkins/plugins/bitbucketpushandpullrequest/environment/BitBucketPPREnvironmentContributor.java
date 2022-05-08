@@ -69,11 +69,6 @@ public class BitBucketPPREnvironmentContributor extends EnvironmentContributor {
 
   static final Logger logger = Logger.getLogger(BitBucketPPREnvironmentContributor.class.getName());
 
-
-  {
-    System.setErr(BitBucketPPRUtils.createLoggingProxyForErrors(System.err));
-  }
-
   @Override
   public void buildEnvironmentFor(Job job, EnvVars envVars, TaskListener taskListener)
       throws IOException, InterruptedException {

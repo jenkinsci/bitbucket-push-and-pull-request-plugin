@@ -64,10 +64,6 @@ import jenkins.triggers.SCMTriggerItem;
 public class BitBucketPPRJobProbe {
   private static final Logger logger = Logger.getLogger(BitBucketPPRJobProbe.class.getName());
 
-  {
-    System.setErr(BitBucketPPRUtils.createLoggingProxyForErrors(System.err));
-  }
-
   public void triggerMatchingJobs(BitBucketPPRHookEvent bitbucketEvent,
       BitBucketPPRAction bitbucketAction, BitBucketPPRObservable observable) {
 

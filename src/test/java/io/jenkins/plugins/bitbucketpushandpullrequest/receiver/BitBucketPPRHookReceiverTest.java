@@ -21,8 +21,10 @@
 package io.jenkins.plugins.bitbucketpushandpullrequest.receiver;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.when;
 import java.io.UnsupportedEncodingException;
 import javax.annotation.Nonnull;
 import org.junit.Test;
@@ -44,7 +46,7 @@ public class BitBucketPPRHookReceiverTest {
     String contentType = BitBucketPPRConst.APPLICATION_X_WWW_FORM_URLENCODED;
     String expected = "";
 
-    execTest(inputStream, contentType, expected);
+    execDecodeImputStream(inputStream, contentType, expected);
   }
 
   @Test
@@ -53,7 +55,7 @@ public class BitBucketPPRHookReceiverTest {
     String contentType = BitBucketPPRConst.APPLICATION_X_WWW_FORM_URLENCODED;
     String expected = "here we are, isn't it??";
 
-    execTest(inputStream, contentType, expected);
+    execDecodeImputStream(inputStream, contentType, expected);
   }
 
   @Test
@@ -62,7 +64,7 @@ public class BitBucketPPRHookReceiverTest {
     String contentType = BitBucketPPRConst.APPLICATION_X_WWW_FORM_URLENCODED;
     String expected = "here we are, isn't it??";
 
-    execTest(inputStream, contentType, expected);
+    execDecodeImputStream(inputStream, contentType, expected);
   }
 
   @Test
@@ -71,18 +73,17 @@ public class BitBucketPPRHookReceiverTest {
     String contentType = BitBucketPPRConst.APPLICATION_X_WWW_FORM_URLENCODED;
     String expected = "payloadhere we are, isn't it??";
 
-    execTest(inputStream, contentType, expected);
+    execDecodeImputStream(inputStream, contentType, expected);
   }
 
   @Test
-  @edu.umd.cs.findbugs.annotations.SuppressFBWarnings(
-      value="NP_NULL_PARAM_DEREF_NONVIRTUAL", 
-      justification="I know what I'm doing")
+  @edu.umd.cs.findbugs.annotations.SuppressFBWarnings(value = "NP_NULL_PARAM_DEREF_NONVIRTUAL",
+      justification = "I know what I'm doing")
   public void testDecodeInputStream5() throws Exception {
     String inputStream = "here%20we%20are%2C%20isn%27t%20it%3F%3F";
     String contentType = "";
     String expected = "here%20we%20are%2C%20isn%27t%20it%3F%3F";
-    execTest(inputStream, contentType, expected);
+    execDecodeImputStream(inputStream, contentType, expected);
   }
 
   @Test
@@ -90,10 +91,12 @@ public class BitBucketPPRHookReceiverTest {
     String inputStream = "here%20we%20are%2C%20isn%27t%20it%3F%3F";
     String contentType = "abc";
     String expected = "here%20we%20are%2C%20isn%27t%20it%3F%3F";
-    execTest(inputStream, contentType, expected);
+    execDecodeImputStream(inputStream, contentType, expected);
   }
 
-  private void execTest(String inputStream, String contentType, String expected)
+  
+
+  private void execDecodeImputStream(String inputStream, String contentType, String expected)
       throws UnsupportedEncodingException {
     try (MockedStatic<ExtensionList> mocked = mockStatic(ExtensionList.class)) {
       mocked.when((Verification) ExtensionList.lookupSingleton(BitBucketPPRPluginConfig.class))
