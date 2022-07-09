@@ -89,7 +89,7 @@ public class BitBucketPPRJobProbe {
         try {
           triggerScm(job, remotes, bitbucketEvent, bitbucketAction, observable);
         } catch (TriggerNotSetException e) {
-          logger.log(Level.WARNING, "Trigger not set");
+          logger.log(Level.FINE, "Trigger not set");
         }
       });
     }
