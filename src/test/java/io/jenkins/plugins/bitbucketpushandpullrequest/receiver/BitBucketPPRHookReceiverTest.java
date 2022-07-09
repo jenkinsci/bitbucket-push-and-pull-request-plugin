@@ -21,13 +21,16 @@
 package io.jenkins.plugins.bitbucketpushandpullrequest.receiver;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
-import static org.mockito.Mockito.when;
 import java.io.UnsupportedEncodingException;
-import javax.annotation.Nonnull;
+import java.util.stream.Stream;
+
 import org.junit.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.runner.RunWith;
 import org.mockito.MockedStatic;
 import org.mockito.MockedStatic.Verification;
@@ -38,70 +41,27 @@ import io.jenkins.plugins.bitbucketpushandpullrequest.config.BitBucketPPRPluginC
 
 
 @RunWith(MockitoJUnitRunner.class)
-public class BitBucketPPRHookReceiverTest {
+class BitBucketPPRHookReceiverTest {
 
-  @Test
-  public void testDecodeInputStream1() throws Exception {
-    String inputStream = "";
-    String contentType = BitBucketPPRConst.APPLICATION_X_WWW_FORM_URLENCODED;
-    String expected = "";
-
-    execDecodeImputStream(inputStream, contentType, expected);
-  }
-
-  @Test
-  public void testDecodeInputStream2() throws Exception {
-    String inputStream = "here%20we%20are%2C%20isn%27t%20it%3F%3F";
-    String contentType = BitBucketPPRConst.APPLICATION_X_WWW_FORM_URLENCODED;
-    String expected = "here we are, isn't it??";
-
-    execDecodeImputStream(inputStream, contentType, expected);
-  }
-
-  @Test
-  public void testDecodeInputStream3() throws Exception {
-    String inputStream = BitBucketPPRConst.PAYLOAD_PFX + "here%20we%20are%2C%20isn%27t%20it%3F%3F";
-    String contentType = BitBucketPPRConst.APPLICATION_X_WWW_FORM_URLENCODED;
-    String expected = "here we are, isn't it??";
-
-    execDecodeImputStream(inputStream, contentType, expected);
-  }
-
-  @Test
-  public void testDecodeInputStream4() throws Exception {
-    String inputStream = "payloadhere%20we%20are%2C%20isn%27t%20it%3F%3F";
-    String contentType = BitBucketPPRConst.APPLICATION_X_WWW_FORM_URLENCODED;
-    String expected = "payloadhere we are, isn't it??";
-
-    execDecodeImputStream(inputStream, contentType, expected);
-  }
-
-  @Test
-  @edu.umd.cs.findbugs.annotations.SuppressFBWarnings(value = "NP_NULL_PARAM_DEREF_NONVIRTUAL",
-      justification = "I know what I'm doing")
-  public void testDecodeInputStream5() throws Exception {
-    String inputStream = "here%20we%20are%2C%20isn%27t%20it%3F%3F";
-    String contentType = "";
-    String expected = "here%20we%20are%2C%20isn%27t%20it%3F%3F";
-    execDecodeImputStream(inputStream, contentType, expected);
-  }
-
-  @Test
-  public void testDecodeInputStream6() throws Exception {
-    String inputStream = "here%20we%20are%2C%20isn%27t%20it%3F%3F";
-    String contentType = "abc";
-    String expected = "here%20we%20are%2C%20isn%27t%20it%3F%3F";
-    execDecodeImputStream(inputStream, contentType, expected);
-  }
-
-  
-
-  private void execDecodeImputStream(String inputStream, String contentType, String expected)
+  @ParameterizedTest
+  @MethodSource("paramsProvider")
+  void execDecodeImputStream(String inputStream, String contentType, String expected)
       throws UnsupportedEncodingException {
     try (MockedStatic<ExtensionList> mocked = mockStatic(ExtensionList.class)) {
       mocked.when((Verification) ExtensionList.lookupSingleton(BitBucketPPRPluginConfig.class))
           .thenReturn(mock(BitBucketPPRPluginConfig.class));
       assertEquals(expected, BitBucketPPRHookReceiver.decodeInputStream(inputStream, contentType));
     }
+  }
+
+  static Stream<Arguments> paramsProvider() {
+    return Stream.of(
+            arguments("here%20we%20are%2C%20isn%27t%20it%3F%3F",  "abc", "here%20we%20are%2C%20isn%27t%20it%3F%3F"),
+            arguments("here%20we%20are%2C%20isn%27t%20it%3F%3F", "", "here%20we%20are%2C%20isn%27t%20it%3F%3F"),
+            arguments("payloadhere%20we%20are%2C%20isn%27t%20it%3F%3F", BitBucketPPRConst.APPLICATION_X_WWW_FORM_URLENCODED, "payloadhere we are, isn't it??"),
+            arguments(BitBucketPPRConst.PAYLOAD_PFX + "here%20we%20are%2C%20isn%27t%20it%3F%3F", BitBucketPPRConst.APPLICATION_X_WWW_FORM_URLENCODED, "here we are, isn't it??"),
+            arguments("", BitBucketPPRConst.APPLICATION_X_WWW_FORM_URLENCODED, ""),
+            arguments("here%20we%20are%2C%20isn%27t%20it%3F%3F",BitBucketPPRConst.APPLICATION_X_WWW_FORM_URLENCODED,"here we are, isn't it??")
+    );
   }
 }
