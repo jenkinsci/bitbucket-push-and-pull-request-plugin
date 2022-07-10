@@ -25,20 +25,17 @@ import static org.junit.Assert.assertNotEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
-import java.io.UnsupportedEncodingException;
-import javax.annotation.Nonnull;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.MockedStatic;
 import org.mockito.MockedStatic.Verification;
 import org.mockito.junit.MockitoJUnitRunner;
 import hudson.ExtensionList;
-import io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst;
 import io.jenkins.plugins.bitbucketpushandpullrequest.config.BitBucketPPRPluginConfig;
 
 
 @RunWith(MockitoJUnitRunner.class)
-public class BitBucketPPRHookReceiverTest2 {
+public class BitBucketPPRHookReceiverGetUrlNameTest {
 
   @Test
   public void testAGetUrlName() {
