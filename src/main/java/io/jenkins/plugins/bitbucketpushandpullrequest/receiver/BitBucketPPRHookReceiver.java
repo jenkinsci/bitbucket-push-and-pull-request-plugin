@@ -118,7 +118,7 @@ public class BitBucketPPRHookReceiver implements UnprotectedRootAction {
       throws JsonSyntaxException, OperationNotSupportedException {
     BitBucketPPRPayload pl = new Gson().fromJson(inputStream,
         BitBucketPPRPayloadFactory.getInstance(bitbucketEvent).getClass());
-    logger.log(Level.FINEST, "the payload is: {}", pl);
+    logger.log(Level.FINEST, "the payload is: {0}", pl);
     return pl;
   }
 

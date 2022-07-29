@@ -113,7 +113,7 @@ public class BitBucketPPRJobProbe {
       // @todo add comments to explain what is this check for
       if (job.getParent() instanceof MultiBranchProject
           && mPJobShouldNotBeTriggered(job, bitbucketEvent, bitbucketAction)) {
-        logger.log(Level.FINEST, "Skipping job {}.", job.getDisplayName());
+        logger.log(Level.FINEST, "Skipping job {0}.", job.getDisplayName());
         return;
       }
 
