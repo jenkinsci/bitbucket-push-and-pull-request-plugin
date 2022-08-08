@@ -96,6 +96,8 @@ _Please note: the branch, related to the events which trigger the builds, must b
 
 2. Now activate the plugin in your job selecting the "Build with Bitbucket Push and Pull Request Plugin" option in the Build Triggers pane.
 
+3. Run the first job manually
+
 ### Authentication for state notification and generally when using the Bitbucket REST API
 
 TYPE | BB CLOUD | BB SERVER | JENKINS CREDENTIALS | NOTES
