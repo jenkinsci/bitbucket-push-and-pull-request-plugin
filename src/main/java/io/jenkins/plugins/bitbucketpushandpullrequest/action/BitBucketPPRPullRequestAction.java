@@ -74,13 +74,13 @@ public class BitBucketPPRPullRequestAction extends InvisibleAction implements Bi
   }
 
   @Override
-  public String getLatestCommitFromRef() {
-    return payload.getPullRequest().getSource().getCommit().getHash();
+  public String getTargetBranch() {
+    return payload.getPullRequest().getDestination().getBranch().getName();
   }
 
   @Override
-  public String getTargetBranch() {
-    return payload.getPullRequest().getDestination().getBranch().getName();
+  public String getLatestCommitFromRef() {
+    return payload.getPullRequest().getSource().getCommit().getHash();
   }
 
   @Override
