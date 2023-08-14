@@ -25,12 +25,16 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import javax.annotation.Nonnull;
 
 import hudson.model.InvisibleAction;
+import io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRUtils;
+import io.jenkins.plugins.bitbucketpushandpullrequest.exception.BitBucketPPRRepositoryNotParsedException;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.server.BitBucketPPRServerChange;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.server.BitBucketPPRServerClone;
@@ -39,6 +43,7 @@ public class BitBucketPPRServerRepositoryAction extends InvisibleAction implemen
   private static final Logger logger = Logger.getLogger(BitBucketPPRAction.class.getName());
 
   private final @Nonnull BitBucketPPRPayload payload;
+  private URL baseUrl;
   private List<String> scmUrls = new ArrayList<>(2);
   private String targetBranchName = null;
   private String targetBranchRefId = null;
@@ -51,8 +56,14 @@ public class BitBucketPPRServerRepositoryAction extends InvisibleAction implemen
     List<BitBucketPPRServerClone> clones = payload.getServerRepository().getLinks().getCloneProperty();
 
     for (BitBucketPPRServerClone clone : clones) {
-      if (clone.getName().equalsIgnoreCase("http") || clone.getName().equalsIgnoreCase("https")
-          || clone.getName().equalsIgnoreCase("ssh")) {
+      if (clone.getName().equalsIgnoreCase("http") || clone.getName().equalsIgnoreCase("https")) {
+        try {
+          this.baseUrl = new URL(clone.getHref());
+          this.scmUrls.add(clone.getHref());
+        } catch (MalformedURLException e) {
+          throw new RuntimeException(e);
+        }
+      } else if (clone.getName().equalsIgnoreCase("ssh")) {
         this.scmUrls.add(clone.getHref());
       }
     }
@@ -153,11 +164,7 @@ public class BitBucketPPRServerRepositoryAction extends InvisibleAction implemen
     // returns:
     // /rest/build-status/1.0/commits/{commitId}
 
-    String baseUrl = getBaseUrl(getProjectUrl());
-    if (baseUrl == null) {
-      logger.log(Level.WARNING, "Base url is empty.");
-      return new ArrayList<String>();
-    }
+    String baseUrl = getBaseUrl();
 
     List<BitBucketPPRServerChange> changes = payload.getServerChanges();
     List<String> links = new ArrayList<>();
@@ -168,14 +175,7 @@ public class BitBucketPPRServerRepositoryAction extends InvisibleAction implemen
     return links;
   }
 
-  private String getBaseUrl(String projectSelfUrl) {
-    String baseUrl = null;
-    try {
-      URL url = new URL(projectSelfUrl);
-      baseUrl = url.getProtocol() + "://" + url.getHost() + ":" + url.getPort();
-    } catch (MalformedURLException e) {
-      logger.log(Level.WARNING, "Cannot extract base url", e);
-    }
-    return baseUrl;
+  private String getBaseUrl() {
+    return baseUrl.getProtocol() + "://" + baseUrl.getHost() + ":" + baseUrl.getPort();
   }
 }

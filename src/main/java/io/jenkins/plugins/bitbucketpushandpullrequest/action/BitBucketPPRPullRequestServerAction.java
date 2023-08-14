@@ -38,6 +38,7 @@ public class BitBucketPPRPullRequestServerAction extends InvisibleAction impleme
   private static final Logger logger = Logger.getLogger(BitBucketPPRPullRequestServerAction.class.getName());
 
   private final @Nonnull BitBucketPPRPayload payload;
+  private URL baseUrl;
   private List<String> scmUrls = new ArrayList<>(2);
   private String repositoryUuid;
 
@@ -49,8 +50,14 @@ public class BitBucketPPRPullRequestServerAction extends InvisibleAction impleme
         .getCloneProperty();
 
     for (BitBucketPPRServerClone clone : clones) {
-      if (clone.getName().equalsIgnoreCase("http") || clone.getName().equalsIgnoreCase("https")
-          || clone.getName().equalsIgnoreCase("ssh")) {
+      if (clone.getName().equalsIgnoreCase("http") || clone.getName().equalsIgnoreCase("https")) {
+        try {
+          this.baseUrl = new URL(clone.getHref());
+          this.scmUrls.add(clone.getHref());
+        } catch (MalformedURLException e) {
+          throw new RuntimeException(e);
+        }
+      } else if (clone.getName().equalsIgnoreCase("ssh")) {
         this.scmUrls.add(clone.getHref());
       }
     }
@@ -62,12 +69,10 @@ public class BitBucketPPRPullRequestServerAction extends InvisibleAction impleme
   public String getSourceBranch() {
     return payload.getServerPullRequest().getFromRef().getDisplayId();
   }
-  
   @Override
   public String getLatestCommitFromRef() {
     return payload.getServerPullRequest().getFromRef().getLatestCommit();
   }
-  
   @Override
   public String getLatestCommitToRef() {
     return payload.getServerPullRequest().getToRef().getLatestCommit();
@@ -84,8 +89,8 @@ public class BitBucketPPRPullRequestServerAction extends InvisibleAction impleme
   }
 
   @Override
-  public String getPullRequestUrl() {
-    return payload.getServerPullRequest().getLinks().getSelfProperty().get(0).getHref();
+  public String getPullRequestApiUrl() {
+    return baseUrl.toString();
   }
 
   @Override
@@ -138,22 +143,11 @@ public class BitBucketPPRPullRequestServerAction extends InvisibleAction impleme
 
   @Override
   public String getLinkApprove() {
-    // returns:
-    // {baseUrl}/rest/api/1.0/projects/{projectKey}/repos/{repositorySlug}/pull-requests/{pullRequestId}/approve
-
     String projectKey = payload.getServerPullRequest().getFromRef().getRepository().getProject().getKey();
     String repoSlug = payload.getServerPullRequest().getFromRef().getRepository().getSlug();
     Long pullrequestId = payload.getServerPullRequest().getId();
 
-    String projectSelfUrl = payload.getServerPullRequest().getFromRef().getRepository().getProject().getLinks()
-        .getSelfProperty().get(0).getHref();
-    String baseUrl = getBaseUrl(projectSelfUrl);
-    if (baseUrl == null) {
-      logger.log(Level.WARNING, "Base url is empty.");
-      return "";
-    }
-
-    return baseUrl + "/rest/api/1.0/projects/" + projectKey.trim() + "/repos/" + repoSlug.trim() + "/pull-requests/"
+    return getBaseUrl() + "/rest/api/1.0/projects/" + projectKey.trim() + "/repos/" + repoSlug.trim() + "/pull-requests/"
         + Long.toString(pullrequestId).trim() + "/approve";
   }
 
@@ -166,15 +160,7 @@ public class BitBucketPPRPullRequestServerAction extends InvisibleAction impleme
     String repoSlug = payload.getServerPullRequest().getFromRef().getRepository().getSlug();
     Long pullrequestId = payload.getServerPullRequest().getId();
 
-    String projectSelfUrl = payload.getServerPullRequest().getFromRef().getRepository().getProject().getLinks()
-        .getSelfProperty().get(0).getHref();
-    String baseUrl = getBaseUrl(projectSelfUrl);
-    if (baseUrl == null) {
-      logger.log(Level.WARNING, "Base url is empty.");
-      return "";
-    }
-
-    return baseUrl + "/rest/api/1.0/projects/" + projectKey.trim() + "/repos/" + repoSlug.trim() + "/pull-requests/"
+    return getBaseUrl() + "/rest/api/1.0/projects/" + projectKey.trim() + "/repos/" + repoSlug.trim() + "/pull-requests/"
         + Long.toString(pullrequestId).trim() + "/decline";
   }
 
@@ -187,34 +173,18 @@ public class BitBucketPPRPullRequestServerAction extends InvisibleAction impleme
   public String getCommitLink() {
     // returns:
     // /rest/build-status/1.0/commits/{commitId}
-    String projectSelfUrl = payload.getServerPullRequest().getFromRef().getRepository().getProject().getLinks()
-        .getSelfProperty().get(0).getHref();
     String commitId = payload.getServerPullRequest().getFromRef().getLatestCommit();
 
-    String baseUrl = getBaseUrl(projectSelfUrl);
-    if (baseUrl == null) {
-      logger.log(Level.WARNING, "Base url is empty.");
-      return "";
-    }
+    return getBaseUrl() + "/rest/build-status/1.0/commits/" + commitId;
+  }
 
-    String result = baseUrl + "/rest/build-status/1.0/commits/" + commitId;
-    return result;
+  private String getBaseUrl() {
+    return baseUrl.getProtocol() + "://" + baseUrl.getHost() + ":" + baseUrl.getPort();
   }
 
   @Override
   public String toString() {
     return "BitBucketPPRPullRequestServerAction";
-  }
-
-  private String getBaseUrl(String projectSelfUrl) {
-    String baseUrl = null;
-    try {
-      URL url = new URL(projectSelfUrl);
-      baseUrl = url.getProtocol() + "://" + url.getHost() + ":" + url.getPort();
-    } catch (MalformedURLException e) {
-      logger.log(Level.WARNING, "Cannot extract base url", e);
-    }
-    return baseUrl;
   }
 
 }

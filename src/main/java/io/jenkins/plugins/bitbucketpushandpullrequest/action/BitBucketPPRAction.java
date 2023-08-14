@@ -96,6 +96,10 @@ public interface BitBucketPPRAction extends Action {
     return null;
   }
 
+  public default String getPullRequestApiUrl(){
+    return null;
+  }
+
   public default String getPullRequestUrl(){
     return null;
   }
@@ -131,7 +135,7 @@ public interface BitBucketPPRAction extends Action {
   public default String getLatestCommitFromRef() {
     return null;
   }
-  
+
   public default String getLatestCommitToRef() {
     return null;
   }

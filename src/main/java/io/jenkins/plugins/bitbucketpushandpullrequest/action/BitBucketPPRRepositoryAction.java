@@ -21,22 +21,30 @@
 
 package io.jenkins.plugins.bitbucketpushandpullrequest.action;
 
+import io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRUtils;
+import io.jenkins.plugins.bitbucketpushandpullrequest.exception.BitBucketPPRRepositoryNotParsedException;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.Nonnull;
 import hudson.model.InvisibleAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud.BitBucketPPRChange;
+import java.util.stream.Collectors;
 
 
 public class BitBucketPPRRepositoryAction extends InvisibleAction implements BitBucketPPRAction {
   private static final Logger logger = Logger.getLogger(BitBucketPPRAction.class.getName());
+  public static final String COMMIT = "commit";
+  private static final String BITBUCKET_API_BASE_URL = "https://api.bitbucket.org/2.0";
+  private static final String BITBUCKET_REPOSITORIES = "repositories";
 
   private final @Nonnull BitBucketPPRPayload payload;
-
-  private List<String> scmUrls = new ArrayList<>(2);
+  private final String repoSlug;
+  private final String workspace;
 
   private String targetBranchName;
 
@@ -47,9 +55,6 @@ public class BitBucketPPRRepositoryAction extends InvisibleAction implements Bit
   public BitBucketPPRRepositoryAction(@Nonnull BitBucketPPRPayload payload) {
     this.payload = payload;
 
-    // TODO: why??
-    scmUrls.add(payload.getRepository().getLinks().getHtml().getHref());
-
     for (BitBucketPPRChange change : payload.getPush().getChanges()) {
       if (change.getNewChange() != null) {
         this.targetBranchName = change.getNewChange().getName();
@@ -58,6 +63,16 @@ public class BitBucketPPRRepositoryAction extends InvisibleAction implements Bit
         break;
       }
     }
+
+    Map<String, String> workspaceRepo;
+    try {
+      workspaceRepo = BitBucketPPRUtils.extractRepositoryNameFromHTTPSUrl(
+          payload.getRepository().getLinks().getHtml().getHref());
+    } catch (BitBucketPPRRepositoryNotParsedException e) {
+      throw new RuntimeException(e);
+    }
+    this.repoSlug = workspaceRepo.get(BitBucketPPRUtils.BB_REPOSITORY);
+    this.workspace = workspaceRepo.get(BitBucketPPRUtils.BB_WORKSPACE);
 
     logger.log(Level.INFO,
         () -> "Received commit hook notification for branch: " + this.targetBranchName);
@@ -101,7 +116,9 @@ public class BitBucketPPRRepositoryAction extends InvisibleAction implements Bit
 
   @Override
   public List<String> getScmUrls() {
-    return scmUrls;
+    List<String> res = new ArrayList<>();
+    res.add(payload.getRepository().getLinks().getHtml().getHref());
+    return res;
   }
 
   @Override
@@ -124,17 +141,12 @@ public class BitBucketPPRRepositoryAction extends InvisibleAction implements Bit
 
   @Override
   public List<String> getCommitLinks() {
-    List<BitBucketPPRChange> changes = payload.getPush().getChanges();
-    List<String> links = new ArrayList<>();
-
-    for (BitBucketPPRChange change : changes) {
-      links.add(change.getNewChange().getTarget().getLinks().getSelf().getHref());
-    }
-
-    return links;
+    return payload.getPush().getChanges().stream().map(c -> String.join("/",
+        BITBUCKET_API_BASE_URL, BITBUCKET_REPOSITORIES, workspace, repoSlug, COMMIT,
+        c.getNewChange().getTarget().getHash())).collect(Collectors.toList());
   }
 
-  @Override 
+  @Override
   public String toString() {
     return "BitBucketPPRRepositoryAction";
   }

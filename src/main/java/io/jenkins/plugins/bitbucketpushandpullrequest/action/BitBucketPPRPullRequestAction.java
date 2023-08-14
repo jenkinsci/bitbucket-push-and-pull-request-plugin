@@ -21,24 +21,51 @@
 
 package io.jenkins.plugins.bitbucketpushandpullrequest.action;
 
+import io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRUtils;
+import io.jenkins.plugins.bitbucketpushandpullrequest.exception.BitBucketPPRRepositoryNotParsedException;
+
 import java.util.ArrayList;
 import java.util.List;
-
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.Nonnull;
 
 import hudson.model.InvisibleAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
+import static java.util.Objects.nonNull;
 
 public class BitBucketPPRPullRequestAction extends InvisibleAction implements BitBucketPPRAction {
+  private static final Logger logger = Logger.getLogger(BitBucketPPRPullRequestAction.class.getName());
+  public static final String APPROVE = "/approve";
+  public static final String DECLINE = "/decline";
+  public static final String STATUSES = "/statuses";
+  public static final String COMMIT = "commit";
+  public static final String BITBUCKET_API_BASE_URL = "https://api.bitbucket.org/2.0";
+  public static final String BITBUCKET_HTTP_BASE_URL = "https://bitbucket.org/";
 
+  private static final String PULL_REQUEST = "pullrequests";
+  private static final String BITBUCKET_REPOSITORIES = "repositories";
   private final @Nonnull BitBucketPPRPayload payload;
-  private List<String> scmUrls = new ArrayList<>(2);
+  private final @Nonnull String workspace;
+
+  private final @Nonnull String repoSlug;
+
+  private final @Nonnull String pullRequestId;
 
   public BitBucketPPRPullRequestAction(@Nonnull BitBucketPPRPayload payload) {
     this.payload = payload;
+    this.pullRequestId = payload.getPullRequest().getId();
 
-    // TODO Why??
-    scmUrls.add(payload.getRepository().getLinks().getHtml().getHref());
+    Map<String, String> workspaceRepo;
+    try {
+      workspaceRepo = BitBucketPPRUtils.extractRepositoryNameFromHTTPSUrl(
+          payload.getRepository().getLinks().getHtml().getHref());
+    } catch (BitBucketPPRRepositoryNotParsedException e) {
+      throw new RuntimeException(e);
+    }
+    this.repoSlug = workspaceRepo.get(BitBucketPPRUtils.BB_REPOSITORY);
+    this.workspace = workspaceRepo.get(BitBucketPPRUtils.BB_WORKSPACE);
   }
 
   @Override
@@ -47,23 +74,30 @@ public class BitBucketPPRPullRequestAction extends InvisibleAction implements Bi
   }
 
   @Override
-  public String getTargetBranch() {
-    return payload.getPullRequest().getDestination().getBranch().getName();
-  }
-  
-  @Override
   public String getLatestCommitFromRef() {
     return payload.getPullRequest().getSource().getCommit().getHash();
   }
-  
+
+  @Override
+  public String getTargetBranch() {
+    return payload.getPullRequest().getDestination().getBranch().getName();
+  }
+
   @Override
   public String getLatestCommitToRef() {
     return payload.getPullRequest().getDestination().getCommit().getHash();
   }
 
   @Override
+  public String getPullRequestApiUrl() {
+    return String.join("/", BITBUCKET_API_BASE_URL, BITBUCKET_REPOSITORIES, workspace, repoSlug,
+        PULL_REQUEST, pullRequestId);
+  }
+
+  @Override
   public String getPullRequestUrl() {
-    return payload.getPullRequest().getLinks().getHtml().getHref();
+    return String.join("/", BITBUCKET_HTTP_BASE_URL, workspace, repoSlug, PULL_REQUEST,
+        pullRequestId);
   }
 
   @Override
@@ -83,7 +117,13 @@ public class BitBucketPPRPullRequestAction extends InvisibleAction implements Bi
 
   @Override
   public String getScm() {
-    return payload.getRepository().getScm() != null ? payload.getRepository().getScm() : "git";
+    String scm =
+        nonNull(payload.getRepository().getScm()) ? payload.getRepository().getScm() : "git";
+    if (!scm.equalsIgnoreCase("git")) {
+      logger.log(Level.WARNING, "Payload received from SCM other than git.");
+    }
+
+    return payload.getRepository().getScm();
   }
 
   @Override
@@ -98,7 +138,9 @@ public class BitBucketPPRPullRequestAction extends InvisibleAction implements Bi
 
   @Override
   public List<String> getScmUrls() {
-    return scmUrls;
+    List<String> res = new ArrayList<>();
+    res.add(payload.getRepository().getLinks().getHtml().getHref());
+    return res;
   }
 
   @Override
@@ -127,17 +169,20 @@ public class BitBucketPPRPullRequestAction extends InvisibleAction implements Bi
 
   @Override
   public String getLinkApprove() {
-    return payload.getPullRequest().getLinks().getApprove().getHref();
+    return String.join("/", BITBUCKET_API_BASE_URL, BITBUCKET_REPOSITORIES, workspace, repoSlug,
+        PULL_REQUEST, pullRequestId) + APPROVE;
   }
 
   @Override
   public String getLinkDecline() {
-    return payload.getPullRequest().getLinks().getDecline().getHref();
+    return String.join("/", BITBUCKET_API_BASE_URL, BITBUCKET_REPOSITORIES, workspace, repoSlug,
+        PULL_REQUEST, pullRequestId) + DECLINE;
   }
 
   @Override
   public String getLinkStatuses() {
-    return payload.getPullRequest().getLinks().getStatuses().getHref();
+    return String.join("/", BITBUCKET_API_BASE_URL, BITBUCKET_REPOSITORIES, workspace, repoSlug,
+        PULL_REQUEST, pullRequestId) + STATUSES;
   }
 
   @Override
@@ -147,7 +192,8 @@ public class BitBucketPPRPullRequestAction extends InvisibleAction implements Bi
 
   @Override
   public String getCommitLink() {
-    return payload.getPullRequest().getSource().getCommit().getLinks().getSelf().getHref();
+    return String.join("/", BITBUCKET_API_BASE_URL, BITBUCKET_REPOSITORIES, workspace, repoSlug,
+        COMMIT) + '/' + this.getLatestCommit();
   }
 
   @Override

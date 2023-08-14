@@ -293,7 +293,7 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
       }
 
       return new StandardListBoxModel().includeEmptyValue()
-          .includeMatchingAs(ACL.SYSTEM, Jenkins.getInstance(), StandardCredentials.class,
+          .includeMatchingAs(ACL.SYSTEM, context, StandardCredentials.class,
               Collections.<DomainRequirement>emptyList(), CredentialsMatchers.always())
           .includeCurrentValue(credentialsId);
     }
