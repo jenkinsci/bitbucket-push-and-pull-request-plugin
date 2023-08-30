@@ -1,5 +1,9 @@
 # Change Log
 
+## 2.8.4 (2023-08-30)
+
+### What's Changed
+* fix for security issue security-3165
 
 ## 2.8.3 (2022-07-29)
 
