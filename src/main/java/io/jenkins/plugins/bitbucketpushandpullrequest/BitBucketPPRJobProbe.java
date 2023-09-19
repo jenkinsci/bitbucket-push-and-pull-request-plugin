@@ -37,6 +37,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
+
+import io.jenkins.plugins.bitbucketpushandpullrequest.config.BitBucketPPRPluginConfig;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.jgit.transport.URIish;
 import hudson.model.Job;
@@ -47,7 +49,6 @@ import hudson.scm.SCM;
 import hudson.security.ACL;
 import hudson.security.ACLContext;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
-import io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRUtils;
 import io.jenkins.plugins.bitbucketpushandpullrequest.exception.TriggerNotSetException;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRHookEvent;
 import io.jenkins.plugins.bitbucketpushandpullrequest.observer.BitBucketPPRObservable;
@@ -93,30 +94,66 @@ public class BitBucketPPRJobProbe {
         .filter(Objects::nonNull).collect(Collectors.toList());
 
     try (ACLContext ctx = ACL.as(ACL.SYSTEM)) {
-      Jenkins.get().getAllItems(Job.class).stream().forEach(job -> {
+      if (globalConfig.isSingleJobSet()) {
         try {
-          triggerScm(job, remotes, bitbucketEvent, bitbucketAction, observable);
+          Job job = (Job) Jenkins.get().getItemByFullName(globalConfig.getSingleJob());
+          if (job == null) {
+            logger.log(Level.WARNING, "Job could not be found!");
+            return;
+          }
+          triggerScmForSingleJob(job, remotes, bitbucketEvent, bitbucketAction, observable);
         } catch (TriggerNotSetException e) {
           logger.log(Level.FINE, "Trigger not set");
         }
-      });
+      }
+      if (!globalConfig.isSingleJobSet()) {
+        Jenkins.get().getAllItems(Job.class).stream().forEach(job -> {
+          try {
+            triggerScm(job, remotes, bitbucketEvent, bitbucketAction, observable);
+          } catch (TriggerNotSetException e) {
+            logger.log(Level.FINE, "Trigger not set");
+          }
+        });
+      }
     }
+  }
+
+  private void triggerScmForSingleJob(@Nonnull Job<?, ?> job, List<URIish> remotes,
+                          BitBucketPPRHookEvent bitbucketEvent, BitBucketPPRAction bitbucketAction,
+                          BitBucketPPRObservable observable) throws TriggerNotSetException {
+
+    Trigger trigger = new Trigger(getBitBucketTrigger(job)
+            .orElseThrow(() -> new TriggerNotSetException(job.getFullDisplayName())), Optional.ofNullable(SCMTriggerItem.SCMTriggerItems.asSCMTriggerItem(job)));
+
+    trigger.scmTriggerItem.ifPresent(it -> it.getSCMs().stream().forEach(scmTrigger -> {
+
+      if (!scmTriggered.contains(scmTrigger)) {
+        scmTriggered.add(scmTrigger);
+
+        try {
+          trigger.bitbucketTrigger.onPost(bitbucketEvent, bitbucketAction, scmTrigger, observable);
+          return;
+
+        } catch (Throwable e) {
+          logger.log(Level.WARNING, "Error: {0}", e.getMessage());
+          e.printStackTrace();
+        }
+      }
+
+      logger.log(Level.FINE, "{0} SCM doesn't match remote repo {1} or it was already triggered.",
+              new Object[] {job.getName(), remotes});
+
+    }));
   }
 
   private void triggerScm(@Nonnull Job<?, ?> job, List<URIish> remotes,
       BitBucketPPRHookEvent bitbucketEvent, BitBucketPPRAction bitbucketAction,
       BitBucketPPRObservable observable) throws TriggerNotSetException {
 
-    BitBucketPPRTrigger bitbucketTrigger = getBitBucketTrigger(job)
-        .orElseThrow(() -> new TriggerNotSetException(job.getFullDisplayName()));
+    Trigger trigger = new Trigger(getBitBucketTrigger(job)
+            .orElseThrow(() -> new TriggerNotSetException(job.getFullDisplayName())), Optional.ofNullable(SCMTriggerItem.SCMTriggerItems.asSCMTriggerItem(job)));
 
-    // @todo shouldn't be an instance variable?
-    List<SCM> scmTriggered = new ArrayList<>();
-
-    Optional<SCMTriggerItem> item =
-        Optional.ofNullable(SCMTriggerItem.SCMTriggerItems.asSCMTriggerItem(job));
-
-    item.ifPresent(it -> it.getSCMs().stream().forEach(scmTrigger -> {
+    trigger.scmTriggerItem.ifPresent(it -> it.getSCMs().stream().forEach(scmTrigger -> {
 
       // @todo add comments to explain what is this check for
       if (job.getParent() instanceof MultiBranchProject
