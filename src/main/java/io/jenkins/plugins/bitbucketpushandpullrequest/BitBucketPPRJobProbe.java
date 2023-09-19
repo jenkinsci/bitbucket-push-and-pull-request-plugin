@@ -64,6 +64,14 @@ import jenkins.triggers.SCMTriggerItem;
 public class BitBucketPPRJobProbe {
   private static final Logger logger = Logger.getLogger(BitBucketPPRJobProbe.class.getName());
 
+  private static final BitBucketPPRPluginConfig globalConfig =
+          BitBucketPPRPluginConfig.getInstance();
+  private final List<SCM> scmTriggered;
+
+  public BitBucketPPRJobProbe() {
+    scmTriggered = new ArrayList<>();
+  }
+
   public void triggerMatchingJobs(BitBucketPPRHookEvent bitbucketEvent,
       BitBucketPPRAction bitbucketAction, BitBucketPPRObservable observable) {
 
@@ -124,7 +132,7 @@ public class BitBucketPPRJobProbe {
         scmTriggered.add(scmTrigger);
 
         try {
-          bitbucketTrigger.onPost(bitbucketEvent, bitbucketAction, scmTrigger, observable);
+          trigger.bitbucketTrigger.onPost(bitbucketEvent, bitbucketAction, scmTrigger, observable);
           return;
 
         } catch (Throwable e) {
@@ -137,6 +145,16 @@ public class BitBucketPPRJobProbe {
           new Object[] {job.getName(), remotes});
 
     }));
+  }
+
+  private static class Trigger {
+    public final BitBucketPPRTrigger bitbucketTrigger;
+    public final Optional<SCMTriggerItem> scmTriggerItem;
+
+    public Trigger(BitBucketPPRTrigger bitbucketTrigger, Optional<SCMTriggerItem> item) {
+      this.bitbucketTrigger = bitbucketTrigger;
+      this.scmTriggerItem = item;
+    }
   }
 
   private boolean mPJobShouldNotBeTriggered(Job<?, ?> job, BitBucketPPRHookEvent bitbucketEvent,
