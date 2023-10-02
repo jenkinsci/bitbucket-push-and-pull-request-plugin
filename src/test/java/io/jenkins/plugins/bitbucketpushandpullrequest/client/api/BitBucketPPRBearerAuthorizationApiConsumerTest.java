@@ -7,12 +7,15 @@ import org.apache.http.HttpResponse;
 import org.jenkinsci.plugins.plaincredentials.StringCredentials;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
+
 import com.github.scribejava.core.model.Verb;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class BitBucketPPRBearerAuthorizationApiConsumerTest {
 
   @Ignore

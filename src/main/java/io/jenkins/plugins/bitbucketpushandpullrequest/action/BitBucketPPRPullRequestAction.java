@@ -42,7 +42,7 @@ public class BitBucketPPRPullRequestAction extends InvisibleAction implements Bi
   public static final String STATUSES = "/statuses";
   public static final String COMMIT = "commit";
   public static final String BITBUCKET_API_BASE_URL = "https://api.bitbucket.org/2.0";
-  public static final String BITBUCKET_HTTP_BASE_URL = "https://bitbucket.org/";
+  public static final String BITBUCKET_HTTP_BASE_URL = "https://bitbucket.org";
 
   private static final String PULL_REQUEST = "pullrequests";
   private static final String BITBUCKET_REPOSITORIES = "repositories";

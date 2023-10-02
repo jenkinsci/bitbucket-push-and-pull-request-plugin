@@ -42,7 +42,7 @@ import io.jenkins.plugins.bitbucketpushandpullrequest.cause.pullrequest.cloud.Bi
 import io.jenkins.plugins.bitbucketpushandpullrequest.cause.pullrequest.server.BitBucketPPRPullRequestServerCause;
 import io.jenkins.plugins.bitbucketpushandpullrequest.cause.repository.BitBucketPPRRepositoryCause;
 import io.jenkins.plugins.bitbucketpushandpullrequest.cause.repository.BitBucketPPRServerRepositoryCause;
-import io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRUtils;
+
 
 @Extension
 public class BitBucketPPREnvironmentContributor extends EnvironmentContributor {

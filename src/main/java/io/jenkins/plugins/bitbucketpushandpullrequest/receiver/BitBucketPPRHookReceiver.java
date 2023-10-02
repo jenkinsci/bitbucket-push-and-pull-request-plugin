@@ -31,6 +31,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.Nonnull;
 import javax.naming.OperationNotSupportedException;
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -40,6 +43,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import hudson.Extension;
 import hudson.model.UnprotectedRootAction;
+import hudson.security.csrf.CrumbExclusion;
 import io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst;
 import io.jenkins.plugins.bitbucketpushandpullrequest.config.BitBucketPPRPluginConfig;
 import io.jenkins.plugins.bitbucketpushandpullrequest.exception.InputStreamException;
@@ -57,7 +61,7 @@ import io.jenkins.plugins.bitbucketpushandpullrequest.processor.BitBucketPPRPayl
  * 
  */
 @Extension
-public class BitBucketPPRHookReceiver implements UnprotectedRootAction {
+public class BitBucketPPRHookReceiver extends CrumbExclusion implements UnprotectedRootAction {
   private static final Logger logger = Logger.getLogger(BitBucketPPRHookReceiver.class.getName());
   private static final BitBucketPPRPluginConfig globalConfig =
       BitBucketPPRPluginConfig.getInstance();
@@ -67,6 +71,7 @@ public class BitBucketPPRHookReceiver implements UnprotectedRootAction {
     if (request.getRequestURI().toLowerCase().contains("/" + getUrlName() + "/")
         && request.getMethod().equalsIgnoreCase("POST")) {
       logger.log(Level.INFO, "Received POST request over Bitbucket hook");
+      System.out.println(">>> Received POST request over Bitbucket hook");
 
       try { 
         BitBucketPPRHookEvent bitbucketEvent = getBitbucketEvent(request);    
@@ -77,6 +82,7 @@ public class BitBucketPPRHookReceiver implements UnprotectedRootAction {
         
         BitBucketPPRPayloadProcessorFactory.createProcessor(bitbucketEvent).processPayload(payload, observable);
       } catch (IOException | InputStreamException | JsonSyntaxException | OperationNotSupportedException e) {
+        System.out.println(">>> Exception: " + e.getMessage());
         writeFailResponse(response, "Bitbuckt PPR Plugin: request failed.");
       }
     }
@@ -105,7 +111,8 @@ public class BitBucketPPRHookReceiver implements UnprotectedRootAction {
   }
 
   String getInputStream(@Nonnull StaplerRequest request) throws IOException, InputStreamException {
-    String inputStream = IOUtils.toString(request.getInputStream());
+    // replace The deprecated method toString(InputStream) from the type IOUtils
+    String inputStream = IOUtils.toString(request.getInputStream(), StandardCharsets.UTF_8);
     if (StringUtils.isBlank(inputStream)) {
       logger.severe("The Jenkins job cannot be triggered. The input stream is empty.");
       throw new InputStreamException("The input stream is empty");
@@ -157,5 +164,20 @@ public class BitBucketPPRHookReceiver implements UnprotectedRootAction {
   @Override
   public String getUrlName() {
     return (globalConfig.isHookUrlSet() ? globalConfig.getHookUrl() : HOOK_URL).toLowerCase();
+  }
+
+  @Override
+  public boolean process(HttpServletRequest request, HttpServletResponse response,
+      FilterChain chain) throws IOException, ServletException {
+
+    String path = request.getPathInfo();
+
+    if (StringUtils.isNotBlank(path) && path.equals("/" + getUrlName() + "/")) {
+      chain.doFilter(request, response);
+
+      return true;
+    }
+
+    return false;
   }
 }

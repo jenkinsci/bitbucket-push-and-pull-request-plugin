@@ -25,7 +25,7 @@ import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPR
 import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst.PULL_REQUEST_SERVER_MERGED;
 import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst.REPOSITORY_CLOUD_PUSH;
 import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst.REPOSITORY_SERVER_PUSH;
-import java.net.URI;
+
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,17 +37,15 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
-import org.apache.commons.lang.StringUtils;
+
 import org.eclipse.jgit.transport.URIish;
 import hudson.model.Job;
 import hudson.plugins.git.GitSCM;
 import hudson.plugins.git.GitStatus;
-import hudson.plugins.mercurial.MercurialSCM;
 import hudson.scm.SCM;
 import hudson.security.ACL;
 import hudson.security.ACLContext;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
-import io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRUtils;
 import io.jenkins.plugins.bitbucketpushandpullrequest.exception.TriggerNotSetException;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRHookEvent;
 import io.jenkins.plugins.bitbucketpushandpullrequest.observer.BitBucketPPRObservable;
@@ -57,9 +55,7 @@ import jenkins.model.ParameterizedJobMixIn;
 import jenkins.triggers.SCMTriggerItem;
 
 /**
- * 
  * @author cdelmonte
- *
  */
 public class BitBucketPPRJobProbe {
   private static final Logger logger = Logger.getLogger(BitBucketPPRJobProbe.class.getName());
@@ -68,12 +64,12 @@ public class BitBucketPPRJobProbe {
       BitBucketPPRAction bitbucketAction, BitBucketPPRObservable observable) {
 
     // @todo deprecated. It will be removed in v3.0
-    if (!("git".equals(bitbucketAction.getScm()) || "hg".equals(bitbucketAction.getScm()))) {
+    if (!("git".equals(bitbucketAction.getScm()))) {
       throw new UnsupportedOperationException(
           String.format("Unsupported SCM type %s", bitbucketAction.getScm()));
     }
 
-    Function<String, URIish> f = (a) -> {
+    Function<String, URIish> f = a -> {
       try {
         return new URIish(a);
       } catch (URISyntaxException e) {
@@ -81,7 +77,7 @@ public class BitBucketPPRJobProbe {
         return null;
       }
     };
-    List<URIish> remotes = (List<URIish>) bitbucketAction.getScmUrls().stream().map(f)
+    List<URIish> remotes = bitbucketAction.getScmUrls().stream().map(f)
         .filter(Objects::nonNull).collect(Collectors.toList());
 
     try (ACLContext ctx = ACL.as(ACL.SYSTEM)) {
@@ -117,8 +113,7 @@ public class BitBucketPPRJobProbe {
         return;
       }
 
-      Predicate<URIish> p = (url) -> scmTrigger instanceof GitSCM ? matchGitScm(scmTrigger, url)
-          : scmTrigger instanceof MercurialSCM ? matchMercurialScm(scmTrigger, url) : false;
+      Predicate<URIish> p = (url) -> scmTrigger instanceof GitSCM && matchGitScm(scmTrigger, url);
 
       if (remotes.stream().anyMatch(p) && !scmTriggered.contains(scmTrigger)) {
         scmTriggered.add(scmTrigger);
@@ -127,14 +122,14 @@ public class BitBucketPPRJobProbe {
           bitbucketTrigger.onPost(bitbucketEvent, bitbucketAction, scmTrigger, observable);
           return;
 
-        } catch (Throwable e) {
+        } catch (Exception e) {
           logger.log(Level.WARNING, "Error: {0}", e.getMessage());
           e.printStackTrace();
         }
       }
 
       logger.log(Level.FINE, "{0} SCM doesn't match remote repo {1} or it was already triggered.",
-          new Object[] {job.getName(), remotes});
+          new Object[] { job.getName(), remotes.stream().map(URIish::toString).collect(Collectors.joining(", ")) });
 
     }));
   }
@@ -149,8 +144,9 @@ public class BitBucketPPRJobProbe {
 
       logger.log(Level.FINEST,
           "Bitbucket event is : {0}, Job Name : {1}, sourceBranchName: {2}, targetBranchName: {3}",
-          new String[] {bitbucketEvent.getAction(), displayName, sourceBranchName,
-              targetBranchName});
+          new String[] {
+              bitbucketEvent.getAction(), displayName, sourceBranchName,
+              targetBranchName });
 
       if (PULL_REQUEST_MERGED.equalsIgnoreCase(bitbucketEvent.getAction())) {
         return !displayName.equalsIgnoreCase(targetBranchName);
@@ -179,64 +175,20 @@ public class BitBucketPPRJobProbe {
   }
 
   private Optional<BitBucketPPRTrigger> getBitBucketTrigger(Job<?, ?> job) {
-    Optional<BitBucketPPRTrigger> trigger = null;
-
     if (job instanceof ParameterizedJobMixIn.ParameterizedJob) {
       ParameterizedJobMixIn.ParameterizedJob<?, ?> pJob =
           (ParameterizedJobMixIn.ParameterizedJob<?, ?>) job;
 
-      trigger = pJob.getTriggers().values().stream().filter(BitBucketPPRTrigger.class::isInstance)
+      return pJob.getTriggers().values().stream().filter(BitBucketPPRTrigger.class::isInstance)
           .findFirst().map(BitBucketPPRTrigger.class::cast);
     }
-    return trigger;
+    return Optional.empty();
   }
 
-  // @todo: deprecated, will be removed in v3.0
-  private boolean matchMercurialScm(SCM scm, URIish remote) {
-    try {
-      URI hgUri = new URI(((MercurialSCM) scm).getSource());
-
-      logger.log(Level.INFO, "Trying to match {0} ", hgUri.toString() + "<-->" + remote.toString());
-      return hgLooselyMatches(hgUri, remote.toString());
-
-    } catch (URISyntaxException ex) {
-      logger.log(Level.SEVERE, "Could not parse jobSource uri: {0} ", ex);
-      return false;
-    }
-  }
 
   private boolean matchGitScm(SCM scm, URIish remote) {
     return ((GitSCM) scm).getRepositories().stream()
         .anyMatch((a) -> a.getURIs().stream().anyMatch((b) -> GitStatus.looselyMatches(b, remote)));
   }
 
-
-  // @todo: deprecated, will be removed in v3.0
-  private boolean hgLooselyMatches(URI notifyUri, String repository) {
-    boolean result = false;
-    try {
-      if (!hgIsUnexpandedEnvVar(repository)) {
-        URI repositoryUri = new URI(repository);
-        logger.log(Level.INFO, "Mercurial loose match between {0} ",
-            notifyUri.toString() + "<- and ->" + repositoryUri.toString());
-        result = Objects.equals(notifyUri.getHost(), repositoryUri.getHost())
-            && Objects.equals(StringUtils.stripEnd(notifyUri.getPath(), "/"),
-                StringUtils.stripEnd(repositoryUri.getPath(), "/"))
-            && Objects.equals(notifyUri.getQuery(), repositoryUri.getQuery());
-      }
-    } catch (URISyntaxException ex) {
-      logger.log(Level.SEVERE, "could not parse repository uri " + repository, ex);
-    }
-    return result;
-  }
-
-  // @todo: deprecated, will be removed in v3.0
-  private boolean hgIsUnexpandedEnvVar(String str) {
-    return str.startsWith("$");
-  }
-
-  // @todo: deprecated, will be removed in v3.0
-  public boolean testMatchMercurialScm(SCM scm, URIish remote) {
-    return matchMercurialScm(scm, remote);
-  }
 }

@@ -22,23 +22,25 @@
 package io.jenkins.plugins.bitbucketpushandpullrequest.receiver;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst.HOOK_URL;
+
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import org.apache.commons.io.IOUtils;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.jvnet.hudson.test.JenkinsRule;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
+
 import com.gargoylesoftware.htmlunit.HttpMethod;
 import com.gargoylesoftware.htmlunit.WebRequest;
 import com.gargoylesoftware.htmlunit.WebResponse;
-import io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst;
 
-
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class BitBucketPPRCrumbExclusionTest {
   private static final int SUCCESS_RESPONSE = 200;
 
@@ -46,30 +48,21 @@ public class BitBucketPPRCrumbExclusionTest {
   public JenkinsRule jenkins = new JenkinsRule();
 
   @Test
-  public void shouldNotRequireACrumbForTheBitbucketHookUrl() throws Exception {
-    JenkinsRule.WebClient webClient = jenkins.createWebClient();
-    WebRequest wrs =
-        new WebRequest(new URL(webClient.getContextPath() + "bitbucket-hook/"), HttpMethod.POST);
-    wrs.setAdditionalHeader("x-event-key", "pullrequest:created");
-    wrs.setRequestBody(URLEncoder.encode(readPayloadScript("./cloud/pr_created.json"),
-        StandardCharsets.UTF_8.toString()));
-    wrs.setAdditionalHeader(BitBucketPPRConst.APPLICATION_X_WWW_FORM_URLENCODED,
-        BitBucketPPRConst.APPLICATION_X_WWW_FORM_URLENCODED);
-    wrs.setCharset("UTF-8");
-    WebResponse resp = webClient.getPage(wrs).getWebResponse();
-    
+  public void testTest() throws IOException {
+    JenkinsRule.WebClient wc = jenkins.createWebClient();
+    WebRequest req = new WebRequest(new URL(wc.getContextPath() + HOOK_URL + "/"), HttpMethod.POST);
+
+    InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream("./cloud/pr_updated.json");
+    String jenkinsFileContent = IOUtils.toString(is, StandardCharsets.UTF_8);
+    assertNotNull(jenkinsFileContent);
+
+    req.setAdditionalHeader("x-event-key", "pullrequest:updated");
+    req.setAdditionalHeader("content-type", "application/json");
+    req.setRequestBody(jenkinsFileContent);
+
+    WebResponse resp = wc.getPage(req).getWebResponse();
+    assertNotNull(resp.getContentAsString());
     assertEquals(SUCCESS_RESPONSE, resp.getStatusCode());
   }
 
-  private String readPayloadScript(String path) throws Exception {
-    String script = null;
-    try {
-      ClassLoader classloader = Thread.currentThread().getContextClassLoader();
-      InputStream is = classloader.getResourceAsStream(path);
-      script = IOUtils.toString(is, StandardCharsets.UTF_8);
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-    return script;
-  }
 }
