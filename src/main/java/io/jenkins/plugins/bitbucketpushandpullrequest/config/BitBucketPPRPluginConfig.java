@@ -94,7 +94,7 @@ public class BitBucketPPRPluginConfig extends GlobalConfiguration {
     if (isEmpty(singleJob)) {
       this.singleJob = "";
     } else {
-      this.singleJob = singleJob;
+      this.singleJob = singleJob.trim();
     }
     save();
   }
