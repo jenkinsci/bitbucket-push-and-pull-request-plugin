@@ -6,6 +6,9 @@
       <f:entry title="Hook URL" field="hookUrlTitle">
         <f:textbox field="hookUrl" />
       </f:entry>
+      <f:entry title="Single job to build" field="singleJobTitle">
+        <f:textbox field="singleJob" />
+      </f:entry>
       <f:entry title="${%Send build status to BitBucket}" field="notifyBitBucket">
         <f:checkbox default="true" />
       </f:entry>
