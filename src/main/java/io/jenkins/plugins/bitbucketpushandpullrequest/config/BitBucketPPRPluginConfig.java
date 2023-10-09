@@ -36,6 +36,8 @@ public class BitBucketPPRPluginConfig extends GlobalConfiguration {
   
   public String credentialsId;
 
+  public String singleJob;
+
   public BitBucketPPRPluginConfig() {
     logger.fine("Read bitbucket push and pull request plugin global configuration.");
     this.notifyBitBucket = true;
@@ -85,6 +87,24 @@ public class BitBucketPPRPluginConfig extends GlobalConfiguration {
   @DataBoundSetter
   public void setCredentialsId(@CheckForNull String credentialsId) {
     this.credentialsId = credentialsId;
+  }
+
+  @DataBoundSetter
+  public void setSingleJob(String singleJob) {
+    if (isEmpty(singleJob)) {
+      this.singleJob = "";
+    } else {
+      this.singleJob = singleJob.trim();
+    }
+    save();
+  }
+
+  public boolean isSingleJobSet() {
+    return !isEmpty(singleJob);
+  }
+
+  public String getSingleJob() {
+    return singleJob;
   }
 
   @Override
