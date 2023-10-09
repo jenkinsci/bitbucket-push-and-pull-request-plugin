@@ -78,11 +78,13 @@ in the __Jenkins Global Configurations__:
 
 1. you can override the default webhook endpoint "/bitbucket-hook/" consumed by the plugin
 
-2. you can disable the build status notifications propagation.
+2. you can configure a single job to be triggered exclusively. That overrides the default behavior of having a dedicated endpoint (+ some internal matching logic) for ALL pipelines to be triggered via this plugin. In case of a non-existing job a WARNING will be logged at global jenkins log. You can omit this feature by simply leaving this field blank.
 
-3. you can choose what build key to use for build status propagation
+3. you can disable the build status notifications propagation.
 
-4. you can set global credentials used by the plugin for the state notification
+4. you can choose what build key to use for build status propagation
+
+5. you can set global credentials used by the plugin for the state notification
 
 ![example global config jenkins bb ppr 1](docs/img/global-config.png)
 
