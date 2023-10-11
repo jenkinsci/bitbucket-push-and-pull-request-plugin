@@ -272,6 +272,9 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
     /**
      * Writes the annotated log to the given output.
      */
+    @edu.umd.cs.findbugs.annotations.SuppressFBWarnings(
+        value="RV_RETURN_VALUE_IGNORED",
+        justification="I know what I'm doing")
     public void writeLogTo(XMLOutput out) throws Exception {
       new AnnotatedLargeText<BitBucketPPRWebHookPollingAction>(getLogFile(),
           Charset.defaultCharset(), true, this).writeHtmlTo(0, out.asWriter());

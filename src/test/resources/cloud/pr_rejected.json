@@ -57,7 +57,7 @@
         "href": "https://api.bitbucket.org/2.0/repositories/some-repo-namespace/some-repo/pullrequests/198/merge"
       },
       "html": {
-        "href": "https://bitbucket.org/some-repo-namespace/some-repo/pull-requests/198"
+        "href": "https://bitbucket.org/some-repo-namespace/some-repo/pullrequests/198"
       },
       "activity": {
         "href": "https://api.bitbucket.org/2.0/repositories/some-repo-namespace/some-repo/pullrequests/198/activity"

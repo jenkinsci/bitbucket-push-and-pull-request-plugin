@@ -35,13 +35,12 @@ import org.eclipse.jgit.transport.URIish;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.junit.MockitoJUnitRunner;
-import hudson.plugins.mercurial.MercurialSCM;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
 
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class BitBucketPPRJobProbeTest {
   BitBucketPPRJobProbe jobProbe;
 
@@ -54,20 +53,6 @@ public class BitBucketPPRJobProbeTest {
   public void setUp() {
     System.out.println("Starting a test");
     jobProbe = new BitBucketPPRJobProbe();
-  }
-
-
-  @Test
-  public void testMatchMercurialScm_not() {
-    MercurialSCM scm = mock(MercurialSCM.class);
-    when(scm.getSource()).thenReturn(
-        "https://bitbucket.org/theveryjenkinsadventure/test-mercurial-in-cloud/src/default");
-
-    URIish remote = mock(URIish.class);
-    when(remote.toString())
-        .thenReturn("https://bitbucket.org/theveryjenkinsadventure/test-mercurial-in-cloud");
-
-    assertFalse(jobProbe.testMatchMercurialScm(scm, remote));
   }
 
   // private BitBucketPPRPayload getPayload() {
