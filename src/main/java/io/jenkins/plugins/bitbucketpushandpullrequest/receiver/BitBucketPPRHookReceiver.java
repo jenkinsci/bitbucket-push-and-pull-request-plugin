@@ -78,34 +78,34 @@ public class BitBucketPPRHookReceiver extends CrumbExclusion implements Unprotec
         BitBucketPPRPayload payload = getPayload(getInputStream(request), bitbucketEvent);
         BitBucketPPRObservable observable = BitBucketPPRObserverFactory.createObservable(bitbucketEvent);
         
-        writeSuccessResponse(response, "Bitbuckt PPR Plugin: request received successfully.");
+        writeSuccessResponse(response);
         
         BitBucketPPRPayloadProcessorFactory.createProcessor(bitbucketEvent).processPayload(payload, observable);
       } catch (IOException | InputStreamException | JsonSyntaxException | OperationNotSupportedException e) {
         System.out.println(">>> Exception: " + e.getMessage());
-        writeFailResponse(response, "Bitbuckt PPR Plugin: request failed.");
+        writeFailResponse(response);
       }
     }
   }
 
-  private void writeSuccessResponse(@Nonnull StaplerResponse response, @Nonnull String msg)
+  private void writeSuccessResponse(@Nonnull StaplerResponse response)
       throws IOException {
     response.setContentType("text/html");
     response.setCharacterEncoding("UTF-8");
     response.setStatus(HttpServletResponse.SC_OK);
     PrintWriter out = response.getWriter();
-    out.write(msg);
+    out.write("Bitbuckt PPR Plugin: request received successfully.");
     out.flush();
     out.close();
   }
 
-  private void writeFailResponse(@Nonnull StaplerResponse response, @Nonnull String msg)
+  private void writeFailResponse(@Nonnull StaplerResponse response)
       throws IOException {
     response.setContentType("text/html");
     response.setCharacterEncoding("UTF-8");
     response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
     PrintWriter out = response.getWriter();
-    out.write(msg);
+    out.write("Bitbuckt PPR Plugin: request failed.");
     out.flush();
     out.close();
   }
@@ -134,7 +134,7 @@ public class BitBucketPPRHookReceiver extends CrumbExclusion implements Unprotec
     String input = inputStream;
     if (StringUtils.startsWithIgnoreCase(contentType,
         BitBucketPPRConst.APPLICATION_X_WWW_FORM_URLENCODED)) {
-      input = URLDecoder.decode(input, StandardCharsets.UTF_8.toString());
+      input = URLDecoder.decode(input, StandardCharsets.UTF_8);
     }
     if (StringUtils.startsWithIgnoreCase(input, BitBucketPPRConst.PAYLOAD_PFX)) {
       input = StringUtils.removeStartIgnoreCase(input, BitBucketPPRConst.PAYLOAD_PFX);

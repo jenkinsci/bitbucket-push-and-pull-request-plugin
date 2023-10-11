@@ -44,7 +44,9 @@ public class BitBucketPPRPullRequestAction extends InvisibleAction implements Bi
   public static final String BITBUCKET_API_BASE_URL = "https://api.bitbucket.org/2.0";
   public static final String BITBUCKET_HTTP_BASE_URL = "https://bitbucket.org";
 
-  private static final String PULL_REQUEST = "pullrequests";
+  private static final String PULL_REQUEST_API = "pullrequests";
+
+  private static final String PULL_REQUEST_HTTP = "pull-requests";
   private static final String BITBUCKET_REPOSITORIES = "repositories";
   private final @Nonnull BitBucketPPRPayload payload;
   private final @Nonnull String workspace;
@@ -90,12 +92,12 @@ public class BitBucketPPRPullRequestAction extends InvisibleAction implements Bi
   @Override
   public String getPullRequestApiUrl() {
     return String.join("/", BITBUCKET_API_BASE_URL, BITBUCKET_REPOSITORIES, workspace, repoSlug,
-        PULL_REQUEST, pullRequestId);
+        PULL_REQUEST_API, pullRequestId);
   }
 
   @Override
   public String getPullRequestUrl() {
-    return String.join("/", BITBUCKET_HTTP_BASE_URL, workspace, repoSlug, PULL_REQUEST,
+    return String.join("/", BITBUCKET_HTTP_BASE_URL, workspace, repoSlug, PULL_REQUEST_HTTP,
         pullRequestId);
   }
 
@@ -169,19 +171,19 @@ public class BitBucketPPRPullRequestAction extends InvisibleAction implements Bi
   @Override
   public String getLinkApprove() {
     return String.join("/", BITBUCKET_API_BASE_URL, BITBUCKET_REPOSITORIES, workspace, repoSlug,
-        PULL_REQUEST, pullRequestId) + APPROVE;
+        PULL_REQUEST_API, pullRequestId) + APPROVE;
   }
 
   @Override
   public String getLinkDecline() {
     return String.join("/", BITBUCKET_API_BASE_URL, BITBUCKET_REPOSITORIES, workspace, repoSlug,
-        PULL_REQUEST, pullRequestId) + DECLINE;
+        PULL_REQUEST_API, pullRequestId) + DECLINE;
   }
 
   @Override
   public String getLinkStatuses() {
     return String.join("/", BITBUCKET_API_BASE_URL, BITBUCKET_REPOSITORIES, workspace, repoSlug,
-        PULL_REQUEST, pullRequestId) + STATUSES;
+        PULL_REQUEST_API, pullRequestId) + STATUSES;
   }
 
   @Override

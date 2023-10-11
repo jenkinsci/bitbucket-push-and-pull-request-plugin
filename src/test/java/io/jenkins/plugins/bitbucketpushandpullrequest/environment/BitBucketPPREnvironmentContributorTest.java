@@ -111,15 +111,11 @@ public class BitBucketPPREnvironmentContributorTest {
     // do
     runEnvironmentContributorForCause(cause);
 
-    System.out.println("HELLLLLLLOPPPPPPP");
-    System.out.println(">>>> " + envVars.get(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_LINK));
-
-
     // assert
     assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_SOURCE_BRANCH, "feature/do-not-merge"));
     assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_TARGET_BRANCH, "develop"));
     assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_LINK,
-        "https://bitbucket.org/some-repo-namespace/some-repo/pullrequests/198"));
+        "https://bitbucket.org/some-repo-namespace/some-repo/pull-requests/198"));
     assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_ID, "198"));
     assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_ACTOR, "me-nickname"));
     assertThat(envVars,
@@ -145,7 +141,7 @@ public class BitBucketPPREnvironmentContributorTest {
     assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_SOURCE_BRANCH, "feature/do-not-merge"));
     assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_TARGET_BRANCH, "develop"));
     assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_LINK,
-        "https://bitbucket.org/some-repo-namespace/some-repo/pullrequests/198"));
+        "https://bitbucket.org/some-repo-namespace/some-repo/pull-requests/198"));
     assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_ID, "198"));
     assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_ACTOR, "me-nickname"));
     assertThat(envVars,
@@ -157,7 +153,7 @@ public class BitBucketPPREnvironmentContributorTest {
   }
 
   @Test
-  public void buildEnvironmentForCloudPullRequestDecliedTest() {
+  public void buildEnvironmentForCloudPullRequestDeclinedTest() {
     BitBucketPPRPayload payload = getCloudPayload("./cloud/pr_rejected.json");
 
     BitBucketPPRPullRequestCause cause = mock(BitBucketPPRPullRequestCause.class);
@@ -171,7 +167,7 @@ public class BitBucketPPREnvironmentContributorTest {
     assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_SOURCE_BRANCH, "feature/do-not-merge"));
     assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_TARGET_BRANCH, "develop"));
     assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_LINK,
-            "https://bitbucket.org/some-repo-namespace/some-repo/pullrequests/198"));
+            "https://bitbucket.org/some-repo-namespace/some-repo/pull-requests/198"));
     assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_ID, "198"));
     assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_ACTOR, "me-nickname"));
     assertThat(envVars,
@@ -197,7 +193,7 @@ public class BitBucketPPREnvironmentContributorTest {
     assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_SOURCE_BRANCH, "feature/do-not-merge"));
     assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_TARGET_BRANCH, "develop"));
     assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_LINK,
-        "https://bitbucket.org/some-repo-namespace/some-repo/pullrequests/198"));
+        "https://bitbucket.org/some-repo-namespace/some-repo/pull-requests/198"));
     assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_ID, "198"));
     assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_ACTOR, "me-nickname"));
     assertThat(envVars,
@@ -223,7 +219,7 @@ public class BitBucketPPREnvironmentContributorTest {
     assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_SOURCE_BRANCH, "feature/do-not-merge"));
     assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_TARGET_BRANCH, "develop"));
     assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_LINK,
-        "https://bitbucket.org/some-repo-namespace/some-repo/pullrequests/198"));
+        "https://bitbucket.org/some-repo-namespace/some-repo/pull-requests/198"));
     assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_ID, "198"));
     assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_ACTOR, "me-nickname"));
     assertThat(envVars,
@@ -249,7 +245,7 @@ public class BitBucketPPREnvironmentContributorTest {
     assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_SOURCE_BRANCH, "feature/do-not-merge"));
     assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_TARGET_BRANCH, "destination-branch"));
     assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_LINK,
-        "https://bitbucket.org/some-repo-namespace/some-repo/pullrequests/198"));
+        "https://bitbucket.org/some-repo-namespace/some-repo/pull-requests/198"));
     assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_ID, "198"));
     assertThat(envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_ACTOR, "me-nickname"));
     assertThat(envVars,
