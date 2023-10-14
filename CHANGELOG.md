@@ -1,5 +1,14 @@
 # Change Log
 
+## 3.0.0 (2023-10-14)
+
+### What's Changed
+* Porting to Java 11
+* Add new feature "Add option for single triggered job", thanks to @solarlodge 
+* Fix issue #306
+
+**Full Changelog**: https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/compare/bitbucket-push-and-pull-request-2.8.4...bitbucket-push-and-pull-request-3.0.0
+
 ## 2.8.4 (2023-08-30)
 
 ### What's Changed
