@@ -21,33 +21,49 @@
 
 package io.jenkins.plugins.bitbucketpushandpullrequest.action;
 
+import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
+
+import hudson.model.InvisibleAction;
+import io.jenkins.plugins.bitbucketpushandpullrequest.exception.BitBucketPPRPayloadPropertyNotFoundException;
+import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
+import io.jenkins.plugins.bitbucketpushandpullrequest.model.server.BitBucketPPRServerClone;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import javax.annotation.Nonnull;
 
-import hudson.model.InvisibleAction;
-import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
-import io.jenkins.plugins.bitbucketpushandpullrequest.model.server.BitBucketPPRServerClone;
+public class BitBucketPPRPullRequestServerAction extends InvisibleAction implements
+    BitBucketPPRAction {
 
-public class BitBucketPPRPullRequestServerAction extends InvisibleAction implements BitBucketPPRAction {
-  private static final Logger logger = Logger.getLogger(BitBucketPPRPullRequestServerAction.class.getName());
+  private static final Logger logger = Logger.getLogger(
+      BitBucketPPRPullRequestServerAction.class.getName());
 
   private final @Nonnull BitBucketPPRPayload payload;
   private URL baseUrl;
   private List<String> scmUrls = new ArrayList<>(2);
   private String repositoryUuid;
 
-  public BitBucketPPRPullRequestServerAction(@Nonnull BitBucketPPRPayload payload) {
+  public BitBucketPPRPullRequestServerAction(@Nonnull BitBucketPPRPayload payload)
+      throws BitBucketPPRPayloadPropertyNotFoundException {
     this.payload = payload;
 
-    // TODO: do we need link clones or link self is enough??
-    List<BitBucketPPRServerClone> clones = payload.getServerPullRequest().getToRef().getRepository().getLinks()
+    if (isNull(payload.getServerPullRequest().getToRef()) || isNull(payload
+        .getServerPullRequest().getToRef().getRepository()) || isNull(payload
+        .getServerPullRequest().getToRef().getRepository().getLinks()) || isNull(payload
+        .getServerPullRequest().getToRef().getRepository().getLinks().getCloneProperty())) {
+      throw new BitBucketPPRPayloadPropertyNotFoundException(
+          "A property (toRef -> repository -> links -> clone ) was not found in the JSON payload.");
+    }
+
+    List<BitBucketPPRServerClone> clones = payload.getServerPullRequest().getToRef()
+        .getRepository().getLinks()
         .getCloneProperty();
+
+    if (clones.isEmpty()) throw new BitBucketPPRPayloadPropertyNotFoundException(
+        "Number of clone urls in JSON payload is zero.");
 
     for (BitBucketPPRServerClone clone : clones) {
       if (clone.getName().equalsIgnoreCase("http") || clone.getName().equalsIgnoreCase("https")) {
@@ -69,10 +85,12 @@ public class BitBucketPPRPullRequestServerAction extends InvisibleAction impleme
   public String getSourceBranch() {
     return payload.getServerPullRequest().getFromRef().getDisplayId();
   }
+
   @Override
   public String getLatestCommitFromRef() {
     return payload.getServerPullRequest().getFromRef().getLatestCommit();
   }
+
   @Override
   public String getLatestCommitToRef() {
     return payload.getServerPullRequest().getToRef().getLatestCommit();
@@ -143,11 +161,13 @@ public class BitBucketPPRPullRequestServerAction extends InvisibleAction impleme
 
   @Override
   public String getLinkApprove() {
-    String projectKey = payload.getServerPullRequest().getFromRef().getRepository().getProject().getKey();
+    String projectKey = payload.getServerPullRequest().getFromRef().getRepository().getProject()
+        .getKey();
     String repoSlug = payload.getServerPullRequest().getFromRef().getRepository().getSlug();
     Long pullrequestId = payload.getServerPullRequest().getId();
 
-    return getBaseUrl() + "/rest/api/1.0/projects/" + projectKey.trim() + "/repos/" + repoSlug.trim() + "/pull-requests/"
+    return getBaseUrl() + "/rest/api/1.0/projects/" + projectKey.trim() + "/repos/"
+        + repoSlug.trim() + "/pull-requests/"
         + Long.toString(pullrequestId).trim() + "/approve";
   }
 
@@ -156,11 +176,13 @@ public class BitBucketPPRPullRequestServerAction extends InvisibleAction impleme
     // returns:
     // {baseUrl}/rest/api/1.0/projects/{projectKey}/repos/{repositorySlug}/pull-requests/{pullRequestId}/approve
 
-    String projectKey = payload.getServerPullRequest().getFromRef().getRepository().getProject().getKey();
+    String projectKey = payload.getServerPullRequest().getFromRef().getRepository().getProject()
+        .getKey();
     String repoSlug = payload.getServerPullRequest().getFromRef().getRepository().getSlug();
     Long pullrequestId = payload.getServerPullRequest().getId();
 
-    return getBaseUrl() + "/rest/api/1.0/projects/" + projectKey.trim() + "/repos/" + repoSlug.trim() + "/pull-requests/"
+    return getBaseUrl() + "/rest/api/1.0/projects/" + projectKey.trim() + "/repos/"
+        + repoSlug.trim() + "/pull-requests/"
         + Long.toString(pullrequestId).trim() + "/decline";
   }
 
