@@ -49,8 +49,8 @@ Plugin for Jenkins **v2.361.4 or later**, that triggers builds on Bitbucket's pu
 Some of the features introduced by Bitbucket Push and Pull Request are:
 
 - build state notification
-- support of pull requests for Bitbucket cloud (rest api v2.x+ with mercurial and git) and bitbucket Server (5.14+ with git)
-- support of pushs for Bitbucket cloud (rest api v2.x+ with mercurial and git) and Bitbucket server (5.14+ with git)
+- support of pull requests for Bitbucket cloud (rest api v2.x+ with mercurial and git) and bitbucket Server (from version 5.14 to version 7.21 - with git)
+- support of pushs for Bitbucket cloud (rest api v2.x+ with mercurial and git) and Bitbucket server (from version 5.14 to version 7.21 - with git)
 - usage of Gson instead of net.sf.json.JSONObject
 - Introduction of models and major security improvements
 
