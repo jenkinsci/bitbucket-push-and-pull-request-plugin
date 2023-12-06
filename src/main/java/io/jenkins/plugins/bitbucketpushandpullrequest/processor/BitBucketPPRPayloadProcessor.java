@@ -20,6 +20,7 @@
  ******************************************************************************/
 package io.jenkins.plugins.bitbucketpushandpullrequest.processor;
 
+import io.jenkins.plugins.bitbucketpushandpullrequest.exception.BitBucketPPRPayloadPropertyNotFoundException;
 import javax.annotation.Nonnull;
 import io.jenkins.plugins.bitbucketpushandpullrequest.BitBucketPPRJobProbe;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRHookEvent;
@@ -38,5 +39,6 @@ public abstract class BitBucketPPRPayloadProcessor {
     this.bitbucketEvent = bitbucketEvent;
   }
 
-  public abstract void processPayload(@Nonnull BitBucketPPRPayload payload, BitBucketPPRObservable observable);
+  public abstract void processPayload(@Nonnull BitBucketPPRPayload payload, BitBucketPPRObservable observable)
+      throws BitBucketPPRPayloadPropertyNotFoundException;
 }

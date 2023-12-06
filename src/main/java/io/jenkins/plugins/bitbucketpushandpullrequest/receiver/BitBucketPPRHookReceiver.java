@@ -22,6 +22,8 @@
 package io.jenkins.plugins.bitbucketpushandpullrequest.receiver;
 
 import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst.HOOK_URL;
+
+import io.jenkins.plugins.bitbucketpushandpullrequest.exception.BitBucketPPRPayloadPropertyNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
@@ -84,6 +86,12 @@ public class BitBucketPPRHookReceiver extends CrumbExclusion implements Unprotec
       } catch (IOException | InputStreamException | JsonSyntaxException | OperationNotSupportedException e) {
         System.out.println(">>> Exception: " + e.getMessage());
         writeFailResponse(response);
+      } catch (
+          BitBucketPPRPayloadPropertyNotFoundException e) {
+        logger.info(
+            "Payload Property doesn't exists. It could be that the " +
+                "Bitbucket Client / Server version is not currently supported by the plugin. "
+                + e.getMessage());
       }
     }
   }

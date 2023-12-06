@@ -258,7 +258,7 @@ public class BitBucketPPREnvironmentContributorTest {
 
   @Ignore
   @Test
-  public void buildEnvironmentForServerPullRequestOpenedTest() {
+  public void buildEnvironmentForServerPullRequestOpenedTest() throws Exception {
     BitBucketPPRServerPayload payload = getServerPayload("./server/pr_opened.json");
 
     BitBucketPPRPullRequestServerCause cause = mock(BitBucketPPRPullRequestServerCause.class);
@@ -283,7 +283,7 @@ public class BitBucketPPREnvironmentContributorTest {
 
   @Ignore
   @Test
-  public void buildEnvironmentForServerPullRequestModifiedTest() {
+  public void buildEnvironmentForServerPullRequestModifiedTest() throws Exception {
     BitBucketPPRServerPayload payload = getServerPayload("./server/pr_modified.json");
 
     BitBucketPPRPullRequestServerCause cause = mock(BitBucketPPRPullRequestServerCause.class);
@@ -308,7 +308,7 @@ public class BitBucketPPREnvironmentContributorTest {
 
   @Ignore
   @Test
-  public void buildEnvironmentForServerSourcePullRequestUpdatedTest() {
+  public void buildEnvironmentForServerSourcePullRequestUpdatedTest() throws Exception {
     BitBucketPPRServerPayload payload = getServerPayload("./server/pr_from_ref_updated.json");
 
     BitBucketPPRPullRequestServerCause cause = mock(BitBucketPPRPullRequestServerCause.class);
@@ -333,7 +333,7 @@ public class BitBucketPPREnvironmentContributorTest {
 
   @Ignore
   @Test
-  public void buildEnvironmentForServerPullRequestApprovedTest() {
+  public void buildEnvironmentForServerPullRequestApprovedTest() throws Exception {
     BitBucketPPRServerPayload payload = getServerPayload("./server/pr_reviewer_approved.json");
 
     BitBucketPPRPullRequestServerCause cause = mock(BitBucketPPRPullRequestServerCause.class);
@@ -358,7 +358,7 @@ public class BitBucketPPREnvironmentContributorTest {
 
   @Ignore
   @Test
-  public void buildEnvironmentForServerPullRequestMergedTest() {
+  public void buildEnvironmentForServerPullRequestMergedTest() throws Exception {
     BitBucketPPRServerPayload payload = getServerPayload("./server/pr_merged.json");
 
     BitBucketPPRPullRequestServerCause cause = mock(BitBucketPPRPullRequestServerCause.class);
@@ -383,7 +383,7 @@ public class BitBucketPPREnvironmentContributorTest {
 
   @Ignore
   @Test
-  public void buildEnvironmentForServerPullRequestDeclinedTest() {
+  public void buildEnvironmentForServerPullRequestDeclinedTest() throws Exception {
     BitBucketPPRServerPayload payload = getServerPayload("./server/pr_declined.json");
 
     BitBucketPPRPullRequestServerCause cause = mock(BitBucketPPRPullRequestServerCause.class);
@@ -428,7 +428,7 @@ public class BitBucketPPREnvironmentContributorTest {
 
   @Ignore
   @Test
-  public void buildEnvironmentForServerCommentCreatedTest() {
+  public void buildEnvironmentForServerCommentCreatedTest() throws Exception {
     BitBucketPPRServerPayload payload = getServerPayload("./server/pr_comment_created.json");
 
     BitBucketPPRPullRequestServerCause cause = mock(BitBucketPPRPullRequestServerCause.class);
