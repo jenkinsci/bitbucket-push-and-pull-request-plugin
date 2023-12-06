@@ -28,7 +28,7 @@ import javaposse.jobdsl.dsl.helpers.triggers.TriggerContext;
 import javaposse.jobdsl.plugin.ContextExtensionPoint;
 import javaposse.jobdsl.plugin.DslExtensionMethod;
 
-@Extension(optional = true)
+@Extension
 public class BitBucketPPRHookJobDslExtension extends ContextExtensionPoint {
 
   /**

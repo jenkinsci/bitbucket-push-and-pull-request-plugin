@@ -22,6 +22,8 @@
 
 package io.jenkins.plugins.bitbucketpushandpullrequest.filter.repository;
 
+import static java.util.Objects.isNull;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.Logger;
@@ -37,6 +39,7 @@ import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRHookEven
 
 
 public class BitBucketPPRRepositoryPushActionFilter extends BitBucketPPRRepositoryActionFilter {
+
   private static final Logger logger =
       Logger.getLogger(BitBucketPPRRepositoryPushActionFilter.class.getName());
 
@@ -69,6 +72,12 @@ public class BitBucketPPRRepositoryPushActionFilter extends BitBucketPPRReposito
     logger.info(
         () -> "Should trigger build for the bitbucket action: " + bitbucketAction.toString() + "?");
 
+    if (isNull(bitbucketAction) || isNull(bitbucketAction.getType())) {
+      logger.info(
+          "The bitbucketAction or the bitbucketAction type are not set.");
+      return false;
+    }
+
     if (!bitbucketAction.getType().equalsIgnoreCase("BRANCH")
         && !bitbucketAction.getType().equalsIgnoreCase("named_branch")
         && !bitbucketAction.getType().equalsIgnoreCase("UPDATE")
@@ -82,14 +91,15 @@ public class BitBucketPPRRepositoryPushActionFilter extends BitBucketPPRReposito
     }
 
     if (this.triggerOnlyIfTagPush && !bitbucketAction.getType().equalsIgnoreCase("TAG")) {
-        return false;
+      return false;
     }
 
     return matches(allowedBranches, bitbucketAction.getTargetBranch(), null);
   }
 
   @Override
-  public BitBucketPPRTriggerCause getCause(File pollingLog, BitBucketPPRAction bitbucketAction, BitBucketPPRHookEvent bitBucketEvent)
+  public BitBucketPPRTriggerCause getCause(File pollingLog, BitBucketPPRAction bitbucketAction,
+      BitBucketPPRHookEvent bitBucketEvent)
       throws IOException {
     return new BitBucketPPRRepositoryCause(pollingLog, bitbucketAction, bitBucketEvent);
   }
@@ -107,6 +117,11 @@ public class BitBucketPPRRepositoryPushActionFilter extends BitBucketPPRReposito
     return triggerAlsoIfNothingChanged;
   }
 
+  @Override
+  public boolean shouldSendApprove() {
+    return isToApprove;
+  }
+
   @Extension
   public static class ActionFilterDescriptorImpl extends BitBucketPPRRepositoryActionDescriptor {
 
@@ -114,10 +129,5 @@ public class BitBucketPPRRepositoryPushActionFilter extends BitBucketPPRReposito
     public String getDisplayName() {
       return "Bitbucket Cloud Push";
     }
-  }
-
-  @Override
-  public boolean shouldSendApprove() {
-    return isToApprove;
   }
 }
