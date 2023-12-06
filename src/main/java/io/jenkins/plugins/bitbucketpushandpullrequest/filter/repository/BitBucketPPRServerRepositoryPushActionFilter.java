@@ -22,23 +22,24 @@
 
 package io.jenkins.plugins.bitbucketpushandpullrequest.filter.repository;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import org.kohsuke.stapler.DataBoundConstructor;
-import org.kohsuke.stapler.DataBoundSetter;
+import static java.util.Objects.isNull;
 
 import hudson.Extension;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.cause.BitBucketPPRTriggerCause;
 import io.jenkins.plugins.bitbucketpushandpullrequest.cause.repository.BitBucketPPRServerRepositoryCause;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRHookEvent;
+import java.io.File;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.DataBoundSetter;
 
 
 public class BitBucketPPRServerRepositoryPushActionFilter
     extends BitBucketPPRRepositoryActionFilter {
+
   private static final Logger logger =
       Logger.getLogger(BitBucketPPRServerRepositoryPushActionFilter.class.getName());
 
@@ -71,24 +72,32 @@ public class BitBucketPPRServerRepositoryPushActionFilter
     logger
         .info(() -> "Should trigger build for bitbucket action" + bitbucketAction.toString() + "?");
 
+    if (isNull(bitbucketAction) || isNull(bitbucketAction.getType())) {
+      logger.info(
+          "The bitbucketAction or the bitbucketAction type are not set.");
+      return false;
+    }
+
     if (!bitbucketAction.getType().equalsIgnoreCase("BRANCH")
         && !bitbucketAction.getType().equalsIgnoreCase("named_branch")
         && !bitbucketAction.getType().equalsIgnoreCase("UPDATE")
         && !bitbucketAction.getType().equalsIgnoreCase("TAG")
         && !this.triggerAlsoIfTagPush) {
-          logger.info(
-          () -> "Neither bitbucketActionType is BRANCH, nor UPDATE, nor trigger on tag push is set for bitbucket type: "
-              + bitbucketAction.getType() + ".");
+      logger.info(
+          () ->
+              "Neither bitbucketActionType is BRANCH, nor UPDATE, nor trigger on tag push is set for bitbucket type: "
+                  + bitbucketAction.getType() + ".");
 
       return false;
     }
 
     if (this.triggerOnlyIfTagPush && !bitbucketAction.getType().equalsIgnoreCase("TAG")) {
-        return false;
+      return false;
     }
 
     logger.log(Level.FINEST, "the target branch is: {0}.", bitbucketAction.getTargetBranch());
-    logger.log(Level.FINEST, "the target branch ref id is: {0}.", bitbucketAction.getTargetBranchRefId());
+    logger.log(Level.FINEST, "the target branch ref id is: {0}.",
+        bitbucketAction.getTargetBranchRefId());
 
     logger.log(Level.FINEST, "The allowed branches are: {0}.", allowedBranches);
     return matches(allowedBranches, bitbucketAction.getTargetBranch(), null)
@@ -96,7 +105,7 @@ public class BitBucketPPRServerRepositoryPushActionFilter
   }
 
   @Override
-  public BitBucketPPRTriggerCause getCause(File pollingLog, BitBucketPPRAction bitbucketAction, 
+  public BitBucketPPRTriggerCause getCause(File pollingLog, BitBucketPPRAction bitbucketAction,
       BitBucketPPRHookEvent bitBucketEvent)
       throws IOException {
     return new BitBucketPPRServerRepositoryCause(pollingLog, bitbucketAction, bitBucketEvent);
@@ -115,6 +124,11 @@ public class BitBucketPPRServerRepositoryPushActionFilter
     return triggerAlsoIfNothingChanged;
   }
 
+  @Override
+  public boolean shouldSendApprove() {
+    return isToApprove;
+  }
+
   @Extension
   public static class ActionFilterDescriptorImpl extends BitBucketPPRRepositoryActionDescriptor {
 
@@ -122,10 +136,5 @@ public class BitBucketPPRServerRepositoryPushActionFilter
     public String getDisplayName() {
       return "Bitbucket Server Push";
     }
-  }
-
-  @Override
-  public boolean shouldSendApprove() {
-    return isToApprove;
   }
 }

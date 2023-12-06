@@ -2,9 +2,12 @@ package io.jenkins.plugins.bitbucketpushandpullrequest.filter.repository;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+
+import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
 import java.util.HashMap;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import hudson.EnvVars;
 
@@ -200,5 +203,13 @@ public class BitBucketPPRServerRepositoryPushActionFilterTest {
     assertTrue(m.matches(allowedBranches, "origin/develop-123", null));
     assertFalse(m.matches(allowedBranches, "origin/master", null));
     assertFalse(m.matches(allowedBranches, "origin/develop", null));
+  }
+
+  @Test
+  public void shouldTriggerBuildReturnsFalseIsTypeNotSet() {
+    BitBucketPPRAction bitbucketAction = Mockito.mock(BitBucketPPRAction.class);
+    Mockito.when(bitbucketAction.getType()).thenReturn(null);
+    BitBucketPPRServerRepositoryPushActionFilter c = new BitBucketPPRServerRepositoryPushActionFilter(false, false, "master");
+    assertFalse(c.shouldTriggerBuild(bitbucketAction));
   }
 }
