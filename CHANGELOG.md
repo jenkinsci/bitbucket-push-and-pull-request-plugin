@@ -1,5 +1,13 @@
 # Change Log
 
+## 3.0.1 (2023-12-08)
+
+### What's Changed
+- Fix issue #314 
+- Fix issue #310 
+
+**Full Changelog**: https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/compare/bitbucket-push-and-pull-request-3.0.0...bitbucket-push-and-pull-request-3.0.1
+
 ## 3.0.0 (2023-10-14)
 
 ### What's Changed
