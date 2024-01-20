@@ -11,9 +11,11 @@ This info is not created by the maintainer of the package. It is how I got it wo
 
 * go to https://bitbucket.org/yourorganisation/workspace/settings/api (cogwheel -> workspace settings -> oauth consumer)
 * Add private consumer
+  
 ![example consumer](./img/bitbucket_oauth2_client.png)
 * Expand the consumer to show key and secret
-![consumer key and secret](./bitbucket_oauth2_keyandsecret.png)
+
+![consumer key and secret](./img/bitbucket_oauth2_keyandsecret.png)
 
 ### Create Jenkins credential
 
@@ -23,10 +25,12 @@ This info is not created by the maintainer of the package. It is how I got it wo
 * Secret : the Secret from bitbucket oauth consumer
 * ID : the Key from bitbucket oauth consumer
 * Description : 
+
 ![jenkins credential](./img/jenkins_oauth_secret.png)
 
 ### Jenkins Job config
 
 Use the credential in the `Build with Butbucket Push and Pull Request Plugin` trigger
+
 ![jenkins credential](./img/jenkins_job_trigger.png)
 
