@@ -125,7 +125,7 @@ TYPE | BB CLOUD | BB SERVER | JENKINS CREDENTIALS | NOTES
 --- | :-- | :---  | :--- | ---
 Username & Password | X | X | Username with password| deprecated by bbc, will be removed in march 2022
 HTTP access token | - | X | Secret Text | [learn more about HTTP tokens](https://confluence.atlassian.com/bitbucketserver/http-access-tokens-939515499.html)
-OAuth consumers  | X | - | Secret Text | [learn more about Oauth Consumers](https://support.atlassian.com/bitbucket-cloud/docs/use-oauth-on-bitbucket-cloud/)
+OAuth consumers  | X | - | Secret Text | [Oauth configuration](./oauth_config.md)
 
 1. you can set globally the credentials used by the plugin for the state notification
 2. you can set for each job the credentials used by the plugin for the state notification, overwriting the global credentials
