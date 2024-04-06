@@ -45,12 +45,12 @@ public abstract class BitBucketPPRHandlerTemplate {
     BitBucketPPRPluginConfig config = getGlobalConfig();
     switch (eventType) {
       case BUILD_STARTED:
-        if (config.shouldNotifyBitBucket()) {
+        if (config.getNotifyBitBucket()) {
           setBuildStatusInProgress();
         }
         break;
       case BUILD_FINISHED:
-        if (config.shouldNotifyBitBucket()) {
+        if (config.getNotifyBitBucket()) {
           setBuildStatusOnFinished();
           setApprovedOrDeclined();
         }
@@ -74,7 +74,7 @@ public abstract class BitBucketPPRHandlerTemplate {
   }
 
   protected String computeBitBucketBuildKey(BitBucketPPREventContext context) {
-    if (getGlobalConfig().shouldUseJobNameAsBuildKey()) {
+    if (getGlobalConfig().getUseJobNameAsBuildKey()) {
       Job<?, ?> job = context.getRun().getParent();
       return job.getDisplayName();
     } else {
