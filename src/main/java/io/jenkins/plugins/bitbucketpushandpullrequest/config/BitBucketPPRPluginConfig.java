@@ -66,7 +66,7 @@ public class BitBucketPPRPluginConfig extends GlobalConfiguration {
     return hookUrl;
   }
 
-  public boolean shouldNotifyBitBucket() {
+  public boolean getNotifyBitBucket() {
     return notifyBitBucket;
   }
 
@@ -75,7 +75,7 @@ public class BitBucketPPRPluginConfig extends GlobalConfiguration {
     this.notifyBitBucket = notifyBitBucket;
   }
 
-  public boolean shouldUseJobNameAsBuildKey() {
+  public boolean getUseJobNameAsBuildKey() {
     return useJobNameAsBuildKey;
   }
 
@@ -88,6 +88,8 @@ public class BitBucketPPRPluginConfig extends GlobalConfiguration {
   public void setCredentialsId(@CheckForNull String credentialsId) {
     this.credentialsId = credentialsId;
   }
+
+  public String getCredentialsId() { return credentialsId; }
 
   @DataBoundSetter
   public void setSingleJob(String singleJob) {

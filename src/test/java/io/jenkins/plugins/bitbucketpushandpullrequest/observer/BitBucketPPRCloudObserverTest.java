@@ -113,13 +113,13 @@ public class BitBucketPPRCloudObserverTest {
     Mockito.doReturn(config).when(spyObserver).getGlobalConfig();
 
     // When it's configured to not use the job name
-    Mockito.when(config.shouldUseJobNameAsBuildKey()).thenReturn(false);
+    Mockito.when(config.getUseJobNameAsBuildKey()).thenReturn(false);
 
     // Then the build number shall be the key
     assertEquals(String.valueOf(buildNumber), spyObserver.computeBitBucketBuildKey(context));
 
     // When it's configured to use the job name
-    Mockito.when(config.shouldUseJobNameAsBuildKey()).thenReturn(true);
+    Mockito.when(config.getUseJobNameAsBuildKey()).thenReturn(true);
 
     // Then the the job name shall be the key
     assertEquals(jobName, spyObserver.computeBitBucketBuildKey(context));
@@ -144,13 +144,13 @@ public class BitBucketPPRCloudObserverTest {
 
 
     // When it's configured to not use the job name
-    Mockito.when(config.shouldUseJobNameAsBuildKey()).thenReturn(false);
+    Mockito.when(config.getUseJobNameAsBuildKey()).thenReturn(false);
 
     // Then the build number shall be the key
     assertEquals(String.valueOf(buildNumber), spyObserver.computeBitBucketBuildKey(context));
 
     // When it's configured to use the job name
-    Mockito.when(config.shouldUseJobNameAsBuildKey()).thenReturn(true);
+    Mockito.when(config.getUseJobNameAsBuildKey()).thenReturn(true);
 
     // Then the the job name shall be the key
     assertEquals(jobName, spyObserver.computeBitBucketBuildKey(context));
