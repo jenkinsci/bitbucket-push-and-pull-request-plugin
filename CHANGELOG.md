@@ -1,5 +1,28 @@
 # Change Log
 
+## 3.0.3 (2024-08-16)
+
+### What's Changed
+* Use "get" prefix for configuration attribute getters by @laudrup in https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/pull/328
+* #334 - fix log message pattern to include parameter index by @Gozke in https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/pull/335
+* Enable Jenkins Security Scan by @strangelookingnerd in https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/pull/333
+
+## New Contributors
+* @laudrup made their first contribution in https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/pull/328
+* @strangelookingnerd made their first contribution in https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/pull/333
+
+**Full Changelog**: https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/compare/bitbucket-push-and-pull-request-3.0.2...bitbucket-push-and-pull-request-3.0.3
+
+## 3.0.2 (2024-01-31)
+
+### What's Changed
+Added Documentation on Bitbucket Cloud integration for build status propagation back to BB-cloud (tnx @ccecvb))
+
+### Closed Issues:
+#316 Documentation on Bitbucket Cloud integration for build status propagation back to BB-cloud
+
+**Full Changelog**: https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/compare/bitbucket-push-and-pull-request-3.0.1...bitbucket-push-and-pull-request-3.0.2
+
 ## 3.0.1 (2023-12-08)
 
 ### What's Changed
