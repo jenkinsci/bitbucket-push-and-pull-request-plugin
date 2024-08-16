@@ -40,6 +40,10 @@
             <id>cdelmonte</id>
             <name>Christian Del Monte</name>
         </developer>
+        <developer>
+            <id>julioc-p</id>
+            <name>Julio Perez</name>
+        </developer>
     </developers>
 
     <dependencyManagement>
