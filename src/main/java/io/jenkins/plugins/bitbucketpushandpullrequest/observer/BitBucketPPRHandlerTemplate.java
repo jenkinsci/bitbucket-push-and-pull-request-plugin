@@ -90,7 +90,7 @@ public abstract class BitBucketPPRHandlerTemplate {
       String jsonPayload = objectMapper.writeValueAsString(payload);
       BitBucketPPRClientFactory.createClient(clientType, context).send(url, jsonPayload);
     } catch (JsonProcessingException e) {
-      logger.log(Level.WARNING, "Cannot create payload: {}", e.getMessage());
+      logger.log(Level.WARNING, "Cannot create payload: {0}", e.getMessage());
     } catch (Exception e) {
       logger.warning(e.getMessage());
     }
@@ -104,7 +104,7 @@ public abstract class BitBucketPPRHandlerTemplate {
       String jsonPayload = payload.isEmpty() ? "" : objectMapper.writeValueAsString(payload);
       BitBucketPPRClientFactory.createClient(clientType, context).send(verb, url, jsonPayload);
     } catch (JsonProcessingException e) {
-      logger.log(Level.WARNING, "Cannot create payload: {}", e.getMessage());
+      logger.log(Level.WARNING, "Cannot create payload: {0}", e.getMessage());
     } catch (Exception e) {
       logger.warning(e.getMessage());
     }

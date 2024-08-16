@@ -63,7 +63,7 @@ public class BitBucketPPRClientServerVisitor implements BitBucketPPRClientVisito
         logger.log(Level.FINEST, "Result of the status notification is: {0}, with status code: {1}",
             new Object[] {responseBody, response.getStatusLine().getStatusCode()});
       } catch (IOException e) {
-        logger.log(Level.WARNING, "Error during state notification: {} ", e.getMessage());
+        logger.log(Level.WARNING, "Error during state notification: {0} ", e.getMessage());
       }
     else if (credentials instanceof StringCredentials)
       try {
@@ -73,7 +73,7 @@ public class BitBucketPPRClientServerVisitor implements BitBucketPPRClientVisito
                 response.getStatusLine().getStatusCode()});
       } catch (ExecutionException | IOException | KeyManagementException | NoSuchAlgorithmException
           | KeyStoreException e) {
-        logger.log(Level.WARNING, "Error du" + "ring state notification: {} ", e.getMessage());
+        logger.log(Level.WARNING, "Error du" + "ring state notification: {0} ", e.getMessage());
       } catch (InterruptedException e) {
         throw e;
       }

@@ -89,7 +89,7 @@ public class BitBucketPPRUtils {
     }
 
     if (patternStr == null || patternStr.trim().isEmpty()) {
-      logger.fine(String.format("The regex filter on the comment from BB is null or it is empty", new Object[] {}));
+      logger.fine("The regex filter on the comment from BB is null or it is empty");
       return true;
     }
 
