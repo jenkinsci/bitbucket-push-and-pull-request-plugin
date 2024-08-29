@@ -21,161 +21,167 @@
 
 package io.jenkins.plugins.bitbucketpushandpullrequest.action;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.stream.Collectors;
-
-import javax.annotation.Nonnull;
-
 import hudson.model.InvisibleAction;
-import io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRUtils;
-import io.jenkins.plugins.bitbucketpushandpullrequest.exception.BitBucketPPRRepositoryNotParsedException;
+import io.jenkins.plugins.bitbucketpushandpullrequest.config.BitBucketPPRPluginConfig;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.server.BitBucketPPRServerChange;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.server.BitBucketPPRServerClone;
 
+import javax.annotation.Nonnull;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 public class BitBucketPPRServerRepositoryAction extends InvisibleAction implements BitBucketPPRAction {
-  private static final Logger logger = Logger.getLogger(BitBucketPPRAction.class.getName());
+    private static final Logger logger = Logger.getLogger(BitBucketPPRAction.class.getName());
+    private static final BitBucketPPRPluginConfig globalConfig =
+            BitBucketPPRPluginConfig.getInstance();
 
-  private final @Nonnull BitBucketPPRPayload payload;
-  private URL baseUrl;
-  private List<String> scmUrls = new ArrayList<>(2);
-  private String targetBranchName = null;
-  private String targetBranchRefId = null;
-  private String type;
+    private final @Nonnull BitBucketPPRPayload payload;
+    private URL baseUrl;
+    private List<String> scmUrls = new ArrayList<>(2);
+    private String targetBranchName = null;
+    private String targetBranchRefId = null;
+    private String type;
 
-  public BitBucketPPRServerRepositoryAction(BitBucketPPRPayload payload) {
-    this.payload = payload;
+    public BitBucketPPRServerRepositoryAction(BitBucketPPRPayload payload) {
+        this.payload = payload;
 
-    // TODO: do we need link clones or link self is enough??
-    List<BitBucketPPRServerClone> clones = payload.getServerRepository().getLinks().getCloneProperty();
+        // TODO: do we need link clones or link self is enough??
+        List<BitBucketPPRServerClone> clones = payload.getServerRepository().getLinks().getCloneProperty();
 
-    for (BitBucketPPRServerClone clone : clones) {
-      if (clone.getName().equalsIgnoreCase("http") || clone.getName().equalsIgnoreCase("https")) {
-        try {
-          this.baseUrl = new URL(clone.getHref());
-          this.scmUrls.add(clone.getHref());
-        } catch (MalformedURLException e) {
-          throw new RuntimeException(e);
+        for (BitBucketPPRServerClone clone : clones) {
+            if (clone.getName().equalsIgnoreCase("http") || clone.getName().equalsIgnoreCase("https")) {
+                try {
+                    this.baseUrl = new URL(clone.getHref());
+                    this.scmUrls.add(clone.getHref());
+                } catch (MalformedURLException e) {
+                    throw new RuntimeException(e);
+                }
+            } else if (clone.getName().equalsIgnoreCase("ssh")) {
+                this.scmUrls.add(clone.getHref());
+            }
         }
-      } else if (clone.getName().equalsIgnoreCase("ssh")) {
-        this.scmUrls.add(clone.getHref());
-      }
+
+        if (!globalConfig.getPropagationUrl().isEmpty()) {
+            try {
+                this.baseUrl = new URL(globalConfig.getPropagationUrl());
+            } catch (MalformedURLException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        for (BitBucketPPRServerChange change : payload.getServerChanges()) {
+            if (change.getRefId() != null) {
+                this.targetBranchName = change.getRef().getDisplayId();
+                this.targetBranchRefId = change.getRefId();
+                this.type = change.getRef().getType();
+                break;
+            }
+        }
+
+        logger.log(Level.INFO,
+                () -> "Received commit hook notification from server for destination branch: " + this.targetBranchName);
+        logger.log(Level.INFO, () -> "Received commit hook type from server: " + this.type);
     }
 
-    for (BitBucketPPRServerChange change : payload.getServerChanges()) {
-      if (change.getRefId() != null) {
-        this.targetBranchName = change.getRef().getDisplayId();
-        this.targetBranchRefId = change.getRefId();
-        this.type = change.getRef().getType();
-        break;
-      }
+    @Override
+    public String getTargetBranch() {
+        return targetBranchName;
     }
 
-    logger.log(Level.INFO,
-        () -> "Received commit hook notification from server for destination branch: " + this.targetBranchName);
-    logger.log(Level.INFO, () -> "Received commit hook type from server: " + this.type);
-  }
-
-  @Override
-  public String getTargetBranch() {
-    return targetBranchName;
-  }
-
-  @Override
-  public String getTargetBranchRefId() {
-    return targetBranchRefId;
-  }
-
-  @Override
-  public BitBucketPPRPayload getPayload() {
-    return payload;
-  }
-
-  @Override
-  public String getScm() {
-    return payload.getServerRepository().getScmId();
-  }
-
-  @Override
-  public String getUser() {
-    return payload.getServerActor().getName();
-  }
-
-  @Override
-  public String getType() {
-    return type;
-  }
-
-  @Override
-  public String getRepositoryName() {
-    return payload.getServerRepository().getName();
-  }
-
-  @Override
-  public List<String> getScmUrls() {
-    return scmUrls;
-  }
-
-  @Override
-  public String getPullRequestId() {
-    return null;
-  }
-
-  @Override
-  public String getRepositoryId() {
-    return payload.getServerRepository().getId();
-  }
-
-  @Override
-  public String getRepositoryUrl() {
-    return payload.getServerRepository().getLinks().getSelfProperty().get(0).getHref();
-  }
-
-  @Override
-  public String getProjectUrl() {
-    return payload.getServerRepository().getProject().getLinks().getSelfProperty().get(0).getHref();
-  }
-
-  @Override
-  public String toString() {
-    return "BitBucketPPRServerRepositoryAction";
-  }
-
-  @Override
-  public String getLatestCommit() {
-    // According to constructor `targetBranchName`, `type` and `targetBranchRefId` will be set to first non-null change
-    // So lets hope it is not very destructive move to set latestCommit from first change.
-    for (BitBucketPPRServerChange change : payload.getServerChanges()) {
-      if (change.getRefId() != null) {
-        return change.getToHash();
-      }
-    }
-    return null;
-  }
-
-  @Override
-  public List<String> getCommitLinks() {
-    // returns:
-    // /rest/build-status/1.0/commits/{commitId}
-
-    String baseUrl = getBaseUrl();
-
-    List<BitBucketPPRServerChange> changes = payload.getServerChanges();
-    List<String> links = new ArrayList<>();
-    for (BitBucketPPRServerChange change : changes) {
-      links.add(baseUrl + "/rest/build-status/1.0/commits/" + change.getToHash());
+    @Override
+    public String getTargetBranchRefId() {
+        return targetBranchRefId;
     }
 
-    return links;
-  }
+    @Override
+    public BitBucketPPRPayload getPayload() {
+        return payload;
+    }
 
-  private String getBaseUrl() {
-    return baseUrl.getProtocol() + "://" + baseUrl.getHost() + ":" + baseUrl.getPort();
-  }
+    @Override
+    public String getScm() {
+        return payload.getServerRepository().getScmId();
+    }
+
+    @Override
+    public String getUser() {
+        return payload.getServerActor().getName();
+    }
+
+    @Override
+    public String getType() {
+        return type;
+    }
+
+    @Override
+    public String getRepositoryName() {
+        return payload.getServerRepository().getName();
+    }
+
+    @Override
+    public List<String> getScmUrls() {
+        return scmUrls;
+    }
+
+    @Override
+    public String getPullRequestId() {
+        return null;
+    }
+
+    @Override
+    public String getRepositoryId() {
+        return payload.getServerRepository().getId();
+    }
+
+    @Override
+    public String getRepositoryUrl() {
+        return payload.getServerRepository().getLinks().getSelfProperty().get(0).getHref();
+    }
+
+    @Override
+    public String getProjectUrl() {
+        return payload.getServerRepository().getProject().getLinks().getSelfProperty().get(0).getHref();
+    }
+
+    @Override
+    public String toString() {
+        return "BitBucketPPRServerRepositoryAction";
+    }
+
+    @Override
+    public String getLatestCommit() {
+        // According to constructor `targetBranchName`, `type` and `targetBranchRefId` will be set to first non-null change
+        // So lets hope it is not very destructive move to set latestCommit from first change.
+        for (BitBucketPPRServerChange change : payload.getServerChanges()) {
+            if (change.getRefId() != null) {
+                return change.getToHash();
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public List<String> getCommitLinks() {
+        // returns:
+        // /rest/build-status/1.0/commits/{commitId}
+
+        String baseUrl = getBaseUrl();
+
+        List<BitBucketPPRServerChange> changes = payload.getServerChanges();
+        List<String> links = new ArrayList<>();
+        for (BitBucketPPRServerChange change : changes) {
+            links.add(baseUrl + "/rest/build-status/1.0/commits/" + change.getToHash());
+        }
+
+        return links;
+    }
+
+    private String getBaseUrl() {
+        return baseUrl.getProtocol() + "://" + baseUrl.getHost() + ":" + baseUrl.getPort();
+    }
 }
