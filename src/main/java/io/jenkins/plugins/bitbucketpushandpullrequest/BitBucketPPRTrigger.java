@@ -107,10 +107,10 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
     }
 
     @DataBoundSetter
-    public void setPropagationUrl(String propgationUrl) {
+    public void setPropagationUrl(String propagationUrl) {
 
-        if (propgationUrl != null && !propgationUrl.isEmpty()) {
-            this.propagationUrl = propgationUrl;
+        if (propagationUrl != null && !propagationUrl.isEmpty()) {
+            this.propagationUrl = propagationUrl;
         } else {
             this.propagationUrl = "";
         }
@@ -185,22 +185,20 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
 
     private void checkLocalPropagationUrl(BitBucketPPRAction bitBucketPPRAction) {
 
-
-        if (bitBucketPPRAction instanceof BitBucketPPRServerRepositoryAction) {
-            if (propagationUrl != null && !propagationUrl.isEmpty()) {
-                // cast
-                BitBucketPPRServerRepositoryAction bitBucketPPRServerRepositoryAction = (BitBucketPPRServerRepositoryAction) bitBucketPPRAction;
-                bitBucketPPRServerRepositoryAction.setBaseUrl(propagationUrl);
-            }
-
+        if (bitBucketPPRAction == null) {
+            return;
+        }
+        if (bitBucketPPRAction instanceof BitBucketPPRServerRepositoryAction && propagationUrl != null && !propagationUrl.isEmpty()) {
+            // cast
+            BitBucketPPRServerRepositoryAction bitBucketPPRServerRepositoryAction = (BitBucketPPRServerRepositoryAction) bitBucketPPRAction;
+            bitBucketPPRServerRepositoryAction.setBaseUrl(propagationUrl);
         }
 
-        if (bitBucketPPRAction instanceof BitBucketPPRPullRequestServerAction) {
-            if (propagationUrl != null && !propagationUrl.isEmpty()) {
-                // cast
-                BitBucketPPRPullRequestServerAction bitBucketPPRPullRequestServerAction = (BitBucketPPRPullRequestServerAction) bitBucketPPRAction;
-                bitBucketPPRPullRequestServerAction.setBaseUrl(propagationUrl);
-            }
+
+        if (bitBucketPPRAction instanceof BitBucketPPRPullRequestServerAction && propagationUrl != null && !propagationUrl.isEmpty()) {
+            // cast
+            BitBucketPPRPullRequestServerAction bitBucketPPRPullRequestServerAction = (BitBucketPPRPullRequestServerAction) bitBucketPPRAction;
+            bitBucketPPRPullRequestServerAction.setBaseUrl(propagationUrl);
         }
 
 
