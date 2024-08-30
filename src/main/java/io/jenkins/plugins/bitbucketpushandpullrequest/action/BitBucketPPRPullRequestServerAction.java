@@ -220,4 +220,13 @@ public class BitBucketPPRPullRequestServerAction extends InvisibleAction impleme
         return "BitBucketPPRPullRequestServerAction";
     }
 
+    public String setBaseUrl(String url) {
+        try {
+            this.baseUrl = new URL(url);
+        } catch (MalformedURLException e) {
+            throw new RuntimeException(e);
+        }
+        return url;
+    }
+
 }

@@ -184,4 +184,13 @@ public class BitBucketPPRServerRepositoryAction extends InvisibleAction implemen
     private String getBaseUrl() {
         return baseUrl.getProtocol() + "://" + baseUrl.getHost() + ":" + baseUrl.getPort();
     }
+
+    public String setBaseUrl(String url) {
+        try {
+            this.baseUrl = new URL(url);
+        } catch (MalformedURLException e) {
+            throw new RuntimeException(e);
+        }
+        return url;
+    }
 }

@@ -9,4 +9,7 @@
     <f:entry title="${%Credentials}" field="credentialsId">
       <f:select/>
     </f:entry>
+    <f:entry title="Propagation URL" field="propagationUrlTitle">
+        <f:textbox field="propagationUrl"/>
+    </f:entry>
 </j:jelly>

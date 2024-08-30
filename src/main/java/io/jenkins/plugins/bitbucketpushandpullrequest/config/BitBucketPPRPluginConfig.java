@@ -54,7 +54,7 @@ public class BitBucketPPRPluginConfig extends GlobalConfiguration {
 
     @DataBoundSetter
     public void setHookUrl(String hookUrl) {
-        if (isEmpty(hookUrl)) {
+        if (hookUrl == null || isEmpty(hookUrl)) {
             this.hookUrl = "";
         } else {
             this.hookUrl = hookUrl;
@@ -67,7 +67,7 @@ public class BitBucketPPRPluginConfig extends GlobalConfiguration {
         if (isEmpty(propagationUrl)) {
             this.propagationUrl = "";
         } else {
-            this.propagationUrl = hookUrl;
+            this.propagationUrl = propagationUrl;
         }
         save();
     }
