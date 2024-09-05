@@ -42,6 +42,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
 import static org.junit.Assert.assertEquals;
@@ -76,7 +77,8 @@ public class BitBucketPPRPullRequestServerPayloadProcessorTest {
         Mockito.mockStatic(BitBucketPPRPluginConfig.class)) {
       BitBucketPPRPluginConfig c = mock(BitBucketPPRPluginConfig.class);
       config.when(BitBucketPPRPluginConfig::getInstance).thenReturn(c);
-      when(c.getPropagationUrl()).thenReturn("");
+      when(c.getPropagationUrl())
+          .thenReturn(new URL("https://example.org/scm/some-namespace/some-repo.git"));
 
       BitBucketPPRJobProbe probe = mock(BitBucketPPRJobProbe.class);
 

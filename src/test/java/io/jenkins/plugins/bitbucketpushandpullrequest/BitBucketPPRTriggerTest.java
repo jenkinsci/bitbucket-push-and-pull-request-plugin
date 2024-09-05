@@ -15,6 +15,7 @@ import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,34 +27,43 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 public class BitBucketPPRTriggerTest {
 
-    @Test
-    public void testTriggerUrlOverridesBaseUrl() {
-        try (MockedStatic<BitBucketPPRPluginConfig> config = Mockito.mockStatic(
-                BitBucketPPRPluginConfig.class)) {
-            BitBucketPPRPluginConfig c = mock(BitBucketPPRPluginConfig.class);
-            config.when(BitBucketPPRPluginConfig::getInstance).thenReturn(c);
-            when(c.getPropagationUrl()).thenReturn("https://example.org/scm/some-namespace/some-repo.git");
+  @Test
+  public void testTriggerUrlOverridesBaseUrl() {
+    try (MockedStatic<BitBucketPPRPluginConfig> config =
+        Mockito.mockStatic(BitBucketPPRPluginConfig.class)) {
+      BitBucketPPRPluginConfig c = mock(BitBucketPPRPluginConfig.class);
+      config.when(BitBucketPPRPluginConfig::getInstance).thenReturn(c);
+      when(c.getPropagationUrl())
+          .thenReturn(new URL("https://example.org/scm/some-namespace/some-repo.git"));
 
-            BitBucketPPRPayload payloadMock = mock(BitBucketPPRPayload.class, RETURNS_DEEP_STUBS);
-            List<BitBucketPPRServerClone> clones = new ArrayList<>();
-            BitBucketPPRServerClone mockServerClone = mock(BitBucketPPRServerClone.class);
-            when(mockServerClone.getName()).thenReturn("ssh");
-            when(mockServerClone.getHref()).thenReturn("ssh://git@example.org/some-namespace/some-repo.git");
-            clones.add(mockServerClone);
-            when(payloadMock.getServerRepository().getLinks().getCloneProperty()).thenReturn(clones);
-            BitBucketPPRPullRequestServerAction bitBucketPPRServerRepositoryAction = new BitBucketPPRPullRequestServerAction(payloadMock);
-            BitBucketPPRTriggerFilter bitBucketPPRTriggerFilter = mock(BitBucketPPRTriggerFilter.class);
-            BitBucketPPRTrigger bitBucketPPRTrigger = new BitBucketPPRTrigger(List.of(bitBucketPPRTriggerFilter));
-            bitBucketPPRTrigger.setPropagationUrl("https://example2.org/scm/some-namespace/some-repo2.git");
-            BitBucketPPRHookEvent bitBucketHookEvent = mock(BitBucketPPRHookEvent.class);
+      BitBucketPPRPayload payloadMock = mock(BitBucketPPRPayload.class, RETURNS_DEEP_STUBS);
+      List<BitBucketPPRServerClone> clones = new ArrayList<>();
+      BitBucketPPRServerClone mockServerClone = mock(BitBucketPPRServerClone.class);
+      when(mockServerClone.getName()).thenReturn("ssh");
+      when(mockServerClone.getHref())
+          .thenReturn("ssh://git@example.org/some-namespace/some-repo.git");
+      clones.add(mockServerClone);
+      when(payloadMock.getServerRepository().getLinks().getCloneProperty()).thenReturn(clones);
+      BitBucketPPRPullRequestServerAction bitBucketPPRServerRepositoryAction =
+          new BitBucketPPRPullRequestServerAction(payloadMock);
+      BitBucketPPRTriggerFilter bitBucketPPRTriggerFilter = mock(BitBucketPPRTriggerFilter.class);
+      BitBucketPPRTrigger bitBucketPPRTrigger =
+          new BitBucketPPRTrigger(List.of(bitBucketPPRTriggerFilter));
+      bitBucketPPRTrigger.setPropagationUrl(
+          "https://example2.org/scm/some-namespace/some-repo2.git");
+      BitBucketPPRHookEvent bitBucketHookEvent = mock(BitBucketPPRHookEvent.class);
 
-            SCM scmTrigger = mock(SCM.class);
-            BitBucketPPRObservable observable = mock(BitBucketPPRObservable.class);
-            bitBucketPPRTrigger.onPost(bitBucketHookEvent, bitBucketPPRServerRepositoryAction, scmTrigger, observable);
-            assertEquals("https://example2.org:-1", bitBucketPPRServerRepositoryAction.getCommitLink().split("/rest/build-status/1.0/commits/")[0]);
+      SCM scmTrigger = mock(SCM.class);
+      BitBucketPPRObservable observable = mock(BitBucketPPRObservable.class);
+      bitBucketPPRTrigger.onPost(
+          bitBucketHookEvent, bitBucketPPRServerRepositoryAction, scmTrigger, observable);
+      assertEquals(
+          "https://example2.org:-1",
+          bitBucketPPRServerRepositoryAction.getCommitLink()
+              .split("/rest/build-status/1.0/commits/")[0]);
 
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+    } catch (Exception e) {
+      throw new RuntimeException(e);
     }
+  }
 }

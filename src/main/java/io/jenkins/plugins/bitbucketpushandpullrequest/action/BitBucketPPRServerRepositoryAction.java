@@ -68,12 +68,8 @@ public class BitBucketPPRServerRepositoryAction extends InvisibleAction
       }
     }
 
-    if (!globalConfig.getPropagationUrl().isEmpty()) {
-      try {
-        this.baseUrl = new URL(globalConfig.getPropagationUrl());
-      } catch (MalformedURLException e) {
-        throw new RuntimeException(e);
-      }
+    if (globalConfig.getPropagationUrl() != null) {
+      this.baseUrl = globalConfig.getPropagationUrl();
     }
 
     for (BitBucketPPRServerChange change : payload.getServerChanges()) {
