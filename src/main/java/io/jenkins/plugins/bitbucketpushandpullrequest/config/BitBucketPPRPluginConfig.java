@@ -18,7 +18,6 @@ import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
 
 import javax.annotation.CheckForNull;
-import java.net.URL;
 import java.util.Collections;
 import java.util.logging.Logger;
 
@@ -40,7 +39,7 @@ public class BitBucketPPRPluginConfig extends GlobalConfiguration {
 
   public String singleJob;
 
-  public URL propagationUrl;
+  public String propagationUrl;
 
   public BitBucketPPRPluginConfig() {
     logger.fine("Read bitbucket push and pull request plugin global configuration.");
@@ -64,13 +63,11 @@ public class BitBucketPPRPluginConfig extends GlobalConfiguration {
 
   @DataBoundSetter
   public void setPropagationUrl(String propagationUrl) {
-
-    try {
-      this.propagationUrl = new URL(propagationUrl);
-    } catch (Exception e) {
-      throw new RuntimeException("Invalid URL: " + propagationUrl);
+    if (isEmpty(propagationUrl)) {
+      this.propagationUrl = "";
+    } else {
+      this.propagationUrl = propagationUrl;
     }
-
     save();
   }
 
@@ -86,7 +83,7 @@ public class BitBucketPPRPluginConfig extends GlobalConfiguration {
     return notifyBitBucket;
   }
 
-  public URL getPropagationUrl() {
+  public String getPropagationUrl() {
     return propagationUrl;
   }
 

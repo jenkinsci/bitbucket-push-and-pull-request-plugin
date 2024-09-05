@@ -87,8 +87,12 @@ public class BitBucketPPRPullRequestServerAction extends InvisibleAction
       }
     }
 
-    if (globalConfig.getPropagationUrl() != null) {
-      this.baseUrl = globalConfig.getPropagationUrl();
+    if (!globalConfig.getPropagationUrl().isEmpty()) {
+      try {
+        this.baseUrl = new URL(globalConfig.getPropagationUrl());
+      } catch (MalformedURLException e) {
+        throw new RuntimeException(e);
+      }
     }
 
     logger.fine("BitBucketPPRPullRequestServerAction was called.");
