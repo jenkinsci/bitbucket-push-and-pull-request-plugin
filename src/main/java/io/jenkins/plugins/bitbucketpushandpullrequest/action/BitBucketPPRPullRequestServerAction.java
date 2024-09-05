@@ -36,197 +36,212 @@ import java.util.logging.Logger;
 
 import static java.util.Objects.isNull;
 
-public class BitBucketPPRPullRequestServerAction extends InvisibleAction implements
-        BitBucketPPRAction {
+public class BitBucketPPRPullRequestServerAction extends InvisibleAction
+    implements BitBucketPPRAction {
 
-    private static final Logger logger = Logger.getLogger(
-            BitBucketPPRPullRequestServerAction.class.getName());
+  private static final Logger logger =
+      Logger.getLogger(BitBucketPPRPullRequestServerAction.class.getName());
 
-    private final @Nonnull BitBucketPPRPayload payload;
-    private URL baseUrl;
-    private List<String> scmUrls = new ArrayList<>(2);
-    private String repositoryUuid;
-    private static final BitBucketPPRPluginConfig globalConfig =
-            BitBucketPPRPluginConfig.getInstance();
+  private final @Nonnull BitBucketPPRPayload payload;
+  private URL baseUrl;
+  private List<String> scmUrls = new ArrayList<>(2);
+  private String repositoryUuid;
+  private static final BitBucketPPRPluginConfig globalConfig =
+      BitBucketPPRPluginConfig.getInstance();
 
-    public BitBucketPPRPullRequestServerAction(@Nonnull BitBucketPPRPayload payload)
-            throws BitBucketPPRPayloadPropertyNotFoundException {
-        this.payload = payload;
+  public BitBucketPPRPullRequestServerAction(@Nonnull BitBucketPPRPayload payload)
+      throws BitBucketPPRPayloadPropertyNotFoundException {
+    this.payload = payload;
 
-        if (isNull(payload.getServerPullRequest().getToRef()) || isNull(payload
-                .getServerPullRequest().getToRef().getRepository()) || isNull(payload
-                .getServerPullRequest().getToRef().getRepository().getLinks()) || isNull(payload
-                .getServerPullRequest().getToRef().getRepository().getLinks().getCloneProperty())) {
-            throw new BitBucketPPRPayloadPropertyNotFoundException(
-                    "A property (toRef -> repository -> links -> clone ) was not found in the JSON payload.");
-        }
-
-        List<BitBucketPPRServerClone> clones = payload.getServerPullRequest().getToRef()
-                .getRepository().getLinks()
-                .getCloneProperty();
-
-        if (clones.isEmpty()) throw new BitBucketPPRPayloadPropertyNotFoundException(
-                "Number of clone urls in JSON payload is zero.");
-
-        for (BitBucketPPRServerClone clone : clones) {
-            if (clone.getName().equalsIgnoreCase("http") || clone.getName().equalsIgnoreCase("https")) {
-                try {
-                    this.baseUrl = new URL(clone.getHref());
-                    this.scmUrls.add(clone.getHref());
-                } catch (MalformedURLException e) {
-                    throw new RuntimeException(e);
-                }
-            } else if (clone.getName().equalsIgnoreCase("ssh")) {
-                this.scmUrls.add(clone.getHref());
-            }
-        }
-
-        if (!globalConfig.getPropagationUrl().isEmpty()) {
-            try {
-                this.baseUrl = new URL(globalConfig.getPropagationUrl());
-            } catch (MalformedURLException e) {
-                throw new RuntimeException(e);
-            }
-        }
-
-        logger.fine("BitBucketPPRPullRequestServerAction was called.");
+    if (isNull(payload.getServerPullRequest().getToRef())
+        || isNull(payload.getServerPullRequest().getToRef().getRepository())
+        || isNull(payload.getServerPullRequest().getToRef().getRepository().getLinks())
+        || isNull(
+            payload
+                .getServerPullRequest()
+                .getToRef()
+                .getRepository()
+                .getLinks()
+                .getCloneProperty())) {
+      throw new BitBucketPPRPayloadPropertyNotFoundException(
+          "A property (toRef -> repository -> links -> clone ) was not found in the JSON payload.");
     }
 
-    @Override
-    public String getSourceBranch() {
-        return payload.getServerPullRequest().getFromRef().getDisplayId();
-    }
+    List<BitBucketPPRServerClone> clones =
+        payload.getServerPullRequest().getToRef().getRepository().getLinks().getCloneProperty();
 
-    @Override
-    public String getLatestCommitFromRef() {
-        return payload.getServerPullRequest().getFromRef().getLatestCommit();
-    }
+    if (clones.isEmpty())
+      throw new BitBucketPPRPayloadPropertyNotFoundException(
+          "Number of clone urls in JSON payload is zero.");
 
-    @Override
-    public String getLatestCommitToRef() {
-        return payload.getServerPullRequest().getToRef().getLatestCommit();
-    }
-
-    @Override
-    public String getTargetBranch() {
-        return payload.getServerPullRequest().getToRef().getDisplayId();
-    }
-
-    @Override
-    public String getTargetBranchRefId() {
-        return payload.getServerPullRequest().getToRef().getId();
-    }
-
-    @Override
-    public String getPullRequestApiUrl() {
-        return baseUrl.toString();
-    }
-
-    @Override
-    public String getScm() {
-        return payload.getServerPullRequest().getFromRef().getRepository().getScmId();
-    }
-
-    @Override
-    public String getUser() {
-        return payload.getServerActor().getName();
-    }
-
-    @Override
-    public String getTitle() {
-        return payload.getServerPullRequest().getTitle();
-    }
-
-    @Override
-    public BitBucketPPRPayload getPayload() {
-        return payload;
-    }
-
-    @Override
-    public String getRepositoryName() {
-        return payload.getServerRepository().getName();
-    }
-
-    @Override
-    public String getServerComment() {
-        if (payload.getServerComment() == null) {
-            return "";
-        }
-        return payload.getServerComment().getText();
-    }
-
-    @Override
-    public List<String> getScmUrls() {
-        return scmUrls;
-    }
-
-    @Override
-    public String getPullRequestId() {
-        return Long.toString(payload.getServerPullRequest().getId());
-    }
-
-    @Override
-    public String getRepositoryId() {
-        return repositoryUuid;
-    }
-
-    @Override
-    public String getLinkApprove() {
-        String projectKey = payload.getServerPullRequest().getFromRef().getRepository().getProject()
-                .getKey();
-        String repoSlug = payload.getServerPullRequest().getFromRef().getRepository().getSlug();
-        Long pullrequestId = payload.getServerPullRequest().getId();
-
-        return getBaseUrl() + "/rest/api/1.0/projects/" + projectKey.trim() + "/repos/"
-                + repoSlug.trim() + "/pull-requests/"
-                + Long.toString(pullrequestId).trim() + "/approve";
-    }
-
-    @Override
-    public String getLinkDecline() {
-        // returns:
-        // {baseUrl}/rest/api/1.0/projects/{projectKey}/repos/{repositorySlug}/pull-requests/{pullRequestId}/approve
-
-        String projectKey = payload.getServerPullRequest().getFromRef().getRepository().getProject()
-                .getKey();
-        String repoSlug = payload.getServerPullRequest().getFromRef().getRepository().getSlug();
-        Long pullrequestId = payload.getServerPullRequest().getId();
-
-        return getBaseUrl() + "/rest/api/1.0/projects/" + projectKey.trim() + "/repos/"
-                + repoSlug.trim() + "/pull-requests/"
-                + Long.toString(pullrequestId).trim() + "/decline";
-    }
-
-    @Override
-    public String getLatestCommit() {
-        return payload.getServerPullRequest().getFromRef().getLatestCommit();
-    }
-
-    @Override
-    public String getCommitLink() {
-        // returns:
-        // /rest/build-status/1.0/commits/{commitId}
-        String commitId = payload.getServerPullRequest().getFromRef().getLatestCommit();
-
-        return getBaseUrl() + "/rest/build-status/1.0/commits/" + commitId;
-    }
-
-    private String getBaseUrl() {
-        return baseUrl.getProtocol() + "://" + baseUrl.getHost() + ":" + baseUrl.getPort();
-    }
-
-    @Override
-    public String toString() {
-        return "BitBucketPPRPullRequestServerAction";
-    }
-
-    public String setBaseUrl(String url) {
+    for (BitBucketPPRServerClone clone : clones) {
+      if (clone.getName().equalsIgnoreCase("http") || clone.getName().equalsIgnoreCase("https")) {
         try {
-            this.baseUrl = new URL(url);
+          this.baseUrl = new URL(clone.getHref());
+          this.scmUrls.add(clone.getHref());
         } catch (MalformedURLException e) {
-            throw new RuntimeException(e);
+          throw new RuntimeException(e);
         }
-        return url;
+      } else if (clone.getName().equalsIgnoreCase("ssh")) {
+        this.scmUrls.add(clone.getHref());
+      }
     }
 
+    if (!globalConfig.getPropagationUrl().isEmpty()) {
+      try {
+        this.baseUrl = new URL(globalConfig.getPropagationUrl());
+      } catch (MalformedURLException e) {
+        throw new RuntimeException(e);
+      }
+    }
+
+    logger.fine("BitBucketPPRPullRequestServerAction was called.");
+  }
+
+  @Override
+  public String getSourceBranch() {
+    return payload.getServerPullRequest().getFromRef().getDisplayId();
+  }
+
+  @Override
+  public String getLatestCommitFromRef() {
+    return payload.getServerPullRequest().getFromRef().getLatestCommit();
+  }
+
+  @Override
+  public String getLatestCommitToRef() {
+    return payload.getServerPullRequest().getToRef().getLatestCommit();
+  }
+
+  @Override
+  public String getTargetBranch() {
+    return payload.getServerPullRequest().getToRef().getDisplayId();
+  }
+
+  @Override
+  public String getTargetBranchRefId() {
+    return payload.getServerPullRequest().getToRef().getId();
+  }
+
+  @Override
+  public String getPullRequestApiUrl() {
+    return baseUrl.toString();
+  }
+
+  @Override
+  public String getScm() {
+    return payload.getServerPullRequest().getFromRef().getRepository().getScmId();
+  }
+
+  @Override
+  public String getUser() {
+    return payload.getServerActor().getName();
+  }
+
+  @Override
+  public String getTitle() {
+    return payload.getServerPullRequest().getTitle();
+  }
+
+  @Override
+  public BitBucketPPRPayload getPayload() {
+    return payload;
+  }
+
+  @Override
+  public String getRepositoryName() {
+    return payload.getServerRepository().getName();
+  }
+
+  @Override
+  public String getServerComment() {
+    if (payload.getServerComment() == null) {
+      return "";
+    }
+    return payload.getServerComment().getText();
+  }
+
+  @Override
+  public List<String> getScmUrls() {
+    return scmUrls;
+  }
+
+  @Override
+  public String getPullRequestId() {
+    return Long.toString(payload.getServerPullRequest().getId());
+  }
+
+  @Override
+  public String getRepositoryId() {
+    return repositoryUuid;
+  }
+
+  @Override
+  public String getLinkApprove() {
+    String projectKey =
+        payload.getServerPullRequest().getFromRef().getRepository().getProject().getKey();
+    String repoSlug = payload.getServerPullRequest().getFromRef().getRepository().getSlug();
+    Long pullrequestId = payload.getServerPullRequest().getId();
+
+    return getBaseUrl()
+        + "/rest/api/1.0/projects/"
+        + projectKey.trim()
+        + "/repos/"
+        + repoSlug.trim()
+        + "/pull-requests/"
+        + Long.toString(pullrequestId).trim()
+        + "/approve";
+  }
+
+  @Override
+  public String getLinkDecline() {
+    // returns:
+    // {baseUrl}/rest/api/1.0/projects/{projectKey}/repos/{repositorySlug}/pull-requests/{pullRequestId}/approve
+
+    String projectKey =
+        payload.getServerPullRequest().getFromRef().getRepository().getProject().getKey();
+    String repoSlug = payload.getServerPullRequest().getFromRef().getRepository().getSlug();
+    Long pullrequestId = payload.getServerPullRequest().getId();
+
+    return getBaseUrl()
+        + "/rest/api/1.0/projects/"
+        + projectKey.trim()
+        + "/repos/"
+        + repoSlug.trim()
+        + "/pull-requests/"
+        + Long.toString(pullrequestId).trim()
+        + "/decline";
+  }
+
+  @Override
+  public String getLatestCommit() {
+    return payload.getServerPullRequest().getFromRef().getLatestCommit();
+  }
+
+  @Override
+  public String getCommitLink() {
+    // returns:
+    // /rest/build-status/1.0/commits/{commitId}
+    String commitId = payload.getServerPullRequest().getFromRef().getLatestCommit();
+
+    return getBaseUrl() + "/rest/build-status/1.0/commits/" + commitId;
+  }
+
+  private String getBaseUrl() {
+    return baseUrl.getProtocol() + "://" + baseUrl.getHost() + ":" + baseUrl.getPort();
+  }
+
+  @Override
+  public String toString() {
+    return "BitBucketPPRPullRequestServerAction";
+  }
+
+  public String setBaseUrl(String url) {
+    try {
+      this.baseUrl = new URL(url);
+    } catch (MalformedURLException e) {
+      throw new RuntimeException(e);
+    }
+    return url;
+  }
 }

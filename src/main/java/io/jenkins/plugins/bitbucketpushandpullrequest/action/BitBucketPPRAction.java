@@ -28,117 +28,116 @@ import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
 
 public interface BitBucketPPRAction extends Action {
 
-    public BitBucketPPRPayload getPayload();
+  public BitBucketPPRPayload getPayload();
 
-    public String getScm();
+  public String getScm();
 
-    public default String getLinkHtml() {
-        return null;
-    }
+  public default String getLinkHtml() {
+    return null;
+  }
 
-    public default String getLinkSelf() {
-        return null;
-    }
+  public default String getLinkSelf() {
+    return null;
+  }
 
-    public default String getLinkApprove() {
-        return null;
-    }
+  public default String getLinkApprove() {
+    return null;
+  }
 
-    public default String getLinkDecline() {
-        return null;
-    }
+  public default String getLinkDecline() {
+    return null;
+  }
 
-    public default String getLinkStatuses() {
-        return null;
-    }
+  public default String getLinkStatuses() {
+    return null;
+  }
 
-    public default String getUser() {
-        return null;
-    }
+  public default String getUser() {
+    return null;
+  }
 
-    public default String getSourceBranch() {
-        return null;
-    }
+  public default String getSourceBranch() {
+    return null;
+  }
 
-    public default String getTargetBranch() {
-        return null;
-    }
+  public default String getTargetBranch() {
+    return null;
+  }
 
-    public default String getTargetBranchRefId() {
-        return null;
-    }
+  public default String getTargetBranchRefId() {
+    return null;
+  }
 
-    public default String getType() {
-        return null;
-    }
+  public default String getType() {
+    return null;
+  }
 
-    public default String getRepositoryName() {
-        return null;
-    }
+  public default String getRepositoryName() {
+    return null;
+  }
 
-    // TODO: do we really neeed it?
-    public default List<String> getScmUrls() {
-        return null;
-    }
+  // TODO: do we really neeed it?
+  public default List<String> getScmUrls() {
+    return null;
+  }
 
-    public default String getPullRequestId() {
-        return null;
-    }
+  public default String getPullRequestId() {
+    return null;
+  }
 
-    public default String getRepositoryId() {
-        return null;
-    }
+  public default String getRepositoryId() {
+    return null;
+  }
 
-    public default String getRepositoryUrl() {
-        return null;
-    }
+  public default String getRepositoryUrl() {
+    return null;
+  }
 
-    public default String getProjectUrl() {
-        return null;
-    }
+  public default String getProjectUrl() {
+    return null;
+  }
 
-    public default String getPullRequestApiUrl() {
-        return null;
-    }
+  public default String getPullRequestApiUrl() {
+    return null;
+  }
 
-    public default String getPullRequestUrl() {
-        return null;
-    }
+  public default String getPullRequestUrl() {
+    return null;
+  }
 
-    public default String getTitle() {
-        return null;
-    }
+  public default String getTitle() {
+    return null;
+  }
 
-    public default String getDescription() {
-        return null;
-    }
+  public default String getDescription() {
+    return null;
+  }
 
-    public default String getComment() {
-        return null;
-    }
+  public default String getComment() {
+    return null;
+  }
 
-    public default String getServerComment() {
-        return null;
-    }
+  public default String getServerComment() {
+    return null;
+  }
 
-    public default String getLatestCommit() {
-        return null;
-    }
+  public default String getLatestCommit() {
+    return null;
+  }
 
-    public default String getCommitLink() {
-        return null;
-    }
+  public default String getCommitLink() {
+    return null;
+  }
 
-    public default List<String> getCommitLinks() {
-        return null;
-    }
+  public default List<String> getCommitLinks() {
+    return null;
+  }
 
-    public default String getLatestCommitFromRef() {
-        return null;
-    }
+  public default String getLatestCommitFromRef() {
+    return null;
+  }
 
-    public default String getLatestCommitToRef() {
-        return null;
-    }
-
+  public default String getLatestCommitToRef() {
+    return null;
+  }
 }

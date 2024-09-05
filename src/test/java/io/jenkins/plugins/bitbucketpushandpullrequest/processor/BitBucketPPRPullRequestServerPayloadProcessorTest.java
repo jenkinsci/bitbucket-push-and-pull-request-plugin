@@ -47,102 +47,100 @@ import java.nio.charset.StandardCharsets;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
 
-
 @RunWith(MockitoJUnitRunner.class)
 public class BitBucketPPRPullRequestServerPayloadProcessorTest {
 
-    @Captor
-    private ArgumentCaptor<BitBucketPPRHookEvent> eventCaptor;
+  @Captor private ArgumentCaptor<BitBucketPPRHookEvent> eventCaptor;
 
-    @Captor
-    private ArgumentCaptor<BitBucketPPRAction> actionCaptor;
+  @Captor private ArgumentCaptor<BitBucketPPRAction> actionCaptor;
 
-    @Captor
-    private ArgumentCaptor<BitBucketPPRObservable> observableCaptor;
+  @Captor private ArgumentCaptor<BitBucketPPRObservable> observableCaptor;
 
-    BitBucketPPRPullRequestServerPayloadProcessor pullRequestPayloadProcessor;
+  BitBucketPPRPullRequestServerPayloadProcessor pullRequestPayloadProcessor;
 
+  @Test
+  public void testProcessPayload() throws Exception {
+    JsonReader reader = null;
 
-    @Test
-    public void testProcessPayload() throws Exception {
-        JsonReader reader = null;
+    try {
+      ClassLoader classloader = Thread.currentThread().getContextClassLoader();
+      InputStream is = classloader.getResourceAsStream("./server/pr_opened.json");
+      assert is != null;
+      InputStreamReader isr = new InputStreamReader(is, StandardCharsets.UTF_8);
+      reader = new JsonReader(isr);
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
 
-        try {
-            ClassLoader classloader = Thread.currentThread().getContextClassLoader();
-            InputStream is = classloader.getResourceAsStream("./server/pr_opened.json");
-            assert is != null;
-            InputStreamReader isr = new InputStreamReader(is, StandardCharsets.UTF_8);
-            reader = new JsonReader(isr);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    try (MockedStatic<BitBucketPPRPluginConfig> config =
+        Mockito.mockStatic(BitBucketPPRPluginConfig.class)) {
+      BitBucketPPRPluginConfig c = mock(BitBucketPPRPluginConfig.class);
+      config.when(BitBucketPPRPluginConfig::getInstance).thenReturn(c);
+      when(c.getPropagationUrl()).thenReturn("");
 
-        try (MockedStatic<BitBucketPPRPluginConfig> config = Mockito.mockStatic(
-                BitBucketPPRPluginConfig.class)) {
-            BitBucketPPRPluginConfig c = mock(BitBucketPPRPluginConfig.class);
-            config.when(BitBucketPPRPluginConfig::getInstance).thenReturn(c);
-            when(c.getPropagationUrl()).thenReturn("");
+      BitBucketPPRJobProbe probe = mock(BitBucketPPRJobProbe.class);
 
-            BitBucketPPRJobProbe probe = mock(BitBucketPPRJobProbe.class);
+      Gson gson = new Gson();
+      assert reader != null;
+      BitBucketPPRPayload payload = gson.fromJson(reader, BitBucketPPRServerPayload.class);
 
-            Gson gson = new Gson();
-            assert reader != null;
-            BitBucketPPRPayload payload = gson.fromJson(reader, BitBucketPPRServerPayload.class);
+      BitBucketPPRHookEvent bitbucketEvent = new BitBucketPPRHookEvent("pr:opened");
 
-            BitBucketPPRHookEvent bitbucketEvent = new BitBucketPPRHookEvent("pr:opened");
+      pullRequestPayloadProcessor =
+          new BitBucketPPRPullRequestServerPayloadProcessor(probe, bitbucketEvent);
 
-            pullRequestPayloadProcessor =
-                    new BitBucketPPRPullRequestServerPayloadProcessor(probe, bitbucketEvent);
+      BitBucketPPRObservable observable =
+          BitBucketPPRObserverFactory.createObservable(bitbucketEvent);
+      pullRequestPayloadProcessor.processPayload(payload, observable);
 
-            BitBucketPPRObservable observable =
-                    BitBucketPPRObserverFactory.createObservable(bitbucketEvent);
+      verify(probe)
+          .triggerMatchingJobs(
+              eventCaptor.capture(), actionCaptor.capture(), observableCaptor.capture());
+
+      assertEquals(bitbucketEvent, eventCaptor.getValue());
+      assertEquals(payload, actionCaptor.getValue().getPayload());
+      assertEquals(observable, observableCaptor.getValue());
+    }
+  }
+
+  @Test
+  public void testProcessPayloadException() throws Exception {
+    JsonReader reader = null;
+
+    try {
+      ClassLoader classloader = Thread.currentThread().getContextClassLoader();
+      InputStream is = classloader.getResourceAsStream("./server/pr_opened_no_clone_property.json");
+      assert is != null;
+      InputStreamReader isr = new InputStreamReader(is, StandardCharsets.UTF_8);
+      reader = new JsonReader(isr);
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+
+    try (MockedStatic<BitBucketPPRPluginConfig> config =
+        Mockito.mockStatic(BitBucketPPRPluginConfig.class)) {
+      BitBucketPPRPluginConfig c = mock(BitBucketPPRPluginConfig.class);
+      config.when(BitBucketPPRPluginConfig::getInstance).thenReturn(c);
+
+      BitBucketPPRJobProbe jobProbe = mock(BitBucketPPRJobProbe.class);
+
+      Gson gson = new Gson();
+      assert reader != null;
+      BitBucketPPRPayload payload = gson.fromJson(reader, BitBucketPPRServerPayload.class);
+
+      BitBucketPPRHookEvent bitbucketEvent = new BitBucketPPRHookEvent("pr:opened");
+
+      pullRequestPayloadProcessor =
+          new BitBucketPPRPullRequestServerPayloadProcessor(jobProbe, bitbucketEvent);
+
+      BitBucketPPRObservable observable =
+          BitBucketPPRObserverFactory.createObservable(bitbucketEvent);
+
+      Assertions.assertThrows(
+          Exception.class,
+          () -> {
             pullRequestPayloadProcessor.processPayload(payload, observable);
-
-            verify(probe).triggerMatchingJobs(eventCaptor.capture(), actionCaptor.capture(),
-                    observableCaptor.capture());
-
-            assertEquals(bitbucketEvent, eventCaptor.getValue());
-            assertEquals(payload, actionCaptor.getValue().getPayload());
-            assertEquals(observable, observableCaptor.getValue());
-        }
+          });
     }
-
-    @Test
-    public void testProcessPayloadException() throws Exception {
-        JsonReader reader = null;
-
-        try {
-            ClassLoader classloader = Thread.currentThread().getContextClassLoader();
-            InputStream is = classloader.getResourceAsStream("./server/pr_opened_no_clone_property.json");
-            assert is != null;
-            InputStreamReader isr = new InputStreamReader(is, StandardCharsets.UTF_8);
-            reader = new JsonReader(isr);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        try (MockedStatic<BitBucketPPRPluginConfig> config = Mockito.mockStatic(
-                BitBucketPPRPluginConfig.class)) {
-            BitBucketPPRPluginConfig c = mock(BitBucketPPRPluginConfig.class);
-            config.when(BitBucketPPRPluginConfig::getInstance).thenReturn(c);
-
-            BitBucketPPRJobProbe jobProbe = mock(BitBucketPPRJobProbe.class);
-
-            Gson gson = new Gson();
-            assert reader != null;
-            BitBucketPPRPayload payload = gson.fromJson(reader, BitBucketPPRServerPayload.class);
-
-            BitBucketPPRHookEvent bitbucketEvent = new BitBucketPPRHookEvent("pr:opened");
-
-            pullRequestPayloadProcessor =
-                    new BitBucketPPRPullRequestServerPayloadProcessor(jobProbe, bitbucketEvent);
-
-            BitBucketPPRObservable observable =
-                    BitBucketPPRObserverFactory.createObservable(bitbucketEvent);
-
-            Assertions.assertThrows(Exception.class, () -> {
-                pullRequestPayloadProcessor.processPayload(payload, observable);
-            });
-        }
-    }
+  }
 }
