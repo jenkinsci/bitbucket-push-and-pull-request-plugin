@@ -8,6 +8,7 @@ import hudson.Extension;
 import hudson.ExtensionList;
 import hudson.model.Item;
 import hudson.security.ACL;
+import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
 import jenkins.model.GlobalConfiguration;
 import jenkins.model.Jenkins;
@@ -18,6 +19,8 @@ import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
 
 import javax.annotation.CheckForNull;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Collections;
 import java.util.logging.Logger;
 
@@ -63,12 +66,23 @@ public class BitBucketPPRPluginConfig extends GlobalConfiguration {
 
   @DataBoundSetter
   public void setPropagationUrl(String propagationUrl) {
-    if (isEmpty(propagationUrl)) {
-      this.propagationUrl = "";
-    } else {
-      this.propagationUrl = propagationUrl;
-    }
+
+    this.propagationUrl = propagationUrl;
+
     save();
+  }
+
+  public FormValidation doCheckPropagationUrl(@QueryParameter String value) {
+    if (value == null || value.isEmpty()) {
+      return FormValidation.ok();
+    }
+
+    try {
+      new URL(value); // This will throw MalformedURLException if the URL is not valid
+      return FormValidation.ok();
+    } catch (MalformedURLException e) {
+      return FormValidation.error("This is not a valid URL. Please enter a correct URL.");
+    }
   }
 
   public boolean isHookUrlSet() {
