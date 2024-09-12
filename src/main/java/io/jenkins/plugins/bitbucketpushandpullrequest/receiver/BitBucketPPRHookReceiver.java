@@ -1,17 +1,17 @@
 /*******************************************************************************
  * The MIT License
- * 
+ *
  * Copyright (C) 2022, CloudBees, Inc.
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
  * including without limitation the rights to use, copy, modify, merge, publish, distribute,
  * sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in all copies or
  * substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT
  * NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
@@ -58,9 +58,8 @@ import io.jenkins.plugins.bitbucketpushandpullrequest.processor.BitBucketPPRPayl
 
 /**
  * BitbucketHookReceiver processes HTTP POST requests sent to $JENKINS_URL/bitbucket-hook/
- * 
+ *
  * @author cdelmonte
- * 
  */
 @Extension
 public class BitBucketPPRHookReceiver extends CrumbExclusion implements UnprotectedRootAction {
@@ -70,34 +69,40 @@ public class BitBucketPPRHookReceiver extends CrumbExclusion implements Unprotec
 
   public void doIndex(@Nonnull StaplerRequest request, @Nonnull StaplerResponse response)
       throws IOException {
+    // log request URL
+    logger.log(Level.INFO, "Request URL: {0}", request.getRequestURI());
+    logger.log(Level.INFO, "Internal URL: {0}", getUrlName());
     if (request.getRequestURI().toLowerCase().contains("/" + getUrlName() + "/")
         && request.getMethod().equalsIgnoreCase("POST")) {
       logger.log(Level.INFO, "Received POST request over Bitbucket hook");
       System.out.println(">>> Received POST request over Bitbucket hook");
 
-      try { 
-        BitBucketPPRHookEvent bitbucketEvent = getBitbucketEvent(request);    
+      try {
+        BitBucketPPRHookEvent bitbucketEvent = getBitbucketEvent(request);
         BitBucketPPRPayload payload = getPayload(getInputStream(request), bitbucketEvent);
-        BitBucketPPRObservable observable = BitBucketPPRObserverFactory.createObservable(bitbucketEvent);
-        
+        BitBucketPPRObservable observable =
+            BitBucketPPRObserverFactory.createObservable(bitbucketEvent);
+
         writeSuccessResponse(response);
-        
-        BitBucketPPRPayloadProcessorFactory.createProcessor(bitbucketEvent).processPayload(payload, observable);
-      } catch (IOException | InputStreamException | JsonSyntaxException | OperationNotSupportedException e) {
+
+        BitBucketPPRPayloadProcessorFactory.createProcessor(bitbucketEvent)
+            .processPayload(payload, observable);
+      } catch (IOException
+          | InputStreamException
+          | JsonSyntaxException
+          | OperationNotSupportedException e) {
         System.out.println(">>> Exception: " + e.getMessage());
         writeFailResponse(response);
-      } catch (
-          BitBucketPPRPayloadPropertyNotFoundException e) {
+      } catch (BitBucketPPRPayloadPropertyNotFoundException e) {
         logger.info(
-            "Payload Property doesn't exists. It could be that the " +
-                "Bitbucket Client / Server version is not currently supported by the plugin. "
+            "Payload Property doesn't exists. It could be that the "
+                + "Bitbucket Client / Server version is not currently supported by the plugin. "
                 + e.getMessage());
       }
     }
   }
 
-  private void writeSuccessResponse(@Nonnull StaplerResponse response)
-      throws IOException {
+  private void writeSuccessResponse(@Nonnull StaplerResponse response) throws IOException {
     response.setContentType("text/html");
     response.setCharacterEncoding("UTF-8");
     response.setStatus(HttpServletResponse.SC_OK);
@@ -107,8 +112,7 @@ public class BitBucketPPRHookReceiver extends CrumbExclusion implements Unprotec
     out.close();
   }
 
-  private void writeFailResponse(@Nonnull StaplerResponse response)
-      throws IOException {
+  private void writeFailResponse(@Nonnull StaplerResponse response) throws IOException {
     response.setContentType("text/html");
     response.setCharacterEncoding("UTF-8");
     response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -128,20 +132,23 @@ public class BitBucketPPRHookReceiver extends CrumbExclusion implements Unprotec
     return decodeInputStream(inputStream, request.getContentType());
   }
 
-  BitBucketPPRPayload getPayload(@Nonnull final String inputStream,
-      @Nonnull BitBucketPPRHookEvent bitbucketEvent)
+  BitBucketPPRPayload getPayload(
+      @Nonnull final String inputStream, @Nonnull BitBucketPPRHookEvent bitbucketEvent)
       throws JsonSyntaxException, OperationNotSupportedException {
-    BitBucketPPRPayload pl = new Gson().fromJson(inputStream,
-        BitBucketPPRPayloadFactory.getInstance(bitbucketEvent).getClass());
+    BitBucketPPRPayload pl =
+        new Gson()
+            .fromJson(
+                inputStream, BitBucketPPRPayloadFactory.getInstance(bitbucketEvent).getClass());
     logger.log(Level.FINEST, "the payload is: {0}", pl);
     return pl;
   }
 
-  static String decodeInputStream(@Nonnull final String inputStream,
-      @Nonnull final String contentType) throws UnsupportedEncodingException {
+  static String decodeInputStream(
+      @Nonnull final String inputStream, @Nonnull final String contentType)
+      throws UnsupportedEncodingException {
     String input = inputStream;
-    if (StringUtils.startsWithIgnoreCase(contentType,
-        BitBucketPPRConst.APPLICATION_X_WWW_FORM_URLENCODED)) {
+    if (StringUtils.startsWithIgnoreCase(
+        contentType, BitBucketPPRConst.APPLICATION_X_WWW_FORM_URLENCODED)) {
       input = URLDecoder.decode(input, StandardCharsets.UTF_8);
     }
     if (StringUtils.startsWithIgnoreCase(input, BitBucketPPRConst.PAYLOAD_PFX)) {
@@ -155,7 +162,8 @@ public class BitBucketPPRHookReceiver extends CrumbExclusion implements Unprotec
     String xEventHeader = request.getHeader(BitBucketPPRConst.X_EVENT_KEY);
 
     // @todo: DEPRECATED_X_HEADER_REPO_POST deprecated. It will be removed in version 3.0.0
-    return StringUtils.isNotBlank(xEventHeader) ? new BitBucketPPRHookEvent(xEventHeader)
+    return StringUtils.isNotBlank(xEventHeader)
+        ? new BitBucketPPRHookEvent(xEventHeader)
         : new BitBucketPPRHookEvent(BitBucketPPRConst.DEPRECATED_X_HEADER_REPO_POST);
   }
 
@@ -175,8 +183,9 @@ public class BitBucketPPRHookReceiver extends CrumbExclusion implements Unprotec
   }
 
   @Override
-  public boolean process(HttpServletRequest request, HttpServletResponse response,
-      FilterChain chain) throws IOException, ServletException {
+  public boolean process(
+      HttpServletRequest request, HttpServletResponse response, FilterChain chain)
+      throws IOException, ServletException {
 
     String path = request.getPathInfo();
 

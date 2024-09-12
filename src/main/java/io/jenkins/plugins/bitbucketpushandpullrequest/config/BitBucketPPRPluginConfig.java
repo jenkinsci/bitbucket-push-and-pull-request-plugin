@@ -113,6 +113,7 @@ public class BitBucketPPRPluginConfig extends GlobalConfiguration {
   @DataBoundSetter
   public void setUseJobNameAsBuildKey(@CheckForNull boolean useJobNameAsBuildKey) {
     this.useJobNameAsBuildKey = useJobNameAsBuildKey;
+    save();
   }
 
   @DataBoundSetter
