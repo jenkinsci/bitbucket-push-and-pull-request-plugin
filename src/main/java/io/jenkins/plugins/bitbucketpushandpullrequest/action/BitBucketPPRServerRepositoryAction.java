@@ -35,7 +35,9 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class BitBucketPPRServerRepositoryAction extends InvisibleAction
+import static org.apache.commons.lang3.ObjectUtils.isEmpty;
+
+public class BitBucketPPRServerRepositoryAction extends BitBucketPPRActionAbstract
     implements BitBucketPPRAction {
   private static final Logger logger = Logger.getLogger(BitBucketPPRAction.class.getName());
   private static final BitBucketPPRPluginConfig globalConfig =
@@ -65,14 +67,6 @@ public class BitBucketPPRServerRepositoryAction extends InvisibleAction
         }
       } else if (clone.getName().equalsIgnoreCase("ssh")) {
         this.scmUrls.add(clone.getHref());
-      }
-    }
-
-    if (!globalConfig.getPropagationUrl().isEmpty()) {
-      try {
-        this.baseUrl = new URL(globalConfig.getPropagationUrl());
-      } catch (MalformedURLException e) {
-        throw new RuntimeException(e);
       }
     }
 
@@ -172,16 +166,17 @@ public class BitBucketPPRServerRepositoryAction extends InvisibleAction
   }
 
   @Override
-  public List<String> getCommitLinks() {
+  public List<String> getCommitLinks() throws MalformedURLException {
     // returns:
     // /rest/build-status/1.0/commits/{commitId}
 
-    String baseUrl = getBaseUrl();
+    URL baseCommitLink =
+        isEmpty(this.getPropagationUrl()) ? baseUrl : new URL(this.getPropagationUrl());
 
     List<BitBucketPPRServerChange> changes = payload.getServerChanges();
     List<String> links = new ArrayList<>();
     for (BitBucketPPRServerChange change : changes) {
-      links.add(baseUrl + "/rest/build-status/1.0/commits/" + change.getToHash());
+      links.add(baseCommitLink + "/rest/build-status/1.0/commits/" + change.getToHash());
     }
 
     return links;
@@ -189,14 +184,5 @@ public class BitBucketPPRServerRepositoryAction extends InvisibleAction
 
   private String getBaseUrl() {
     return baseUrl.getProtocol() + "://" + baseUrl.getHost() + ":" + baseUrl.getPort();
-  }
-
-  public String setBaseUrl(String url) {
-    try {
-      this.baseUrl = new URL(url);
-    } catch (MalformedURLException e) {
-      throw new RuntimeException(e);
-    }
-    return url;
   }
 }

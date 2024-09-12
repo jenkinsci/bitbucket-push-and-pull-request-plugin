@@ -48,7 +48,7 @@ public class BitBucketPPRPullRequestServerObserver extends BitBucketPPRHandlerTe
   }
 
   @Override
-  public void setApprovedOrDeclined() {
+  public void setApprovedOrDeclined() throws MalformedURLException {
     if (!(context.getFilter().shouldSendApprove() || context.getFilter().shouldSendDecline())) {
       return;
     }
@@ -77,7 +77,7 @@ public class BitBucketPPRPullRequestServerObserver extends BitBucketPPRHandlerTe
   }
 
   @Override
-  public void setBuildStatusOnFinished() {
+  public void setBuildStatusOnFinished() throws MalformedURLException {
     BitBucketPPRAction bitbucketAction = context.getAction();
     String url = bitbucketAction.getCommitLink();
     Result result = context.getRun().getResult();
@@ -92,7 +92,7 @@ public class BitBucketPPRPullRequestServerObserver extends BitBucketPPRHandlerTe
   }
 
   @Override
-  public void setBuildStatusInProgress() {
+  public void setBuildStatusInProgress() throws MalformedURLException {
     BitBucketPPRAction bitbucketAction = context.getAction();
     String url = bitbucketAction.getCommitLink();
 

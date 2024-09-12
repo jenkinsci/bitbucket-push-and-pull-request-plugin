@@ -21,6 +21,7 @@
 
 package io.jenkins.plugins.bitbucketpushandpullrequest.action;
 
+import java.net.MalformedURLException;
 import java.util.List;
 
 import hudson.model.Action;
@@ -40,11 +41,11 @@ public interface BitBucketPPRAction extends Action {
     return null;
   }
 
-  public default String getLinkApprove() {
+  public default String getLinkApprove() throws MalformedURLException {
     return null;
   }
 
-  public default String getLinkDecline() {
+  public default String getLinkDecline() throws MalformedURLException {
     return null;
   }
 
@@ -125,11 +126,11 @@ public interface BitBucketPPRAction extends Action {
     return null;
   }
 
-  public default String getCommitLink() {
+  public default String getCommitLink() throws MalformedURLException {
     return null;
   }
 
-  public default List<String> getCommitLinks() {
+  public default List<String> getCommitLinks() throws MalformedURLException {
     return null;
   }
 

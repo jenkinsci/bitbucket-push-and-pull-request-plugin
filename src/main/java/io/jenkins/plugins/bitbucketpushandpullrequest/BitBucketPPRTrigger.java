@@ -33,6 +33,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.logging.Logger;
 import javax.annotation.CheckForNull;
 
+import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRActionAbstract;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRPullRequestServerAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRServerRepositoryAction;
 import org.apache.commons.jelly.XMLOutput;
@@ -80,6 +81,8 @@ import io.jenkins.plugins.bitbucketpushandpullrequest.observer.BitBucketPPRObser
 import jenkins.model.Jenkins;
 import jenkins.model.ParameterizedJobMixIn;
 import jenkins.triggers.SCMTriggerItem;
+
+import static org.apache.commons.lang3.ObjectUtils.isEmpty;
 
 /**
  * @author cdelmonte
@@ -198,22 +201,11 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
     if (bitBucketPPRAction == null) {
       return;
     }
-    if (bitBucketPPRAction instanceof BitBucketPPRServerRepositoryAction
-        && propagationUrl != null
-        && !propagationUrl.isEmpty()) {
-      // cast
-      BitBucketPPRServerRepositoryAction bitBucketPPRServerRepositoryAction =
-          (BitBucketPPRServerRepositoryAction) bitBucketPPRAction;
-      bitBucketPPRServerRepositoryAction.setBaseUrl(propagationUrl);
-    }
-
-    if (bitBucketPPRAction instanceof BitBucketPPRPullRequestServerAction
-        && propagationUrl != null
-        && !propagationUrl.isEmpty()) {
-      // cast
-      BitBucketPPRPullRequestServerAction bitBucketPPRPullRequestServerAction =
-          (BitBucketPPRPullRequestServerAction) bitBucketPPRAction;
-      bitBucketPPRPullRequestServerAction.setBaseUrl(propagationUrl);
+    assert bitBucketPPRAction instanceof BitBucketPPRActionAbstract;
+    if (!isEmpty(propagationUrl)) {
+      BitBucketPPRActionAbstract bitBucketPPRActionAbstract =
+          (BitBucketPPRActionAbstract) bitBucketPPRAction;
+      bitBucketPPRActionAbstract.setPropagationUrl(propagationUrl);
     }
   }
 

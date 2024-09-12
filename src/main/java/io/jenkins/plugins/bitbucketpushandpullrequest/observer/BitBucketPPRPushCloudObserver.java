@@ -46,7 +46,7 @@ public class BitBucketPPRPushCloudObserver extends BitBucketPPRHandlerTemplate
   }
 
   @Override
-  public void setBuildStatusOnFinished() {
+  public void setBuildStatusOnFinished() throws MalformedURLException {
     BitBucketPPRAction bitbucketAction = context.getAction();
     Result result = context.getRun().getResult();
     String state =
@@ -61,7 +61,7 @@ public class BitBucketPPRPushCloudObserver extends BitBucketPPRHandlerTemplate
   }
 
   @Override
-  public void setBuildStatusInProgress() {
+  public void setBuildStatusInProgress() throws MalformedURLException {
     BitBucketPPRAction bitbucketAction = context.getAction();
 
     Map<String, String> map = new HashMap<>();

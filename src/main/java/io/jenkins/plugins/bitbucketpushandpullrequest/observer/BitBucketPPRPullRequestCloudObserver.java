@@ -92,7 +92,7 @@ public class BitBucketPPRPullRequestCloudObserver extends BitBucketPPRHandlerTem
   }
 
   @Override
-  public void setBuildStatusInProgress() {
+  public void setBuildStatusInProgress() throws MalformedURLException {
     BitBucketPPRAction bitbucketAction = context.getAction();
     String url = bitbucketAction.getCommitLink() + "/statuses/build";
 

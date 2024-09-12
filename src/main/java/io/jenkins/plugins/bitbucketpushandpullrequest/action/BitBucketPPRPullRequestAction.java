@@ -24,6 +24,8 @@ package io.jenkins.plugins.bitbucketpushandpullrequest.action;
 import io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRUtils;
 import io.jenkins.plugins.bitbucketpushandpullrequest.exception.BitBucketPPRRepositoryNotParsedException;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -34,8 +36,10 @@ import javax.annotation.Nonnull;
 import hudson.model.InvisibleAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
 import static java.util.Objects.nonNull;
+import static org.apache.commons.lang3.ObjectUtils.isEmpty;
 
-public class BitBucketPPRPullRequestAction extends InvisibleAction implements BitBucketPPRAction {
+public class BitBucketPPRPullRequestAction extends BitBucketPPRActionAbstract
+    implements BitBucketPPRAction {
   private static final Logger logger =
       Logger.getLogger(BitBucketPPRPullRequestAction.class.getName());
   public static final String APPROVE = "/approve";
@@ -224,8 +228,9 @@ public class BitBucketPPRPullRequestAction extends InvisibleAction implements Bi
 
   @Override
   public String getCommitLink() {
-    return String.join(
-            "/", BITBUCKET_API_BASE_URL, BITBUCKET_REPOSITORIES, workspace, repoSlug, COMMIT)
+    String baseCommitLink =
+        isEmpty(this.getPropagationUrl()) ? BITBUCKET_API_BASE_URL : this.getPropagationUrl();
+    return String.join("/", baseCommitLink, BITBUCKET_REPOSITORIES, workspace, repoSlug, COMMIT)
         + '/'
         + this.getLatestCommit();
   }

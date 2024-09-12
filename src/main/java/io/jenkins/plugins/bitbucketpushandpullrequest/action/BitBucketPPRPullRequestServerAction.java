@@ -35,8 +35,9 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import static java.util.Objects.isNull;
+import static org.apache.commons.lang3.ObjectUtils.isEmpty;
 
-public class BitBucketPPRPullRequestServerAction extends InvisibleAction
+public class BitBucketPPRPullRequestServerAction extends BitBucketPPRActionAbstract
     implements BitBucketPPRAction {
 
   private static final Logger logger =
@@ -177,7 +178,7 @@ public class BitBucketPPRPullRequestServerAction extends InvisibleAction
   }
 
   @Override
-  public String getLinkApprove() {
+  public String getLinkApprove() throws MalformedURLException {
     String projectKey =
         payload.getServerPullRequest().getFromRef().getRepository().getProject().getKey();
     String repoSlug = payload.getServerPullRequest().getFromRef().getRepository().getSlug();
@@ -194,7 +195,7 @@ public class BitBucketPPRPullRequestServerAction extends InvisibleAction
   }
 
   @Override
-  public String getLinkDecline() {
+  public String getLinkDecline() throws MalformedURLException {
     // returns:
     // {baseUrl}/rest/api/1.0/projects/{projectKey}/repos/{repositorySlug}/pull-requests/{pullRequestId}/approve
 
@@ -219,7 +220,7 @@ public class BitBucketPPRPullRequestServerAction extends InvisibleAction
   }
 
   @Override
-  public String getCommitLink() {
+  public String getCommitLink() throws MalformedURLException {
     // returns:
     // /rest/build-status/1.0/commits/{commitId}
     String commitId = payload.getServerPullRequest().getFromRef().getLatestCommit();
@@ -227,8 +228,14 @@ public class BitBucketPPRPullRequestServerAction extends InvisibleAction
     return getBaseUrl() + "/rest/build-status/1.0/commits/" + commitId;
   }
 
-  private String getBaseUrl() {
-    return baseUrl.getProtocol() + "://" + baseUrl.getHost() + ":" + baseUrl.getPort();
+  private String getBaseUrl() throws MalformedURLException {
+    URL baseCommitLink =
+        isEmpty(this.getPropagationUrl()) ? baseUrl : new URL(this.getPropagationUrl());
+    return baseCommitLink.getProtocol()
+        + "://"
+        + baseCommitLink.getHost()
+        + ":"
+        + baseCommitLink.getPort();
   }
 
   @Override

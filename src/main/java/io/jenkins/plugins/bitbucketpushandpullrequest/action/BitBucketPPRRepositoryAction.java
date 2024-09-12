@@ -35,7 +35,10 @@ import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud.BitBucketPPRChange;
 import java.util.stream.Collectors;
 
-public class BitBucketPPRRepositoryAction extends InvisibleAction implements BitBucketPPRAction {
+import static org.apache.commons.lang3.ObjectUtils.isEmpty;
+
+public class BitBucketPPRRepositoryAction extends BitBucketPPRActionAbstract
+    implements BitBucketPPRAction {
   private static final Logger logger = Logger.getLogger(BitBucketPPRAction.class.getName());
   public static final String COMMIT = "commit";
   private static final String BITBUCKET_API_BASE_URL = "https://api.bitbucket.org/2.0";
@@ -142,12 +145,14 @@ public class BitBucketPPRRepositoryAction extends InvisibleAction implements Bit
 
   @Override
   public List<String> getCommitLinks() {
+    String baseCommitLink =
+        isEmpty(this.getPropagationUrl()) ? BITBUCKET_API_BASE_URL : this.getPropagationUrl();
     return payload.getPush().getChanges().stream()
         .map(
             c ->
                 String.join(
                     "/",
-                    BITBUCKET_API_BASE_URL,
+                    baseCommitLink,
                     BITBUCKET_REPOSITORIES,
                     workspace,
                     repoSlug,
