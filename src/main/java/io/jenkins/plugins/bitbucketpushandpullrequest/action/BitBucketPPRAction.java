@@ -21,6 +21,7 @@
 
 package io.jenkins.plugins.bitbucketpushandpullrequest.action;
 
+import java.net.MalformedURLException;
 import java.util.List;
 
 import hudson.model.Action;
@@ -40,11 +41,11 @@ public interface BitBucketPPRAction extends Action {
     return null;
   }
 
-  public default String getLinkApprove() {
+  public default String getLinkApprove() throws MalformedURLException {
     return null;
   }
 
-  public default String getLinkDecline() {
+  public default String getLinkDecline() throws MalformedURLException {
     return null;
   }
 
@@ -75,6 +76,7 @@ public interface BitBucketPPRAction extends Action {
   public default String getRepositoryName() {
     return null;
   }
+
   // TODO: do we really neeed it?
   public default List<String> getScmUrls() {
     return null;
@@ -84,7 +86,7 @@ public interface BitBucketPPRAction extends Action {
     return null;
   }
 
-  public default String getRepositoryId(){
+  public default String getRepositoryId() {
     return null;
   }
 
@@ -96,27 +98,27 @@ public interface BitBucketPPRAction extends Action {
     return null;
   }
 
-  public default String getPullRequestApiUrl(){
+  public default String getPullRequestApiUrl() {
     return null;
   }
 
-  public default String getPullRequestUrl(){
+  public default String getPullRequestUrl() {
     return null;
   }
 
-  public default String getTitle(){
+  public default String getTitle() {
     return null;
   }
 
-  public default String getDescription(){
+  public default String getDescription() {
     return null;
   }
 
-  public default String getComment(){
+  public default String getComment() {
     return null;
   }
 
-  public default String getServerComment(){
+  public default String getServerComment() {
     return null;
   }
 
@@ -124,11 +126,11 @@ public interface BitBucketPPRAction extends Action {
     return null;
   }
 
-  public default String getCommitLink() {
+  public default String getCommitLink() throws MalformedURLException {
     return null;
   }
 
-  public default List<String> getCommitLinks() {
+  public default List<String> getCommitLinks() throws MalformedURLException {
     return null;
   }
 

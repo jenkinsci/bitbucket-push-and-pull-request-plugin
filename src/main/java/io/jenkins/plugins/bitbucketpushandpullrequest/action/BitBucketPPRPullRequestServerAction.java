@@ -21,49 +21,59 @@
 
 package io.jenkins.plugins.bitbucketpushandpullrequest.action;
 
-import static java.util.Objects.isNull;
-import static java.util.Objects.nonNull;
-
 import hudson.model.InvisibleAction;
+import io.jenkins.plugins.bitbucketpushandpullrequest.config.BitBucketPPRPluginConfig;
 import io.jenkins.plugins.bitbucketpushandpullrequest.exception.BitBucketPPRPayloadPropertyNotFoundException;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.server.BitBucketPPRServerClone;
+
+import javax.annotation.Nonnull;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
-import javax.annotation.Nonnull;
 
-public class BitBucketPPRPullRequestServerAction extends InvisibleAction implements
-    BitBucketPPRAction {
+import static java.util.Objects.isNull;
+import static org.apache.commons.lang3.ObjectUtils.isEmpty;
 
-  private static final Logger logger = Logger.getLogger(
-      BitBucketPPRPullRequestServerAction.class.getName());
+public class BitBucketPPRPullRequestServerAction extends BitBucketPPRActionAbstract
+    implements BitBucketPPRAction {
+
+  private static final Logger logger =
+      Logger.getLogger(BitBucketPPRPullRequestServerAction.class.getName());
 
   private final @Nonnull BitBucketPPRPayload payload;
   private URL baseUrl;
   private List<String> scmUrls = new ArrayList<>(2);
   private String repositoryUuid;
+  private static final BitBucketPPRPluginConfig globalConfig =
+      BitBucketPPRPluginConfig.getInstance();
 
   public BitBucketPPRPullRequestServerAction(@Nonnull BitBucketPPRPayload payload)
       throws BitBucketPPRPayloadPropertyNotFoundException {
     this.payload = payload;
 
-    if (isNull(payload.getServerPullRequest().getToRef()) || isNull(payload
-        .getServerPullRequest().getToRef().getRepository()) || isNull(payload
-        .getServerPullRequest().getToRef().getRepository().getLinks()) || isNull(payload
-        .getServerPullRequest().getToRef().getRepository().getLinks().getCloneProperty())) {
+    if (isNull(payload.getServerPullRequest().getToRef())
+        || isNull(payload.getServerPullRequest().getToRef().getRepository())
+        || isNull(payload.getServerPullRequest().getToRef().getRepository().getLinks())
+        || isNull(
+            payload
+                .getServerPullRequest()
+                .getToRef()
+                .getRepository()
+                .getLinks()
+                .getCloneProperty())) {
       throw new BitBucketPPRPayloadPropertyNotFoundException(
           "A property (toRef -> repository -> links -> clone ) was not found in the JSON payload.");
     }
 
-    List<BitBucketPPRServerClone> clones = payload.getServerPullRequest().getToRef()
-        .getRepository().getLinks()
-        .getCloneProperty();
+    List<BitBucketPPRServerClone> clones =
+        payload.getServerPullRequest().getToRef().getRepository().getLinks().getCloneProperty();
 
-    if (clones.isEmpty()) throw new BitBucketPPRPayloadPropertyNotFoundException(
-        "Number of clone urls in JSON payload is zero.");
+    if (clones.isEmpty())
+      throw new BitBucketPPRPayloadPropertyNotFoundException(
+          "Number of clone urls in JSON payload is zero.");
 
     for (BitBucketPPRServerClone clone : clones) {
       if (clone.getName().equalsIgnoreCase("http") || clone.getName().equalsIgnoreCase("https")) {
@@ -75,6 +85,14 @@ public class BitBucketPPRPullRequestServerAction extends InvisibleAction impleme
         }
       } else if (clone.getName().equalsIgnoreCase("ssh")) {
         this.scmUrls.add(clone.getHref());
+      }
+    }
+
+    if (!globalConfig.getPropagationUrl().isEmpty()) {
+      try {
+        this.baseUrl = new URL(globalConfig.getPropagationUrl());
+      } catch (MalformedURLException e) {
+        throw new RuntimeException(e);
       }
     }
 
@@ -160,30 +178,40 @@ public class BitBucketPPRPullRequestServerAction extends InvisibleAction impleme
   }
 
   @Override
-  public String getLinkApprove() {
-    String projectKey = payload.getServerPullRequest().getFromRef().getRepository().getProject()
-        .getKey();
+  public String getLinkApprove() throws MalformedURLException {
+    String projectKey =
+        payload.getServerPullRequest().getFromRef().getRepository().getProject().getKey();
     String repoSlug = payload.getServerPullRequest().getFromRef().getRepository().getSlug();
     Long pullrequestId = payload.getServerPullRequest().getId();
 
-    return getBaseUrl() + "/rest/api/1.0/projects/" + projectKey.trim() + "/repos/"
-        + repoSlug.trim() + "/pull-requests/"
-        + Long.toString(pullrequestId).trim() + "/approve";
+    return getBaseUrl()
+        + "/rest/api/1.0/projects/"
+        + projectKey.trim()
+        + "/repos/"
+        + repoSlug.trim()
+        + "/pull-requests/"
+        + Long.toString(pullrequestId).trim()
+        + "/approve";
   }
 
   @Override
-  public String getLinkDecline() {
+  public String getLinkDecline() throws MalformedURLException {
     // returns:
     // {baseUrl}/rest/api/1.0/projects/{projectKey}/repos/{repositorySlug}/pull-requests/{pullRequestId}/approve
 
-    String projectKey = payload.getServerPullRequest().getFromRef().getRepository().getProject()
-        .getKey();
+    String projectKey =
+        payload.getServerPullRequest().getFromRef().getRepository().getProject().getKey();
     String repoSlug = payload.getServerPullRequest().getFromRef().getRepository().getSlug();
     Long pullrequestId = payload.getServerPullRequest().getId();
 
-    return getBaseUrl() + "/rest/api/1.0/projects/" + projectKey.trim() + "/repos/"
-        + repoSlug.trim() + "/pull-requests/"
-        + Long.toString(pullrequestId).trim() + "/decline";
+    return getBaseUrl()
+        + "/rest/api/1.0/projects/"
+        + projectKey.trim()
+        + "/repos/"
+        + repoSlug.trim()
+        + "/pull-requests/"
+        + Long.toString(pullrequestId).trim()
+        + "/decline";
   }
 
   @Override
@@ -192,7 +220,7 @@ public class BitBucketPPRPullRequestServerAction extends InvisibleAction impleme
   }
 
   @Override
-  public String getCommitLink() {
+  public String getCommitLink() throws MalformedURLException {
     // returns:
     // /rest/build-status/1.0/commits/{commitId}
     String commitId = payload.getServerPullRequest().getFromRef().getLatestCommit();
@@ -200,8 +228,14 @@ public class BitBucketPPRPullRequestServerAction extends InvisibleAction impleme
     return getBaseUrl() + "/rest/build-status/1.0/commits/" + commitId;
   }
 
-  private String getBaseUrl() {
-    return baseUrl.getProtocol() + "://" + baseUrl.getHost() + ":" + baseUrl.getPort();
+  private String getBaseUrl() throws MalformedURLException {
+    URL baseCommitLink =
+        isEmpty(this.getPropagationUrl()) ? baseUrl : new URL(this.getPropagationUrl());
+    return baseCommitLink.getProtocol()
+        + "://"
+        + baseCommitLink.getHost()
+        + ":"
+        + baseCommitLink.getPort();
   }
 
   @Override
@@ -209,4 +243,12 @@ public class BitBucketPPRPullRequestServerAction extends InvisibleAction impleme
     return "BitBucketPPRPullRequestServerAction";
   }
 
+  public String setBaseUrl(String url) {
+    try {
+      this.baseUrl = new URL(url);
+    } catch (MalformedURLException e) {
+      throw new RuntimeException(e);
+    }
+    return url;
+  }
 }

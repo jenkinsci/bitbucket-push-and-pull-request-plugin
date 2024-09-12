@@ -35,8 +35,10 @@ import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud.BitBucketPPRChange;
 import java.util.stream.Collectors;
 
+import static org.apache.commons.lang3.ObjectUtils.isEmpty;
 
-public class BitBucketPPRRepositoryAction extends InvisibleAction implements BitBucketPPRAction {
+public class BitBucketPPRRepositoryAction extends BitBucketPPRActionAbstract
+    implements BitBucketPPRAction {
   private static final Logger logger = Logger.getLogger(BitBucketPPRAction.class.getName());
   public static final String COMMIT = "commit";
   private static final String BITBUCKET_API_BASE_URL = "https://api.bitbucket.org/2.0";
@@ -66,16 +68,17 @@ public class BitBucketPPRRepositoryAction extends InvisibleAction implements Bit
 
     Map<String, String> workspaceRepo;
     try {
-      workspaceRepo = BitBucketPPRUtils.extractRepositoryNameFromHTTPSUrl(
-          payload.getRepository().getLinks().getHtml().getHref());
+      workspaceRepo =
+          BitBucketPPRUtils.extractRepositoryNameFromHTTPSUrl(
+              payload.getRepository().getLinks().getHtml().getHref());
     } catch (BitBucketPPRRepositoryNotParsedException e) {
       throw new RuntimeException(e);
     }
     this.repoSlug = workspaceRepo.get(BitBucketPPRUtils.BB_REPOSITORY);
     this.workspace = workspaceRepo.get(BitBucketPPRUtils.BB_WORKSPACE);
 
-    logger.log(Level.INFO,
-        () -> "Received commit hook notification for branch: " + this.targetBranchName);
+    logger.log(
+        Level.INFO, () -> "Received commit hook notification for branch: " + this.targetBranchName);
     logger.log(Level.INFO, () -> "Received commit hook type: " + this.type);
   }
 
@@ -128,7 +131,8 @@ public class BitBucketPPRRepositoryAction extends InvisibleAction implements Bit
 
   @Override
   public String getLatestCommit() {
-    // According to constructor `targetBranchName`, `type` and `repositoryUuid` will be set to first non-null change
+    // According to constructor `targetBranchName`, `type` and `repositoryUuid` will be set to first
+    // non-null change
     // So lets hope it is not very destructive move to set latestCommit from first change.
     for (BitBucketPPRChange change : payload.getPush().getChanges()) {
       if (change.getNewChange() != null) {
@@ -141,9 +145,20 @@ public class BitBucketPPRRepositoryAction extends InvisibleAction implements Bit
 
   @Override
   public List<String> getCommitLinks() {
-    return payload.getPush().getChanges().stream().map(c -> String.join("/",
-        BITBUCKET_API_BASE_URL, BITBUCKET_REPOSITORIES, workspace, repoSlug, COMMIT,
-        c.getNewChange().getTarget().getHash())).collect(Collectors.toList());
+    String baseCommitLink =
+        isEmpty(this.getPropagationUrl()) ? BITBUCKET_API_BASE_URL : this.getPropagationUrl();
+    return payload.getPush().getChanges().stream()
+        .map(
+            c ->
+                String.join(
+                    "/",
+                    baseCommitLink,
+                    BITBUCKET_REPOSITORIES,
+                    workspace,
+                    repoSlug,
+                    COMMIT,
+                    c.getNewChange().getTarget().getHash()))
+        .collect(Collectors.toList());
   }
 
   @Override

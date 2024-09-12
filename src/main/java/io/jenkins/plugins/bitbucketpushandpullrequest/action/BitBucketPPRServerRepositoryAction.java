@@ -21,26 +21,27 @@
 
 package io.jenkins.plugins.bitbucketpushandpullrequest.action;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.stream.Collectors;
-
-import javax.annotation.Nonnull;
-
 import hudson.model.InvisibleAction;
-import io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRUtils;
-import io.jenkins.plugins.bitbucketpushandpullrequest.exception.BitBucketPPRRepositoryNotParsedException;
+import io.jenkins.plugins.bitbucketpushandpullrequest.config.BitBucketPPRPluginConfig;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.server.BitBucketPPRServerChange;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.server.BitBucketPPRServerClone;
 
-public class BitBucketPPRServerRepositoryAction extends InvisibleAction implements BitBucketPPRAction {
+import javax.annotation.Nonnull;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import static org.apache.commons.lang3.ObjectUtils.isEmpty;
+
+public class BitBucketPPRServerRepositoryAction extends BitBucketPPRActionAbstract
+    implements BitBucketPPRAction {
   private static final Logger logger = Logger.getLogger(BitBucketPPRAction.class.getName());
+  private static final BitBucketPPRPluginConfig globalConfig =
+      BitBucketPPRPluginConfig.getInstance();
 
   private final @Nonnull BitBucketPPRPayload payload;
   private URL baseUrl;
@@ -53,7 +54,8 @@ public class BitBucketPPRServerRepositoryAction extends InvisibleAction implemen
     this.payload = payload;
 
     // TODO: do we need link clones or link self is enough??
-    List<BitBucketPPRServerClone> clones = payload.getServerRepository().getLinks().getCloneProperty();
+    List<BitBucketPPRServerClone> clones =
+        payload.getServerRepository().getLinks().getCloneProperty();
 
     for (BitBucketPPRServerClone clone : clones) {
       if (clone.getName().equalsIgnoreCase("http") || clone.getName().equalsIgnoreCase("https")) {
@@ -77,8 +79,11 @@ public class BitBucketPPRServerRepositoryAction extends InvisibleAction implemen
       }
     }
 
-    logger.log(Level.INFO,
-        () -> "Received commit hook notification from server for destination branch: " + this.targetBranchName);
+    logger.log(
+        Level.INFO,
+        () ->
+            "Received commit hook notification from server for destination branch: "
+                + this.targetBranchName);
     logger.log(Level.INFO, () -> "Received commit hook type from server: " + this.type);
   }
 
@@ -149,7 +154,8 @@ public class BitBucketPPRServerRepositoryAction extends InvisibleAction implemen
 
   @Override
   public String getLatestCommit() {
-    // According to constructor `targetBranchName`, `type` and `targetBranchRefId` will be set to first non-null change
+    // According to constructor `targetBranchName`, `type` and `targetBranchRefId` will be set to
+    // first non-null change
     // So lets hope it is not very destructive move to set latestCommit from first change.
     for (BitBucketPPRServerChange change : payload.getServerChanges()) {
       if (change.getRefId() != null) {
@@ -160,16 +166,17 @@ public class BitBucketPPRServerRepositoryAction extends InvisibleAction implemen
   }
 
   @Override
-  public List<String> getCommitLinks() {
+  public List<String> getCommitLinks() throws MalformedURLException {
     // returns:
     // /rest/build-status/1.0/commits/{commitId}
 
-    String baseUrl = getBaseUrl();
+    URL baseCommitLink =
+        isEmpty(this.getPropagationUrl()) ? baseUrl : new URL(this.getPropagationUrl());
 
     List<BitBucketPPRServerChange> changes = payload.getServerChanges();
     List<String> links = new ArrayList<>();
     for (BitBucketPPRServerChange change : changes) {
-      links.add(baseUrl + "/rest/build-status/1.0/commits/" + change.getToHash());
+      links.add(baseCommitLink + "/rest/build-status/1.0/commits/" + change.getToHash());
     }
 
     return links;
