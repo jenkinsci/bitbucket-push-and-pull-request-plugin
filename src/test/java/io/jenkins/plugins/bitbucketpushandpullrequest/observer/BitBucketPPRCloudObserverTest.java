@@ -1,7 +1,7 @@
 package io.jenkins.plugins.bitbucketpushandpullrequest.observer;
 
-
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -20,6 +20,7 @@ import hudson.model.Run;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
@@ -31,7 +32,6 @@ import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRHookEven
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud.BitBucketPPRCloudPayload;
 import io.jenkins.plugins.bitbucketpushandpullrequest.config.BitBucketPPRPluginConfig;
-
 
 @RunWith(MockitoJUnitRunner.class)
 public class BitBucketPPRCloudObserverTest {
@@ -63,36 +63,40 @@ public class BitBucketPPRCloudObserverTest {
 
   @Test
   public void testPushCloudObserver() throws Throwable {
-    BitBucketPPRAction action = new BitBucketPPRRepositoryAction(payload);
-    List<String> links = new ArrayList<>();
-    links.add(
-        "https://api.bitbucket.org/2.0/repositories/some-repository/some-repo/commit/09c4367c5bdbef7d7a28ba4cc2638488c2088d6b");
+    try (MockedStatic<BitBucketPPRPluginConfig> config =
+        Mockito.mockStatic(BitBucketPPRPluginConfig.class)) {
+      BitBucketPPRPluginConfig c = mock(BitBucketPPRPluginConfig.class);
+      config.when(BitBucketPPRPluginConfig::getInstance).thenReturn(c);
+      BitBucketPPRAction action = new BitBucketPPRRepositoryAction(payload);
+      List<String> links = new ArrayList<>();
+      links.add(
+          "https://api.bitbucket.org/2.0/repositories/some-repository/some-repo/commit/09c4367c5bdbef7d7a28ba4cc2638488c2088d6b");
 
-    assertEquals(links, action.getCommitLinks());
+      assertEquals(links, action.getCommitLinks());
 
-    BitBucketPPRPushCloudObserver spyObserver = Mockito.spy(BitBucketPPRPushCloudObserver.class);
-    BitBucketPPREvent event = Mockito.mock(BitBucketPPREvent.class);
-    BitBucketPPREventContext context = Mockito.mock(BitBucketPPREventContext.class);
-    BitBucketPPRPluginConfig config = Mockito.mock(BitBucketPPRPluginConfig.class);
+      BitBucketPPRPushCloudObserver spyObserver = Mockito.spy(BitBucketPPRPushCloudObserver.class);
+      BitBucketPPREvent event = Mockito.mock(BitBucketPPREvent.class);
+      BitBucketPPREventContext context = Mockito.mock(BitBucketPPREventContext.class);
 
-    Mockito.when(context.getAbsoluteUrl()).thenReturn("https://someURL");
-    Mockito.when(context.getBuildNumber()).thenReturn(12);
-    Mockito.when(context.getAction()).thenReturn(action);
-    Mockito.when(event.getContext()).thenReturn(context);
-    Mockito.doReturn(config).when(spyObserver).getGlobalConfig();
+      Mockito.when(context.getAbsoluteUrl()).thenReturn("https://someURL");
+      Mockito.when(context.getBuildNumber()).thenReturn(12);
+      Mockito.when(context.getAction()).thenReturn(action);
+      Mockito.when(event.getContext()).thenReturn(context);
+      Mockito.doReturn(c).when(spyObserver).getGlobalConfig();
 
-    String url =
-        "https://api.bitbucket.org/2.0/repositories/some-repository/some-repo/commit/09c4367c5bdbef7d7a28ba4cc2638488c2088d6b/statuses/build";
-    Map<String, String> map = new HashMap<>();
-    map.put("key", spyObserver.computeBitBucketBuildKey(context));
-    map.put("state", "INPROGRESS");
-    map.put("url", context.getAbsoluteUrl());
+      String url =
+          "https://api.bitbucket.org/2.0/repositories/some-repository/some-repo/commit/09c4367c5bdbef7d7a28ba4cc2638488c2088d6b/statuses/build";
+      Map<String, String> map = new HashMap<>();
+      map.put("key", spyObserver.computeBitBucketBuildKey(context));
+      map.put("state", "INPROGRESS");
+      map.put("url", context.getAbsoluteUrl());
 
-    spyObserver.getNotification(event);
-    spyObserver.setBuildStatusInProgress();
-    Mockito.verify(spyObserver).setBuildStatusInProgress();
+      spyObserver.getNotification(event);
+      spyObserver.setBuildStatusInProgress();
+      Mockito.verify(spyObserver).setBuildStatusInProgress();
 
-    Mockito.verify(spyObserver).callClient(url, map);
+      Mockito.verify(spyObserver).callClient(url, map);
+    }
   }
 
   @Test
@@ -141,7 +145,6 @@ public class BitBucketPPRCloudObserverTest {
     Mockito.when(context.getRun()).thenReturn(run);
     Mockito.when(context.getBuildNumber()).thenReturn(buildNumber);
     Mockito.doReturn(config).when(spyObserver).getGlobalConfig();
-
 
     // When it's configured to not use the job name
     Mockito.when(config.getUseJobNameAsBuildKey()).thenReturn(false);

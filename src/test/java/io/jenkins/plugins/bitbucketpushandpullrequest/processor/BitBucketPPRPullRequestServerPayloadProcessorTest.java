@@ -21,25 +21,16 @@
 
 package io.jenkins.plugins.bitbucketpushandpullrequest.processor;
 
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
 import io.jenkins.plugins.bitbucketpushandpullrequest.BitBucketPPRJobProbe;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.config.BitBucketPPRPluginConfig;
-import io.jenkins.plugins.bitbucketpushandpullrequest.exception.BitBucketPPRPayloadPropertyNotFoundException;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRHookEvent;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.server.BitBucketPPRServerPayload;
 import io.jenkins.plugins.bitbucketpushandpullrequest.observer.BitBucketPPRObservable;
 import io.jenkins.plugins.bitbucketpushandpullrequest.observer.BitBucketPPRObserverFactory;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
 import org.junit.runner.RunWith;
@@ -49,21 +40,23 @@ import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class BitBucketPPRPullRequestServerPayloadProcessorTest {
 
-  @Captor
-  private ArgumentCaptor<BitBucketPPRHookEvent> eventCaptor;
+  @Captor private ArgumentCaptor<BitBucketPPRHookEvent> eventCaptor;
 
-  @Captor
-  private ArgumentCaptor<BitBucketPPRAction> actionCaptor;
+  @Captor private ArgumentCaptor<BitBucketPPRAction> actionCaptor;
 
-  @Captor
-  private ArgumentCaptor<BitBucketPPRObservable> observableCaptor;
+  @Captor private ArgumentCaptor<BitBucketPPRObservable> observableCaptor;
 
   BitBucketPPRPullRequestServerPayloadProcessor pullRequestPayloadProcessor;
-
 
   @Test
   public void testProcessPayload() throws Exception {
@@ -79,10 +72,11 @@ public class BitBucketPPRPullRequestServerPayloadProcessorTest {
       e.printStackTrace();
     }
 
-    try (MockedStatic<BitBucketPPRPluginConfig> config = Mockito.mockStatic(
-        BitBucketPPRPluginConfig.class)) {
+    try (MockedStatic<BitBucketPPRPluginConfig> config =
+        Mockito.mockStatic(BitBucketPPRPluginConfig.class)) {
       BitBucketPPRPluginConfig c = mock(BitBucketPPRPluginConfig.class);
       config.when(BitBucketPPRPluginConfig::getInstance).thenReturn(c);
+      when(c.getPropagationUrl()).thenReturn("");
 
       BitBucketPPRJobProbe probe = mock(BitBucketPPRJobProbe.class);
 
@@ -99,8 +93,9 @@ public class BitBucketPPRPullRequestServerPayloadProcessorTest {
           BitBucketPPRObserverFactory.createObservable(bitbucketEvent);
       pullRequestPayloadProcessor.processPayload(payload, observable);
 
-      verify(probe).triggerMatchingJobs(eventCaptor.capture(), actionCaptor.capture(),
-          observableCaptor.capture());
+      verify(probe)
+          .triggerMatchingJobs(
+              eventCaptor.capture(), actionCaptor.capture(), observableCaptor.capture());
 
       assertEquals(bitbucketEvent, eventCaptor.getValue());
       assertEquals(payload, actionCaptor.getValue().getPayload());
@@ -122,8 +117,8 @@ public class BitBucketPPRPullRequestServerPayloadProcessorTest {
       e.printStackTrace();
     }
 
-    try (MockedStatic<BitBucketPPRPluginConfig> config = Mockito.mockStatic(
-        BitBucketPPRPluginConfig.class)) {
+    try (MockedStatic<BitBucketPPRPluginConfig> config =
+        Mockito.mockStatic(BitBucketPPRPluginConfig.class)) {
       BitBucketPPRPluginConfig c = mock(BitBucketPPRPluginConfig.class);
       config.when(BitBucketPPRPluginConfig::getInstance).thenReturn(c);
 
@@ -141,9 +136,11 @@ public class BitBucketPPRPullRequestServerPayloadProcessorTest {
       BitBucketPPRObservable observable =
           BitBucketPPRObserverFactory.createObservable(bitbucketEvent);
 
-      Assertions.assertThrows(Exception.class, () -> {
-        pullRequestPayloadProcessor.processPayload(payload, observable);
-      });
+      Assertions.assertThrows(
+          Exception.class,
+          () -> {
+            pullRequestPayloadProcessor.processPayload(payload, observable);
+          });
     }
   }
 }

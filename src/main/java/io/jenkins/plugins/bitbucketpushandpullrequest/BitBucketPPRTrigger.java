@@ -1,17 +1,17 @@
 /*******************************************************************************
  * The MIT License
- * 
+ *
  * Copyright (C) 2021, CloudBees, Inc.
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
  * including without limitation the rights to use, copy, modify, merge, publish, distribute,
  * sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in all copies or
  * substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT
  * NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
@@ -27,10 +27,15 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Logger;
 import javax.annotation.CheckForNull;
+
+import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRActionAbstract;
+import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRPullRequestServerAction;
+import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRServerRepositoryAction;
 import org.apache.commons.jelly.XMLOutput;
 import org.eclipse.jgit.transport.URIish;
 import org.jenkinsci.Symbol;
@@ -77,10 +82,10 @@ import jenkins.model.Jenkins;
 import jenkins.model.ParameterizedJobMixIn;
 import jenkins.triggers.SCMTriggerItem;
 
+import static org.apache.commons.lang3.ObjectUtils.isEmpty;
+
 /**
- * 
  * @author cdelmonte
- *
  */
 public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
 
@@ -89,6 +94,9 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
   private List<BitBucketPPRTriggerFilter> triggers;
   public static final boolean ALLOW_HOOKURL_OVERRIDE = true;
   public String credentialsId;
+  public String propagationUrl;
+
+  // list of classes
 
   @DataBoundConstructor
   public BitBucketPPRTrigger(List<BitBucketPPRTriggerFilter> triggers) {
@@ -100,18 +108,33 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
     this.credentialsId = credentialsId;
   }
 
+  @DataBoundSetter
+  public void setPropagationUrl(String propagationUrl) {
+
+    if (propagationUrl != null && !propagationUrl.isEmpty()) {
+      this.propagationUrl = propagationUrl;
+    } else {
+      this.propagationUrl = "";
+    }
+  }
+
   /**
    * Called when a POST is made.
-   * 
+   *
    * @param bitbucketEvent
    * @param bitbucketAction
    * @param scmTrigger
    * @param observable
    * @throws Exception
    */
-  public void onPost(BitBucketPPRHookEvent bitbucketEvent, BitBucketPPRAction bitbucketAction,
-      SCM scmTrigger, BitBucketPPRObservable observable) throws Exception {
+  public void onPost(
+      BitBucketPPRHookEvent bitbucketEvent,
+      BitBucketPPRAction bitbucketAction,
+      SCM scmTrigger,
+      BitBucketPPRObservable observable)
+      throws Exception {
     logger.finest(String.format("Called onPost Method for action %s", bitbucketAction));
+    checkLocalPropagationUrl(bitbucketAction);
 
     if (job == null) {
       logger.warning("Error: the job is null");
@@ -125,38 +148,46 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
     if (matchingFilters != null && !matchingFilters.isEmpty()) {
 
       BitBucketPPRPollingRunnable bitbucketPollingRunnable =
-          new BitBucketPPRPollingRunnable(job, getLogFile(), new BitBucketPPRPollResultListener() {
+          new BitBucketPPRPollingRunnable(
+              job,
+              getLogFile(),
+              new BitBucketPPRPollResultListener() {
 
-            @Override
-            public void onPollSuccess(PollingResult pollingResult) {
-              matchingFilters.stream().forEach(filter -> {
-                try {
-                  BitBucketPPRTriggerCause cause =
-                      filter.getCause(getLogFile(), bitbucketAction, bitbucketEvent);
-                  if (shouldScheduleJob(filter, pollingResult, bitbucketAction)) {
-                    scheduleJob(cause, bitbucketAction, scmTrigger, observable, filter);
-                  }
-                } catch (Throwable e) {
-                  logger.warning(String.format(
-                      "During the polling process an exception was thrown: %s.", e.getMessage()));
+                @Override
+                public void onPollSuccess(PollingResult pollingResult) {
+                  matchingFilters.stream()
+                      .forEach(
+                          filter -> {
+                            try {
+                              BitBucketPPRTriggerCause cause =
+                                  filter.getCause(getLogFile(), bitbucketAction, bitbucketEvent);
+                              if (shouldScheduleJob(filter, pollingResult, bitbucketAction)) {
+                                scheduleJob(cause, bitbucketAction, scmTrigger, observable, filter);
+                              }
+                            } catch (Throwable e) {
+                              logger.warning(
+                                  String.format(
+                                      "During the polling process an exception was thrown: %s.",
+                                      e.getMessage()));
+                              e.printStackTrace();
+                            }
+                          });
+                }
+
+                @Override
+                public void onPollError(Throwable e) {
+                  logger.warning(String.format("Called onPollError: %s.", e.getMessage()));
                   e.printStackTrace();
                 }
               });
-            }
-
-            @Override
-            public void onPollError(Throwable e) {
-              logger.warning(String.format("Called onPollError: %s.", e.getMessage()));
-              e.printStackTrace();
-            }
-          });
 
       try {
         getDescriptor().queue.execute(bitbucketPollingRunnable);
       } catch (Throwable e) {
-        logger.warning(String.format(
-            "Error: cannot add the BB PPR polling runnable to the Jenkins' SequentialExecutionQueue queue: %s",
-            e.getMessage()));
+        logger.warning(
+            String.format(
+                "Error: cannot add the BB PPR polling runnable to the Jenkins' SequentialExecutionQueue queue: %s",
+                e.getMessage()));
         e.printStackTrace();
       }
 
@@ -165,19 +196,40 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
     }
   }
 
-  private boolean shouldScheduleJob(BitBucketPPRTriggerFilter filter, PollingResult pollingResult,
+  private void checkLocalPropagationUrl(BitBucketPPRAction bitBucketPPRAction) {
+
+    if (bitBucketPPRAction == null) {
+      return;
+    }
+
+    if (!isEmpty(propagationUrl)) {
+      BitBucketPPRActionAbstract bitBucketPPRActionAbstract =
+          (BitBucketPPRActionAbstract) bitBucketPPRAction;
+      bitBucketPPRActionAbstract.setPropagationUrl(propagationUrl);
+    }
+  }
+
+  private boolean shouldScheduleJob(
+      BitBucketPPRTriggerFilter filter,
+      PollingResult pollingResult,
       BitBucketPPRAction bitbucketAction) {
-    logger.finest(String.format(
-        "Should schedule job: %s and (polling result has changes: %s or trigger also if there aren't changes: %s)",
-        filter.shouldScheduleJob(bitbucketAction), pollingResult.hasChanges(),
-        filter.shouldTriggerAlsoIfNothingChanged()));
+    logger.finest(
+        String.format(
+            "Should schedule job: %s and (polling result has changes: %s or trigger also if there aren't changes: %s)",
+            filter.shouldScheduleJob(bitbucketAction),
+            pollingResult.hasChanges(),
+            filter.shouldTriggerAlsoIfNothingChanged()));
 
     return filter.shouldScheduleJob(bitbucketAction)
         && (pollingResult.hasChanges() || filter.shouldTriggerAlsoIfNothingChanged());
   }
 
-  private void scheduleJob(BitBucketPPRTriggerCause cause, BitBucketPPRAction bitbucketAction,
-      SCM scmTrigger, BitBucketPPRObservable observable, BitBucketPPRTriggerFilter filter)
+  private void scheduleJob(
+      BitBucketPPRTriggerCause cause,
+      BitBucketPPRAction bitbucketAction,
+      SCM scmTrigger,
+      BitBucketPPRObservable observable,
+      BitBucketPPRTriggerFilter filter)
       throws URISyntaxException {
 
     // Jenkins will take all instances of QueueAction from this job and will try to compare these
@@ -187,30 +239,38 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
     // So we need RevisionParameterAction to distinguish THIS job from all other pending jobs in
     // queue
 
-    Queue.Item item = ParameterizedJobMixIn.scheduleBuild2(job, 5, new CauseAction(cause),
-        bitbucketAction, new RevisionParameterAction(bitbucketAction.getLatestCommit(),
-            new URIish(bitbucketAction.getScmUrls().get(0))));
+    Queue.Item item =
+        ParameterizedJobMixIn.scheduleBuild2(
+            job,
+            5,
+            new CauseAction(cause),
+            bitbucketAction,
+            new RevisionParameterAction(
+                bitbucketAction.getLatestCommit(),
+                new URIish(bitbucketAction.getScmUrls().get(0))));
 
     QueueTaskFuture<? extends Run<?, ?>> f =
         item != null ? (QueueTaskFuture) item.getFuture() : null;
 
-    if (f == null)
-      return;
+    if (f == null) return;
 
     try {
       Run<?, ?> startedBuild = (Run<?, ?>) f.waitForStart();
 
       logger.info(String.format("Triggering %s # %d", job.getName(), startedBuild.getNumber()));
 
-      observable.notifyObservers(BitBucketPPREventFactory.createEvent(
-          BitBucketPPREventType.BUILD_STARTED,
-          new BitBucketPPREventContext(this, bitbucketAction, scmTrigger, startedBuild, filter)));
+      observable.notifyObservers(
+          BitBucketPPREventFactory.createEvent(
+              BitBucketPPREventType.BUILD_STARTED,
+              new BitBucketPPREventContext(
+                  this, bitbucketAction, scmTrigger, startedBuild, filter)));
 
       Run<?, ?> run = (Run<?, ?>) f.get();
 
       if (f.isDone()) {
         observable.notifyObservers(
-            BitBucketPPREventFactory.createEvent(BitBucketPPREventType.BUILD_FINISHED,
+            BitBucketPPREventFactory.createEvent(
+                BitBucketPPREventType.BUILD_FINISHED,
                 new BitBucketPPREventContext(this, bitbucketAction, scmTrigger, run, filter)));
       }
 
@@ -223,8 +283,7 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
   }
 
   File getLogFile() {
-    if (job == null)
-      return null;
+    if (job == null) return null;
     return new File(job.getRootDir(), BITBUCKET_POLLING_LOG);
   }
 
@@ -242,9 +301,7 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
     return triggers;
   }
 
-  /**
-   * Action object for {@link BitBucketPPRProject}. Used to display the polling log.
-   */
+  /** Action object for {@link BitBucketPPRProject}. Used to display the polling log. */
   public class BitBucketPPRWebHookPollingAction implements hudson.model.Action {
     public Job<?, ?> getOwner() {
       return job;
@@ -269,15 +326,14 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
       return Util.loadFile(getLogFile(), StandardCharsets.UTF_8);
     }
 
-    /**
-     * Writes the annotated log to the given output.
-     */
+    /** Writes the annotated log to the given output. */
     @edu.umd.cs.findbugs.annotations.SuppressFBWarnings(
-        value="RV_RETURN_VALUE_IGNORED",
-        justification="I know what I'm doing")
+        value = "RV_RETURN_VALUE_IGNORED",
+        justification = "I know what I'm doing")
     public void writeLogTo(XMLOutput out) throws Exception {
-      new AnnotatedLargeText<BitBucketPPRWebHookPollingAction>(getLogFile(),
-          Charset.defaultCharset(), true, this).writeHtmlTo(0, out.asWriter());
+      new AnnotatedLargeText<BitBucketPPRWebHookPollingAction>(
+              getLogFile(), Charset.defaultCharset(), true, this)
+          .writeHtmlTo(0, out.asWriter());
     }
   }
 
@@ -287,23 +343,31 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
     private final SequentialExecutionQueue queue =
         new SequentialExecutionQueue(Jenkins.MasterComputer.threadPoolForRemoting);
 
-    public ListBoxModel doFillCredentialsIdItems(@AncestorInPath Item context,
-        @QueryParameter String remote, @QueryParameter String credentialsId) {
+    public ListBoxModel doFillCredentialsIdItems(
+        @AncestorInPath Item context,
+        @QueryParameter String remote,
+        @QueryParameter String credentialsId) {
 
       if (context == null && !Jenkins.get().hasPermission(Jenkins.ADMINISTER)
           || context != null && !context.hasPermission(Item.EXTENDED_READ)) {
         return new StandardListBoxModel().includeCurrentValue(credentialsId);
       }
 
-      return new StandardListBoxModel().includeEmptyValue()
-          .includeMatchingAs(ACL.SYSTEM, context, StandardCredentials.class,
-              Collections.<DomainRequirement>emptyList(), CredentialsMatchers.always())
+      return new StandardListBoxModel()
+          .includeEmptyValue()
+          .includeMatchingAs(
+              ACL.SYSTEM,
+              context,
+              StandardCredentials.class,
+              Collections.<DomainRequirement>emptyList(),
+              CredentialsMatchers.always())
           .includeCurrentValue(credentialsId);
     }
 
     @Override
     public boolean isApplicable(Item item) {
-      return item instanceof Job && SCMTriggerItem.SCMTriggerItems.asSCMTriggerItem(item) != null
+      return item instanceof Job
+          && SCMTriggerItem.SCMTriggerItems.asSCMTriggerItem(item) != null
           && item instanceof ParameterizedJobMixIn.ParameterizedJob;
     }
 
@@ -317,6 +381,5 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
       // fancy
       return Jenkins.get().getDescriptorList(BitBucketPPRTriggerFilter.class);
     }
-
   }
 }

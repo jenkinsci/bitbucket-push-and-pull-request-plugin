@@ -1,17 +1,17 @@
 /*******************************************************************************
  * The MIT License
- * 
+ *
  * Copyright (C) 2021, CloudBees, Inc.
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
  * including without limitation the rights to use, copy, modify, merge, publish, distribute,
  * sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in all copies or
  * substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT
  * NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
@@ -20,6 +20,7 @@
  ******************************************************************************/
 package io.jenkins.plugins.bitbucketpushandpullrequest.observer;
 
+import java.net.MalformedURLException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -47,7 +48,7 @@ public class BitBucketPPRPullRequestServerObserver extends BitBucketPPRHandlerTe
   }
 
   @Override
-  public void setApprovedOrDeclined() {
+  public void setApprovedOrDeclined() throws MalformedURLException {
     if (!(context.getFilter().shouldSendApprove() || context.getFilter().shouldSendDecline())) {
       return;
     }
@@ -61,22 +62,22 @@ public class BitBucketPPRPullRequestServerObserver extends BitBucketPPRHandlerTe
     if (context.getFilter().shouldSendApprove()) {
       url = bitbucketAction.getLinkApprove();
       Verb verb = Verb.POST;
-      
+
       if (result == Result.FAILURE) {
         verb = Verb.DELETE;
       }
-      
+
       callClient(verb, url, map);
     }
 
     if (result == Result.FAILURE && context.getFilter().shouldSendDecline()) {
       url = bitbucketAction.getLinkDecline();
       callClient(Verb.POST, url, map);
-    }    
+    }
   }
 
   @Override
-  public void setBuildStatusOnFinished() {
+  public void setBuildStatusOnFinished() throws MalformedURLException {
     BitBucketPPRAction bitbucketAction = context.getAction();
     String url = bitbucketAction.getCommitLink();
     Result result = context.getRun().getResult();
@@ -91,7 +92,7 @@ public class BitBucketPPRPullRequestServerObserver extends BitBucketPPRHandlerTe
   }
 
   @Override
-  public void setBuildStatusInProgress() {
+  public void setBuildStatusInProgress() throws MalformedURLException {
     BitBucketPPRAction bitbucketAction = context.getAction();
     String url = bitbucketAction.getCommitLink();
 

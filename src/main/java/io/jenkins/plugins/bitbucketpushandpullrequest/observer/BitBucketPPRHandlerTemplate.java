@@ -1,17 +1,17 @@
 /*******************************************************************************
  * The MIT License
- * 
+ *
  * Copyright (C) 2021, CloudBees, Inc.
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
  * including without limitation the rights to use, copy, modify, merge, publish, distribute,
  * sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in all copies or
  * substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT
  * NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
@@ -20,6 +20,7 @@
  ******************************************************************************/
 package io.jenkins.plugins.bitbucketpushandpullrequest.observer;
 
+import java.net.MalformedURLException;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -33,7 +34,6 @@ import io.jenkins.plugins.bitbucketpushandpullrequest.client.BitBucketPPRClientT
 import io.jenkins.plugins.bitbucketpushandpullrequest.config.BitBucketPPRPluginConfig;
 import io.jenkins.plugins.bitbucketpushandpullrequest.event.BitBucketPPREventContext;
 import io.jenkins.plugins.bitbucketpushandpullrequest.event.BitBucketPPREventType;
-
 
 public abstract class BitBucketPPRHandlerTemplate {
   static final Logger logger = Logger.getLogger(BitBucketPPRHandlerTemplate.class.getName());
@@ -61,13 +61,13 @@ public abstract class BitBucketPPRHandlerTemplate {
   }
 
   // @todo: do we need it also for pushs?
-  public void setApprovedOrDeclined() {
+  public void setApprovedOrDeclined() throws MalformedURLException {
     return;
   }
 
-  public abstract void setBuildStatusOnFinished();
+  public abstract void setBuildStatusOnFinished() throws MalformedURLException;
 
-  public abstract void setBuildStatusInProgress();
+  public abstract void setBuildStatusInProgress() throws MalformedURLException;
 
   protected BitBucketPPRPluginConfig getGlobalConfig() {
     return BitBucketPPRPluginConfig.getInstance();
@@ -96,8 +96,8 @@ public abstract class BitBucketPPRHandlerTemplate {
     }
   }
 
-  protected void callClient(@Nonnull Verb verb, @Nonnull String url,
-      @Nonnull Map<String, String> payload) {
+  protected void callClient(
+      @Nonnull Verb verb, @Nonnull String url, @Nonnull Map<String, String> payload) {
     ObjectMapper objectMapper = new ObjectMapper();
 
     try {
