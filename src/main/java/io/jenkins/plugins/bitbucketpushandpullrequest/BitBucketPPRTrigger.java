@@ -201,7 +201,7 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
     if (bitBucketPPRAction == null) {
       return;
     }
-    assert bitBucketPPRAction instanceof BitBucketPPRActionAbstract;
+
     if (!isEmpty(propagationUrl)) {
       BitBucketPPRActionAbstract bitBucketPPRActionAbstract =
           (BitBucketPPRActionAbstract) bitBucketPPRAction;
