@@ -1,5 +1,31 @@
 # Change Log
 
+## 3.1.0 (2024-09-12)
+
+## What's Changed
+* New field for status propagation of pipeline by @julioc-p in https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/pull/338
+* add implementation of method getPullRequestUrl() and refactoring. by @cdelmonte-zg  #339
+
+## Closed Issues
+- #331
+- #332 
+- #334 
+- #337 
+
+**Full Changelog**: https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/compare/bitbucket-push-and-pull-request-3.0.3...bitbucket-push-and-pull-request-3.1.0
+## 3.0.3 (2024-08-16)
+
+### What's Changed
+* Use "get" prefix for configuration attribute getters by @laudrup in https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/pull/328
+* #334 - fix log message pattern to include parameter index by @Gozke in https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/pull/335
+* Enable Jenkins Security Scan by @strangelookingnerd in https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/pull/333
+
+## New Contributors
+* @laudrup made their first contribution in https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/pull/328
+* @strangelookingnerd made their first contribution in https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/pull/333
+
+**Full Changelog**: https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/compare/bitbucket-push-and-pull-request-3.0.2...bitbucket-push-and-pull-request-3.0.3
+
 ## 3.0.3 (2024-08-16)
 
 ### What's Changed
