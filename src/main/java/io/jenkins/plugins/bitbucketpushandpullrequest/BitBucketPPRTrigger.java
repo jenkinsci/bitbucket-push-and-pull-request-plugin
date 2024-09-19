@@ -33,6 +33,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.logging.Logger;
 import javax.annotation.CheckForNull;
 
+import hudson.plugins.git.GitSCM;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRActionAbstract;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRPullRequestServerAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRServerRepositoryAction;
@@ -162,7 +163,8 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
                               BitBucketPPRTriggerCause cause =
                                   filter.getCause(getLogFile(), bitbucketAction, bitbucketEvent);
                               if (shouldScheduleJob(filter, pollingResult, bitbucketAction)) {
-                                scheduleJob(cause, bitbucketAction, scmTrigger, observable, filter);
+                                scheduleJobs(
+                                    cause, bitbucketAction, scmTrigger, observable, filter);
                               }
                             } catch (Throwable e) {
                               logger.warning(
@@ -196,6 +198,34 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
     }
   }
 
+  private void scheduleJobs(
+      BitBucketPPRTriggerCause cause,
+      BitBucketPPRAction bitbucketAction,
+      SCM scmTrigger,
+      BitBucketPPRObservable observable,
+      BitBucketPPRTriggerFilter filter) {
+    ((GitSCM) scmTrigger)
+        .getRepositories()
+        .forEach(
+            repository -> {
+              // for each url call schedulejob
+              repository
+                  .getURIs()
+                  .forEach(
+                      uri -> {
+                        try {
+                          scheduleJob(cause, uri, bitbucketAction, observable, filter, scmTrigger);
+                        } catch (URISyntaxException e) {
+                          logger.warning(
+                              String.format(
+                                  "Error: cannot schedule the job for the repository %s: %s",
+                                  uri.toPrivateString(), e.getMessage()));
+                          e.printStackTrace();
+                        }
+                      });
+            });
+  }
+
   private void checkLocalPropagationUrl(BitBucketPPRAction bitBucketPPRAction) {
 
     if (bitBucketPPRAction == null) {
@@ -226,10 +256,11 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
 
   private void scheduleJob(
       BitBucketPPRTriggerCause cause,
+      URIish uri,
       BitBucketPPRAction bitbucketAction,
-      SCM scmTrigger,
       BitBucketPPRObservable observable,
-      BitBucketPPRTriggerFilter filter)
+      BitBucketPPRTriggerFilter filter,
+      SCM scmTrigger)
       throws URISyntaxException {
 
     // Jenkins will take all instances of QueueAction from this job and will try to compare these
@@ -245,9 +276,7 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
             5,
             new CauseAction(cause),
             bitbucketAction,
-            new RevisionParameterAction(
-                bitbucketAction.getLatestCommit(),
-                new URIish(bitbucketAction.getScmUrls().get(0))));
+            new RevisionParameterAction(bitbucketAction.getLatestCommit(), uri));
 
     QueueTaskFuture<? extends Run<?, ?>> f =
         item != null ? (QueueTaskFuture) item.getFuture() : null;
