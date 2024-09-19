@@ -21,6 +21,7 @@ public class BitBucketPPRPullRequestServerActionTest {
                 BitBucketPPRPluginConfig.class)) {
             BitBucketPPRPluginConfig c = mock(BitBucketPPRPluginConfig.class);
             config.when(BitBucketPPRPluginConfig::getInstance).thenReturn(c);
+            when(c.isPropagationUrlSet()).thenReturn(true);
             when(c.getPropagationUrl()).thenReturn("https://example.org/scm/some-namespace/some-repo.git");
 
             BitBucketPPRPayload payloadMock = mock(BitBucketPPRPayload.class, RETURNS_DEEP_STUBS);

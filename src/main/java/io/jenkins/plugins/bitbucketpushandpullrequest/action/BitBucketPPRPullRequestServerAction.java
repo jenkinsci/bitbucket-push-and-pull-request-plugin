@@ -88,7 +88,7 @@ public class BitBucketPPRPullRequestServerAction extends BitBucketPPRActionAbstr
       }
     }
 
-    if (!globalConfig.getPropagationUrl().isEmpty()) {
+    if (globalConfig.isPropagationUrlSet()) {
       try {
         this.baseUrl = new URL(globalConfig.getPropagationUrl());
       } catch (MalformedURLException e) {

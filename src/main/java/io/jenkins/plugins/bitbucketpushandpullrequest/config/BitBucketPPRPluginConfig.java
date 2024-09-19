@@ -101,6 +101,10 @@ public class BitBucketPPRPluginConfig extends GlobalConfiguration {
     return propagationUrl;
   }
 
+  public boolean isPropagationUrlSet() {
+    return !isEmpty(propagationUrl);
+  }
+
   @DataBoundSetter
   public void setNotifyBitBucket(@CheckForNull boolean notifyBitBucket) {
     this.notifyBitBucket = notifyBitBucket;

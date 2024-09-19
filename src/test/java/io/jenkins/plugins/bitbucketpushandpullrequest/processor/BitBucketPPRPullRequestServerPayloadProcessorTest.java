@@ -76,7 +76,6 @@ public class BitBucketPPRPullRequestServerPayloadProcessorTest {
         Mockito.mockStatic(BitBucketPPRPluginConfig.class)) {
       BitBucketPPRPluginConfig c = mock(BitBucketPPRPluginConfig.class);
       config.when(BitBucketPPRPluginConfig::getInstance).thenReturn(c);
-      when(c.getPropagationUrl()).thenReturn("");
 
       BitBucketPPRJobProbe probe = mock(BitBucketPPRJobProbe.class);
 
