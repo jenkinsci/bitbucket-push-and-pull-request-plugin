@@ -1,5 +1,12 @@
 # Change Log
 
+## 3.1.1 (2024-09-19)
+
+## What's Changed
+* Fix: Fix npe for propagation url settings by @solarlodge in https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/pull/340
+
+**Full Changelog**: https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/compare/bitbucket-push-and-pull-request-3.1.0...bitbucket-push-and-pull-request-3.1.1
+
 ## 3.1.0 (2024-09-12)
 
 ## What's Changed
