@@ -24,6 +24,7 @@ package io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.cloud;
 import java.io.File;
 import java.io.IOException;
 
+import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 
@@ -56,22 +57,24 @@ public class BitBucketPPRPullRequestCommentDeletedActionFilter
   }
 
   @Override
-  public BitBucketPPRTriggerCause getCause(File pollingLog, BitBucketPPRAction pullRequestAction, 
-      BitBucketPPRHookEvent bitBucketEvent)
+  public BitBucketPPRTriggerCause getCause(
+      File pollingLog, BitBucketPPRAction pullRequestAction, BitBucketPPRHookEvent bitBucketEvent)
       throws IOException {
-    return new BitBucketPPRPullRequestCommentDeletedCause(pollingLog, pullRequestAction, bitBucketEvent);
+    return new BitBucketPPRPullRequestCommentDeletedCause(
+        pollingLog, pullRequestAction, bitBucketEvent);
   }
 
   @Override
   public boolean shouldSendApprove() {
     return false;
   }
-  
+
   @Override
   public boolean shouldSendDecline() {
     return false;
   }
 
+  @Symbol("bitbucketCloudPullRequestCommentDeletedActionFilter")
   @Extension
   public static class ActionFilterDescriptorImpl extends BitBucketPPRPullRequestActionDescriptor {
 
@@ -83,8 +86,14 @@ public class BitBucketPPRPullRequestCommentDeletedActionFilter
 
   @Override
   public String toString() {
-    return "BitBucketPPRPullRequestCommentDeletedActionFilter [getDescriptor()=" + getDescriptor()
-        + ", getClass()=" + getClass() + ", hashCode()=" + hashCode() + ", toString()="
-        + super.toString() + "]";
+    return "BitBucketPPRPullRequestCommentDeletedActionFilter [getDescriptor()="
+        + getDescriptor()
+        + ", getClass()="
+        + getClass()
+        + ", hashCode()="
+        + hashCode()
+        + ", toString()="
+        + super.toString()
+        + "]";
   }
 }

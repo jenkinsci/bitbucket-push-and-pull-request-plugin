@@ -24,6 +24,7 @@ package io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.server
 import java.io.File;
 import java.io.IOException;
 
+import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 
@@ -35,14 +36,14 @@ import io.jenkins.plugins.bitbucketpushandpullrequest.cause.pullrequest.server.B
 import io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRUtils;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRHookEvent;
 
-public class BitBucketPPRPullRequestServerCommentCreatedActionFilter extends BitBucketPPRPullRequestServerActionFilter {
+public class BitBucketPPRPullRequestServerCommentCreatedActionFilter
+    extends BitBucketPPRPullRequestServerActionFilter {
 
   public String allowedBranches;
   public String commentFilter;
 
   @DataBoundConstructor
-  public BitBucketPPRPullRequestServerCommentCreatedActionFilter() {
-  }
+  public BitBucketPPRPullRequestServerCommentCreatedActionFilter() {}
 
   @DataBoundSetter
   public void setAllowedBranches(String allowedBranches) {
@@ -64,22 +65,24 @@ public class BitBucketPPRPullRequestServerCommentCreatedActionFilter extends Bit
 
   @Override
   public boolean shouldTriggerBuild(BitBucketPPRAction bitbucketAction) {
-    return ( matches(allowedBranches, bitbucketAction.getTargetBranch(), null)
-        || matches(allowedBranches, bitbucketAction.getTargetBranchRefId(), null)) &&
-        hasInComment(bitbucketAction.getServerComment(), null);
-    }
+    return (matches(allowedBranches, bitbucketAction.getTargetBranch(), null)
+            || matches(allowedBranches, bitbucketAction.getTargetBranchRefId(), null))
+        && hasInComment(bitbucketAction.getServerComment(), null);
+  }
 
   @Override
-  public BitBucketPPRTriggerCause getCause(File pollingLog, BitBucketPPRAction pullRequestAction,
-      BitBucketPPRHookEvent bitBucketEvent) throws IOException {
-    return new BitBucketPPRPullRequestServerCommentCreatedCause(pollingLog, pullRequestAction, bitBucketEvent);
+  public BitBucketPPRTriggerCause getCause(
+      File pollingLog, BitBucketPPRAction pullRequestAction, BitBucketPPRHookEvent bitBucketEvent)
+      throws IOException {
+    return new BitBucketPPRPullRequestServerCommentCreatedCause(
+        pollingLog, pullRequestAction, bitBucketEvent);
   }
 
   @Override
   public boolean shouldSendApprove() {
     return false;
   }
-  
+
   @Override
   public boolean shouldSendDecline() {
     return false;
@@ -89,8 +92,10 @@ public class BitBucketPPRPullRequestServerCommentCreatedActionFilter extends Bit
     return BitBucketPPRUtils.matchWithRegex(comment, commentFilter, vars);
   }
 
+  @Symbol("bitbucketServerPullRequestCommentCreated")
   @Extension
-  public static class ActionFilterDescriptorImpl extends BitBucketPPRPullRequestServerActionDescriptor {
+  public static class ActionFilterDescriptorImpl
+      extends BitBucketPPRPullRequestServerActionDescriptor {
 
     @Override
     public String getDisplayName() {
@@ -100,7 +105,14 @@ public class BitBucketPPRPullRequestServerCommentCreatedActionFilter extends Bit
 
   @Override
   public String toString() {
-    return "BitBucketPPRPullRequestServerCommentCreatedActionFilter [getDescriptor()=" + getDescriptor()
-        + ", getClass()=" + getClass() + ", hashCode()=" + hashCode() + ", toString()=" + super.toString() + "]";
+    return "BitBucketPPRPullRequestServerCommentCreatedActionFilter [getDescriptor()="
+        + getDescriptor()
+        + ", getClass()="
+        + getClass()
+        + ", hashCode()="
+        + hashCode()
+        + ", toString()="
+        + super.toString()
+        + "]";
   }
 }
