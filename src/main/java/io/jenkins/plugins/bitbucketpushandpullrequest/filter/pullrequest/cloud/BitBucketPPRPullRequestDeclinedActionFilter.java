@@ -1,17 +1,17 @@
 /*******************************************************************************
  * The MIT License
- * 
+ *
  * Copyright (C) 2019, CloudBees, Inc.
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
  * including without limitation the rights to use, copy, modify, merge, publish, distribute,
  * sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in all copies or
  * substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT
  * NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
@@ -26,18 +26,20 @@ import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.cause.BitBucketPPRTriggerCause;
 import io.jenkins.plugins.bitbucketpushandpullrequest.cause.pullrequest.cloud.BitBucketPPRPullRequestDeclinedCause;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRHookEvent;
+import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 
 import java.io.File;
 import java.io.IOException;
 
-public class BitBucketPPRPullRequestDeclinedActionFilter extends BitBucketPPRPullRequestActionFilter {
+public class BitBucketPPRPullRequestDeclinedActionFilter
+    extends BitBucketPPRPullRequestActionFilter {
   public String allowedBranches;
 
   @DataBoundConstructor
   public BitBucketPPRPullRequestDeclinedActionFilter() {}
-  
+
   @DataBoundSetter
   public void setAllowedBranches(String allowedBranches) {
     if (allowedBranches == null) {
@@ -53,8 +55,8 @@ public class BitBucketPPRPullRequestDeclinedActionFilter extends BitBucketPPRPul
   }
 
   @Override
-  public BitBucketPPRTriggerCause getCause(File pollingLog, BitBucketPPRAction pullRequestAction, 
-      BitBucketPPRHookEvent bitBucketEvent)
+  public BitBucketPPRTriggerCause getCause(
+      File pollingLog, BitBucketPPRAction pullRequestAction, BitBucketPPRHookEvent bitBucketEvent)
       throws IOException {
     return new BitBucketPPRPullRequestDeclinedCause(pollingLog, pullRequestAction, bitBucketEvent);
   }
@@ -68,7 +70,8 @@ public class BitBucketPPRPullRequestDeclinedActionFilter extends BitBucketPPRPul
   public boolean shouldSendDecline() {
     return false;
   }
-  
+
+  @Symbol("bitbucketCloudPullRequestDeclined")
   @Extension
   public static class ActionFilterDescriptorImpl extends BitBucketPPRPullRequestActionDescriptor {
 
@@ -80,8 +83,14 @@ public class BitBucketPPRPullRequestDeclinedActionFilter extends BitBucketPPRPul
 
   @Override
   public String toString() {
-    return "BitBucketPPRPullRequestDeclinedActionFilter [getDescriptor()=" + getDescriptor()
-        + ", getClass()=" + getClass() + ", hashCode()=" + hashCode() + ", toString()="
-        + super.toString() + "]";
+    return "BitBucketPPRPullRequestDeclinedActionFilter [getDescriptor()="
+        + getDescriptor()
+        + ", getClass()="
+        + getClass()
+        + ", hashCode()="
+        + hashCode()
+        + ", toString()="
+        + super.toString()
+        + "]";
   }
 }

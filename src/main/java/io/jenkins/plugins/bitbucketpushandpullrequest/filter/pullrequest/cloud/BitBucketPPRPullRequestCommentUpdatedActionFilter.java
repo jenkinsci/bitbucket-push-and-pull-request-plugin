@@ -24,6 +24,7 @@ package io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.cloud;
 import java.io.File;
 import java.io.IOException;
 
+import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 
@@ -69,17 +70,18 @@ public class BitBucketPPRPullRequestCommentUpdatedActionFilter
   }
 
   @Override
-  public BitBucketPPRTriggerCause getCause(File pollingLog, BitBucketPPRAction pullRequestAction, 
-      BitBucketPPRHookEvent bitBucketEvent)
+  public BitBucketPPRTriggerCause getCause(
+      File pollingLog, BitBucketPPRAction pullRequestAction, BitBucketPPRHookEvent bitBucketEvent)
       throws IOException {
-    return new BitBucketPPRPullRequestCommentUpdatedCause(pollingLog, pullRequestAction, bitBucketEvent);
+    return new BitBucketPPRPullRequestCommentUpdatedCause(
+        pollingLog, pullRequestAction, bitBucketEvent);
   }
 
   @Override
   public boolean shouldSendApprove() {
     return false;
   }
-  
+
   @Override
   public boolean shouldSendDecline() {
     return false;
@@ -89,6 +91,7 @@ public class BitBucketPPRPullRequestCommentUpdatedActionFilter
     return BitBucketPPRUtils.matchWithRegex(comment, commentFilter, vars);
   }
 
+  @Symbol("bitbucketCloudPullRequestCommentUpdated")
   @Extension
   public static class ActionFilterDescriptorImpl extends BitBucketPPRPullRequestActionDescriptor {
 
@@ -100,8 +103,14 @@ public class BitBucketPPRPullRequestCommentUpdatedActionFilter
 
   @Override
   public String toString() {
-    return "BitBucketPPRPullRequestCommentUpdatedActionFilter [getDescriptor()=" + getDescriptor()
-        + ", getClass()=" + getClass() + ", hashCode()=" + hashCode() + ", toString()="
-        + super.toString() + "]";
+    return "BitBucketPPRPullRequestCommentUpdatedActionFilter [getDescriptor()="
+        + getDescriptor()
+        + ", getClass()="
+        + getClass()
+        + ", hashCode()="
+        + hashCode()
+        + ", toString()="
+        + super.toString()
+        + "]";
   }
 }

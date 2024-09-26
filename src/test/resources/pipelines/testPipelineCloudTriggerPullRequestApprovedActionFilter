@@ -1,0 +1,33 @@
+properties([
+  pipelineTriggers([
+    bitBucketTrigger(
+      triggers: [
+              bitbucketCloudPullRequest(
+              actionFilter:
+                  bitbucketCloudPullRequestApproved(
+                  triggerOnlyIfAllReviewersApproved: false
+                  )
+            )
+      ]
+    )
+  ])
+])
+
+pipeline {
+  agent any
+
+  stages {
+    stage('Build') {
+      steps {
+        echo 'Building...'
+        echo 'Env vars for cloud pull request...'
+        echo "BITBUCKET_SOURCE_BRANCH ${env.BITBUCKET_SOURCE_BRANCH}"
+        echo "BITBUCKET_TARGET_BRANCH ${env.BITBUCKET_TARGET_BRANCH}"
+        echo "BITBUCKET_PULL_REQUEST_LINK ${env.BITBUCKET_PULL_REQUEST_LINK}"
+        echo "BITBUCKET_PULL_REQUEST_ID ${env.BITBUCKET_PULL_REQUEST_ID}"
+        echo "BITBUCKET_PAYLOAD ${env.BITBUCKET_PAYLOAD}"
+        echo "branch feature/test-branch"
+      }
+    }
+  }
+}

@@ -24,6 +24,7 @@ package io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.cloud;
 import java.io.File;
 import java.io.IOException;
 
+import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 
@@ -64,22 +65,23 @@ public class BitBucketPPRPullRequestCommentCreatedActionFilter
 
   @Override
   public boolean shouldTriggerBuild(BitBucketPPRAction bitbucketAction) {
-    return matches(allowedBranches, bitbucketAction.getTargetBranch(), null) &&
-        hasInComment(bitbucketAction.getComment(), null);
-    }
+    return matches(allowedBranches, bitbucketAction.getTargetBranch(), null)
+        && hasInComment(bitbucketAction.getComment(), null);
+  }
 
   @Override
-  public BitBucketPPRTriggerCause getCause(File pollingLog, BitBucketPPRAction pullRequestAction, 
-      BitBucketPPRHookEvent bitBucketEvent)
+  public BitBucketPPRTriggerCause getCause(
+      File pollingLog, BitBucketPPRAction pullRequestAction, BitBucketPPRHookEvent bitBucketEvent)
       throws IOException {
-    return new BitBucketPPRPullRequestCommentCreatedCause(pollingLog, pullRequestAction, bitBucketEvent);
+    return new BitBucketPPRPullRequestCommentCreatedCause(
+        pollingLog, pullRequestAction, bitBucketEvent);
   }
 
   @Override
   public boolean shouldSendApprove() {
     return false;
   }
-  
+
   @Override
   public boolean shouldSendDecline() {
     return false;
@@ -89,6 +91,7 @@ public class BitBucketPPRPullRequestCommentCreatedActionFilter
     return BitBucketPPRUtils.matchWithRegex(comment, commentFilter, vars);
   }
 
+  @Symbol("bitbucketCloudPullRequestCommentCreated")
   @Extension
   public static class ActionFilterDescriptorImpl extends BitBucketPPRPullRequestActionDescriptor {
 
@@ -100,8 +103,14 @@ public class BitBucketPPRPullRequestCommentCreatedActionFilter
 
   @Override
   public String toString() {
-    return "BitBucketPPRPullRequestCommentCreatedActionFilter [getDescriptor()=" + getDescriptor()
-        + ", getClass()=" + getClass() + ", hashCode()=" + hashCode() + ", toString()="
-        + super.toString() + "]";
+    return "BitBucketPPRPullRequestCommentCreatedActionFilter [getDescriptor()="
+        + getDescriptor()
+        + ", getClass()="
+        + getClass()
+        + ", hashCode()="
+        + hashCode()
+        + ", toString()="
+        + super.toString()
+        + "]";
   }
 }
