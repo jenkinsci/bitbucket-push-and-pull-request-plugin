@@ -245,9 +245,7 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
             5,
             new CauseAction(cause),
             bitbucketAction,
-            new RevisionParameterAction(
-                bitbucketAction.getLatestCommit(),
-                new URIish(bitbucketAction.getScmUrls().get(0))));
+            new RevisionParameterAction(bitbucketAction.getLatestCommit()));
 
     QueueTaskFuture<? extends Run<?, ?>> f =
         item != null ? (QueueTaskFuture) item.getFuture() : null;
