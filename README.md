@@ -13,12 +13,12 @@
 - [Introduction](#introduction)
 - [Before you start](#before-you-start)
 - [Configuration](#configuration)
-  - [Configure the webhook](#configure-the-webhook)
-    - [Configure the Global Configurations of the Plugin](#configure-the-global-configurations-of-the-plugin)
-  - [Configure your Jenkins job](#configure-your-jenkins-job)
-    - [Authentication for state notification and generally when using the Bitbucket REST API](#authentication-for-state-notification-and-generally-when-using-the-bitbucket-rest-api)
-  - [Bitbucket Events supported by the plugin](#bitbucket-events-supported-by-the-plugin)
-    - [Some examples](#some-examples)
+    - [Configure the webhook](#configure-the-webhook)
+        - [Configure the Global Configurations of the Plugin](#configure-the-global-configurations-of-the-plugin)
+    - [Configure your Jenkins job](#configure-your-jenkins-job)
+        - [Authentication for state notification and generally when using the Bitbucket REST API](#authentication-for-state-notification-and-generally-when-using-the-bitbucket-rest-api)
+    - [Bitbucket Events supported by the plugin](#bitbucket-events-supported-by-the-plugin)
+        - [Some examples](#some-examples)
 - [Troubleshooting: Some important aspects to keep in mind](#troubleshooting-some-important-aspects-to-keep-in-mind)
     - [About the initialization of the plugin](#about-the-initialization-of-the-plugin)
     - [About the filters on the branches](#about-the-filters-on-the-branches)
@@ -31,14 +31,15 @@
 - [Pipeline script](#pipeline-script)
 - [Thanks and Acknowledgments](#thanks-and-acknowledgments)
 
-
 # Compatibility
 
 **Starting from version 3.x.x** the Plugin is compatible with:
+
 - Jenkins version: >= **2.361.4**
 - Java version: **11**
 
 The version 2.x.x of the Plugin is compatible with:
+
 - Jenkins >= v2.138.2
 - Java 8
 
@@ -49,8 +50,10 @@ Plugin for Jenkins **v2.361.4 or later**, that triggers builds on Bitbucket's pu
 Some of the features introduced by Bitbucket Push and Pull Request are:
 
 - build state notification
-- support of pull requests for Bitbucket cloud (rest api v2.x+ with mercurial and git) and bitbucket Server (from version 5.14 to version 7.21 - with git)
-- support of pushs for Bitbucket cloud (rest api v2.x+ with mercurial and git) and Bitbucket server (from version 5.14 to version 7.21 - with git)
+- support of pull requests for Bitbucket cloud (rest api v2.x+ with mercurial and git) and bitbucket Server (from
+  version 5.14 to version 7.21 - with git)
+- support of pushs for Bitbucket cloud (rest api v2.x+ with mercurial and git) and Bitbucket server (from version 5.14
+  to version 7.21 - with git)
 - usage of Gson instead of net.sf.json.JSONObject
 - Introduction of models and major security improvements
 
@@ -59,45 +62,58 @@ Bitbucket Push and Pull Request supports the
 - Bitbucket cloud rest api v2.x+ and later (with git and mercurial repos)
 - Bitbucket server 5.14+ and later (with git repos)
 
-
 # Before you start
 
 The version 2.x.x of the Plugin is compatible with:
-- Jenkins >= v2.138.2 
+
+- Jenkins >= v2.138.2
 - Java 8
 
 Otherwise, The version 3.x.x of the Plugin compatible with:
+
 - Jenkins version: >= 2.361.4
 - Java version: 11
 
-Bitbucket Push And Pull Request Plugin will not work if the old Bitbucket plugin <https://plugins.jenkins.io/bitbucket> is still installed. So, please de-install from Jenkins the previous Bitbucket plugin if you want to use this new one.
+Bitbucket Push And Pull Request Plugin will not work if the old Bitbucket plugin <https://plugins.jenkins.io/bitbucket>
+is still installed. So, please de-install from Jenkins the previous Bitbucket plugin if you want to use this new one.
 
-Reason is: both plugins use the same webhook endpoint and Jenkins gives priority to the old Bitbucket plugin, due to the lexical ordering used by Stapler to dispatch the request.
+Reason is: both plugins use the same webhook endpoint and Jenkins gives priority to the old Bitbucket plugin, due to the
+lexical ordering used by Stapler to dispatch the request.
 
 In case you want to use both plugins on the same Jenkins instance, you must:
 
-- override the default webhook endpoint "bitbucket-hook" in the Jenkins Global Configurations of the Bitbucket Push and Pull Request Plugin using a fresh new webhook - let's say: "bitbucket-ppr-webhook". **This webhook has to be a new one, consumed only by the Bitbucket Push and Pull Request Plugin, in order to avoid conflicts with other plugins**
+- override the default webhook endpoint "bitbucket-hook" in the Jenkins Global Configurations of the Bitbucket Push and
+  Pull Request Plugin using a fresh new webhook - let's say: "bitbucket-ppr-webhook". **This webhook has to be a new
+  one, consumed only by the Bitbucket Push and Pull Request Plugin, in order to avoid conflicts with other plugins**
 - After that, restart Jenkins
-- and configure the Bitbucket Cloud / Server webhooks accordingly to the new webhook endpoint (in our example: "bitbucket-ppr-webhook")
+- and configure the Bitbucket Cloud / Server webhooks accordingly to the new webhook endpoint (in our example: "
+  bitbucket-ppr-webhook")
 
 # Configuration
 
 ## Configure the webhook
 
-Configure your Bitbucket repository adding a webhook in the settings page. In the URL field (see image, at point A) add your JENKINS_URL followed by "/bitbucket-hook/" (for example <https://my-jenkins.on-my-planet-far-away.com/bitbucket-hook/>) Credentials for the webhook endpoint are not required, the trailing slash is mandatory.
+Configure your Bitbucket repository adding a webhook in the settings page. In the URL field (see image, at point A) add
+your JENKINS_URL followed by "/bitbucket-hook/" (for
+example <https://my-jenkins.on-my-planet-far-away.com/bitbucket-hook/>) Credentials for the webhook endpoint are not
+required, the trailing slash is mandatory.
 
 For more specific infos about managing webhooks please consult:
 
 - <https://confluence.atlassian.com/bitbucket/manage-webhooks-735643732.html>. (Bitbucket Cloud)
-- <https://confluence.atlassian.com/bitbucketserver/managing-webhooks-in-bitbucket-server-938025878.html>. (Bitbucket Server)
+- <https://confluence.atlassian.com/bitbucketserver/managing-webhooks-in-bitbucket-server-938025878.html>. (Bitbucket
+  Server)
 
 ### Configure the Global Configurations of the Plugin
 
-in the __Jenkins Global Configurations__: 
+in the __Jenkins Global Configurations__:
 
 1. you can override the default webhook endpoint "/bitbucket-hook/" consumed by the plugin
 
-2. you can configure a single job to be triggered exclusively. That overrides the default behavior of having a dedicated endpoint (+ some internal matching logic) for ALL pipelines to be triggered via this plugin. In case of a non-existing job a WARNING will be logged at global jenkins log. You can omit this feature by simply leaving this field blank.
+2. you can configure a single job to be triggered exclusively. That overrides the default behavior of having a dedicated
+   endpoint (+ some internal matching logic) for ALL pipelines to be triggered via this plugin. In case of a
+   non-existing job a WARNING will be logged at global jenkins log. You can omit this feature by simply leaving this
+   field blank.
 
 3. you can disable the build status notifications propagation.
 
@@ -105,30 +121,38 @@ in the __Jenkins Global Configurations__:
 
 5. you can set global credentials used by the plugin for the state notification
 
+6. you can set a propagation url to send the build status notification to a different url than the one used for the
+   webhook
+
 ![example global config jenkins bb ppr 1](docs/img/global-config.png)
 
 ## Configure your Jenkins job
 
 1. Configure the Bitbucket Repository under the Source Code Management with your credentials. For git:
-![example config git](docs/img/conf_git.png)
-In case you are using Mercurial instead of git, configure it as follows:
-![exampel config mercurial](docs/img/conf_mercurial.png)
-_Please note: the branch, related to the events which trigger the builds, must be specified in the field Revision._
+   ![example config git](docs/img/conf_git.png)
+   In case you are using Mercurial instead of git, configure it as follows:
+   ![exampel config mercurial](docs/img/conf_mercurial.png)
+   _Please note: the branch, related to the events which trigger the builds, must be specified in the field Revision._
 
-2. Now activate the plugin in your job selecting the "Build with Bitbucket Push and Pull Request Plugin" option in the Build Triggers pane.
+2. Now activate the plugin in your job selecting the "Build with Bitbucket Push and Pull Request Plugin" option in the
+   Build Triggers pane.
 
-3. Run the first job manually
+3. you can set a propagation url to send the build status notification to a different url than the one used for the
+   webhook. Note: this will override the one in the global configuration.
+
+4. Run the first job manually
 
 ### Authentication for state notification and generally when using the Bitbucket REST API
 
-| TYPE                | BB CLOUD | BB SERVER | JENKINS CREDENTIALS    | NOTES                                                                                                                |
-|---------------------|:---------|:----------|:-----------------------|----------------------------------------------------------------------------------------------------------------------|
-| Username & Password | X        | X         | Username with password | deprecated by bbc, will be removed in march 2022                                                                     |
-| HTTP access token   | -        | X         | Secret Text            | [learn more about HTTP tokens](https://confluence.atlassian.com/bitbucketserver/http-access-tokens-939515499.html)   |
-| OAuth consumers     | X        | -         | Secret Text            | [Oauth Consumers example config](./docs/oauth_config.md) |
+| TYPE                | BB CLOUD | BB SERVER | JENKINS CREDENTIALS    | NOTES                                                                                                              |
+|---------------------|:---------|:----------|:-----------------------|--------------------------------------------------------------------------------------------------------------------|
+| Username & Password | X        | X         | Username with password | deprecated by bbc, will be removed in march 2022                                                                   |
+| HTTP access token   | -        | X         | Secret Text            | [learn more about HTTP tokens](https://confluence.atlassian.com/bitbucketserver/http-access-tokens-939515499.html) |
+| OAuth consumers     | X        | -         | Secret Text            | [Oauth Consumers example config](./docs/oauth_config.md)                                                           |
 
 1. you can set globally the credentials used by the plugin for the state notification
-2. you can set for each job the credentials used by the plugin for the state notification, overwriting the global credentials
+2. you can set for each job the credentials used by the plugin for the state notification, overwriting the global
+   credentials
 3. you you don't set nothing the plugin will try to use the credentials used by the git plugin
 
 ## Bitbucket Events supported by the plugin
@@ -144,6 +168,12 @@ _Please note: the branch, related to the events which trigger the builds, must b
 | Comment Updated       | X        | -         | If a user updates the same comment with not much time in between, Bitbucket only sends the event request the first time the comment is updated. |
 | Comment Deleted       | X        | -         |                                                                                                                                                 |
 
+### Interaction with the git plugin
+
+This plugin forwards events from Bitbucket to the Git plugin, which manages all Git-related operations such as cloning,
+checking out, and fetching repositories. By delegating Git tasks to the Git plugin, this plugin focuses solely on
+handling Bitbucket events and trigger logic.
+
 ### Some examples
 
 ![example config jenkins bb ppr 1](docs/img/example_config_jenkins_bb_ppr_1.png)
@@ -151,34 +181,45 @@ _Please note: the branch, related to the events which trigger the builds, must b
 ![example config jenkins bb ppr 3](docs/img/example_config_jenkins_bb_ppr_3.png)
 ![example config jenkins bb ppr 4](docs/img/example_config_jenkins_bb_ppr_4.png)
 
-
 # Troubleshooting: Some important aspects to keep in mind
 
 ### About the initialization of the plugin
 
-The Bitbucket Push and Pull Request Plugin (**BBPPR Plugin**) uses the **Git Plugin** to handle with the git repositories managed by BitBucket. More in details:
+The Bitbucket Push and Pull Request Plugin (**BBPPR Plugin**) uses the **Git Plugin** to handle with the git
+repositories managed by BitBucket. More in details:
 
 1. The user initiliazes a new job starting manually a build.
-2. The **Git Plugin** clones the repository declared in the job fetching the branches as defined in the **Branch Specifier** filter field.
-3. Due to the fact that each branch is new, the **BBPPR Plugin** *sees* everywhere changes and, as a consequence, the **BBPPR Plugin** starts for each new fetched branch a job.
-4. It's also important to keep in mind that the filters on the branches specified by the **BBPPR Plugin** in its **Allowed Branches** field, are not applied in the initialization phase, because they are only active for jobs triggered through the BitBucket webhook (and not for the ones, which are built manually).
+2. The **Git Plugin** clones the repository declared in the job fetching the branches as defined in the **Branch
+   Specifier** filter field.
+3. Due to the fact that each branch is new, the **BBPPR Plugin** *sees* everywhere changes and, as a consequence, the *
+   *BBPPR Plugin** starts for each new fetched branch a job.
+4. It's also important to keep in mind that the filters on the branches specified by the **BBPPR Plugin** in its *
+   *Allowed Branches** field, are not applied in the initialization phase, because they are only active for jobs
+   triggered through the BitBucket webhook (and not for the ones, which are built manually).
 
 ### About the filters on the branches
 
 Talking generally, there are two filters used to 'control the branches':
 
 - the **Git plugin** filter on the branches: a kind of general filter applied at job level.
-- the **BBPPR plugin** filter: a specific one, that acts at trigger level and that is there because the user can have in a job more triggers than only one.
+- the **BBPPR plugin** filter: a specific one, that acts at trigger level and that is there because the user can have in
+  a job more triggers than only one.
 
-- Important is to keep in mind, that you cannot trigger events on branches that are excluded from the Git Plugin filter. It has the precedence because it defines (fetches) the branches, that can be accessed by the **BBPPR plugin**.
+- Important is to keep in mind, that you cannot trigger events on branches that are excluded from the Git Plugin filter.
+  It has the precedence because it defines (fetches) the branches, that can be accessed by the **BBPPR plugin**.
 
-- Moreover, the way in which the matching is done is the same for both plugins, because **we are using for the matching the public method given to disposal from the Git Plugin**.
-The reason for that is the wish to guarantee consistency between the two plugins, at least regarding the way in which branches are matched. This all means also, that we are not implementing the matching logic.
+- Moreover, the way in which the matching is done is the same for both plugins, because **we are using for the matching
+  the public method given to disposal from the Git Plugin**.
+  The reason for that is the wish to guarantee consistency between the two plugins, at least regarding the way in which
+  branches are matched. This all means also, that we are not implementing the matching logic.
 
-- As you see from the code: `return matches(allowedBranches, bitbucketAction.getTargetBranch(), null);`, the matching is between the string you specified (`allowedBranches`) and the **target branch** specified in the payload sent from BitBucket (`bitbucketAction.getTargetBranch()`). This means that **The filter is not on the source branch, but on the target branch.**
+- As you see from the code: `return matches(allowedBranches, bitbucketAction.getTargetBranch(), null);`, the matching is
+  between the string you specified (`allowedBranches`) and the **target branch** specified in the payload sent from
+  BitBucket (`bitbucketAction.getTargetBranch()`). This means that **The filter is not on the source branch, but on the
+  target branch.**
 
-- You can find al lot of examples in this test class: [BitBucketPPRPullRequestCreatedActionFilterTest.java](https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/blob/master/src/test/java/io/jenkins/plugins/bitbucketpushandpullrequest/filter/pullrequest/cloud/BitBucketPPRPullRequestCreatedActionFilterTest.java)
-
+- You can find al lot of examples in this test
+  class: [BitBucketPPRPullRequestCreatedActionFilterTest.java](https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/blob/master/src/test/java/io/jenkins/plugins/bitbucketpushandpullrequest/filter/pullrequest/cloud/BitBucketPPRPullRequestCreatedActionFilterTest.java)
 
 # Environment variables
 
@@ -207,73 +248,75 @@ The reason for that is the wish to guarantee consistency between the two plugins
 ```groovy
 bitbucketTriggers {
 
-  // For Bitbucket Cloud
-  repositoryPushAction(triggerAlsoIfTagPush: boolean, triggerAlsoIfNothingChanged: boolean, allowedBranches: String)
-  repositoryPushAction(triggerAlsoIfTagPush: boolean, triggerAlsoIfNothingChanged: boolean, allowedBranches: String, isToApprove: boolean)
-  repositoryPushAction(triggerAlsoIfTagPush: boolean, triggerAlsoIfNothingChanged: boolean, allowedBranches: String, isToApprove: boolean, triggerOnlyIfTagPush: boolean)
+    // For Bitbucket Cloud
+    repositoryPushAction(triggerAlsoIfTagPush: boolean, triggerAlsoIfNothingChanged: boolean, allowedBranches: String)
+    repositoryPushAction(triggerAlsoIfTagPush: boolean, triggerAlsoIfNothingChanged: boolean, allowedBranches: String, isToApprove: boolean)
+    repositoryPushAction(triggerAlsoIfTagPush: boolean, triggerAlsoIfNothingChanged: boolean, allowedBranches: String, isToApprove: boolean, triggerOnlyIfTagPush: boolean)
 
-  pullRequestApprovedAction(onlyIfReviewersApproved: boolean)
-  pullRequestApprovedAction(onlyIfReviewersApproved: boolean, allowedBranches: String)
-  pullRequestApprovedAction(onlyIfReviewersApproved: boolean, allowedBranches: String, isToApprove: boolean)
+    pullRequestApprovedAction(onlyIfReviewersApproved: boolean)
+    pullRequestApprovedAction(onlyIfReviewersApproved: boolean, allowedBranches: String)
+    pullRequestApprovedAction(onlyIfReviewersApproved: boolean, allowedBranches: String, isToApprove: boolean)
 
-  pullRequestCreatedAction()
-  pullRequestCreatedAction(allowedBranches: String)
-  pullRequestCreatedAction(allowedBranches: String, isToApprove: String)
+    pullRequestCreatedAction()
+    pullRequestCreatedAction(allowedBranches: String)
+    pullRequestCreatedAction(allowedBranches: String, isToApprove: String)
 
-  pullRequestUpdatedAction()
-  pullRequestUpdatedAction(allowedBranches: String)
-  pullRequestUpdatedAction(allowedBranches: String, isToApprove: String)
+    pullRequestUpdatedAction()
+    pullRequestUpdatedAction(allowedBranches: String)
+    pullRequestUpdatedAction(allowedBranches: String, isToApprove: String)
 
-  pullRequestMergedAction()
-  pullRequestMergedAction(allowedBranches: String)
-  pullRequestMergedAction(allowedBranches: String, isToApprove: String)
+    pullRequestMergedAction()
+    pullRequestMergedAction(allowedBranches: String)
+    pullRequestMergedAction(allowedBranches: String, isToApprove: String)
 
-  pullRequestDeclinedAction()
-  pullRequestDeclinedAction(allowedBranches: String)
+    pullRequestDeclinedAction()
+    pullRequestDeclinedAction(allowedBranches: String)
 
-  pullRequestCommentCreatedAction()
-  pullRequestCommentCreatedAction(allowedBranches: String)
-  pullRequestCommentCreatedAction(allowedBranches: String, commentFilter: String) // CommentFilter is java a regex expression
+    pullRequestCommentCreatedAction()
+    pullRequestCommentCreatedAction(allowedBranches: String)
+    pullRequestCommentCreatedAction(allowedBranches: String, commentFilter: String)
+    // CommentFilter is java a regex expression
 
-  pullRequestCommentUpdatedAction()
-  pullRequestCommentUpdatedAction(allowedBranches: String)
-  pullRequestCommentUpdatedAction(allowedBranches: String, commentFilter: String) // CommentFilter is java a regex expression
+    pullRequestCommentUpdatedAction()
+    pullRequestCommentUpdatedAction(allowedBranches: String)
+    pullRequestCommentUpdatedAction(allowedBranches: String, commentFilter: String)
+    // CommentFilter is java a regex expression
 
-  pullRequestCommentDeletedAction()
-  pullRequestCommentDeletedAction(allowedBranches: String)
+    pullRequestCommentDeletedAction()
+    pullRequestCommentDeletedAction(allowedBranches: String)
 
-  // For Bitbucket Server
-  // note: flag `isToApprove` has no effect yet
-  repositoryServerPushAction(triggerAlsoIfTagPush: boolean, triggerAlsoIfNothingChanged: boolean, allowedBranches: String)
-  repositoryServerPushAction(triggerAlsoIfTagPush: boolean, triggerAlsoIfNothingChanged: boolean, allowedBranches: String, isToApprove: boolean)
-  repositoryServerPushAction(triggerAlsoIfTagPush: boolean, triggerAlsoIfNothingChanged: boolean, allowedBranches: String, isToApprove: boolean, triggerOnlyIfTagPush: boolean)
+    // For Bitbucket Server
+    // note: flag `isToApprove` has no effect yet
+    repositoryServerPushAction(triggerAlsoIfTagPush: boolean, triggerAlsoIfNothingChanged: boolean, allowedBranches: String)
+    repositoryServerPushAction(triggerAlsoIfTagPush: boolean, triggerAlsoIfNothingChanged: boolean, allowedBranches: String, isToApprove: boolean)
+    repositoryServerPushAction(triggerAlsoIfTagPush: boolean, triggerAlsoIfNothingChanged: boolean, allowedBranches: String, isToApprove: boolean, triggerOnlyIfTagPush: boolean)
 
-  pullRequestServerApprovedAction(onlyIfReviewersApproved: boolean)
-  pullRequestServerApprovedAction(onlyIfReviewersApproved: boolean, allowedBranches: String)
-  pullRequestServerApprovedAction(onlyIfReviewersApproved: boolean, allowedBranches: String, isToApprove: boolean)
+    pullRequestServerApprovedAction(onlyIfReviewersApproved: boolean)
+    pullRequestServerApprovedAction(onlyIfReviewersApproved: boolean, allowedBranches: String)
+    pullRequestServerApprovedAction(onlyIfReviewersApproved: boolean, allowedBranches: String, isToApprove: boolean)
 
-  pullRequestServerCreatedAction()
-  pullRequestServerCreatedAction(allowedBranches: String)
-  pullRequestServerCreatedAction(allowedBranches: String, isToApprove: boolean)
+    pullRequestServerCreatedAction()
+    pullRequestServerCreatedAction(allowedBranches: String)
+    pullRequestServerCreatedAction(allowedBranches: String, isToApprove: boolean)
 
-  pullRequestServerUpdatedAction()
-  pullRequestServerUpdatedAction(allowedBranches: String)
-  pullRequestServerUpdatedAction(allowedBranches: String, isToApprove: boolean)
+    pullRequestServerUpdatedAction()
+    pullRequestServerUpdatedAction(allowedBranches: String)
+    pullRequestServerUpdatedAction(allowedBranches: String, isToApprove: boolean)
 
-  pullRequestServerSourceUpdatedAction()
-  pullRequestServerSourceUpdatedAction(allowedBranches: String)
-  pullRequestServerSourceUpdatedAction(allowedBranches: String, isToApprove: boolean)
+    pullRequestServerSourceUpdatedAction()
+    pullRequestServerSourceUpdatedAction(allowedBranches: String)
+    pullRequestServerSourceUpdatedAction(allowedBranches: String, isToApprove: boolean)
 
-  pullRequestServerMergedAction()
-  pullRequestServerMergedAction(allowedBranches: String)
-  pullRequestServerMergedAction(allowedBranches: String, isToApprove: boolean)
+    pullRequestServerMergedAction()
+    pullRequestServerMergedAction(allowedBranches: String)
+    pullRequestServerMergedAction(allowedBranches: String, isToApprove: boolean)
 
-  pullRequestServerDeclinedAction()
-  pullRequestServerDeclinedAction(allowedBranches: String)
+    pullRequestServerDeclinedAction()
+    pullRequestServerDeclinedAction(allowedBranches: String)
 
-  pullRequestServerCommentCreatedAction()
-  pullRequestServerCommentCreatedAction(allowedBranches : String)
-  pullRequestServerCommentCreatedAction(allowedBranches : String, commentFilter : String)
+    pullRequestServerCommentCreatedAction()
+    pullRequestServerCommentCreatedAction(allowedBranches: String)
+    pullRequestServerCommentCreatedAction(allowedBranches: String, commentFilter: String)
 }
 ```
 
@@ -284,304 +327,305 @@ bitbucketTriggers {
 ```groovy
 // pullRequestCreatedAction()
 job('example-pull-request-created') {
-  triggers{
-    bitbucketTriggers {
-      pullRequestCreatedAction()
+    triggers {
+        bitbucketTriggers {
+            pullRequestCreatedAction()
+        }
     }
-  }
-  scm {
-    git {
-      remote {
-        url("https://git.company.domain/scm/~username/telegram.git")
-      }
+    scm {
+        git {
+            remote {
+                url("https://git.company.domain/scm/~username/telegram.git")
+            }
+        }
     }
-  }
-  steps {
-    shell('echo START pull request created')
-  }
+    steps {
+        shell('echo START pull request created')
+    }
 }
 
 // pullRequestCreatedAction() with filter on branches
 job('example-pull-request-created-with-filter-on-branches') {
-  triggers{
-    bitbucketTriggers {
-      pullRequestCreatedAction("master")
+    triggers {
+        bitbucketTriggers {
+            pullRequestCreatedAction("master")
+        }
     }
-  }
-  scm {
-    git {
-      remote {
-        url("https://git.company.domain/scm/~username/telegram.git")
-      }
+    scm {
+        git {
+            remote {
+                url("https://git.company.domain/scm/~username/telegram.git")
+            }
+        }
     }
-  }
-  steps {
-    shell('echo START pull request created with filter on branches')
-  }
+    steps {
+        shell('echo START pull request created with filter on branches')
+    }
 }
 
 // pullRequestCreatedAction() with filter on branches
 // and eventually approve Pull Request in BB after the job is done
 job('example-pull-request-created-with-filter-on-branches-and-is-to-approve') {
-  triggers{
-    bitbucketTriggers {
-      pullRequestCreatedAction("master", true)
+    triggers {
+        bitbucketTriggers {
+            pullRequestCreatedAction("master", true)
+        }
     }
-  }
-  scm {
-    git {
-      remote {
-        url("https://git.company.domain/scm/~username/telegram.git")
-      }
+    scm {
+        git {
+            remote {
+                url("https://git.company.domain/scm/~username/telegram.git")
+            }
+        }
     }
-  }
-  steps {
-    shell('echo START pull request created with filter on branches')
-  }
+    steps {
+        shell('echo START pull request created with filter on branches')
+    }
 }
 
 // pullRequestUpdatedAction()
 job('example-pull-request-updated') {
-  triggers{
-    bitbucketTriggers {
-      pullRequestUpdatedAction()
+    triggers {
+        bitbucketTriggers {
+            pullRequestUpdatedAction()
+        }
     }
-  }
-  scm {
-    git {
-      remote {
-        url("https://git.company.domain/scm/~username/telegram.git")
-      }
+    scm {
+        git {
+            remote {
+                url("https://git.company.domain/scm/~username/telegram.git")
+            }
+        }
     }
-  }
-  steps {
-    shell('echo START pull request updated')
-  }
+    steps {
+        shell('echo START pull request updated')
+    }
 }
 
 // pullRequestUpdatedAction() wiht filter on branches
 job('example-pull-request-updated-with-filter-on-branches') {
-  triggers{
-    bitbucketTriggers {
-      pullRequestUpdatedAction("master")
+    triggers {
+        bitbucketTriggers {
+            pullRequestUpdatedAction("master")
+        }
     }
-  }
-  scm {
-    git {
-      remote {
-        url("https://git.company.domain/scm/~username/telegram.git")
-      }
+    scm {
+        git {
+            remote {
+                url("https://git.company.domain/scm/~username/telegram.git")
+            }
+        }
     }
-  }
-  steps {
-    shell('echo START pull request updated with filter on branches')
-  }
+    steps {
+        shell('echo START pull request updated with filter on branches')
+    }
 }
 
 // pullRequestUpdatedAction() wiht filter on branches
 // and eventually approve Pull Request in BB after the job is done
 job('example-pull-request-updated-with-filter-on-branches') {
-  triggers{
-    bitbucketTriggers {
-      pullRequestUpdatedAction("master", true)
+    triggers {
+        bitbucketTriggers {
+            pullRequestUpdatedAction("master", true)
+        }
     }
-  }
-  scm {
-    git {
-      remote {
-        url("https://git.company.domain/scm/~username/telegram.git")
-      }
+    scm {
+        git {
+            remote {
+                url("https://git.company.domain/scm/~username/telegram.git")
+            }
+        }
     }
-  }
-  steps {
-    shell('echo START pull request updated with filter on branches')
-  }
+    steps {
+        shell('echo START pull request updated with filter on branches')
+    }
 
 
 // pullRequestApprovedAction(boolean onlyIfReviewersApproved)
-job('example-pull-request-approved') {
-  triggers{
-    bitbucketTriggers {
-      pullRequestApprovedAction(false)
+    job('example-pull-request-approved') {
+        triggers {
+            bitbucketTriggers {
+                pullRequestApprovedAction(false)
+            }
+        }
+        scm {
+            git {
+                remote {
+                    url("https://git.company.domain/scm/~username/telegram.git")
+                }
+            }
+        }
+        steps {
+            shell('echo START pull request approved')
+        }
     }
-  }
-  scm {
-    git {
-      remote {
-        url("https://git.company.domain/scm/~username/telegram.git")
-      }
-    }
-  }
-  steps {
-    shell('echo START pull request approved')
-  }
-}
 
 // pullRequestApprovedAction(boolean onlyIfReviewersApproved) with filter on branches
-job('example-pull-request-approved-with-filter-on-branches') {
-  triggers{
-    bitbucketTriggers {
-      pullRequestApprovedAction(false, "master")
+    job('example-pull-request-approved-with-filter-on-branches') {
+        triggers {
+            bitbucketTriggers {
+                pullRequestApprovedAction(false, "master")
+            }
+        }
+        scm {
+            git {
+                remote {
+                    url("https://git.company.domain/scm/~username/telegram.git")
+                }
+            }
+        }
+        steps {
+            shell('echo START pull request approved with filter on branches')
+        }
     }
-  }
-  scm {
-    git {
-      remote {
-        url("https://git.company.domain/scm/~username/telegram.git")
-      }
-    }
-  }
-  steps {
-    shell('echo START pull request approved with filter on branches')
-  }
-}
 
 
 // pullRequestApprovedAction(boolean onlyIfReviewersApproved) with filter on branches
 // and eventually approve Pull Request in BB after the job is done
-job('example-pull-request-approved-with-filter-on-branches') {
-  triggers{
-    bitbucketTriggers {
-      pullRequestApprovedAction(false, "master", true)
+    job('example-pull-request-approved-with-filter-on-branches') {
+        triggers {
+            bitbucketTriggers {
+                pullRequestApprovedAction(false, "master", true)
+            }
+        }
+        scm {
+            git {
+                remote {
+                    url("https://git.company.domain/scm/~username/telegram.git")
+                }
+            }
+        }
+        steps {
+            shell('echo START pull request approved with filter on branches')
+        }
     }
-  }
-  scm {
-    git {
-      remote {
-        url("https://git.company.domain/scm/~username/telegram.git")
-      }
-    }
-  }
-  steps {
-    shell('echo START pull request approved with filter on branches')
-  }
-}
 
 // pullRequestMergedAction()
-job('example-pull-request-merged') {
-  triggers{
-    bitbucketTriggers {
-      pullRequestMergedAction()
+    job('example-pull-request-merged') {
+        triggers {
+            bitbucketTriggers {
+                pullRequestMergedAction()
+            }
+        }
+        scm {
+            git {
+                remote {
+                    url("https://git.company.domain/scm/~username/telegram.git")
+                }
+            }
+        }
+        steps {
+            shell('echo START pull request merged')
+        }
     }
-  }
-  scm {
-    git {
-      remote {
-        url("https://git.company.domain/scm/~username/telegram.git")
-      }
-    }
-  }
-  steps {
-    shell('echo START pull request merged')
-  }
-}
 
 // pullRequestMergedAction() with filter on branches
-job('example-pull-request-merged-with-filter-on-branches') {
-  triggers{
-    bitbucketTriggers {
-      pullRequestMergedAction("master")
+    job('example-pull-request-merged-with-filter-on-branches') {
+        triggers {
+            bitbucketTriggers {
+                pullRequestMergedAction("master")
+            }
+        }
+        scm {
+            git {
+                remote {
+                    url("https://git.company.domain/scm/~username/telegram.git")
+                }
+            }
+        }
+        steps {
+            shell('echo START pull request merged with filter on branches')
+        }
     }
-  }
-  scm {
-    git {
-      remote {
-        url("https://git.company.domain/scm/~username/telegram.git")
-      }
-    }
-  }
-  steps {
-    shell('echo START pull request merged with filter on branches')
-  }
-}
 
 // pullRequestMergedAction() with filter on branches
 // and eventually approve Pull Request in BB after the job is done
-job('example-pull-request-merged-with-filter-on-branches') {
-  triggers{
-    bitbucketTriggers {
-      pullRequestMergedAction("master")
+    job('example-pull-request-merged-with-filter-on-branches') {
+        triggers {
+            bitbucketTriggers {
+                pullRequestMergedAction("master")
+            }
+        }
+        scm {
+            git {
+                remote {
+                    url("https://git.company.domain/scm/~username/telegram.git")
+                }
+            }
+        }
+        steps {
+            shell('echo START pull request merged with filter on branches')
+        }
     }
-  }
-  scm {
-    git {
-      remote {
-        url("https://git.company.domain/scm/~username/telegram.git")
-      }
-    }
-  }
-  steps {
-    shell('echo START pull request merged with filter on branches')
-  }
-}
 
 // repositoryPushAction(boolean triggerAlsoIfTagPush, boolean triggerAlsoIfNothingChanged, String allowedBranches)
-job('example-push') {
-  triggers{
-    bitbucketTriggers {
-      repositoryPushAction(false, true, "master")
+    job('example-push') {
+        triggers {
+            bitbucketTriggers {
+                repositoryPushAction(false, true, "master")
+            }
+        }
+        scm {
+            git {
+                remote {
+                    url("https://git.company.domain/scm/~username/telegram.git")
+                }
+            }
+        }
+        steps {
+            shell('echo START push')
+        }
     }
-  }
-  scm {
-    git {
-      remote {
-        url("https://git.company.domain/scm/~username/telegram.git")
-      }
-    }
-  }
-  steps {
-      shell('echo START push')
-  }
-}
 
 
 // repositoryPushAction(boolean triggerAlsoIfTagPush, boolean triggerAlsoIfNothingChanged, String allowedBranches)
 // and eventually approve Pull Request in BB after the job is done
-job('example-push') {
-  triggers{
-    bitbucketTriggers {// and eventually approve Pull Request in BB after the job is done
+    job('example-push') {
+        triggers {
+            bitbucketTriggers {// and eventually approve Pull Request in BB after the job is done
 
-      repositoryPushAction(false, true, "master", true)
+                repositoryPushAction(false, true, "master", true)
+            }
+        }
+        scm {
+            git {
+                remote {
+                    url("https://git.company.domain/scm/~username/telegram.git")
+                }
+            }
+        }
+        steps {
+            shell('echo START push')
+        }
     }
-  }
-  scm {
-    git {
-      remote {
-        url("https://git.company.domain/scm/~username/telegram.git")
-      }
-    }
-  }
-  steps {
-      shell('echo START push')
-  }
-}
 
 // combination of triggers is also possible
-job('example-pull-request-created-updated') {
-  triggers{
-    bitbucketTriggers {
-      pullRequestCreatedAction()
-      pullRequestUpdatedAction()
-      pullRequestMergedAction("master")
+    job('example-pull-request-created-updated') {
+        triggers {
+            bitbucketTriggers {
+                pullRequestCreatedAction()
+                pullRequestUpdatedAction()
+                pullRequestMergedAction("master")
+            }
+        }
+        scm {
+            git {
+                remote {
+                    url("https://git.company.domain/scm/~username/telegram.git")
+                }
+            }
+        }
+        steps {
+            shell('echo START pull request created')
+        }
     }
-  }
-  scm {
-    git {
-      remote {
-          url("https://git.company.domain/scm/~username/telegram.git")
-      }
-    }
-  }
-  steps {
-      shell('echo START pull request created')
-  }
-}
 
 ```
 
 ### Valid for pipeline with job-dsl 1.77+ (and before)
 
 Note that this may require an additional script approval, the seed job failing with a message similar to:
+
 ```
 ERROR: Scripts not permitted to use method groovy.lang.GroovyObject invokeMethod java.lang.String java.lang.Object (javaposse.jobdsl.dsl.jobs.WorkflowJob bitbucketTrigger script$_run_closure1$_closure5$_closure24$_closure29$_closure30$_closure31)
 ```
@@ -589,495 +633,495 @@ ERROR: Scripts not permitted to use method groovy.lang.GroovyObject invokeMethod
 ```groovy
 // pullRequestCreatedAction()
 job('example-pull-request-created') {
-  properties {
-    pipelineTriggers {
-      triggers {
-        bitBucketTrigger {
-          triggers {
-            bitBucketPPRPullRequestTriggerFilter {
-              actionFilter {
-                bitBucketPPRPullRequestCreatedActionFilter {
+    properties {
+        pipelineTriggers {
+            triggers {
+                bitBucketTrigger {
+                    triggers {
+                        bitBucketPPRPullRequestTriggerFilter {
+                            actionFilter {
+                                bitBucketPPRPullRequestCreatedActionFilter {
+                                }
+                            }
+                        }
+                    }
                 }
-              }
             }
-          }
         }
-      }
     }
-  }
-  scm {
-    git {
-      remote {
-        url("https://git.company.domain/scm/~username/telegram.git")
-      }
+    scm {
+        git {
+            remote {
+                url("https://git.company.domain/scm/~username/telegram.git")
+            }
+        }
     }
-  }
-  steps {
-    shell('echo START pull request created')
-  }
+    steps {
+        shell('echo START pull request created')
+    }
 }
 
 // pullRequestCreatedAction() with filter on branches
 job('example-pull-request-created-with-filter-on-branches') {
-  properties {
-    pipelineTriggers {
-      triggers {
-        bitBucketTrigger {
-          triggers {
-            bitBucketPPRPullRequestTriggerFilter {
-              actionFilter {
-                bitBucketPPRPullRequestCreatedActionFilter {
-                  allowedBranches("master")
+    properties {
+        pipelineTriggers {
+            triggers {
+                bitBucketTrigger {
+                    triggers {
+                        bitBucketPPRPullRequestTriggerFilter {
+                            actionFilter {
+                                bitBucketPPRPullRequestCreatedActionFilter {
+                                    allowedBranches("master")
+                                }
+                            }
+                        }
+                    }
                 }
-              }
             }
-          }
         }
-      }
     }
-  }
-  scm {
-    git {
-      remote {
-        url("https://git.company.domain/scm/~username/telegram.git")
-      }
+    scm {
+        git {
+            remote {
+                url("https://git.company.domain/scm/~username/telegram.git")
+            }
+        }
     }
-  }
-  steps {
-    shell('echo START pull request created with filter on branches')
-  }
+    steps {
+        shell('echo START pull request created with filter on branches')
+    }
 }
 
 // pullRequestCreatedAction() with filter on branches
 // and eventually approve Pull Request in BB after the job is done
 job('example-pull-request-created-with-filter-on-branches-and-is-to-approve') {
-  properties {
-    pipelineTriggers {
-      triggers {
-        bitBucketTrigger {
-          triggers {
-            bitBucketPPRPullRequestTriggerFilter {
-              actionFilter {
-                bitBucketPPRPullRequestCreatedActionFilter {
-                  allowedBranches("master")
-                  isToApprove(true)
+    properties {
+        pipelineTriggers {
+            triggers {
+                bitBucketTrigger {
+                    triggers {
+                        bitBucketPPRPullRequestTriggerFilter {
+                            actionFilter {
+                                bitBucketPPRPullRequestCreatedActionFilter {
+                                    allowedBranches("master")
+                                    isToApprove(true)
+                                }
+                            }
+                        }
+                    }
                 }
-              }
             }
-          }
         }
-      }
     }
-  }
-  scm {
-    git {
-      remote {
-        url("https://git.company.domain/scm/~username/telegram.git")
-      }
+    scm {
+        git {
+            remote {
+                url("https://git.company.domain/scm/~username/telegram.git")
+            }
+        }
     }
-  }
-  steps {
-    shell('echo START pull request created with filter on branches')
-  }
+    steps {
+        shell('echo START pull request created with filter on branches')
+    }
 }
 
 // pullRequestUpdatedAction()
 job('example-pull-request-updated') {
-  properties {
-    pipelineTriggers {
-      triggers {
-        bitBucketTrigger {
-          triggers {
-            bitBucketPPRPullRequestTriggerFilter {
-              actionFilter {
-                bitBucketPPRPullRequestUpdatedActionFilter {
+    properties {
+        pipelineTriggers {
+            triggers {
+                bitBucketTrigger {
+                    triggers {
+                        bitBucketPPRPullRequestTriggerFilter {
+                            actionFilter {
+                                bitBucketPPRPullRequestUpdatedActionFilter {
+                                }
+                            }
+                        }
+                    }
                 }
-              }
             }
-          }
         }
-      }
     }
-  }
-  scm {
-    git {
-      remote {
-        url("https://git.company.domain/scm/~username/telegram.git")
-      }
+    scm {
+        git {
+            remote {
+                url("https://git.company.domain/scm/~username/telegram.git")
+            }
+        }
     }
-  }
-  steps {
-    shell('echo START pull request updated')
-  }
+    steps {
+        shell('echo START pull request updated')
+    }
 }
 
 // pullRequestUpdatedAction() wiht filter on branches
 job('example-pull-request-updated-with-filter-on-branches') {
-  properties {
-    pipelineTriggers {
-      triggers {
-        bitBucketTrigger {
-          triggers {
-            bitBucketPPRPullRequestTriggerFilter {
-              actionFilter {
-                bitBucketPPRPullRequestUpdatedActionFilter {
-                  allowedBranches("master")
+    properties {
+        pipelineTriggers {
+            triggers {
+                bitBucketTrigger {
+                    triggers {
+                        bitBucketPPRPullRequestTriggerFilter {
+                            actionFilter {
+                                bitBucketPPRPullRequestUpdatedActionFilter {
+                                    allowedBranches("master")
+                                }
+                            }
+                        }
+                    }
                 }
-              }
             }
-          }
         }
-      }
     }
-  }
-  scm {
-    git {
-      remote {
-        url("https://git.company.domain/scm/~username/telegram.git")
-      }
+    scm {
+        git {
+            remote {
+                url("https://git.company.domain/scm/~username/telegram.git")
+            }
+        }
     }
-  }
-  steps {
-    shell('echo START pull request updated with filter on branches')
-  }
+    steps {
+        shell('echo START pull request updated with filter on branches')
+    }
 }
 
 // pullRequestUpdatedAction() wiht filter on branches
 // and eventually approve Pull Request in BB after the job is done
 job('example-pull-request-updated-with-filter-on-branches') {
-  properties {
-    pipelineTriggers {
-      triggers {
-        bitBucketTrigger {
-          triggers {
-            bitBucketPPRPullRequestTriggerFilter {
-              actionFilter {
-                bitBucketPPRPullRequestUpdatedActionFilter {
-                  allowedBranches("master")
-                  isToApprove(true)
+    properties {
+        pipelineTriggers {
+            triggers {
+                bitBucketTrigger {
+                    triggers {
+                        bitBucketPPRPullRequestTriggerFilter {
+                            actionFilter {
+                                bitBucketPPRPullRequestUpdatedActionFilter {
+                                    allowedBranches("master")
+                                    isToApprove(true)
+                                }
+                            }
+                        }
+                    }
                 }
-              }
             }
-          }
         }
-      }
     }
-  }
-  scm {
-    git {
-      remote {
-        url("https://git.company.domain/scm/~username/telegram.git")
-      }
+    scm {
+        git {
+            remote {
+                url("https://git.company.domain/scm/~username/telegram.git")
+            }
+        }
     }
-  }
-  steps {
-    shell('echo START pull request updated with filter on branches')
-  }
+    steps {
+        shell('echo START pull request updated with filter on branches')
+    }
 
 
 // pullRequestApprovedAction(boolean onlyIfReviewersApproved)
-job('example-pull-request-approved') {
-  properties {
-    pipelineTriggers {
-      triggers {
-        bitBucketTrigger {
-          triggers {
-            bitBucketPPRPullRequestTriggerFilter {
-              actionFilter {
-                bitBucketPPRPullRequestApprovedActionFilter {
-                  triggerOnlyIfAllReviewersApproved(false)
+    job('example-pull-request-approved') {
+        properties {
+            pipelineTriggers {
+                triggers {
+                    bitBucketTrigger {
+                        triggers {
+                            bitBucketPPRPullRequestTriggerFilter {
+                                actionFilter {
+                                    bitBucketPPRPullRequestApprovedActionFilter {
+                                        triggerOnlyIfAllReviewersApproved(false)
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
-              }
             }
-          }
         }
-      }
+        scm {
+            git {
+                remote {
+                    url("https://git.company.domain/scm/~username/telegram.git")
+                }
+            }
+        }
+        steps {
+            shell('echo START pull request approved')
+        }
     }
-  }
-  scm {
-    git {
-      remote {
-        url("https://git.company.domain/scm/~username/telegram.git")
-      }
-    }
-  }
-  steps {
-    shell('echo START pull request approved')
-  }
-}
 
 // pullRequestApprovedAction(boolean onlyIfReviewersApproved) with filter on branches
-job('example-pull-request-approved-with-filter-on-branches') {
-  properties {
-    pipelineTriggers {
-      triggers {
-        bitBucketTrigger {
-          triggers {
-            bitBucketPPRPullRequestTriggerFilter {
-              actionFilter {
-                bitBucketPPRPullRequestApprovedActionFilter {
-                  triggerOnlyIfAllReviewersApproved(false)
-                  allowedBranches("master")
+    job('example-pull-request-approved-with-filter-on-branches') {
+        properties {
+            pipelineTriggers {
+                triggers {
+                    bitBucketTrigger {
+                        triggers {
+                            bitBucketPPRPullRequestTriggerFilter {
+                                actionFilter {
+                                    bitBucketPPRPullRequestApprovedActionFilter {
+                                        triggerOnlyIfAllReviewersApproved(false)
+                                        allowedBranches("master")
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
-              }
             }
-          }
         }
-      }
+        scm {
+            git {
+                remote {
+                    url("https://git.company.domain/scm/~username/telegram.git")
+                }
+            }
+        }
+        steps {
+            shell('echo START pull request approved with filter on branches')
+        }
     }
-  }
-  scm {
-    git {
-      remote {
-        url("https://git.company.domain/scm/~username/telegram.git")
-      }
-    }
-  }
-  steps {
-    shell('echo START pull request approved with filter on branches')
-  }
-}
 
 
 // pullRequestApprovedAction(boolean onlyIfReviewersApproved) with filter on branches
 // and eventually approve Pull Request in BB after the job is done
-job('example-pull-request-approved-with-filter-on-branches') {
-  properties {
-    pipelineTriggers {
-      triggers {
-        bitBucketTrigger {
-          triggers {
-            bitBucketPPRPullRequestTriggerFilter {
-              actionFilter {
-                bitBucketPPRPullRequestApprovedActionFilter {
-                  triggerOnlyIfAllReviewersApproved(false)
-                  allowedBranches("master")
-                  isToApprove(true)
+    job('example-pull-request-approved-with-filter-on-branches') {
+        properties {
+            pipelineTriggers {
+                triggers {
+                    bitBucketTrigger {
+                        triggers {
+                            bitBucketPPRPullRequestTriggerFilter {
+                                actionFilter {
+                                    bitBucketPPRPullRequestApprovedActionFilter {
+                                        triggerOnlyIfAllReviewersApproved(false)
+                                        allowedBranches("master")
+                                        isToApprove(true)
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
-              }
             }
-          }
         }
-      }
+        scm {
+            git {
+                remote {
+                    url("https://git.company.domain/scm/~username/telegram.git")
+                }
+            }
+        }
+        steps {
+            shell('echo START pull request approved with filter on branches')
+        }
     }
-  }
-  scm {
-    git {
-      remote {
-        url("https://git.company.domain/scm/~username/telegram.git")
-      }
-    }
-  }
-  steps {
-    shell('echo START pull request approved with filter on branches')
-  }
-}
 
 // pullRequestMergedAction()
-job('example-pull-request-merged') {
-  properties {
-    pipelineTriggers {
-      triggers {
-        bitBucketTrigger {
-          triggers {
-            bitBucketPPRPullRequestTriggerFilter {
-              actionFilter {
-                bitBucketPPRPullRequestMergedActionFilter {
+    job('example-pull-request-merged') {
+        properties {
+            pipelineTriggers {
+                triggers {
+                    bitBucketTrigger {
+                        triggers {
+                            bitBucketPPRPullRequestTriggerFilter {
+                                actionFilter {
+                                    bitBucketPPRPullRequestMergedActionFilter {
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
-              }
             }
-          }
         }
-      }
+        scm {
+            git {
+                remote {
+                    url("https://git.company.domain/scm/~username/telegram.git")
+                }
+            }
+        }
+        steps {
+            shell('echo START pull request merged')
+        }
     }
-  }
-  scm {
-    git {
-      remote {
-        url("https://git.company.domain/scm/~username/telegram.git")
-      }
-    }
-  }
-  steps {
-    shell('echo START pull request merged')
-  }
-}
 
 // pullRequestMergedAction() with filter on branches
-job('example-pull-request-merged-with-filter-on-branches') {
-  properties {
-    pipelineTriggers {
-      triggers {
-        bitBucketTrigger {
-          triggers {
-            bitBucketPPRPullRequestTriggerFilter {
-              actionFilter {
-                bitBucketPPRPullRequestMergedActionFilter {
-                  allowedBranches("master")
+    job('example-pull-request-merged-with-filter-on-branches') {
+        properties {
+            pipelineTriggers {
+                triggers {
+                    bitBucketTrigger {
+                        triggers {
+                            bitBucketPPRPullRequestTriggerFilter {
+                                actionFilter {
+                                    bitBucketPPRPullRequestMergedActionFilter {
+                                        allowedBranches("master")
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
-              }
             }
-          }
         }
-      }
+        scm {
+            git {
+                remote {
+                    url("https://git.company.domain/scm/~username/telegram.git")
+                }
+            }
+        }
+        steps {
+            shell('echo START pull request merged with filter on branches')
+        }
     }
-  }
-  scm {
-    git {
-      remote {
-        url("https://git.company.domain/scm/~username/telegram.git")
-      }
-    }
-  }
-  steps {
-    shell('echo START pull request merged with filter on branches')
-  }
-}
 
 // pullRequestMergedAction() with filter on branches
 // and eventually approve Pull Request in BB after the job is done
-job('example-pull-request-merged-with-filter-on-branches') {
-  properties {
-    pipelineTriggers {
-      triggers {
-        bitBucketTrigger {
-          triggers {
-            bitBucketPPRPullRequestTriggerFilter {
-              actionFilter {
-                bitBucketPPRPullRequestMergedActionFilter {
-                  allowedBranches("master")
-                  isToApprove(true)
+    job('example-pull-request-merged-with-filter-on-branches') {
+        properties {
+            pipelineTriggers {
+                triggers {
+                    bitBucketTrigger {
+                        triggers {
+                            bitBucketPPRPullRequestTriggerFilter {
+                                actionFilter {
+                                    bitBucketPPRPullRequestMergedActionFilter {
+                                        allowedBranches("master")
+                                        isToApprove(true)
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
-              }
             }
-          }
         }
-      }
+        scm {
+            git {
+                remote {
+                    url("https://git.company.domain/scm/~username/telegram.git")
+                }
+            }
+        }
+        steps {
+            shell('echo START pull request merged with filter on branches')
+        }
     }
-  }
-  scm {
-    git {
-      remote {
-        url("https://git.company.domain/scm/~username/telegram.git")
-      }
-    }
-  }
-  steps {
-    shell('echo START pull request merged with filter on branches')
-  }
-}
 
 // repositoryPushAction(boolean triggerAlsoIfTagPush, boolean triggerAlsoIfNothingChanged, String allowedBranches)
-job('example-push') {
-  properties {
-    pipelineTriggers {
-      triggers {
-        bitBucketTrigger {
-          triggers {
-            bitBucketPPRRepositoryTriggerFilter {
-              actionFilter {
-                bitBucketPPRRepositoryPushActionFilter {
-                  triggerAlsoIfTagPush(false)
-                  triggerAlsoIfNothingChanged(true)
-                  allowedBranches("master")
+    job('example-push') {
+        properties {
+            pipelineTriggers {
+                triggers {
+                    bitBucketTrigger {
+                        triggers {
+                            bitBucketPPRRepositoryTriggerFilter {
+                                actionFilter {
+                                    bitBucketPPRRepositoryPushActionFilter {
+                                        triggerAlsoIfTagPush(false)
+                                        triggerAlsoIfNothingChanged(true)
+                                        allowedBranches("master")
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
-              }
             }
-          }
         }
-      }
+        scm {
+            git {
+                remote {
+                    url("https://git.company.domain/scm/~username/telegram.git")
+                }
+            }
+        }
+        steps {
+            shell('echo START push')
+        }
     }
-  }
-  scm {
-    git {
-      remote {
-        url("https://git.company.domain/scm/~username/telegram.git")
-      }
-    }
-  }
-  steps {
-      shell('echo START push')
-  }
-}
 
 
 // repositoryPushAction(boolean triggerAlsoIfTagPush, boolean triggerAlsoIfNothingChanged, String allowedBranches)
 // and eventually approve Pull Request in BB after the job is done
-job('example-push') {
-  properties {
-    pipelineTriggers {
-      triggers {
-        bitBucketTrigger {// and eventually approve Pull Request in BB after the job is done
-          triggers {
-            bitBucketPPRRepositoryTriggerFilter {
-              actionFilter {
-                bitBucketPPRRepositoryPushActionFilter {
-                  triggerAlsoIfTagPush(false)
-                  triggerAlsoIfNothingChanged(true)
-                  allowedBranches("master")
-                  isToApprove(true)
+    job('example-push') {
+        properties {
+            pipelineTriggers {
+                triggers {
+                    bitBucketTrigger {// and eventually approve Pull Request in BB after the job is done
+                        triggers {
+                            bitBucketPPRRepositoryTriggerFilter {
+                                actionFilter {
+                                    bitBucketPPRRepositoryPushActionFilter {
+                                        triggerAlsoIfTagPush(false)
+                                        triggerAlsoIfNothingChanged(true)
+                                        allowedBranches("master")
+                                        isToApprove(true)
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
-              }
             }
-          }
         }
-      }
+        scm {
+            git {
+                remote {
+                    url("https://git.company.domain/scm/~username/telegram.git")
+                }
+            }
+        }
+        steps {
+            shell('echo START push')
+        }
     }
-  }
-  scm {
-    git {
-      remote {
-        url("https://git.company.domain/scm/~username/telegram.git")
-      }
-    }
-  }
-  steps {
-      shell('echo START push')
-  }
-}
 
 // combination of triggers is also possible
-job('example-pull-request-created-updated') {
-  properties {
-    pipelineTriggers {
-      triggers {
-        bitBucketTrigger {
-          triggers {
-            bitBucketPPRPullRequestTriggerFilter {
-              actionFilter {
-                bitBucketPPRPullRequestCreatedActionFilter {
+    job('example-pull-request-created-updated') {
+        properties {
+            pipelineTriggers {
+                triggers {
+                    bitBucketTrigger {
+                        triggers {
+                            bitBucketPPRPullRequestTriggerFilter {
+                                actionFilter {
+                                    bitBucketPPRPullRequestCreatedActionFilter {
+                                    }
+                                }
+                            }
+                            bitBucketPPRPullRequestTriggerFilter {
+                                actionFilter {
+                                    bitBucketPPRPullRequestUpdatedActionFilter {
+                                    }
+                                }
+                            }
+                            bitBucketPPRPullRequestTriggerFilter {
+                                actionFilter {
+                                    bitBucketPPRPullRequestMergedActionFilter {
+                                        allowedBranches("master")
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
-              }
             }
-            bitBucketPPRPullRequestTriggerFilter {
-              actionFilter {
-                bitBucketPPRPullRequestUpdatedActionFilter {
-                }
-              }
-            }
-            bitBucketPPRPullRequestTriggerFilter {
-              actionFilter {
-                bitBucketPPRPullRequestMergedActionFilter {
-                  allowedBranches("master")
-                }
-              }
-            }
-          }
         }
-      }
+        scm {
+            git {
+                remote {
+                    url("https://git.company.domain/scm/~username/telegram.git")
+                }
+            }
+        }
+        steps {
+            shell('echo START pull request created')
+        }
     }
-  }
-  scm {
-    git {
-      remote {
-          url("https://git.company.domain/scm/~username/telegram.git")
-      }
-    }
-  }
-  steps {
-      shell('echo START pull request created')
-  }
-}
 ```
 
 ### Second (more verbose) valid dsl for freestyle jobs
@@ -1087,19 +1131,19 @@ All the above examples can be adapted with the same paradigm.
 
 ```groovy
 freeStyleJob('test-job') {
-  triggers {
-    bitBucketTrigger {
-      triggers {
-        bitBucketPPRPullRequestTriggerFilter {
-          actionFilter {
-            bitBucketPPRPullRequestUpdatedActionFilter {
-              isToApprove(true)
+    triggers {
+        bitBucketTrigger {
+            triggers {
+                bitBucketPPRPullRequestTriggerFilter {
+                    actionFilter {
+                        bitBucketPPRPullRequestUpdatedActionFilter {
+                            isToApprove(true)
+                        }
+                    }
+                }
             }
-          }
         }
-      }
     }
-  }
 }
 ```
 
@@ -1109,80 +1153,80 @@ Example of pipeline code for building on pull-request and push events.
 
 ```groovy
 properties([
-  pipelineTriggers([
-    [
-      $class: 'BitBucketPPRTrigger',
-      triggers : [
-        [
-          $class: 'BitBucketPPRPullRequestTriggerFilter',
-          actionFilter: [
-            $class: 'BitBucketPPRPullRequestCreatedActionFilter',
-          ]
-        ],
-        [
-          $class: 'BitBucketPPRPullRequestTriggerFilter',
-          actionFilter: [
-            $class: 'BitBucketPPRPullRequestApprovedActionFilter',
-          ]
-        ],
-        [
-          $class: 'BitBucketPPRPullRequestTriggerFilter',
-          actionFilter: [
-            $class: 'BitBucketPPRPullRequestUpdatedActionFilter',
-          ]
-        ],
-        [
-          $class: 'BitBucketPPRPullRequestTriggerFilter',
-          actionFilter: [
-            $class: 'BitBucketPPRPullRequestMergedActionFilter',
-          ]
-        ],
-        [
-          $class: 'BitBucketPPRRepositoryTriggerFilter',
-          actionFilter: [
-            $class: 'BitBucketPPRRepositoryPushActionFilter',
-            triggerAlsoIfNothingChanged: true,
-            triggerAlsoIfTagPush: false,
-            allowedBranches: "",
-            isToApprove: true
-          ]
-        ]
-      ]
-    ]
-  ])
+        pipelineTriggers([
+                [
+                        $class  : 'BitBucketPPRTrigger',
+                        triggers: [
+                                [
+                                        $class      : 'BitBucketPPRPullRequestTriggerFilter',
+                                        actionFilter: [
+                                                $class: 'BitBucketPPRPullRequestCreatedActionFilter',
+                                        ]
+                                ],
+                                [
+                                        $class      : 'BitBucketPPRPullRequestTriggerFilter',
+                                        actionFilter: [
+                                                $class: 'BitBucketPPRPullRequestApprovedActionFilter',
+                                        ]
+                                ],
+                                [
+                                        $class      : 'BitBucketPPRPullRequestTriggerFilter',
+                                        actionFilter: [
+                                                $class: 'BitBucketPPRPullRequestUpdatedActionFilter',
+                                        ]
+                                ],
+                                [
+                                        $class      : 'BitBucketPPRPullRequestTriggerFilter',
+                                        actionFilter: [
+                                                $class: 'BitBucketPPRPullRequestMergedActionFilter',
+                                        ]
+                                ],
+                                [
+                                        $class      : 'BitBucketPPRRepositoryTriggerFilter',
+                                        actionFilter: [
+                                                $class                     : 'BitBucketPPRRepositoryPushActionFilter',
+                                                triggerAlsoIfNothingChanged: true,
+                                                triggerAlsoIfTagPush       : false,
+                                                allowedBranches            : "",
+                                                isToApprove                : true
+                                        ]
+                                ]
+                        ]
+                ]
+        ])
 ])
 
 pipeline {
-  agent any
+    agent any
 
-  stages {
-  stage('Build') {
-      steps {
-        echo 'Building...'
+    stages {
+        stage('Build') {
+            steps {
+                echo 'Building...'
 
-        echo 'Env vars for cloud pull request...'
-        echo "BITBUCKET_SOURCE_BRANCH ${env.BITBUCKET_SOURCE_BRANCH}"
-        echo "BITBUCKET_TARGET_BRANCH ${env.BITBUCKET_TARGET_BRANCH}"
-        echo "BITBUCKET_PULL_REQUEST_LINK ${env.BITBUCKET_PULL_REQUEST_LINK}"
-        echo "BITBUCKET_PULL_REQUEST_ID ${env.BITBUCKET_PULL_REQUEST_ID}"
-        echo "BITBUCKET_PAYLOAD ${env.BITBUCKET_PAYLOAD}"
+                echo 'Env vars for cloud pull request...'
+                echo "BITBUCKET_SOURCE_BRANCH ${env.BITBUCKET_SOURCE_BRANCH}"
+                echo "BITBUCKET_TARGET_BRANCH ${env.BITBUCKET_TARGET_BRANCH}"
+                echo "BITBUCKET_PULL_REQUEST_LINK ${env.BITBUCKET_PULL_REQUEST_LINK}"
+                echo "BITBUCKET_PULL_REQUEST_ID ${env.BITBUCKET_PULL_REQUEST_ID}"
+                echo "BITBUCKET_PAYLOAD ${env.BITBUCKET_PAYLOAD}"
 
-        echo 'Env vars for cloud push...'
-        echo "REPOSITORY_LINK ${env.REPOSITORY_LINK}"
-        echo "BITBUCKET_SOURCE_BRANCH ${env.BITBUCKET_SOURCE_BRANCH}"
-        echo "BITBUCKET_REPOSITORY_URL ${env.BITBUCKET_REPOSITORY_URL}"
-        echo "BITBUCKET_PUSH_REPOSITORY_UUID ${env.BITBUCKET_PUSH_REPOSITORY_UUID}"
-        echo "BITBUCKET_PAYLOAD ${env.BITBUCKET_PAYLOAD}"
+                echo 'Env vars for cloud push...'
+                echo "REPOSITORY_LINK ${env.REPOSITORY_LINK}"
+                echo "BITBUCKET_SOURCE_BRANCH ${env.BITBUCKET_SOURCE_BRANCH}"
+                echo "BITBUCKET_REPOSITORY_URL ${env.BITBUCKET_REPOSITORY_URL}"
+                echo "BITBUCKET_PUSH_REPOSITORY_UUID ${env.BITBUCKET_PUSH_REPOSITORY_UUID}"
+                echo "BITBUCKET_PAYLOAD ${env.BITBUCKET_PAYLOAD}"
 
-        echo 'Env vars for server push...'
-        echo "REPOSITORY_LINK ${env.REPOSITORY_LINK}"
-        echo "BITBUCKET_SOURCE_BRANCH ${env.BITBUCKET_SOURCE_BRANCH}"
-        echo "BITBUCKET_REPOSITORY_URL ${env.BITBUCKET_REPOSITORY_URL}"
-        echo "BITBUCKET_PUSH_REPOSITORY_UUID ${env.BITBUCKET_PUSH_REPOSITORY_UUID}"
-        echo "BITBUCKET_PAYLOAD ${env.BITBUCKET_PAYLOAD}"
-      }
+                echo 'Env vars for server push...'
+                echo "REPOSITORY_LINK ${env.REPOSITORY_LINK}"
+                echo "BITBUCKET_SOURCE_BRANCH ${env.BITBUCKET_SOURCE_BRANCH}"
+                echo "BITBUCKET_REPOSITORY_URL ${env.BITBUCKET_REPOSITORY_URL}"
+                echo "BITBUCKET_PUSH_REPOSITORY_UUID ${env.BITBUCKET_PUSH_REPOSITORY_UUID}"
+                echo "BITBUCKET_PAYLOAD ${env.BITBUCKET_PAYLOAD}"
+            }
+        }
     }
-  }
 }
 ```
 
