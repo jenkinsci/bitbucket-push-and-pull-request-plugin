@@ -1,15 +1,44 @@
 package io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.cloud;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import hudson.model.FreeStyleProject;
+import hudson.triggers.Trigger;
+import hudson.triggers.TriggerDescriptor;
+import io.jenkins.plugins.bitbucketpushandpullrequest.BitBucketPPRTrigger;
+import javaposse.jobdsl.plugin.ExecuteDslScripts;
+import javaposse.jobdsl.plugin.RemovedJobAction;
+import org.apache.commons.io.IOUtils;
+import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
+import org.jenkinsci.plugins.workflow.job.WorkflowJob;
+import org.jenkinsci.plugins.workflow.job.WorkflowRun;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.jvnet.hudson.test.JenkinsRule;
 import org.mockito.junit.MockitoJUnitRunner;
 import hudson.EnvVars;
 
+import static org.junit.Assert.*;
+
 @RunWith(MockitoJUnitRunner.class)
 public class BitBucketPPRPullRequestApprovedActionFilterTest {
+  @Rule public JenkinsRule j = new JenkinsRule();
+
+  private void createSeedJob(String script) throws Exception {
+    WorkflowJob pipelineJob = j.createProject(WorkflowJob.class, "pipelineJob");
+
+    // Set the pipeline script (like setting a Jenkinsfile)
+    pipelineJob.setDefinition(new CpsFlowDefinition(script, true));
+
+    // Build and assert that it succeeded
+    j.buildAndAssertSuccess(pipelineJob);
+  }
 
   @Test
   public void testMatches() {
@@ -133,7 +162,6 @@ public class BitBucketPPRPullRequestApprovedActionFilterTest {
         new BitBucketPPRPullRequestApprovedActionFilter(false);
     c.setAllowedBranches(allowedBranches);
 
-
     assertTrue(c.matches(allowedBranches, "refs/heads/jenkins", null));
     assertTrue(c.matches(allowedBranches, "refs/heads/jane", null));
     assertTrue(c.matches(allowedBranches, "refs/heads/jones", null));
@@ -197,7 +225,6 @@ public class BitBucketPPRPullRequestApprovedActionFilterTest {
     assertTrue(c.matches(allowedBranches, "feature/new-stuff", null));
   }
 
-
   @Test
   public void testUsesJavaPatternWithRepetition() {
     String allowedBranches = ":origin/release-\\d{8}";
@@ -226,5 +253,45 @@ public class BitBucketPPRPullRequestApprovedActionFilterTest {
     assertTrue(c.matches(allowedBranches, "origin/develop-123", null));
     assertFalse(c.matches(allowedBranches, "origin/master", null));
     assertFalse(c.matches(allowedBranches, "origin/develop", null));
+  }
+
+  private String readScript(String path) throws Exception {
+    String script = null;
+    try {
+      ClassLoader classloader = Thread.currentThread().getContextClassLoader();
+      InputStream is = classloader.getResourceAsStream(path);
+      script = IOUtils.toString(is, StandardCharsets.UTF_8);
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+    return script;
+  }
+
+  @Test
+  public void testPipelineTrigger() throws Exception {
+
+    createSeedJob(
+        readScript("./pipelines/testPipelineCloudTriggerPullRequestApprovedActionFilter"));
+    // get newly created pipeline job
+    WorkflowJob createdJob = (WorkflowJob) j.getInstance().getItem("pipelineJob");
+    assert createdJob != null;
+    Map<TriggerDescriptor, Trigger<?>> triggers = createdJob.getTriggers();
+    assertEquals(1, triggers.size());
+    List<String> dispNames = new ArrayList<>();
+    boolean isToApprove = false;
+    for (Trigger<?> entry : triggers.values()) {
+      BitBucketPPRTrigger tmp2 = (BitBucketPPRTrigger) entry;
+      assertEquals(1, tmp2.getTriggers().size());
+      String tmpName = tmp2.getTriggers().get(0).getActionFilter().getClass().getName();
+      String dispName = tmpName.substring(tmpName.lastIndexOf(".") + 1);
+      dispNames.add(dispName);
+      BitBucketPPRPullRequestApprovedActionFilter tmp3 =
+          (BitBucketPPRPullRequestApprovedActionFilter) tmp2.getTriggers().get(0).getActionFilter();
+      isToApprove = tmp3.shouldSendApprove();
+    }
+
+    assertEquals(1, dispNames.size());
+    assertEquals(dispNames.get(0), "BitBucketPPRPullRequestApprovedActionFilter");
+    assertFalse(isToApprove);
   }
 }
