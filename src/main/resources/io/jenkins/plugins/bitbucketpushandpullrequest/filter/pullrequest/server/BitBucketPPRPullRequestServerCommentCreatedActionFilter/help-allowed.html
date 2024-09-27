@@ -2,12 +2,6 @@
   <p>Specify the branches if you'd like to track a specific branch in a repository.
   If left blank, all branches will be examined for changes and built.</p>
 
-  <p>The safest way is to use the <code>refs/heads/&lt;branchName&gt;</code> syntax. This way the expected branch
-  is unambiguous.</p>
-
-  <p>If your branch name has a <code>/</code> in it make sure to use the full reference above. When not presented
-  with a full path the plugin will only use the part of the string right of the last slash.
-  Meaning <code>foo/bar</code> will actually match <code>bar</code>.</p>
 
   <p>If you use a wildcard branch specifier, with a slash (e.g. <code>release/</code>),
   you'll need to specify the origin repository in the branch names to
@@ -16,14 +10,10 @@
   <p>Possible options:
     <ul>
       <li> <strong><code>&lt;branchName&gt;</code></strong><br/>
-           Tracks/checks out the specified branch. If ambiguous the first result is taken, which is not necessarily
-           the expected one. Better use <code>refs/heads/&lt;branchName&gt;</code>.<br/>
+           Tracks/checks out the specified branch.
            E.g. <code>master</code>, <code>feature1</code>, ...
       </li>
-      <li> <strong><code>refs/heads/&lt;branchName&gt;</code></strong><br/>
-           Tracks/checks out the specified branch.<br/>
-           E.g. <code>refs/heads/master</code>, <code>refs/heads/feature1/master</code>, ...
-      </li>
+
       <li> <strong><code>&lt;remoteRepoName&gt;/&lt;branchName&gt;</code></strong><br/>
            Tracks/checks out the specified branch. If ambiguous the first result is taken, which is not necessarily
            the expected one.<br/>
