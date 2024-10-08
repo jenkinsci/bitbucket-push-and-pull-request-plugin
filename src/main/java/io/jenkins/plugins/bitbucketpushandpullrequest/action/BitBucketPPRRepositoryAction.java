@@ -30,7 +30,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.Nonnull;
-import hudson.model.InvisibleAction;
+
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud.BitBucketPPRChange;
 import java.util.stream.Collectors;
