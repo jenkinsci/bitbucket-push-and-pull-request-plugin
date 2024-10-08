@@ -21,9 +21,9 @@
 
 package io.jenkins.plugins.bitbucketpushandpullrequest.action;
 
-import hudson.model.InvisibleAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.config.BitBucketPPRPluginConfig;
 import io.jenkins.plugins.bitbucketpushandpullrequest.exception.BitBucketPPRPayloadPropertyNotFoundException;
+import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRHookEvent;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.server.BitBucketPPRServerClone;
 
@@ -34,6 +34,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
+import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst.PULL_REQUEST_MERGED;
 import static java.util.Objects.isNull;
 import static org.apache.commons.lang3.ObjectUtils.isEmpty;
 
@@ -49,10 +50,13 @@ public class BitBucketPPRPullRequestServerAction extends BitBucketPPRActionAbstr
   private String repositoryUuid;
   private static final BitBucketPPRPluginConfig globalConfig =
       BitBucketPPRPluginConfig.getInstance();
+  private final BitBucketPPRHookEvent bitbucketEvent;
 
-  public BitBucketPPRPullRequestServerAction(@Nonnull BitBucketPPRPayload payload)
+  public BitBucketPPRPullRequestServerAction(
+      @Nonnull BitBucketPPRPayload payload, BitBucketPPRHookEvent bitbucketEvent)
       throws BitBucketPPRPayloadPropertyNotFoundException {
     this.payload = payload;
+    this.bitbucketEvent = bitbucketEvent;
 
     if (isNull(payload.getServerPullRequest().getToRef())
         || isNull(payload.getServerPullRequest().getToRef().getRepository())
@@ -216,6 +220,9 @@ public class BitBucketPPRPullRequestServerAction extends BitBucketPPRActionAbstr
 
   @Override
   public String getLatestCommit() {
+    if (PULL_REQUEST_MERGED.equalsIgnoreCase(this.bitbucketEvent.getAction())) {
+      return payload.getPullRequest().getMergeCommit().getHash();
+    }
     return payload.getServerPullRequest().getFromRef().getLatestCommit();
   }
 
@@ -223,7 +230,7 @@ public class BitBucketPPRPullRequestServerAction extends BitBucketPPRActionAbstr
   public String getCommitLink() throws MalformedURLException {
     // returns:
     // /rest/build-status/1.0/commits/{commitId}
-    String commitId = payload.getServerPullRequest().getFromRef().getLatestCommit();
+    String commitId = this.getLatestCommit();
 
     return getBaseUrl() + "/rest/build-status/1.0/commits/" + commitId;
   }

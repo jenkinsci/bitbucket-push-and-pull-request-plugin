@@ -1,17 +1,17 @@
 /*******************************************************************************
  * The MIT License
- * 
+ *
  * Copyright (C) 2018, CloudBees, Inc.
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
  * including without limitation the rights to use, copy, modify, merge, publish, distribute,
  * sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in all copies or
  * substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT
  * NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
@@ -26,7 +26,6 @@ import java.util.Date;
 import java.util.List;
 import com.google.gson.annotations.SerializedName;
 
-
 public class BitBucketPPRPullRequest implements Serializable {
   private static final long serialVersionUID = -530740975503014281L;
   private String id;
@@ -36,6 +35,7 @@ public class BitBucketPPRPullRequest implements Serializable {
   private BitBucketPPRActor author;
   private @SerializedName("created_on") Date createdOn;
   private @SerializedName("updated_on") Date updatedOn;
+  private @SerializedName("merge_commit") BitBucketPPRCommit mergeCommit;
   private BitBucketPPRSource source;
   private BitBucketPPRDestination destination;
   private List<BitBucketPPRParticipant> participants = new ArrayList<>();
@@ -73,6 +73,14 @@ public class BitBucketPPRPullRequest implements Serializable {
 
   public void setState(final String state) {
     this.state = state;
+  }
+
+  public BitBucketPPRCommit getMergeCommit() {
+    return mergeCommit;
+  }
+
+  public void setMergeCommit(final BitBucketPPRCommit mergeCommit) {
+    this.mergeCommit = mergeCommit;
   }
 
   public BitBucketPPRActor getAuthor() {
@@ -149,9 +157,32 @@ public class BitBucketPPRPullRequest implements Serializable {
 
   @Override
   public String toString() {
-    return "BitBucketPPRPullRequest [id=" + id + ", title=" + title + ", description=" + description
-        + ", state=" + state + ", author=" + author + ", createdOn=" + createdOn + ", updatedOn="
-        + updatedOn + ", source=" + source + ", destination=" + destination + ", participants="
-        + participants + ", type=" + type + ", reason=" + reason + ", links=" + links + "]";
+    return "BitBucketPPRPullRequest [id="
+        + id
+        + ", title="
+        + title
+        + ", description="
+        + description
+        + ", state="
+        + state
+        + ", author="
+        + author
+        + ", createdOn="
+        + createdOn
+        + ", updatedOn="
+        + updatedOn
+        + ", source="
+        + source
+        + ", destination="
+        + destination
+        + ", participants="
+        + participants
+        + ", type="
+        + type
+        + ", reason="
+        + reason
+        + ", links="
+        + links
+        + "]";
   }
 }

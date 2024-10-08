@@ -27,18 +27,14 @@ import org.mockito.Captor;
 import org.mockito.MockedStatic;
 import org.mockito.junit.MockitoJUnitRunner;
 
-
 @RunWith(MockitoJUnitRunner.class)
 public class BitBucketPPRRepositoryPayloadProcessorTest {
 
   public BitBucketPPRPayload payload;
   public BitBucketPPRHookEvent bitbucketEvent;
-  @Captor
-  private ArgumentCaptor<BitBucketPPRHookEvent> eventCaptor;
-  @Captor
-  private ArgumentCaptor<BitBucketPPRAction> actionCaptor;
-  @Captor
-  private ArgumentCaptor<BitBucketPPRObservable> observableCaptor;
+  @Captor private ArgumentCaptor<BitBucketPPRHookEvent> eventCaptor;
+  @Captor private ArgumentCaptor<BitBucketPPRAction> actionCaptor;
+  @Captor private ArgumentCaptor<BitBucketPPRObservable> observableCaptor;
 
   @Before
   public void readPayload() {
@@ -67,8 +63,8 @@ public class BitBucketPPRRepositoryPayloadProcessorTest {
 
   @Test
   public void testRepositoryPushWebhookGit() {
-    try (MockedStatic<BitBucketPPRPluginConfig> config = mockStatic(
-        BitBucketPPRPluginConfig.class)) {
+    try (MockedStatic<BitBucketPPRPluginConfig> config =
+        mockStatic(BitBucketPPRPluginConfig.class)) {
       BitBucketPPRPluginConfig configInstance = mock(BitBucketPPRPluginConfig.class);
       config.when(BitBucketPPRPluginConfig::getInstance).thenReturn(configInstance);
       BitBucketPPRJobProbe probe = mock(BitBucketPPRJobProbe.class);
@@ -85,8 +81,9 @@ public class BitBucketPPRRepositoryPayloadProcessorTest {
 
       repositoryPayloadProcessor.processPayload(payload, observable);
 
-      verify(probe).triggerMatchingJobs(eventCaptor.capture(), actionCaptor.capture(),
-          observableCaptor.capture());
+      verify(probe)
+          .triggerMatchingJobs(
+              eventCaptor.capture(), actionCaptor.capture(), observableCaptor.capture());
 
       assertEquals(bitbucketEvent, eventCaptor.getValue());
       assertEquals(payload, actionCaptor.getValue().getPayload());

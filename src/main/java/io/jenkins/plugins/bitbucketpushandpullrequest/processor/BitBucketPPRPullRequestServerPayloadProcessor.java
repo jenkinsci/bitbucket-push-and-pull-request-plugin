@@ -19,7 +19,6 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  ******************************************************************************/
 
-
 package io.jenkins.plugins.bitbucketpushandpullrequest.processor;
 
 import static java.util.Objects.nonNull;
@@ -34,28 +33,29 @@ import io.jenkins.plugins.bitbucketpushandpullrequest.observer.BitBucketPPRObser
 import java.util.logging.Logger;
 import javax.annotation.Nonnull;
 
-
 public class BitBucketPPRPullRequestServerPayloadProcessor extends BitBucketPPRPayloadProcessor {
 
   private static final Logger logger =
       Logger.getLogger(BitBucketPPRPullRequestServerPayloadProcessor.class.getName());
 
-  public BitBucketPPRPullRequestServerPayloadProcessor(@Nonnull BitBucketPPRJobProbe jobProbe,
-      @Nonnull BitBucketPPRHookEvent bitbucketEvent) {
+  public BitBucketPPRPullRequestServerPayloadProcessor(
+      @Nonnull BitBucketPPRJobProbe jobProbe, @Nonnull BitBucketPPRHookEvent bitbucketEvent) {
     super(jobProbe, bitbucketEvent);
     logger.fine(() -> "Processing " + bitbucketEvent.toString());
-
   }
 
-  private BitBucketPPRAction buildActionForJobs(@Nonnull BitBucketPPRPayload payload)
+  private BitBucketPPRAction buildActionForJobs(
+      @Nonnull BitBucketPPRPayload payload, @Nonnull BitBucketPPRHookEvent bitbucketEvent)
       throws BitBucketPPRPayloadPropertyNotFoundException {
-    return new BitBucketPPRPullRequestServerAction(payload);
+    return new BitBucketPPRPullRequestServerAction(payload, bitbucketEvent);
   }
 
   @Override
-  public void processPayload(@Nonnull BitBucketPPRPayload payload,
-      BitBucketPPRObservable observable) throws BitBucketPPRPayloadPropertyNotFoundException {
+  public void processPayload(
+      @Nonnull BitBucketPPRPayload payload, BitBucketPPRObservable observable)
+      throws BitBucketPPRPayloadPropertyNotFoundException {
 
-    jobProbe.triggerMatchingJobs(bitbucketEvent, buildActionForJobs(payload), observable);
+    jobProbe.triggerMatchingJobs(
+        bitbucketEvent, buildActionForJobs(payload, bitbucketEvent), observable);
   }
 }

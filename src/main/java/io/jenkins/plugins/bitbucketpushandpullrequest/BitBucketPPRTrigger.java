@@ -33,9 +33,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.logging.Logger;
 import javax.annotation.CheckForNull;
 
-import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRActionAbstract;
-import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRPullRequestServerAction;
-import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRServerRepositoryAction;
+import io.jenkins.plugins.bitbucketpushandpullrequest.action.*;
 import org.apache.commons.jelly.XMLOutput;
 import org.eclipse.jgit.transport.URIish;
 import org.jenkinsci.Symbol;
@@ -66,7 +64,6 @@ import hudson.triggers.Trigger;
 import hudson.triggers.TriggerDescriptor;
 import hudson.util.ListBoxModel;
 import hudson.util.SequentialExecutionQueue;
-import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.cause.BitBucketPPRTriggerCause;
 import io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRUtils;
 import io.jenkins.plugins.bitbucketpushandpullrequest.event.BitBucketPPREventContext;
@@ -246,6 +243,8 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
             new CauseAction(cause),
             bitbucketAction,
             new RevisionParameterAction(bitbucketAction.getLatestCommit()));
+
+    logger.info(String.format("Commit passed to git: %s", bitbucketAction.getLatestCommit()));
 
     QueueTaskFuture<? extends Run<?, ?>> f =
         item != null ? (QueueTaskFuture) item.getFuture() : null;
