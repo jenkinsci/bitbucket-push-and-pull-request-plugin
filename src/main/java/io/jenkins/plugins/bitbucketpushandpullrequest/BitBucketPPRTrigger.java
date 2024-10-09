@@ -22,24 +22,26 @@
 package io.jenkins.plugins.bitbucketpushandpullrequest;
 
 import java.io.File;
+import java.net.MalformedURLException;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Logger;
 import javax.annotation.CheckForNull;
 
+import hudson.model.*;
+import hudson.util.FormValidation;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRActionAbstract;
-import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRPullRequestServerAction;
-import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRServerRepositoryAction;
+import io.jenkins.plugins.bitbucketpushandpullrequest.observer.BitBucketPPRMsTeamsObserver;
+import io.jenkins.plugins.bitbucketpushandpullrequest.observer.BitBucketPPRObserverFactory;
+import io.jenkins.plugins.bitbucketpushandpullrequest.observer.BitBucketPPRPushCloudObserver;
 import org.apache.commons.jelly.XMLOutput;
-import org.eclipse.jgit.transport.URIish;
 import org.jenkinsci.Symbol;
-import org.jenkinsci.plugins.plaincredentials.StringCredentials;
 import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
@@ -51,12 +53,6 @@ import com.cloudbees.plugins.credentials.domains.DomainRequirement;
 import hudson.Extension;
 import hudson.Util;
 import hudson.console.AnnotatedLargeText;
-import hudson.model.CauseAction;
-import hudson.model.Item;
-import hudson.model.Job;
-import hudson.model.Queue;
-import hudson.model.Run;
-import hudson.model.Build;
 import hudson.model.queue.QueueTaskFuture;
 import hudson.plugins.git.RevisionParameterAction;
 import hudson.scm.PollingResult;
@@ -68,7 +64,6 @@ import hudson.util.ListBoxModel;
 import hudson.util.SequentialExecutionQueue;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.cause.BitBucketPPRTriggerCause;
-import io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRUtils;
 import io.jenkins.plugins.bitbucketpushandpullrequest.event.BitBucketPPREventContext;
 import io.jenkins.plugins.bitbucketpushandpullrequest.event.BitBucketPPREventFactory;
 import io.jenkins.plugins.bitbucketpushandpullrequest.event.BitBucketPPREventType;
@@ -95,6 +90,7 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
   public static final boolean ALLOW_HOOKURL_OVERRIDE = true;
   public String credentialsId;
   public String propagationUrl;
+  public String msTeamsNotificationUrl;
 
   // list of classes
 
@@ -118,6 +114,16 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
     }
   }
 
+  @DataBoundSetter
+  public void setMsTeamsNotificationUrl(String msTeamsNotificationUrl) {
+
+    if (msTeamsNotificationUrl != null && !msTeamsNotificationUrl.isEmpty()) {
+      this.msTeamsNotificationUrl = msTeamsNotificationUrl;
+    } else {
+      this.msTeamsNotificationUrl = "";
+    }
+  }
+
   /**
    * Called when a POST is made.
    *
@@ -135,6 +141,7 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
       throws Exception {
     logger.finest(String.format("Called onPost Method for action %s", bitbucketAction));
     checkLocalPropagationUrl(bitbucketAction);
+    checkMSNotificationUrl(bitbucketAction, observable, bitbucketEvent);
 
     if (job == null) {
       logger.warning("Error: the job is null");
@@ -193,6 +200,20 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
 
     } else {
       logger.warning("Triggers are not configured.");
+    }
+  }
+
+  private void checkMSNotificationUrl(
+      BitBucketPPRAction bitbucketAction,
+      BitBucketPPRObservable observable,
+      BitBucketPPRHookEvent bitbucketEvent) {
+
+    if (bitbucketAction == null) {
+      return;
+    }
+
+    if (!isEmpty(msTeamsNotificationUrl)) {
+      observable.addObserver(new BitBucketPPRMsTeamsObserver(msTeamsNotificationUrl));
     }
   }
 
@@ -367,6 +388,19 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
       return item instanceof Job
           && SCMTriggerItem.SCMTriggerItems.asSCMTriggerItem(item) != null
           && item instanceof ParameterizedJobMixIn.ParameterizedJob;
+    }
+
+    public FormValidation doCheckMsTeamsNotificationUrl(@QueryParameter String value) {
+      if (value == null || value.isEmpty()) {
+        return FormValidation.ok();
+      }
+
+      try {
+        new URL(value); // This will throw MalformedURLException if the URL is not valid
+        return FormValidation.ok();
+      } catch (MalformedURLException e) {
+        return FormValidation.error("This is not a valid URL. Please enter a correct URL.");
+      }
     }
 
     @Override

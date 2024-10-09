@@ -51,7 +51,7 @@ public class BitBucketPPRPushServerObserver extends BitBucketPPRHandlerTemplate
     Result result = context.getRun().getResult();
     String state = result == Result.SUCCESS ? "SUCCESSFUL" : "FAILED";
 
-    Map<String, String> map = new HashMap<>();
+    Map<String, Object> map = new HashMap<>();
     map.put("key", computeBitBucketBuildKey(context));
     map.put("url", context.getAbsoluteUrl());
     map.put("state", state);
@@ -62,7 +62,7 @@ public class BitBucketPPRPushServerObserver extends BitBucketPPRHandlerTemplate
   @Override
   public void setBuildStatusInProgress() throws MalformedURLException {
     BitBucketPPRAction bitbucketAction = context.getAction();
-    Map<String, String> map = new HashMap<>();
+    Map<String, Object> map = new HashMap<>();
     map.put("key", computeBitBucketBuildKey(context));
     map.put("url", context.getAbsoluteUrl());
     map.put("state", "INPROGRESS");

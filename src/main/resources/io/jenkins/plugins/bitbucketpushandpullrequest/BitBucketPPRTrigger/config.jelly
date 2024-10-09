@@ -12,4 +12,9 @@
     <f:entry title="Propagation URL" field="propagationUrlTitle">
         <f:textbox field="propagationUrl"/>
     </f:entry>
+
+    <f:entry title="Microsoft Teams Notification Webhook" field="msTeamsNotificationUrlTitle">
+        <f:textbox field="msTeamsNotificationUrl"/>
+    </f:entry>
+
 </j:jelly>

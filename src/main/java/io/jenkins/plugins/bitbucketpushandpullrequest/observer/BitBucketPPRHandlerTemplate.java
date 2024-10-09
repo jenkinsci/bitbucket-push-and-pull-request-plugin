@@ -83,7 +83,7 @@ public abstract class BitBucketPPRHandlerTemplate {
     }
   }
 
-  protected void callClient(@Nonnull String url, @Nonnull Map<String, String> payload) {
+  protected void callClient(@Nonnull String url, @Nonnull Map<String, Object> payload) {
     ObjectMapper objectMapper = new ObjectMapper();
 
     try {

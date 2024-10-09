@@ -83,7 +83,7 @@ public class BitBucketPPRPullRequestCloudObserver extends BitBucketPPRHandlerTem
     String state =
         result == Result.SUCCESS ? "SUCCESSFUL" : result == Result.ABORTED ? "STOPPED" : "FAILED";
 
-    Map<String, String> map = new HashMap<>();
+    Map<String, Object> map = new HashMap<>();
     map.put("key", computeBitBucketBuildKey(context));
     map.put("url", context.getAbsoluteUrl());
     map.put("state", state);
@@ -96,7 +96,7 @@ public class BitBucketPPRPullRequestCloudObserver extends BitBucketPPRHandlerTem
     BitBucketPPRAction bitbucketAction = context.getAction();
     String url = bitbucketAction.getCommitLink() + "/statuses/build";
 
-    Map<String, String> map = new HashMap<>();
+    Map<String, Object> map = new HashMap<>();
     map.put("key", computeBitBucketBuildKey(context));
     map.put("url", context.getAbsoluteUrl());
     map.put("state", "INPROGRESS");
