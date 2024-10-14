@@ -24,8 +24,6 @@ package io.jenkins.plugins.bitbucketpushandpullrequest.action;
 import io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRUtils;
 import io.jenkins.plugins.bitbucketpushandpullrequest.exception.BitBucketPPRRepositoryNotParsedException;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -33,8 +31,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.Nonnull;
 
-import hudson.model.InvisibleAction;
+import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRHookEvent;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
+
+import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst.PULL_REQUEST_MERGED;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.ObjectUtils.isEmpty;
 
@@ -59,10 +59,13 @@ public class BitBucketPPRPullRequestAction extends BitBucketPPRActionAbstract
   private final @Nonnull String repoSlug;
 
   private final @Nonnull String pullRequestId;
+  private final @Nonnull BitBucketPPRHookEvent bitbucketEvent;
 
-  public BitBucketPPRPullRequestAction(@Nonnull BitBucketPPRPayload payload) {
+  public BitBucketPPRPullRequestAction(
+      @Nonnull BitBucketPPRPayload payload, @Nonnull BitBucketPPRHookEvent event) {
     this.payload = payload;
     this.pullRequestId = payload.getPullRequest().getId();
+    this.bitbucketEvent = event;
 
     Map<String, String> workspaceRepo;
     try {
@@ -223,6 +226,9 @@ public class BitBucketPPRPullRequestAction extends BitBucketPPRActionAbstract
 
   @Override
   public String getLatestCommit() {
+    if (PULL_REQUEST_MERGED.equalsIgnoreCase(this.bitbucketEvent.getAction())) {
+      return payload.getPullRequest().getMergeCommit().getHash();
+    }
     return payload.getPullRequest().getSource().getCommit().getHash();
   }
 

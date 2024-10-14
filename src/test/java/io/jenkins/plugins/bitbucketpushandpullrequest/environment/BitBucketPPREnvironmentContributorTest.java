@@ -137,7 +137,7 @@ public class BitBucketPPREnvironmentContributorTest {
 
       BitBucketPPRPullRequestCause cause = mock(BitBucketPPRPullRequestCause.class);
       BitBucketPPRPullRequestAction bitBucketPPRPullRequestAction =
-          new BitBucketPPRPullRequestAction(payload);
+          new BitBucketPPRPullRequestAction(payload, mock(BitBucketPPRHookEvent.class));
       when(cause.getPullRequestPayLoad()).thenReturn(bitBucketPPRPullRequestAction);
       when(cause.getHookEvent()).thenReturn("X-EVENT");
 
@@ -188,7 +188,7 @@ public class BitBucketPPREnvironmentContributorTest {
 
       BitBucketPPRPullRequestCause cause = mock(BitBucketPPRPullRequestCause.class);
       BitBucketPPRPullRequestAction bitBucketPPRPullRequestAction =
-          new BitBucketPPRPullRequestAction(payload);
+          new BitBucketPPRPullRequestAction(payload, mock(BitBucketPPRHookEvent.class));
       when(cause.getPullRequestPayLoad()).thenReturn(bitBucketPPRPullRequestAction);
       when(cause.getHookEvent()).thenReturn("X-EVENT");
 
@@ -239,7 +239,7 @@ public class BitBucketPPREnvironmentContributorTest {
 
       BitBucketPPRPullRequestCause cause = mock(BitBucketPPRPullRequestCause.class);
       BitBucketPPRPullRequestAction bitBucketPPRPullRequestAction =
-          new BitBucketPPRPullRequestAction(payload);
+          new BitBucketPPRPullRequestAction(payload, mock(BitBucketPPRHookEvent.class));
       when(cause.getPullRequestPayLoad()).thenReturn(bitBucketPPRPullRequestAction);
       when(cause.getHookEvent()).thenReturn("X-EVENT");
 
@@ -290,7 +290,7 @@ public class BitBucketPPREnvironmentContributorTest {
 
       BitBucketPPRPullRequestCause cause = mock(BitBucketPPRPullRequestCause.class);
       BitBucketPPRPullRequestAction bitBucketPPRPullRequestAction =
-          new BitBucketPPRPullRequestAction(payload);
+          new BitBucketPPRPullRequestAction(payload, mock(BitBucketPPRHookEvent.class));
       when(cause.getPullRequestPayLoad()).thenReturn(bitBucketPPRPullRequestAction);
       when(cause.getHookEvent()).thenReturn("X-EVENT");
 
@@ -342,7 +342,7 @@ public class BitBucketPPREnvironmentContributorTest {
 
       BitBucketPPRPullRequestCause cause = mock(BitBucketPPRPullRequestCause.class);
       BitBucketPPRPullRequestAction bitBucketPPRPullRequestAction =
-          new BitBucketPPRPullRequestAction(payload);
+          new BitBucketPPRPullRequestAction(payload, mock(BitBucketPPRHookEvent.class));
       when(cause.getPullRequestPayLoad()).thenReturn(bitBucketPPRPullRequestAction);
       when(cause.getHookEvent()).thenReturn("X-EVENT");
 
@@ -393,7 +393,7 @@ public class BitBucketPPREnvironmentContributorTest {
 
       BitBucketPPRPullRequestCause cause = mock(BitBucketPPRPullRequestCause.class);
       BitBucketPPRPullRequestAction bitBucketPPRPullRequestAction =
-          new BitBucketPPRPullRequestAction(payload);
+          new BitBucketPPRPullRequestAction(payload, mock(BitBucketPPRHookEvent.class));
       when(cause.getPullRequestPayLoad()).thenReturn(bitBucketPPRPullRequestAction);
       when(cause.getHookEvent()).thenReturn("X-EVENT");
 
@@ -443,7 +443,8 @@ public class BitBucketPPREnvironmentContributorTest {
 
     BitBucketPPRPullRequestServerCause cause = mock(BitBucketPPRPullRequestServerCause.class);
     when(cause.getPullRequestPayLoad())
-        .thenReturn(new BitBucketPPRPullRequestServerAction(payload));
+        .thenReturn(
+            new BitBucketPPRPullRequestServerAction(payload, mock(BitBucketPPRHookEvent.class)));
     when(cause.getHookEvent()).thenReturn("X-EVENT");
 
     // do
@@ -480,7 +481,8 @@ public class BitBucketPPREnvironmentContributorTest {
 
     BitBucketPPRPullRequestServerCause cause = mock(BitBucketPPRPullRequestServerCause.class);
     when(cause.getPullRequestPayLoad())
-        .thenReturn(new BitBucketPPRPullRequestServerAction(payload));
+        .thenReturn(
+            new BitBucketPPRPullRequestServerAction(payload, mock(BitBucketPPRHookEvent.class)));
     when(cause.getHookEvent()).thenReturn("X-EVENT");
 
     // do
@@ -517,7 +519,8 @@ public class BitBucketPPREnvironmentContributorTest {
 
     BitBucketPPRPullRequestServerCause cause = mock(BitBucketPPRPullRequestServerCause.class);
     when(cause.getPullRequestPayLoad())
-        .thenReturn(new BitBucketPPRPullRequestServerAction(payload));
+        .thenReturn(
+            new BitBucketPPRPullRequestServerAction(payload, mock(BitBucketPPRHookEvent.class)));
     when(cause.getHookEvent()).thenReturn("X-EVENT");
 
     // do
@@ -554,7 +557,8 @@ public class BitBucketPPREnvironmentContributorTest {
 
     BitBucketPPRPullRequestServerCause cause = mock(BitBucketPPRPullRequestServerCause.class);
     when(cause.getPullRequestPayLoad())
-        .thenReturn(new BitBucketPPRPullRequestServerAction(payload));
+        .thenReturn(
+            new BitBucketPPRPullRequestServerAction(payload, mock(BitBucketPPRHookEvent.class)));
     when(cause.getHookEvent()).thenReturn("X-EVENT");
 
     // do
@@ -592,7 +596,8 @@ public class BitBucketPPREnvironmentContributorTest {
 
     BitBucketPPRPullRequestServerCause cause = mock(BitBucketPPRPullRequestServerCause.class);
     when(cause.getPullRequestPayLoad())
-        .thenReturn(new BitBucketPPRPullRequestServerAction(payload));
+        .thenReturn(
+            new BitBucketPPRPullRequestServerAction(payload, mock(BitBucketPPRHookEvent.class)));
     when(cause.getHookEvent()).thenReturn("X-EVENT");
 
     // do
@@ -629,7 +634,8 @@ public class BitBucketPPREnvironmentContributorTest {
 
     BitBucketPPRPullRequestServerCause cause = mock(BitBucketPPRPullRequestServerCause.class);
     when(cause.getPullRequestPayLoad())
-        .thenReturn(new BitBucketPPRPullRequestServerAction(payload));
+        .thenReturn(
+            new BitBucketPPRPullRequestServerAction(payload, mock(BitBucketPPRHookEvent.class)));
     when(cause.getHookEvent()).thenReturn("X-EVENT");
 
     // do
@@ -691,7 +697,8 @@ public class BitBucketPPREnvironmentContributorTest {
 
     BitBucketPPRPullRequestServerCause cause = mock(BitBucketPPRPullRequestServerCause.class);
     when(cause.getPullRequestPayLoad())
-        .thenReturn(new BitBucketPPRPullRequestServerAction(payload));
+        .thenReturn(
+            new BitBucketPPRPullRequestServerAction(payload, mock(BitBucketPPRHookEvent.class)));
     when(cause.getHookEvent()).thenReturn("X-EVENT");
 
     // do
