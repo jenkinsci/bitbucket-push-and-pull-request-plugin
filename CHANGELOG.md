@@ -1,5 +1,14 @@
 # Change Log
 
+## 3.1.2 (2024-10-14)
+* add git plugin interaction explanation and status propagation feature… by @julioc-p in https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/pull/342
+* 198 skipping resolution of commit since it originates from another repository by @julioc-p in https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/pull/341
+* Reformat declarative pipeline by @julioc-p in https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/pull/344
+* use merge commit for build if event is pull request fulfilled by @julioc-p in https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/pull/346
+* update help so that it does not recommend the refs/heads branch speci… by @julioc-p in https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/pull/345
+
+**Full Changelog**: https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/compare/bitbucket-push-and-pull-request-3.1.1...bitbucket-push-and-pull-request-3.1.2
+
 ## 3.1.1 (2024-09-19)
 
 ## What's Changed
