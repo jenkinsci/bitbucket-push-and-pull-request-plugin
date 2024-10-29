@@ -1,5 +1,14 @@
 # Change Log
 
+## 3.1.3 (2024-10-29)
+* Fix: #350 and #348 
+
+### Closed Issues
+- #350
+- #348
+
+**Full Changelog**: https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/compare/bitbucket-push-and-pull-request-3.1.2...bitbucket-push-and-pull-request-3.1.3
+
 ## 3.1.2 (2024-10-14)
 * add git plugin interaction explanation and status propagation feature… by @julioc-p in https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/pull/342
 * 198 skipping resolution of commit since it originates from another repository by @julioc-p in https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/pull/341
@@ -11,18 +20,18 @@
 
 ## 3.1.1 (2024-09-19)
 
-## What's Changed
+### What's Changed
 * Fix: Fix npe for propagation url settings by @solarlodge in https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/pull/340
 
 **Full Changelog**: https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/compare/bitbucket-push-and-pull-request-3.1.0...bitbucket-push-and-pull-request-3.1.1
 
 ## 3.1.0 (2024-09-12)
 
-## What's Changed
+### What's Changed
 * New field for status propagation of pipeline by @julioc-p in https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/pull/338
 * add implementation of method getPullRequestUrl() and refactoring. by @cdelmonte-zg  #339
 
-## Closed Issues
+### Closed Issues
 - #331
 - #332 
 - #334 
@@ -36,7 +45,7 @@
 * #334 - fix log message pattern to include parameter index by @Gozke in https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/pull/335
 * Enable Jenkins Security Scan by @strangelookingnerd in https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/pull/333
 
-## New Contributors
+### New Contributors
 * @laudrup made their first contribution in https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/pull/328
 * @strangelookingnerd made their first contribution in https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/pull/333
 
@@ -49,7 +58,7 @@
 * #334 - fix log message pattern to include parameter index by @Gozke in https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/pull/335
 * Enable Jenkins Security Scan by @strangelookingnerd in https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/pull/333
 
-## New Contributors
+### New Contributors
 * @laudrup made their first contribution in https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/pull/328
 * @strangelookingnerd made their first contribution in https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/pull/333
 
