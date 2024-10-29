@@ -242,7 +242,9 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
             5,
             new CauseAction(cause),
             bitbucketAction,
-            new RevisionParameterAction(bitbucketAction.getLatestCommit()));
+            new RevisionParameterAction(
+                    bitbucketAction.getLatestCommit(),
+                    new URIish(bitbucketAction.getScmUrls().get(0))));
 
     logger.info(String.format("Commit passed to git: %s", bitbucketAction.getLatestCommit()));
 
