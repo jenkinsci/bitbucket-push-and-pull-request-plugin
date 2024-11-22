@@ -34,7 +34,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
-import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst.PULL_REQUEST_MERGED;
+import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst.PULL_REQUEST_SERVER_MERGED;
 import static java.util.Objects.isNull;
 import static org.apache.commons.lang3.ObjectUtils.isEmpty;
 
@@ -220,7 +220,7 @@ public class BitBucketPPRPullRequestServerAction extends BitBucketPPRActionAbstr
 
   @Override
   public String getLatestCommit() {
-    if (PULL_REQUEST_MERGED.equalsIgnoreCase(this.bitbucketEvent.getAction())) {
+    if (PULL_REQUEST_SERVER_MERGED.equalsIgnoreCase(this.bitbucketEvent.getAction())) {
       return payload.getPullRequest().getMergeCommit().getHash();
     }
     return payload.getServerPullRequest().getFromRef().getLatestCommit();
