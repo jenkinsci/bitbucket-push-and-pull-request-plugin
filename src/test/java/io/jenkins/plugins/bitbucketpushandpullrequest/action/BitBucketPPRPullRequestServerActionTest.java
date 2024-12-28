@@ -60,7 +60,7 @@ public class BitBucketPPRPullRequestServerActionTest {
       BitBucketPPRPayload payloadMock = mock(BitBucketPPRPayload.class, RETURNS_DEEP_STUBS);
       when(payloadMock.getPullRequest().getMergeCommit().getHash()).thenReturn("123456");
       BitBucketPPRHookEvent event = mock(BitBucketPPRHookEvent.class);
-      when(event.getAction()).thenReturn("fulfilled");
+      when(event.getAction()).thenReturn("merged");
       BitBucketPPRPullRequestServerAction action =
           new BitBucketPPRPullRequestServerAction(payloadMock, event);
       assertEquals("123456", action.getLatestCommit());
