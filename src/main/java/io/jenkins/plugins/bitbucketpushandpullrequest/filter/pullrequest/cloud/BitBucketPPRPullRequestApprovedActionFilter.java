@@ -22,6 +22,8 @@
 package io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.cloud;
 
 import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst.PULL_REQUEST_REVIEWER;
+
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.Logger;
@@ -43,6 +45,8 @@ public class BitBucketPPRPullRequestApprovedActionFilter
       Logger.getLogger(BitBucketPPRPullRequestApprovedActionFilter.class.getName());
 
   public boolean triggerOnlyIfAllReviewersApproved;
+
+  @SuppressFBWarnings(value="PA_PUBLIC_PRIMITIVE_ATTRIBUTE", justification="Preserve API compatibility")
   public String allowedBranches;
 
   @DataBoundConstructor

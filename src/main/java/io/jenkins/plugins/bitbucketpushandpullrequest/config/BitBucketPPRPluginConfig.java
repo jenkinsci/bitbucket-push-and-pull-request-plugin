@@ -4,6 +4,7 @@ import com.cloudbees.plugins.credentials.CredentialsMatchers;
 import com.cloudbees.plugins.credentials.common.StandardCredentials;
 import com.cloudbees.plugins.credentials.common.StandardListBoxModel;
 import com.cloudbees.plugins.credentials.domains.DomainRequirement;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import hudson.Extension;
 import hudson.ExtensionList;
 import hudson.model.Item;
@@ -32,16 +33,22 @@ public class BitBucketPPRPluginConfig extends GlobalConfiguration {
   public static final String BITBUCKET_PPR_PLUGIN_CONFIGURATION_ID =
       "bitbucket-ppr-plugin-configuration";
 
+  @SuppressFBWarnings(value="PA_PUBLIC_PRIMITIVE_ATTRIBUTE", justification="Preserve API compatibility")
   public String hookUrl;
 
+  @SuppressFBWarnings(value="PA_PUBLIC_PRIMITIVE_ATTRIBUTE", justification="Preserve API compatibility")
   public boolean notifyBitBucket;
 
+  @SuppressFBWarnings(value="PA_PUBLIC_PRIMITIVE_ATTRIBUTE", justification="Preserve API compatibility")
   public boolean useJobNameAsBuildKey;
 
+  @SuppressFBWarnings(value="PA_PUBLIC_PRIMITIVE_ATTRIBUTE", justification="Preserve API compatibility")
   public String credentialsId;
 
+  @SuppressFBWarnings(value="PA_PUBLIC_PRIMITIVE_ATTRIBUTE", justification="Preserve API compatibility")
   public String singleJob;
 
+  @SuppressFBWarnings(value="PA_PUBLIC_PRIMITIVE_ATTRIBUTE", justification="Preserve API compatibility")
   public String propagationUrl;
 
   public BitBucketPPRPluginConfig() {

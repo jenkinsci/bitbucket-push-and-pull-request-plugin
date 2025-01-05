@@ -24,6 +24,7 @@ package io.jenkins.plugins.bitbucketpushandpullrequest.filter.repository;
 
 import static java.util.Objects.isNull;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.Logger;
@@ -43,10 +44,19 @@ public class BitBucketPPRRepositoryPushActionFilter extends BitBucketPPRReposito
   private static final Logger logger =
       Logger.getLogger(BitBucketPPRRepositoryPushActionFilter.class.getName());
 
+  @SuppressFBWarnings(value="PA_PUBLIC_PRIMITIVE_ATTRIBUTE", justification="Preserve API compatibility")
   public boolean triggerAlsoIfTagPush;
+
+  @SuppressFBWarnings(value="PA_PUBLIC_PRIMITIVE_ATTRIBUTE", justification="Preserve API compatibility")
   public boolean triggerAlsoIfNothingChanged;
+
+  @SuppressFBWarnings(value="PA_PUBLIC_PRIMITIVE_ATTRIBUTE", justification="Preserve API compatibility")
   public boolean triggerOnlyIfTagPush;
+
+  @SuppressFBWarnings(value="PA_PUBLIC_PRIMITIVE_ATTRIBUTE", justification="Preserve API compatibility")
   public String allowedBranches;
+
+  @SuppressFBWarnings(value="PA_PUBLIC_PRIMITIVE_ATTRIBUTE", justification="Preserve API compatibility")
   public boolean isToApprove;
 
   @DataBoundConstructor

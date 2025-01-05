@@ -33,6 +33,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.logging.Logger;
 import javax.annotation.CheckForNull;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.*;
 import org.apache.commons.jelly.XMLOutput;
 import org.eclipse.jgit.transport.URIish;
@@ -90,7 +91,9 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
   private static final Logger logger = Logger.getLogger(BitBucketPPRTrigger.class.getName());
   private List<BitBucketPPRTriggerFilter> triggers;
   public static final boolean ALLOW_HOOKURL_OVERRIDE = true;
+  @SuppressFBWarnings(value="PA_PUBLIC_PRIMITIVE_ATTRIBUTE", justification="Preserve API compatibility")
   public String credentialsId;
+  @SuppressFBWarnings(value="PA_PUBLIC_PRIMITIVE_ATTRIBUTE", justification="Preserve API compatibility")
   public String propagationUrl;
 
   // list of classes
