@@ -21,6 +21,7 @@
 
 package io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.server;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import hudson.Extension;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.cause.BitBucketPPRTriggerCause;
@@ -36,6 +37,7 @@ import java.io.IOException;
 public class BitBucketPPRPullRequestServerDeclinedActionFilter
     extends BitBucketPPRPullRequestServerActionFilter {
 
+  @SuppressFBWarnings(value="PA_PUBLIC_PRIMITIVE_ATTRIBUTE", justification="Preserve API compatibility")
   public String allowedBranches;
 
   @DataBoundConstructor
