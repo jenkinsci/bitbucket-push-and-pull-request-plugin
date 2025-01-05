@@ -15,8 +15,8 @@
     <packaging>hpi</packaging>
 
     <properties>
-        <jenkins.baseline>2.452</jenkins.baseline>
-        <jenkins.version>${jenkins.baseline}.4</jenkins.version>
+        <jenkins.baseline>2.401</jenkins.baseline>
+        <jenkins.version>${jenkins.baseline}.3</jenkins.version>
         <powermock.version>2.0.0</powermock.version>
         <hpi.compatibleSinceVersion>2.9.0</hpi.compatibleSinceVersion>
 <!-- Readd to enable Java 17 -->
@@ -52,7 +52,7 @@
             <dependency>
                 <groupId>io.jenkins.tools.bom</groupId>
                 <artifactId>bom-${jenkins.baseline}.x</artifactId>
-                <version>3875.v1df09947cde6</version>
+                <version>2745.vc7b_fe4c876fa_</version>
                 <scope>import</scope>
                 <type>pom</type>
             </dependency>
@@ -93,6 +93,7 @@
         <dependency>
             <groupId>org.jenkins-ci.plugins</groupId>
             <artifactId>job-dsl</artifactId>
+            <version>1.87</version>
         </dependency>
 
         <dependency>
