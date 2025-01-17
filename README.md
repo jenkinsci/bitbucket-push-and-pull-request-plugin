@@ -33,7 +33,12 @@
 
 # Compatibility
 
-**Starting from version 3.x.x** the Plugin is compatible with:
+**Starting from version 3.2.0** the Plugin is compatible with:
+
+- Jenkins version: >= **2.401.3**
+- Java version: **11**
+
+**Starting from version 3.0.0** the Plugin is compatible with:
 
 - Jenkins version: >= **2.361.4**
 - Java version: **11**
