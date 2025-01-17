@@ -22,7 +22,6 @@
 package io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.server;
 
 import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst.PULL_REQUEST_REVIEWER;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.Logger;
