@@ -15,7 +15,9 @@
     <packaging>hpi</packaging>
 
     <properties>
-        <jenkins.version>2.361.4</jenkins.version>
+        <!-- https://www.jenkins.io/doc/developer/plugin-development/choosing-jenkins-baseline/ -->
+        <jenkins.baseline>2.361</jenkins.baseline>
+        <jenkins.version>${jenkins.baseline}.4</jenkins.version>
         <powermock.version>2.0.0</powermock.version>
         <hpi.compatibleSinceVersion>2.9.0</hpi.compatibleSinceVersion>
 <!-- Readd to enable Java 17 -->
@@ -50,7 +52,7 @@
         <dependencies>
             <dependency>
                 <groupId>io.jenkins.tools.bom</groupId>
-                <artifactId>bom-2.361.x</artifactId>
+                <artifactId>bom-${jenkins.baseline}.x</artifactId>
                 <version>1750.v0071fa_4c4a_e3</version>
                 <scope>import</scope>
                 <type>pom</type>
