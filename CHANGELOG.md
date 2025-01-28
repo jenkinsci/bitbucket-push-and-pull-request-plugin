@@ -1,5 +1,16 @@
 # Change Log
 
+## 3.1.4 (2024-10-29)
+
+### Closed Issues
+- #358
+
+## What's Changed
+* Use `jenkins.baseline` to reduce bom update mistakes by @strangelookingnerd in https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/pull/356
+* Changed model for Bitbucket Server Payload by @RMadsenG in https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/pull/359
+
+**Full Changelog**: https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/compare/bitbucket-push-and-pull-request-3.1.4...bitbucket-push-and-pull-request-3.1.5
+
 ## 3.1.3 (2024-10-29)
 * Fix: #350 and #348 
 
