@@ -48,6 +48,8 @@ public class BitBucketPPRServerPullRequest implements Serializable {
 
   private BitBucketPPRServerRepositoryRef toRef;
 
+  private BitBucketPPRServerPRProperties properties;
+
   public Long getId() {
     return id;
   }
@@ -166,6 +168,14 @@ public class BitBucketPPRServerPullRequest implements Serializable {
 
   public void setToRef(final BitBucketPPRServerRepositoryRef toRef) {
     this.toRef = toRef;
+  }
+
+  public BitBucketPPRServerPRProperties getProperties() {
+    return properties;
+  }
+
+  public void setToRef(final BitBucketPPRServerPRProperties properties) {
+    this.properties = properties;
   }
 
   @Override

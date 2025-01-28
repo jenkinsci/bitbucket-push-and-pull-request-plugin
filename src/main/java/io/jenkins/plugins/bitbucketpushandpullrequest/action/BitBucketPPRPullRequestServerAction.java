@@ -221,7 +221,7 @@ public class BitBucketPPRPullRequestServerAction extends BitBucketPPRActionAbstr
   @Override
   public String getLatestCommit() {
     if (PULL_REQUEST_SERVER_MERGED.equalsIgnoreCase(this.bitbucketEvent.getAction())) {
-      return payload.getPullRequest().getMergeCommit().getHash();
+      return payload.getServerPullRequest().getProperties().getMergeCommit().getId();
     }
     return payload.getServerPullRequest().getFromRef().getLatestCommit();
   }
