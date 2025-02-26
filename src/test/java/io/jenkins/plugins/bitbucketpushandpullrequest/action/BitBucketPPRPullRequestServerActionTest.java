@@ -58,7 +58,7 @@ public class BitBucketPPRPullRequestServerActionTest {
       BitBucketPPRPluginConfig c = mock(BitBucketPPRPluginConfig.class);
       config.when(BitBucketPPRPluginConfig::getInstance).thenReturn(c);
       BitBucketPPRPayload payloadMock = mock(BitBucketPPRPayload.class, RETURNS_DEEP_STUBS);
-      when(payloadMock.getPullRequest().getMergeCommit().getHash()).thenReturn("123456");
+      when(payloadMock.getServerPullRequest().getProperties().getMergeCommit().getId()).thenReturn("123456");
       BitBucketPPRHookEvent event = mock(BitBucketPPRHookEvent.class);
       when(event.getAction()).thenReturn("merged");
       BitBucketPPRPullRequestServerAction action =
