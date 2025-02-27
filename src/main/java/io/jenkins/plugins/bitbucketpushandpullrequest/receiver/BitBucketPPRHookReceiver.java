@@ -39,8 +39,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.kohsuke.stapler.StaplerRequest;
-import org.kohsuke.stapler.StaplerResponse;
+import org.kohsuke.stapler.StaplerRequest2;
+import org.kohsuke.stapler.StaplerResponse2;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import hudson.Extension;
@@ -67,7 +67,7 @@ public class BitBucketPPRHookReceiver extends CrumbExclusion implements Unprotec
   private static final BitBucketPPRPluginConfig globalConfig =
       BitBucketPPRPluginConfig.getInstance();
 
-  public void doIndex(@Nonnull StaplerRequest request, @Nonnull StaplerResponse response)
+  public void doIndex(@Nonnull StaplerRequest2 request, @Nonnull StaplerResponse2 response)
       throws IOException {
     // log request URL
     logger.log(Level.INFO, "Request URL: {0}", request.getRequestURI());
@@ -102,7 +102,7 @@ public class BitBucketPPRHookReceiver extends CrumbExclusion implements Unprotec
     }
   }
 
-  private void writeSuccessResponse(@Nonnull StaplerResponse response) throws IOException {
+  private void writeSuccessResponse(@Nonnull StaplerResponse2 response) throws IOException {
     response.setContentType("text/html");
     response.setCharacterEncoding("UTF-8");
     response.setStatus(HttpServletResponse.SC_OK);
@@ -112,7 +112,7 @@ public class BitBucketPPRHookReceiver extends CrumbExclusion implements Unprotec
     out.close();
   }
 
-  private void writeFailResponse(@Nonnull StaplerResponse response) throws IOException {
+  private void writeFailResponse(@Nonnull StaplerResponse2 response) throws IOException {
     response.setContentType("text/html");
     response.setCharacterEncoding("UTF-8");
     response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -122,7 +122,7 @@ public class BitBucketPPRHookReceiver extends CrumbExclusion implements Unprotec
     out.close();
   }
 
-  String getInputStream(@Nonnull StaplerRequest request) throws IOException, InputStreamException {
+  String getInputStream(@Nonnull StaplerRequest2 request) throws IOException, InputStreamException {
     // replace The deprecated method toString(InputStream) from the type IOUtils
     String inputStream = IOUtils.toString(request.getInputStream(), StandardCharsets.UTF_8);
     if (StringUtils.isBlank(inputStream)) {
@@ -157,7 +157,7 @@ public class BitBucketPPRHookReceiver extends CrumbExclusion implements Unprotec
     return input;
   }
 
-  BitBucketPPRHookEvent getBitbucketEvent(@Nonnull StaplerRequest request)
+  BitBucketPPRHookEvent getBitbucketEvent(@Nonnull StaplerRequest2 request)
       throws OperationNotSupportedException {
     String xEventHeader = request.getHeader(BitBucketPPRConst.X_EVENT_KEY);
 

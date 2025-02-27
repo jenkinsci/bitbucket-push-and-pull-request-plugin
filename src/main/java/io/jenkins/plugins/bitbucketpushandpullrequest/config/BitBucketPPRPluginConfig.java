@@ -16,7 +16,7 @@ import net.sf.json.JSONObject;
 import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
-import org.kohsuke.stapler.StaplerRequest;
+import org.kohsuke.stapler.StaplerRequest2;
 
 import javax.annotation.CheckForNull;
 import java.net.MalformedURLException;
@@ -153,7 +153,7 @@ public class BitBucketPPRPluginConfig extends GlobalConfiguration {
   }
 
   @Override
-  public boolean configure(StaplerRequest req, JSONObject formData) throws FormException {
+  public boolean configure(StaplerRequest2 req, JSONObject formData) throws FormException {
     req.bindJSON(this, formData);
     save();
     return true;
