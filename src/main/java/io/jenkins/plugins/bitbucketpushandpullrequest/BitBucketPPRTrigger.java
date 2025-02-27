@@ -1,17 +1,17 @@
 /*******************************************************************************
  * The MIT License
- *
+ * <p>
  * Copyright (C) 2021, CloudBees, Inc.
- *
+ * <p>
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
  * including without limitation the rights to use, copy, modify, merge, publish, distribute,
  * sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * <p>
  * The above copyright notice and this permission notice shall be included in all copies or
  * substantial portions of the Software.
- *
+ * <p>
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT
  * NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
@@ -27,17 +27,16 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Logger;
 import javax.annotation.CheckForNull;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.*;
 import org.apache.commons.jelly.XMLOutput;
 import org.eclipse.jgit.transport.URIish;
 import org.jenkinsci.Symbol;
-import org.jenkinsci.plugins.plaincredentials.StringCredentials;
 import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
@@ -45,7 +44,6 @@ import org.kohsuke.stapler.QueryParameter;
 import com.cloudbees.plugins.credentials.CredentialsMatchers;
 import com.cloudbees.plugins.credentials.common.StandardCredentials;
 import com.cloudbees.plugins.credentials.common.StandardListBoxModel;
-import com.cloudbees.plugins.credentials.domains.DomainRequirement;
 import hudson.Extension;
 import hudson.Util;
 import hudson.console.AnnotatedLargeText;
@@ -54,7 +52,6 @@ import hudson.model.Item;
 import hudson.model.Job;
 import hudson.model.Queue;
 import hudson.model.Run;
-import hudson.model.Build;
 import hudson.model.queue.QueueTaskFuture;
 import hudson.plugins.git.RevisionParameterAction;
 import hudson.scm.PollingResult;
@@ -65,7 +62,6 @@ import hudson.triggers.TriggerDescriptor;
 import hudson.util.ListBoxModel;
 import hudson.util.SequentialExecutionQueue;
 import io.jenkins.plugins.bitbucketpushandpullrequest.cause.BitBucketPPRTriggerCause;
-import io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRUtils;
 import io.jenkins.plugins.bitbucketpushandpullrequest.event.BitBucketPPREventContext;
 import io.jenkins.plugins.bitbucketpushandpullrequest.event.BitBucketPPREventFactory;
 import io.jenkins.plugins.bitbucketpushandpullrequest.event.BitBucketPPREventType;
@@ -152,7 +148,7 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
 
                 @Override
                 public void onPollSuccess(PollingResult pollingResult) {
-                  matchingFilters.stream()
+                  matchingFilters
                       .forEach(
                           filter -> {
                             try {
@@ -254,7 +250,7 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
     if (f == null) return;
 
     try {
-      Run<?, ?> startedBuild = (Run<?, ?>) f.waitForStart();
+      Run<?, ?> startedBuild = f.waitForStart();
 
       logger.info(String.format("Triggering %s # %d", job.getName(), startedBuild.getNumber()));
 
@@ -264,7 +260,7 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
               new BitBucketPPREventContext(
                   this, bitbucketAction, scmTrigger, startedBuild, filter)));
 
-      Run<?, ?> run = (Run<?, ?>) f.get();
+      Run<?, ?> run = f.get();
 
       if (f.isDone()) {
         observable.notifyObservers(
@@ -330,8 +326,8 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
         value = "RV_RETURN_VALUE_IGNORED",
         justification = "I know what I'm doing")
     public void writeLogTo(XMLOutput out) throws Exception {
-      new AnnotatedLargeText<BitBucketPPRWebHookPollingAction>(
-              getLogFile(), Charset.defaultCharset(), true, this)
+        new AnnotatedLargeText<>(
+                getLogFile(), Charset.defaultCharset(), true, this)
           .writeHtmlTo(0, out.asWriter());
     }
   }
@@ -355,10 +351,10 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
       return new StandardListBoxModel()
           .includeEmptyValue()
           .includeMatchingAs(
-              ACL.SYSTEM,
+              ACL.SYSTEM2,
               context,
               StandardCredentials.class,
-              Collections.<DomainRequirement>emptyList(),
+              Collections.emptyList(),
               CredentialsMatchers.always())
           .includeCurrentValue(credentialsId);
     }
@@ -370,6 +366,7 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
           && item instanceof ParameterizedJobMixIn.ParameterizedJob;
     }
 
+    @NonNull
     @Override
     public String getDisplayName() {
       return "Build with BitBucket Push and Pull Request Plugin";

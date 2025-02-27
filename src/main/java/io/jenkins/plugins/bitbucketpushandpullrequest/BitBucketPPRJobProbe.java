@@ -1,17 +1,17 @@
 /*******************************************************************************
  * The MIT License
- *
+ * <p>
  * Copyright (C) 2021, CloudBees, Inc.
- *
+ * <p>
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
  * including without limitation the rights to use, copy, modify, merge, publish, distribute,
  * sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * <p>
  * The above copyright notice and this permission notice shall be included in all copies or
  * substantial portions of the Software.
- *
+ * <p>
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT
  * NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
@@ -55,7 +55,7 @@ import jenkins.triggers.SCMTriggerItem;
 import org.eclipse.jgit.transport.URIish;
 
 /**
- * 
+ *
  * @author cdelmonte
  *
  */
@@ -92,7 +92,7 @@ public class BitBucketPPRJobProbe {
     List<URIish> remoteScmUrls = bitbucketAction.getScmUrls().stream().map(makeUrl)
         .filter(Objects::nonNull).collect(Collectors.toList());
 
-    try (ACLContext ctx = ACL.as(ACL.SYSTEM)) {
+    try (ACLContext ctx = ACL.as2(ACL.SYSTEM2)) {
       if (globalConfig.isSingleJobSet()) {
         try {
           Job job = (Job) Jenkins.get().getItemByFullName(globalConfig.getSingleJob());
@@ -159,7 +159,7 @@ public class BitBucketPPRJobProbe {
         return;
       }
 
-      Predicate<URIish> checkSCM = (url) -> scm instanceof GitSCM && matchGitScm(scm, url);
+      Predicate<URIish> checkSCM = url -> scm instanceof GitSCM && matchGitScm(scm, url);
 
       if (remotes.stream().anyMatch(checkSCM) && !scmTriggered.contains(scm)) {
         scmTriggered.add(scm);
@@ -230,11 +230,9 @@ public class BitBucketPPRJobProbe {
   }
 
   private Optional<BitBucketPPRTrigger> getBitBucketTrigger(Job<?, ?> job) {
-    if (job instanceof ParameterizedJobMixIn.ParameterizedJob) {
-      ParameterizedJobMixIn.ParameterizedJob<?, ?> pJob =
-          (ParameterizedJobMixIn.ParameterizedJob<?, ?>) job;
+    if (job instanceof ParameterizedJobMixIn.ParameterizedJob<?, ?> pJob) {
 
-      return pJob.getTriggers().values().stream().filter(BitBucketPPRTrigger.class::isInstance)
+        return pJob.getTriggers().values().stream().filter(BitBucketPPRTrigger.class::isInstance)
           .findFirst().map(BitBucketPPRTrigger.class::cast);
     }
     return Optional.empty();

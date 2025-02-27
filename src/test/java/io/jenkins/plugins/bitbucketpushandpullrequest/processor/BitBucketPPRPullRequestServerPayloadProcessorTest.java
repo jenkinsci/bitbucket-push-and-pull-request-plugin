@@ -137,9 +137,7 @@ public class BitBucketPPRPullRequestServerPayloadProcessorTest {
 
       Assertions.assertThrows(
           Exception.class,
-          () -> {
-            pullRequestPayloadProcessor.processPayload(payload, observable);
-          });
+          () -> pullRequestPayloadProcessor.processPayload(payload, observable));
     }
   }
 }

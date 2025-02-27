@@ -1,17 +1,17 @@
 /*******************************************************************************
  * The MIT License
- *
+ * <p>
  * Copyright (C) 2020, CloudBees, Inc.
- *
+ * <p>
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
  * including without limitation the rights to use, copy, modify, merge, publish, distribute,
  * sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * <p>
  * The above copyright notice and this permission notice shall be included in all copies or
  * substantial portions of the Software.
- *
+ * <p>
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT
  * NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
@@ -29,116 +29,116 @@ import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
 
 public interface BitBucketPPRAction extends Action {
 
-  public BitBucketPPRPayload getPayload();
+  BitBucketPPRPayload getPayload();
 
-  public String getScm();
+  String getScm();
 
-  public default String getLinkHtml() {
+  default String getLinkHtml() {
     return null;
   }
 
-  public default String getLinkSelf() {
+  default String getLinkSelf() {
     return null;
   }
 
-  public default String getLinkApprove() throws MalformedURLException {
+  default String getLinkApprove() throws MalformedURLException {
     return null;
   }
 
-  public default String getLinkDecline() throws MalformedURLException {
+  default String getLinkDecline() throws MalformedURLException {
     return null;
   }
 
-  public default String getLinkStatuses() {
+  default String getLinkStatuses() {
     return null;
   }
 
-  public default String getUser() {
+  default String getUser() {
     return null;
   }
 
-  public default String getSourceBranch() {
+  default String getSourceBranch() {
     return null;
   }
 
-  public default String getTargetBranch() {
+  default String getTargetBranch() {
     return null;
   }
 
-  public default String getTargetBranchRefId() {
+  default String getTargetBranchRefId() {
     return null;
   }
 
-  public default String getType() {
+  default String getType() {
     return null;
   }
 
-  public default String getRepositoryName() {
+  default String getRepositoryName() {
     return null;
   }
 
   // TODO: do we really neeed it?
-  public default List<String> getScmUrls() {
+  default List<String> getScmUrls() {
     return null;
   }
 
-  public default String getPullRequestId() {
+  default String getPullRequestId() {
     return null;
   }
 
-  public default String getRepositoryId() {
+  default String getRepositoryId() {
     return null;
   }
 
-  public default String getRepositoryUrl() {
+  default String getRepositoryUrl() {
     return null;
   }
 
-  public default String getProjectUrl() {
+  default String getProjectUrl() {
     return null;
   }
 
-  public default String getPullRequestApiUrl() {
+  default String getPullRequestApiUrl() {
     return null;
   }
 
-  public default String getPullRequestUrl() {
+  default String getPullRequestUrl() {
     return null;
   }
 
-  public default String getTitle() {
+  default String getTitle() {
     return null;
   }
 
-  public default String getDescription() {
+  default String getDescription() {
     return null;
   }
 
-  public default String getComment() {
+  default String getComment() {
     return null;
   }
 
-  public default String getServerComment() {
+  default String getServerComment() {
     return null;
   }
 
-  public default String getLatestCommit() {
+  default String getLatestCommit() {
     return null;
   }
 
-  public default String getCommitLink() throws MalformedURLException {
+  default String getCommitLink() throws MalformedURLException {
     return null;
   }
 
-  public default List<String> getCommitLinks() throws MalformedURLException {
+  default List<String> getCommitLinks() throws MalformedURLException {
     return null;
   }
 
-  public default String getLatestCommitFromRef() {
+  default String getLatestCommitFromRef() {
     return null;
   }
 
-  public default String getLatestCommitToRef() {
+  default String getLatestCommitToRef() {
     return null;
   }
 }

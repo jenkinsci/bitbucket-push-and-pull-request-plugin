@@ -1,8 +1,10 @@
 package io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 public class BitBucketPPRSelf implements Serializable {
+  @Serial
   private static final long serialVersionUID = -9156939739440067961L;
   private String href;
 
