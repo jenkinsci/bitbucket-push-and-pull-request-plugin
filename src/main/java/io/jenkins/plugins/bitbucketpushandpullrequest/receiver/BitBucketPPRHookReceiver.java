@@ -1,17 +1,17 @@
 /*******************************************************************************
  * The MIT License
- *
+ * <p>
  * Copyright (C) 2022, CloudBees, Inc.
- *
+ * <p>
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
  * including without limitation the rights to use, copy, modify, merge, publish, distribute,
  * sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * <p>
  * The above copyright notice and this permission notice shall be included in all copies or
  * substantial portions of the Software.
- *
+ * <p>
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT
  * NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
@@ -26,7 +26,6 @@ import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPR
 import io.jenkins.plugins.bitbucketpushandpullrequest.exception.BitBucketPPRPayloadPropertyNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.logging.Level;
@@ -39,8 +38,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.kohsuke.stapler.StaplerRequest;
-import org.kohsuke.stapler.StaplerResponse;
+import org.kohsuke.stapler.StaplerRequest2;
+import org.kohsuke.stapler.StaplerResponse2;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import hudson.Extension;
@@ -67,7 +66,7 @@ public class BitBucketPPRHookReceiver extends CrumbExclusion implements Unprotec
   private static final BitBucketPPRPluginConfig globalConfig =
       BitBucketPPRPluginConfig.getInstance();
 
-  public void doIndex(@Nonnull StaplerRequest request, @Nonnull StaplerResponse response)
+  public void doIndex(@Nonnull StaplerRequest2 request, @Nonnull StaplerResponse2 response)
       throws IOException {
     // log request URL
     logger.log(Level.INFO, "Request URL: {0}", request.getRequestURI());
@@ -102,7 +101,7 @@ public class BitBucketPPRHookReceiver extends CrumbExclusion implements Unprotec
     }
   }
 
-  private void writeSuccessResponse(@Nonnull StaplerResponse response) throws IOException {
+  private void writeSuccessResponse(@Nonnull StaplerResponse2 response) throws IOException {
     response.setContentType("text/html");
     response.setCharacterEncoding("UTF-8");
     response.setStatus(HttpServletResponse.SC_OK);
@@ -112,7 +111,7 @@ public class BitBucketPPRHookReceiver extends CrumbExclusion implements Unprotec
     out.close();
   }
 
-  private void writeFailResponse(@Nonnull StaplerResponse response) throws IOException {
+  private void writeFailResponse(@Nonnull StaplerResponse2 response) throws IOException {
     response.setContentType("text/html");
     response.setCharacterEncoding("UTF-8");
     response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -122,7 +121,7 @@ public class BitBucketPPRHookReceiver extends CrumbExclusion implements Unprotec
     out.close();
   }
 
-  String getInputStream(@Nonnull StaplerRequest request) throws IOException, InputStreamException {
+  String getInputStream(@Nonnull StaplerRequest2 request) throws IOException, InputStreamException {
     // replace The deprecated method toString(InputStream) from the type IOUtils
     String inputStream = IOUtils.toString(request.getInputStream(), StandardCharsets.UTF_8);
     if (StringUtils.isBlank(inputStream)) {
@@ -144,8 +143,7 @@ public class BitBucketPPRHookReceiver extends CrumbExclusion implements Unprotec
   }
 
   static String decodeInputStream(
-      @Nonnull final String inputStream, @Nonnull final String contentType)
-      throws UnsupportedEncodingException {
+      @Nonnull final String inputStream, @Nonnull final String contentType) {
     String input = inputStream;
     if (StringUtils.startsWithIgnoreCase(
         contentType, BitBucketPPRConst.APPLICATION_X_WWW_FORM_URLENCODED)) {
@@ -157,7 +155,7 @@ public class BitBucketPPRHookReceiver extends CrumbExclusion implements Unprotec
     return input;
   }
 
-  BitBucketPPRHookEvent getBitbucketEvent(@Nonnull StaplerRequest request)
+  BitBucketPPRHookEvent getBitbucketEvent(@Nonnull StaplerRequest2 request)
       throws OperationNotSupportedException {
     String xEventHeader = request.getHeader(BitBucketPPRConst.X_EVENT_KEY);
 

@@ -1,17 +1,17 @@
 /*******************************************************************************
  * The MIT License
- *
+ * <p>
  * Copyright (C) 2021, CloudBees, Inc.
- *
+ * <p>
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
  * including without limitation the rights to use, copy, modify, merge, publish, distribute,
  * sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * <p>
  * The above copyright notice and this permission notice shall be included in all copies or
  * substantial portions of the Software.
- *
+ * <p>
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT
  * NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
@@ -21,10 +21,11 @@
 
 package io.jenkins.plugins.bitbucketpushandpullrequest.environment;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.logging.Logger;
 import javax.annotation.Nonnull;
+
+import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.EnvVars;
 import hudson.Extension;
 import hudson.matrix.MatrixBuild;
@@ -70,19 +71,17 @@ public class BitBucketPPREnvironmentContributor extends EnvironmentContributor {
   static final Logger logger = Logger.getLogger(BitBucketPPREnvironmentContributor.class.getName());
 
   @Override
-  public void buildEnvironmentFor(Job job, EnvVars envVars, TaskListener taskListener)
-      throws IOException, InterruptedException {
+  public void buildEnvironmentFor(@NonNull Job job, @NonNull EnvVars envVars, @NonNull TaskListener taskListener) {
     // NOTHING TO DO HERE
   }
 
   @Override
-  public void buildEnvironmentFor(@Nonnull Run run, EnvVars envVars, TaskListener taskListener)
-      throws IOException, InterruptedException {
+  public void buildEnvironmentFor(@Nonnull Run run, @NonNull EnvVars envVars, @NonNull TaskListener taskListener) {
 
     List<Cause> causes = null;
 
-    if (run instanceof MatrixRun) {
-      MatrixBuild parent = ((MatrixRun) run).getParentBuild();
+    if (run instanceof MatrixRun matrixRun) {
+      MatrixBuild parent = matrixRun.getParentBuild();
       if (parent != null) {
         causes = parent.getCauses();
       }
@@ -94,30 +93,25 @@ public class BitBucketPPREnvironmentContributor extends EnvironmentContributor {
       return;
     }
 
-    causes.stream().forEach((Cause cause) -> {
+    causes.forEach((Cause cause) -> {
       try {
-        if (cause instanceof BitBucketPPRPullRequestCause) {
-          BitBucketPPRPullRequestCause castedCause = (BitBucketPPRPullRequestCause) cause;
-          setEnvVarsForCloudPullRequest(envVars, castedCause.getPullRequestPayLoad(),
+        if (cause instanceof BitBucketPPRPullRequestCause castedCause) {
+            setEnvVarsForCloudPullRequest(envVars, castedCause.getPullRequestPayLoad(),
               castedCause.getHookEvent());
-        } else if (cause instanceof BitBucketPPRPullRequestServerCause) {
-          BitBucketPPRPullRequestServerCause castedCause =
-              (BitBucketPPRPullRequestServerCause) cause;
-          setEnvVarsForServerPullRequest(envVars, castedCause.getPullRequestPayLoad(),
+        } else if (cause instanceof BitBucketPPRPullRequestServerCause castedCause) {
+            setEnvVarsForServerPullRequest(envVars, castedCause.getPullRequestPayLoad(),
               castedCause.getHookEvent());
-        } else if (cause instanceof BitBucketPPRRepositoryCause) {
-          BitBucketPPRRepositoryCause castedCause = (BitBucketPPRRepositoryCause) cause;
-          setEnvVarsForCloudRepository(envVars, castedCause.getRepositoryPayLoad(),
+        } else if (cause instanceof BitBucketPPRRepositoryCause castedCause) {
+            setEnvVarsForCloudRepository(envVars, castedCause.getRepositoryPayLoad(),
               castedCause.getHookEvent());
-        } else if (cause instanceof BitBucketPPRServerRepositoryCause) {
-          BitBucketPPRServerRepositoryCause castedCause = (BitBucketPPRServerRepositoryCause) cause;
-          setEnvVarsForServerRepository(envVars, castedCause.getServerRepositoryPayLoad(),
+        } else if (cause instanceof BitBucketPPRServerRepositoryCause castedCause) {
+            setEnvVarsForServerRepository(envVars, castedCause.getServerRepositoryPayLoad(),
               castedCause.getHookEvent());
         }
       } catch (Exception e) {
         e.printStackTrace();
         logger.warning(String.format("Cannot build environment variables for cause %s %s.",
-            cause.getShortDescription(), e.toString()));
+            cause.getShortDescription(), e));
       }
     });
   }

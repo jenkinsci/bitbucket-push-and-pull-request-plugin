@@ -7,16 +7,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import hudson.model.FreeStyleProject;
 import hudson.triggers.Trigger;
 import hudson.triggers.TriggerDescriptor;
 import io.jenkins.plugins.bitbucketpushandpullrequest.BitBucketPPRTrigger;
-import javaposse.jobdsl.plugin.ExecuteDslScripts;
-import javaposse.jobdsl.plugin.RemovedJobAction;
 import org.apache.commons.io.IOUtils;
 import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
-import org.jenkinsci.plugins.workflow.job.WorkflowRun;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -255,7 +251,7 @@ public class BitBucketPPRPullRequestApprovedActionFilterTest {
     assertFalse(c.matches(allowedBranches, "origin/develop", null));
   }
 
-  private String readScript(String path) throws Exception {
+  private String readScript(String path) {
     String script = null;
     try {
       ClassLoader classloader = Thread.currentThread().getContextClassLoader();
@@ -291,7 +287,7 @@ public class BitBucketPPRPullRequestApprovedActionFilterTest {
     }
 
     assertEquals(1, dispNames.size());
-    assertEquals(dispNames.get(0), "BitBucketPPRPullRequestApprovedActionFilter");
+    assertEquals("BitBucketPPRPullRequestApprovedActionFilter", dispNames.get(0));
     assertFalse(isToApprove);
   }
 }

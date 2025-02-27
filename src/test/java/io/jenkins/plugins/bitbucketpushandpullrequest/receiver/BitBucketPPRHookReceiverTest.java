@@ -24,10 +24,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
-import java.io.UnsupportedEncodingException;
+
 import java.util.stream.Stream;
 
-import org.junit.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -45,8 +44,7 @@ class BitBucketPPRHookReceiverTest {
 
   @ParameterizedTest
   @MethodSource("paramsProvider")
-  void execDecodeImputStream(String inputStream, String contentType, String expected)
-      throws UnsupportedEncodingException {
+  void execDecodeImputStream(String inputStream, String contentType, String expected) {
     try (MockedStatic<ExtensionList> mocked = mockStatic(ExtensionList.class)) {
       mocked.when((Verification) ExtensionList.lookupSingleton(BitBucketPPRPluginConfig.class))
           .thenReturn(mock(BitBucketPPRPluginConfig.class));
