@@ -24,7 +24,7 @@
     </properties>
 
     <name>Bitbucket Push and Pull Request Plugin</name>
-    <description>Bitbucket plugin for Jenkins v2.138.2 or later, allowing push and pull requests</description>
+    <description>Bitbucket plugin for Jenkins allowing push and pull requests</description>
 
     <licenses>
         <license>
@@ -198,7 +198,6 @@
             <version>5.2.0</version>
             <scope>test</scope>
         </dependency>
-
     </dependencies>
 
     <url>https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin</url>
@@ -243,5 +242,4 @@
             </plugin>
         </plugins>
     </build>
-
 </project>

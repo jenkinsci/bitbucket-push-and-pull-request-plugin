@@ -48,9 +48,9 @@ import javax.naming.OperationNotSupportedException;
 /**
  * Extracts event and action from the event key sent by Bitbucket and verifies that they are
  * supported by the plugin.
- * 
+ *
  * @author cdelmonte
- * 
+ *
  */
 public class BitBucketPPRHookEvent {
   private String event;

@@ -21,7 +21,7 @@
 
 package io.jenkins.plugins.bitbucketpushandpullrequest.action;
 
-import hudson.model.InvisibleAction;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import io.jenkins.plugins.bitbucketpushandpullrequest.config.BitBucketPPRPluginConfig;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.server.BitBucketPPRServerChange;
@@ -50,7 +50,7 @@ public class BitBucketPPRServerRepositoryAction extends BitBucketPPRActionAbstra
   private String targetBranchRefId = null;
   private String type;
 
-  public BitBucketPPRServerRepositoryAction(BitBucketPPRPayload payload) {
+  public BitBucketPPRServerRepositoryAction(@NonNull BitBucketPPRPayload payload) {
     this.payload = payload;
 
     // TODO: do we need link clones or link self is enough??
@@ -97,6 +97,7 @@ public class BitBucketPPRServerRepositoryAction extends BitBucketPPRActionAbstra
     return targetBranchRefId;
   }
 
+  @NonNull
   @Override
   public BitBucketPPRPayload getPayload() {
     return payload;

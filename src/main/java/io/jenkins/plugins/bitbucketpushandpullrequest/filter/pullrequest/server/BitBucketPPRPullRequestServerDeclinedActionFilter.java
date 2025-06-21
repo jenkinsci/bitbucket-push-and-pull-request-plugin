@@ -21,6 +21,7 @@
 
 package io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.server;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.cause.BitBucketPPRTriggerCause;
@@ -32,6 +33,7 @@ import org.kohsuke.stapler.DataBoundSetter;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Objects;
 
 public class BitBucketPPRPullRequestServerDeclinedActionFilter
     extends BitBucketPPRPullRequestServerActionFilter {
@@ -43,11 +45,7 @@ public class BitBucketPPRPullRequestServerDeclinedActionFilter
 
   @DataBoundSetter
   public void setAllowedBranches(String allowedBranches) {
-    if (allowedBranches == null) {
-      this.allowedBranches = "";
-    } else {
-      this.allowedBranches = allowedBranches;
-    }
+      this.allowedBranches = Objects.requireNonNullElse(allowedBranches, "");
   }
 
   @Override
@@ -69,6 +67,7 @@ public class BitBucketPPRPullRequestServerDeclinedActionFilter
   public static class ActionFilterDescriptorImpl
       extends BitBucketPPRPullRequestServerActionDescriptor {
 
+    @NonNull
     @Override
     public String getDisplayName() {
       return "Declined";

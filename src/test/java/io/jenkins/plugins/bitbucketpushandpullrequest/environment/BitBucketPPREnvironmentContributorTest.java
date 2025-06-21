@@ -750,8 +750,8 @@ public class BitBucketPPREnvironmentContributorTest {
 
     assertEquals(
         "Bitbuckethook event and hockEvent property of cause object are the same.",
-        cause.getHookEvent(),
-        hookEventAction);
+            hookEventAction,
+            cause.getHookEvent());
   }
 
   @Test
@@ -773,12 +773,12 @@ public class BitBucketPPREnvironmentContributorTest {
 
     assertEquals(
         "Bitbuckethook event and hockEvent property of cause object are the same.",
-        cause.getHookEvent(),
-        hookEventAction);
+            hookEventAction,
+            cause.getHookEvent());
   }
 
   private BitBucketPPRPayload getCloudPayload(String res) {
-    return (BitBucketPPRPayload) getGenericPayload(res, BitBucketPPRCloudPayload.class);
+    return getGenericPayload(res, BitBucketPPRCloudPayload.class);
   }
 
   private BitBucketPPRServerPayload getServerPayload(String res) {

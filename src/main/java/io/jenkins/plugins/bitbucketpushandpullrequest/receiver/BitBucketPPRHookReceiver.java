@@ -21,33 +21,35 @@
 
 package io.jenkins.plugins.bitbucketpushandpullrequest.receiver;
 
-import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst.HOOK_URL;
-
-import io.jenkins.plugins.bitbucketpushandpullrequest.exception.BitBucketPPRPayloadPropertyNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import javax.annotation.Nonnull;
 import javax.naming.OperationNotSupportedException;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
+
 import hudson.Extension;
 import hudson.model.UnprotectedRootAction;
 import hudson.security.csrf.CrumbExclusion;
 import io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst;
+import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst.HOOK_URL;
 import io.jenkins.plugins.bitbucketpushandpullrequest.config.BitBucketPPRPluginConfig;
+import io.jenkins.plugins.bitbucketpushandpullrequest.exception.BitBucketPPRPayloadPropertyNotFoundException;
 import io.jenkins.plugins.bitbucketpushandpullrequest.exception.InputStreamException;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRHookEvent;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
@@ -144,8 +146,7 @@ public class BitBucketPPRHookReceiver extends CrumbExclusion implements Unprotec
   }
 
   static String decodeInputStream(
-      @Nonnull final String inputStream, @Nonnull final String contentType)
-      throws UnsupportedEncodingException {
+      @Nonnull final String inputStream, @Nonnull final String contentType) {
     String input = inputStream;
     if (StringUtils.startsWithIgnoreCase(
         contentType, BitBucketPPRConst.APPLICATION_X_WWW_FORM_URLENCODED)) {

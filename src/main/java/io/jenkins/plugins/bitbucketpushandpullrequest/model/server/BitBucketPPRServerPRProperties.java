@@ -22,10 +22,12 @@
 
 package io.jenkins.plugins.bitbucketpushandpullrequest.model.server;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 
 public class BitBucketPPRServerPRProperties implements Serializable {
+  @Serial
   private static final long serialVersionUID = -4327337466069004128L;
 
   private BitBucketPPRServerMergeCommit mergeCommit;

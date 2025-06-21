@@ -23,7 +23,10 @@ package io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud;
 import com.google.gson.annotations.SerializedName;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
 
+import java.io.Serial;
+
 public class BitBucketPPRCloudPayload implements BitBucketPPRPayload {
+  @Serial
   private static final long serialVersionUID = -3467640601880230847L;
 
   private BitBucketPPRPush push;

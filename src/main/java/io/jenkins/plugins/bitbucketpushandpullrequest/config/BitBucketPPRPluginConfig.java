@@ -1,9 +1,23 @@
 package io.jenkins.plugins.bitbucketpushandpullrequest.config;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Collections;
+import java.util.logging.Logger;
+
+import javax.annotation.CheckForNull;
+
+import static org.apache.commons.lang3.StringUtils.isEmpty;
+import org.kohsuke.stapler.AncestorInPath;
+import org.kohsuke.stapler.DataBoundSetter;
+import org.kohsuke.stapler.QueryParameter;
+import org.kohsuke.stapler.StaplerRequest;
+
 import com.cloudbees.plugins.credentials.CredentialsMatchers;
 import com.cloudbees.plugins.credentials.common.StandardCredentials;
 import com.cloudbees.plugins.credentials.common.StandardListBoxModel;
-import com.cloudbees.plugins.credentials.domains.DomainRequirement;
+
+import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;
 import hudson.ExtensionList;
 import hudson.model.Item;
@@ -13,18 +27,6 @@ import hudson.util.ListBoxModel;
 import jenkins.model.GlobalConfiguration;
 import jenkins.model.Jenkins;
 import net.sf.json.JSONObject;
-import org.kohsuke.stapler.AncestorInPath;
-import org.kohsuke.stapler.DataBoundSetter;
-import org.kohsuke.stapler.QueryParameter;
-import org.kohsuke.stapler.StaplerRequest;
-
-import javax.annotation.CheckForNull;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Collections;
-import java.util.logging.Logger;
-
-import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 @Extension
 public class BitBucketPPRPluginConfig extends GlobalConfiguration {
@@ -106,7 +108,7 @@ public class BitBucketPPRPluginConfig extends GlobalConfiguration {
   }
 
   @DataBoundSetter
-  public void setNotifyBitBucket(@CheckForNull boolean notifyBitBucket) {
+  public void setNotifyBitBucket(boolean notifyBitBucket) {
     this.notifyBitBucket = notifyBitBucket;
   }
 
@@ -115,7 +117,7 @@ public class BitBucketPPRPluginConfig extends GlobalConfiguration {
   }
 
   @DataBoundSetter
-  public void setUseJobNameAsBuildKey(@CheckForNull boolean useJobNameAsBuildKey) {
+  public void setUseJobNameAsBuildKey(boolean useJobNameAsBuildKey) {
     this.useJobNameAsBuildKey = useJobNameAsBuildKey;
     save();
   }
@@ -147,13 +149,14 @@ public class BitBucketPPRPluginConfig extends GlobalConfiguration {
     return singleJob;
   }
 
+  @NonNull
   @Override
   public String getDisplayName() {
     return "Bitbucket Push and Pull Request";
   }
 
   @Override
-  public boolean configure(StaplerRequest req, JSONObject formData) throws FormException {
+  public boolean configure(StaplerRequest req, JSONObject formData) {
     req.bindJSON(this, formData);
     save();
     return true;
@@ -172,10 +175,10 @@ public class BitBucketPPRPluginConfig extends GlobalConfiguration {
     return new StandardListBoxModel()
         .includeEmptyValue()
         .includeMatchingAs(
-            ACL.SYSTEM,
-            Jenkins.getInstance(),
+            ACL.SYSTEM2,
+            Jenkins.get(),
             StandardCredentials.class,
-            Collections.<DomainRequirement>emptyList(),
+            Collections.emptyList(),
             CredentialsMatchers.always())
         .includeCurrentValue(credentialsId);
   }

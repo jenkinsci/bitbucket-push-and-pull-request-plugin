@@ -21,6 +21,7 @@
 
 package io.jenkins.plugins.bitbucketpushandpullrequest.action;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
 import io.jenkins.plugins.bitbucketpushandpullrequest.config.BitBucketPPRPluginConfig;
 import io.jenkins.plugins.bitbucketpushandpullrequest.exception.BitBucketPPRPayloadPropertyNotFoundException;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRHookEvent;
@@ -148,6 +149,7 @@ public class BitBucketPPRPullRequestServerAction extends BitBucketPPRActionAbstr
     return payload.getServerPullRequest().getTitle();
   }
 
+  @NonNull
   @Override
   public BitBucketPPRPayload getPayload() {
     return payload;

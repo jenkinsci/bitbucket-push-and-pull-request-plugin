@@ -25,6 +25,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
 import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.DataBoundConstructor;
 
@@ -71,6 +72,7 @@ public class BitBucketPPRPullRequestTriggerFilter extends BitBucketPPRTriggerFil
   @Extension
   public static class FilterDescriptorImpl extends BitBucketPPRTriggerFilterDescriptor {
 
+    @NonNull
     @Override
     public String getDisplayName() {
       return "Bitbucket Cloud Pull Request";

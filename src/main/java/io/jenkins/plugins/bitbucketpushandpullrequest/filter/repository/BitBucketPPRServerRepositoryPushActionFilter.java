@@ -24,6 +24,7 @@ package io.jenkins.plugins.bitbucketpushandpullrequest.filter.repository;
 
 import static java.util.Objects.isNull;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.cause.BitBucketPPRTriggerCause;
@@ -132,6 +133,7 @@ public class BitBucketPPRServerRepositoryPushActionFilter
   @Extension
   public static class ActionFilterDescriptorImpl extends BitBucketPPRRepositoryActionDescriptor {
 
+    @NonNull
     @Override
     public String getDisplayName() {
       return "Bitbucket Server Push";

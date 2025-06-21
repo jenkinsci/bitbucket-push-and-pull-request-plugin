@@ -72,7 +72,7 @@ public class BitBucketPPRHookJobDslExtensionTest {
     j.buildAndAssertSuccess(seedJob);
   }
 
-  private String readDslScript(String path) throws Exception {
+  private String readDslScript(String path) {
     String script = null;
     try {
         ClassLoader classloader = Thread.currentThread().getContextClassLoader();
@@ -107,7 +107,7 @@ public class BitBucketPPRHookJobDslExtensionTest {
       isToApprove = tmp3.shouldSendApprove();
     }
     assertEquals(1, dispNames.size());
-    assertEquals(dispNames.get(0), "BitBucketPPRRepositoryPushActionFilter");
+    assertEquals("BitBucketPPRRepositoryPushActionFilter", dispNames.get(0));
     assertFalse(isToApprove);
   }
 
@@ -133,7 +133,7 @@ public class BitBucketPPRHookJobDslExtensionTest {
       isToApprove = tmp3.shouldSendApprove();
     }
     assertEquals(1, dispNames.size());
-    assertEquals(dispNames.get(0), "BitBucketPPRRepositoryPushActionFilter");
+    assertEquals("BitBucketPPRRepositoryPushActionFilter", dispNames.get(0));
     assertTrue(isToApprove);
   }
 
@@ -159,7 +159,7 @@ public class BitBucketPPRHookJobDslExtensionTest {
       isToApprove = tmp3.shouldSendApprove();
     }
     assertEquals(1, dispNames.size());
-    assertEquals(dispNames.get(0), "BitBucketPPRPullRequestApprovedActionFilter");
+    assertEquals("BitBucketPPRPullRequestApprovedActionFilter", dispNames.get(0));
     assertFalse(isToApprove);
   }
 
@@ -186,7 +186,7 @@ public class BitBucketPPRHookJobDslExtensionTest {
       isToApprove = tmp3.shouldSendApprove();
     }
     assertEquals(1, dispNames.size());
-    assertEquals(dispNames.get(0), "BitBucketPPRPullRequestApprovedActionFilter");
+    assertEquals("BitBucketPPRPullRequestApprovedActionFilter", dispNames.get(0));
     assertTrue(isToApprove);
   }
 
@@ -208,7 +208,7 @@ public class BitBucketPPRHookJobDslExtensionTest {
       dispNames.add(dispName);
     }
     assertEquals(1, dispNames.size());
-    assertEquals(dispNames.get(0), "BitBucketPPRPullRequestApprovedActionFilter");
+    assertEquals("BitBucketPPRPullRequestApprovedActionFilter", dispNames.get(0));
   }
 
   @Test
@@ -229,7 +229,7 @@ public class BitBucketPPRHookJobDslExtensionTest {
       dispNames.add(dispName);
     }
     assertEquals(1, dispNames.size());
-    assertEquals(dispNames.get(0), "BitBucketPPRPullRequestCommentCreatedActionFilter");
+    assertEquals("BitBucketPPRPullRequestCommentCreatedActionFilter", dispNames.get(0));
   }
 
   @Test
@@ -250,7 +250,7 @@ public class BitBucketPPRHookJobDslExtensionTest {
       dispNames.add(dispName);
     }
     assertEquals(1, dispNames.size());
-    assertEquals(dispNames.get(0), "BitBucketPPRPullRequestCommentCreatedActionFilter");
+    assertEquals("BitBucketPPRPullRequestCommentCreatedActionFilter", dispNames.get(0));
   }
 
   @Test
@@ -271,7 +271,7 @@ public class BitBucketPPRHookJobDslExtensionTest {
       dispNames.add(dispName);
     }
     assertEquals(1, dispNames.size());
-    assertEquals(dispNames.get(0), "BitBucketPPRPullRequestCommentCreatedActionFilter");
+    assertEquals("BitBucketPPRPullRequestCommentCreatedActionFilter", dispNames.get(0));
   }
 
   @Test
@@ -292,7 +292,7 @@ public class BitBucketPPRHookJobDslExtensionTest {
       dispNames.add(dispName);
     }
     assertEquals(1, dispNames.size());
-    assertEquals(dispNames.get(0), "BitBucketPPRPullRequestCommentUpdatedActionFilter");
+    assertEquals("BitBucketPPRPullRequestCommentUpdatedActionFilter", dispNames.get(0));
   }
 
   @Test
@@ -313,7 +313,7 @@ public class BitBucketPPRHookJobDslExtensionTest {
       dispNames.add(dispName);
     }
     assertEquals(1, dispNames.size());
-    assertEquals(dispNames.get(0), "BitBucketPPRPullRequestCommentUpdatedActionFilter");
+    assertEquals("BitBucketPPRPullRequestCommentUpdatedActionFilter", dispNames.get(0));
   }
 
   @Test
@@ -334,7 +334,7 @@ public class BitBucketPPRHookJobDslExtensionTest {
       dispNames.add(dispName);
     }
     assertEquals(1, dispNames.size());
-    assertEquals(dispNames.get(0), "BitBucketPPRPullRequestCommentUpdatedActionFilter");
+    assertEquals("BitBucketPPRPullRequestCommentUpdatedActionFilter", dispNames.get(0));
   }
 
   @Test
@@ -355,7 +355,7 @@ public class BitBucketPPRHookJobDslExtensionTest {
       dispNames.add(dispName);
     }
     assertEquals(1, dispNames.size());
-    assertEquals(dispNames.get(0), "BitBucketPPRPullRequestCommentDeletedActionFilter");
+    assertEquals("BitBucketPPRPullRequestCommentDeletedActionFilter", dispNames.get(0));
   }
 
   @Test
@@ -376,7 +376,7 @@ public class BitBucketPPRHookJobDslExtensionTest {
       dispNames.add(dispName);
     }
     assertEquals(1, dispNames.size());
-    assertEquals(dispNames.get(0), "BitBucketPPRPullRequestCommentDeletedActionFilter");
+    assertEquals("BitBucketPPRPullRequestCommentDeletedActionFilter", dispNames.get(0));
   }
 
   @Test
@@ -397,7 +397,7 @@ public class BitBucketPPRHookJobDslExtensionTest {
       dispNames.add(dispName);
     }
     assertEquals(1, dispNames.size());
-    assertEquals(dispNames.get(0), "BitBucketPPRPullRequestCreatedActionFilter");
+    assertEquals("BitBucketPPRPullRequestCreatedActionFilter", dispNames.get(0));
   }
 
   @Test
@@ -422,7 +422,7 @@ public class BitBucketPPRHookJobDslExtensionTest {
       isToApprove = tmp3.shouldSendApprove();
     }
     assertEquals(1, dispNames.size());
-    assertEquals(dispNames.get(0), "BitBucketPPRPullRequestCreatedActionFilter");
+    assertEquals("BitBucketPPRPullRequestCreatedActionFilter", dispNames.get(0));
     assertFalse(isToApprove);
   }
 
@@ -448,7 +448,7 @@ public class BitBucketPPRHookJobDslExtensionTest {
       isToApprove = tmp3.shouldSendApprove();
     }
     assertEquals(1, dispNames.size());
-    assertEquals(dispNames.get(0), "BitBucketPPRPullRequestCreatedActionFilter");
+    assertEquals("BitBucketPPRPullRequestCreatedActionFilter", dispNames.get(0));
     assertTrue(isToApprove);
   }
 
@@ -470,7 +470,7 @@ public class BitBucketPPRHookJobDslExtensionTest {
       dispNames.add(dispName);
     }
     assertEquals(1, dispNames.size());
-    assertEquals(dispNames.get(0), "BitBucketPPRPullRequestUpdatedActionFilter");
+    assertEquals("BitBucketPPRPullRequestUpdatedActionFilter", dispNames.get(0));
   }
 
   @Test
@@ -495,7 +495,7 @@ public class BitBucketPPRHookJobDslExtensionTest {
       isToApprove = tmp3.shouldSendApprove();
     }
     assertEquals(1, dispNames.size());
-    assertEquals(dispNames.get(0), "BitBucketPPRPullRequestUpdatedActionFilter");
+    assertEquals("BitBucketPPRPullRequestUpdatedActionFilter", dispNames.get(0));
     assertFalse(isToApprove);
   }
 
@@ -521,7 +521,7 @@ public class BitBucketPPRHookJobDslExtensionTest {
       isToApprove = tmp3.shouldSendApprove();
     }
     assertEquals(1, dispNames.size());
-    assertEquals(dispNames.get(0), "BitBucketPPRPullRequestUpdatedActionFilter");
+    assertEquals("BitBucketPPRPullRequestUpdatedActionFilter", dispNames.get(0));
     assertTrue(isToApprove);
   }
 
@@ -544,7 +544,7 @@ public class BitBucketPPRHookJobDslExtensionTest {
       dispNames.add(dispName);
     }
     assertEquals(1, dispNames.size());
-    assertEquals(dispNames.get(0), "BitBucketPPRPullRequestMergedActionFilter");
+    assertEquals("BitBucketPPRPullRequestMergedActionFilter", dispNames.get(0));
   }
 
   @Test
@@ -565,7 +565,7 @@ public class BitBucketPPRHookJobDslExtensionTest {
       dispNames.add(dispName);
     }
     assertEquals(1, dispNames.size());
-    assertEquals(dispNames.get(0), "BitBucketPPRPullRequestDeclinedActionFilter");
+    assertEquals("BitBucketPPRPullRequestDeclinedActionFilter", dispNames.get(0));
   }
 
   @Test
@@ -590,7 +590,7 @@ public class BitBucketPPRHookJobDslExtensionTest {
       isToApprove = tmp3.shouldSendApprove();
     }
     assertEquals(1, dispNames.size());
-    assertEquals(dispNames.get(0), "BitBucketPPRPullRequestMergedActionFilter");
+    assertEquals("BitBucketPPRPullRequestMergedActionFilter", dispNames.get(0));
     assertFalse(isToApprove);
   }
 
@@ -616,7 +616,7 @@ public class BitBucketPPRHookJobDslExtensionTest {
       isToApprove = tmp3.shouldSendApprove();
     }
     assertEquals(1, dispNames.size());
-    assertEquals(dispNames.get(0), "BitBucketPPRPullRequestDeclinedActionFilter");
+    assertEquals("BitBucketPPRPullRequestDeclinedActionFilter", dispNames.get(0));
     assertFalse(isToApprove);
   }
 
@@ -642,7 +642,7 @@ public class BitBucketPPRHookJobDslExtensionTest {
       isToApprove = tmp3.shouldSendApprove();
     }
     assertEquals(1, dispNames.size());
-    assertEquals(dispNames.get(0), "BitBucketPPRPullRequestMergedActionFilter");
+    assertEquals("BitBucketPPRPullRequestMergedActionFilter", dispNames.get(0));
     assertTrue(isToApprove);
   }
 
@@ -672,9 +672,9 @@ public class BitBucketPPRHookJobDslExtensionTest {
       dispNames.add(dispName);
     }
     assertEquals(3, dispNames.size());
-    assertEquals(dispNames.get(0), "BitBucketPPRPullRequestCreatedActionFilter");
-    assertEquals(dispNames.get(1), "BitBucketPPRPullRequestUpdatedActionFilter");
-    assertEquals(dispNames.get(2), "BitBucketPPRPullRequestApprovedActionFilter");
+    assertEquals("BitBucketPPRPullRequestCreatedActionFilter", dispNames.get(0));
+    assertEquals("BitBucketPPRPullRequestUpdatedActionFilter", dispNames.get(1));
+    assertEquals("BitBucketPPRPullRequestApprovedActionFilter", dispNames.get(2));
   }
 
   @Test
@@ -709,11 +709,11 @@ public class BitBucketPPRHookJobDslExtensionTest {
       dispNames.add(dispName);
     }
     assertEquals(5, dispNames.size());
-    assertEquals(dispNames.get(0), "BitBucketPPRPullRequestCreatedActionFilter");
-    assertEquals(dispNames.get(1), "BitBucketPPRPullRequestUpdatedActionFilter");
-    assertEquals(dispNames.get(2), "BitBucketPPRPullRequestMergedActionFilter");
-    assertEquals(dispNames.get(3), "BitBucketPPRPullRequestDeclinedActionFilter");
-    assertEquals(dispNames.get(4), "BitBucketPPRPullRequestApprovedActionFilter");
+    assertEquals("BitBucketPPRPullRequestCreatedActionFilter", dispNames.get(0));
+    assertEquals("BitBucketPPRPullRequestUpdatedActionFilter", dispNames.get(1));
+    assertEquals("BitBucketPPRPullRequestMergedActionFilter", dispNames.get(2));
+    assertEquals("BitBucketPPRPullRequestDeclinedActionFilter", dispNames.get(3));
+    assertEquals("BitBucketPPRPullRequestApprovedActionFilter", dispNames.get(4));
   }
 
   @Test
@@ -745,10 +745,10 @@ public class BitBucketPPRHookJobDslExtensionTest {
       dispNames.add(dispName);
     }
     assertEquals(4, dispNames.size());
-    assertEquals(dispNames.get(0), "BitBucketPPRPullRequestCreatedActionFilter");
-    assertEquals(dispNames.get(1), "BitBucketPPRPullRequestUpdatedActionFilter");
-    assertEquals(dispNames.get(2), "BitBucketPPRPullRequestMergedActionFilter");
-    assertEquals(dispNames.get(3), "BitBucketPPRPullRequestApprovedActionFilter");
+    assertEquals("BitBucketPPRPullRequestCreatedActionFilter", dispNames.get(0));
+    assertEquals("BitBucketPPRPullRequestUpdatedActionFilter", dispNames.get(1));
+    assertEquals("BitBucketPPRPullRequestMergedActionFilter", dispNames.get(2));
+    assertEquals("BitBucketPPRPullRequestApprovedActionFilter", dispNames.get(3));
   }
 
   @Test
@@ -769,7 +769,7 @@ public class BitBucketPPRHookJobDslExtensionTest {
       dispNames.add(dispName);
     }
     assertEquals(1, dispNames.size());
-    assertEquals(dispNames.get(0), "BitBucketPPRPullRequestCreatedActionFilter");
+    assertEquals("BitBucketPPRPullRequestCreatedActionFilter", dispNames.get(0));
 
     /* Verify second job content */
     createdJob = (FreeStyleProject) j.getInstance().getItem("test-job2");
@@ -785,7 +785,7 @@ public class BitBucketPPRHookJobDslExtensionTest {
       dispNames.add(dispName);
     }
     assertEquals(1, dispNames.size());
-    assertEquals(dispNames.get(0), "BitBucketPPRRepositoryPushActionFilter");
+    assertEquals("BitBucketPPRRepositoryPushActionFilter", dispNames.get(0));
   }
 
   @Test
@@ -820,11 +820,11 @@ public class BitBucketPPRHookJobDslExtensionTest {
       dispNames.add(dispName);
     }
     assertEquals(5, dispNames.size());
-    assertEquals(dispNames.get(0), "BitBucketPPRPullRequestServerCreatedActionFilter");
-    assertEquals(dispNames.get(1), "BitBucketPPRPullRequestServerUpdatedActionFilter");
-    assertEquals(dispNames.get(2), "BitBucketPPRPullRequestServerApprovedActionFilter");
-    assertEquals(dispNames.get(3), "BitBucketPPRPullRequestServerMergedActionFilter");
-    assertEquals(dispNames.get(4), "BitBucketPPRPullRequestServerDeclinedActionFilter");
+    assertEquals("BitBucketPPRPullRequestServerCreatedActionFilter", dispNames.get(0));
+    assertEquals("BitBucketPPRPullRequestServerUpdatedActionFilter", dispNames.get(1));
+    assertEquals("BitBucketPPRPullRequestServerApprovedActionFilter", dispNames.get(2));
+    assertEquals("BitBucketPPRPullRequestServerMergedActionFilter", dispNames.get(3));
+    assertEquals("BitBucketPPRPullRequestServerDeclinedActionFilter", dispNames.get(4));
   }
 
   @Test
@@ -864,12 +864,12 @@ public class BitBucketPPRHookJobDslExtensionTest {
       dispNames.add(dispName);
     }
     assertEquals(6, dispNames.size());
-    assertEquals(dispNames.get(0), "BitBucketPPRPullRequestServerCreatedActionFilter");
-    assertEquals(dispNames.get(1), "BitBucketPPRPullRequestServerUpdatedActionFilter");
-    assertEquals(dispNames.get(2), "BitBucketPPRPullRequestServerSourceUpdatedActionFilter");
-    assertEquals(dispNames.get(3), "BitBucketPPRPullRequestServerApprovedActionFilter");
-    assertEquals(dispNames.get(4), "BitBucketPPRPullRequestServerMergedActionFilter");
-    assertEquals(dispNames.get(5), "BitBucketPPRPullRequestServerDeclinedActionFilter");
+    assertEquals("BitBucketPPRPullRequestServerCreatedActionFilter", dispNames.get(0));
+    assertEquals("BitBucketPPRPullRequestServerUpdatedActionFilter", dispNames.get(1));
+    assertEquals("BitBucketPPRPullRequestServerSourceUpdatedActionFilter", dispNames.get(2));
+    assertEquals("BitBucketPPRPullRequestServerApprovedActionFilter", dispNames.get(3));
+    assertEquals("BitBucketPPRPullRequestServerMergedActionFilter", dispNames.get(4));
+    assertEquals("BitBucketPPRPullRequestServerDeclinedActionFilter", dispNames.get(5));
   }
 
   @Test
@@ -906,11 +906,11 @@ public class BitBucketPPRHookJobDslExtensionTest {
       dispNames.add(dispName);
     }
     assertEquals(5, dispNames.size());
-    assertEquals(dispNames.get(0), "BitBucketPPRPullRequestServerCreatedActionFilter");
-    assertEquals(dispNames.get(1), "BitBucketPPRPullRequestServerUpdatedActionFilter");
-    assertEquals(dispNames.get(2), "BitBucketPPRPullRequestServerSourceUpdatedActionFilter");
-    assertEquals(dispNames.get(3), "BitBucketPPRPullRequestServerApprovedActionFilter");
-    assertEquals(dispNames.get(4), "BitBucketPPRPullRequestServerMergedActionFilter");
+    assertEquals("BitBucketPPRPullRequestServerCreatedActionFilter", dispNames.get(0));
+    assertEquals("BitBucketPPRPullRequestServerUpdatedActionFilter", dispNames.get(1));
+    assertEquals("BitBucketPPRPullRequestServerSourceUpdatedActionFilter", dispNames.get(2));
+    assertEquals("BitBucketPPRPullRequestServerApprovedActionFilter", dispNames.get(3));
+    assertEquals("BitBucketPPRPullRequestServerMergedActionFilter", dispNames.get(4));
   }
 
   @Test
@@ -966,19 +966,19 @@ public class BitBucketPPRHookJobDslExtensionTest {
       dispNames.add(dispName);
     }
     assertEquals(12, dispNames.size());
-    assertEquals(dispNames.get(0), "BitBucketPPRPullRequestServerCreatedActionFilter");
-    assertEquals(dispNames.get(1), "BitBucketPPRPullRequestServerUpdatedActionFilter");
-    assertEquals(dispNames.get(2), "BitBucketPPRPullRequestServerSourceUpdatedActionFilter");
-    assertEquals(dispNames.get(3), "BitBucketPPRPullRequestServerApprovedActionFilter");
-    assertEquals(dispNames.get(4), "BitBucketPPRPullRequestServerMergedActionFilter");
-    assertEquals(dispNames.get(5), "BitBucketPPRPullRequestServerDeclinedActionFilter");
+    assertEquals("BitBucketPPRPullRequestServerCreatedActionFilter", dispNames.get(0));
+    assertEquals("BitBucketPPRPullRequestServerUpdatedActionFilter", dispNames.get(1));
+    assertEquals("BitBucketPPRPullRequestServerSourceUpdatedActionFilter", dispNames.get(2));
+    assertEquals("BitBucketPPRPullRequestServerApprovedActionFilter", dispNames.get(3));
+    assertEquals("BitBucketPPRPullRequestServerMergedActionFilter", dispNames.get(4));
+    assertEquals("BitBucketPPRPullRequestServerDeclinedActionFilter", dispNames.get(5));
 
-    assertEquals(dispNames.get(6), "BitBucketPPRPullRequestServerCreatedActionFilter");
-    assertEquals(dispNames.get(7), "BitBucketPPRPullRequestServerUpdatedActionFilter");
-    assertEquals(dispNames.get(8), "BitBucketPPRPullRequestServerSourceUpdatedActionFilter");
-    assertEquals(dispNames.get(9), "BitBucketPPRPullRequestServerApprovedActionFilter");
-    assertEquals(dispNames.get(10), "BitBucketPPRPullRequestServerMergedActionFilter");
-    assertEquals(dispNames.get(11), "BitBucketPPRPullRequestServerDeclinedActionFilter");
+    assertEquals("BitBucketPPRPullRequestServerCreatedActionFilter", dispNames.get(6));
+    assertEquals("BitBucketPPRPullRequestServerUpdatedActionFilter", dispNames.get(7));
+    assertEquals("BitBucketPPRPullRequestServerSourceUpdatedActionFilter", dispNames.get(8));
+    assertEquals("BitBucketPPRPullRequestServerApprovedActionFilter", dispNames.get(9));
+    assertEquals("BitBucketPPRPullRequestServerMergedActionFilter", dispNames.get(10));
+    assertEquals("BitBucketPPRPullRequestServerDeclinedActionFilter", dispNames.get(11));
   }
 
   @Test
@@ -988,7 +988,7 @@ public class BitBucketPPRHookJobDslExtensionTest {
     /* Fetch the newly created job and check its trigger configuration */
     WorkflowJob createdJob = (WorkflowJob) j.getInstance().getItem("test-job");
     /* Go through all triggers to validate DSL */
-    PipelineTriggersJobProperty pipelineTriggers = (PipelineTriggersJobProperty) createdJob.getProperty(PipelineTriggersJobProperty.class);
+    PipelineTriggersJobProperty pipelineTriggers = createdJob.getProperty(PipelineTriggersJobProperty.class);
     Map<TriggerDescriptor, Trigger<?>> triggers = pipelineTriggers.getTriggersMap();
     /* Only one 'triggers{}' closure */
     assertEquals(1, triggers.size());
@@ -1014,11 +1014,11 @@ public class BitBucketPPRHookJobDslExtensionTest {
       dispNames.add(dispName);
     }
     assertEquals(5, dispNames.size());
-    assertEquals(dispNames.get(0), "BitBucketPPRPullRequestServerCreatedActionFilter");
-    assertEquals(dispNames.get(1), "BitBucketPPRPullRequestServerUpdatedActionFilter");
-    assertEquals(dispNames.get(2), "BitBucketPPRPullRequestServerApprovedActionFilter");
-    assertEquals(dispNames.get(3), "BitBucketPPRPullRequestServerMergedActionFilter");
-    assertEquals(dispNames.get(4), "BitBucketPPRPullRequestServerDeclinedActionFilter");
+    assertEquals("BitBucketPPRPullRequestServerCreatedActionFilter", dispNames.get(0));
+    assertEquals("BitBucketPPRPullRequestServerUpdatedActionFilter", dispNames.get(1));
+    assertEquals("BitBucketPPRPullRequestServerApprovedActionFilter", dispNames.get(2));
+    assertEquals("BitBucketPPRPullRequestServerMergedActionFilter", dispNames.get(3));
+    assertEquals("BitBucketPPRPullRequestServerDeclinedActionFilter", dispNames.get(4));
   }
 
   @Test
@@ -1028,7 +1028,7 @@ public class BitBucketPPRHookJobDslExtensionTest {
     /* Fetch the newly created job and check its trigger configuration */
     WorkflowJob createdJob = (WorkflowJob) j.getInstance().getItem("test-job");
     /* Go through all triggers to validate DSL */
-    PipelineTriggersJobProperty pipelineTriggers = (PipelineTriggersJobProperty) createdJob.getProperty(PipelineTriggersJobProperty.class);
+    PipelineTriggersJobProperty pipelineTriggers = createdJob.getProperty(PipelineTriggersJobProperty.class);
     Map<TriggerDescriptor, Trigger<?>> triggers = pipelineTriggers.getTriggersMap();
     /* Only one 'triggers{}' closure */
     assertEquals(1, triggers.size());
@@ -1059,14 +1059,14 @@ public class BitBucketPPRHookJobDslExtensionTest {
       dispNames.add(dispName);
     }
     assertEquals(6, dispNames.size());
-    assertEquals(dispNames.get(0), "BitBucketPPRPullRequestServerCreatedActionFilter");
-    assertEquals(dispNames.get(1), "BitBucketPPRPullRequestServerUpdatedActionFilter");
-    assertEquals(dispNames.get(2), "BitBucketPPRPullRequestServerSourceUpdatedActionFilter");
-    assertEquals(dispNames.get(3), "BitBucketPPRPullRequestServerApprovedActionFilter");
-    assertEquals(dispNames.get(4), "BitBucketPPRPullRequestServerMergedActionFilter");
-    assertEquals(dispNames.get(5), "BitBucketPPRPullRequestServerDeclinedActionFilter");
+    assertEquals("BitBucketPPRPullRequestServerCreatedActionFilter", dispNames.get(0));
+    assertEquals("BitBucketPPRPullRequestServerUpdatedActionFilter", dispNames.get(1));
+    assertEquals("BitBucketPPRPullRequestServerSourceUpdatedActionFilter", dispNames.get(2));
+    assertEquals("BitBucketPPRPullRequestServerApprovedActionFilter", dispNames.get(3));
+    assertEquals("BitBucketPPRPullRequestServerMergedActionFilter", dispNames.get(4));
+    assertEquals("BitBucketPPRPullRequestServerDeclinedActionFilter", dispNames.get(5));
   }
-  
+
   @Ignore
   @Test
   public void testDslServerAllPRAllowedBranchesWithApproveActionsPipeline() throws Exception {
@@ -1075,7 +1075,7 @@ public class BitBucketPPRHookJobDslExtensionTest {
     /* Fetch the newly created job and check its trigger configuration */
     WorkflowJob createdJob = (WorkflowJob) j.getInstance().getItem("test-job");
     /* Go through all triggers to validate DSL */
-    PipelineTriggersJobProperty pipelineTriggers = (PipelineTriggersJobProperty) createdJob.getProperty(PipelineTriggersJobProperty.class);
+    PipelineTriggersJobProperty pipelineTriggers = createdJob.getProperty(PipelineTriggersJobProperty.class);
     Map<TriggerDescriptor, Trigger<?>> triggers = pipelineTriggers.getTriggersMap();
     /* Only one 'triggers{}' closure */
     assertEquals(1, triggers.size());
@@ -1103,13 +1103,13 @@ public class BitBucketPPRHookJobDslExtensionTest {
       dispNames.add(dispName);
     }
     assertEquals(5, dispNames.size());
-    assertEquals(dispNames.get(0), "BitBucketPPRPullRequestServerCreatedActionFilter");
-    assertEquals(dispNames.get(1), "BitBucketPPRPullRequestServerUpdatedActionFilter");
-    assertEquals(dispNames.get(2), "BitBucketPPRPullRequestServerSourceUpdatedActionFilter");
-    assertEquals(dispNames.get(3), "BitBucketPPRPullRequestServerApprovedActionFilter");
-    assertEquals(dispNames.get(4), "BitBucketPPRPullRequestServerMergedActionFilter");
+    assertEquals("BitBucketPPRPullRequestServerCreatedActionFilter", dispNames.get(0));
+    assertEquals("BitBucketPPRPullRequestServerUpdatedActionFilter", dispNames.get(1));
+    assertEquals("BitBucketPPRPullRequestServerSourceUpdatedActionFilter", dispNames.get(2));
+    assertEquals("BitBucketPPRPullRequestServerApprovedActionFilter", dispNames.get(3));
+    assertEquals("BitBucketPPRPullRequestServerMergedActionFilter", dispNames.get(4));
   }
-  
+
   @Test
   public void testDslServerAllPRUnfilteredAndAllowedBranchesActionsPipeline() throws Exception {
     /* Create seed job which will process DSL */
@@ -1117,7 +1117,7 @@ public class BitBucketPPRHookJobDslExtensionTest {
     /* Fetch the newly created job and check its trigger configuration */
     WorkflowJob createdJob = (WorkflowJob) j.getInstance().getItem("test-job");
     /* Go through all triggers to validate DSL */
-    PipelineTriggersJobProperty pipelineTriggers = (PipelineTriggersJobProperty) createdJob.getProperty(PipelineTriggersJobProperty.class);
+    PipelineTriggersJobProperty pipelineTriggers = createdJob.getProperty(PipelineTriggersJobProperty.class);
     Map<TriggerDescriptor, Trigger<?>> triggers = pipelineTriggers.getTriggersMap();
     /* Only one 'triggers{}' closure */
     assertEquals(1, triggers.size());
@@ -1161,17 +1161,17 @@ public class BitBucketPPRHookJobDslExtensionTest {
       dispNames.add(dispName);
     }
     assertEquals(11, dispNames.size());
-    assertEquals(dispNames.get(0), "BitBucketPPRPullRequestServerCreatedActionFilter");
-    assertEquals(dispNames.get(1), "BitBucketPPRPullRequestServerUpdatedActionFilter");
-    assertEquals(dispNames.get(2), "BitBucketPPRPullRequestServerSourceUpdatedActionFilter");
-    assertEquals(dispNames.get(3), "BitBucketPPRPullRequestServerApprovedActionFilter");
-    assertEquals(dispNames.get(4), "BitBucketPPRPullRequestServerMergedActionFilter");
-    assertEquals(dispNames.get(5), "BitBucketPPRPullRequestServerCreatedActionFilter");
-    assertEquals(dispNames.get(6), "BitBucketPPRPullRequestServerUpdatedActionFilter");
-    assertEquals(dispNames.get(7), "BitBucketPPRPullRequestServerSourceUpdatedActionFilter");
-    assertEquals(dispNames.get(8), "BitBucketPPRPullRequestServerApprovedActionFilter");
-    assertEquals(dispNames.get(9), "BitBucketPPRPullRequestServerMergedActionFilter");
-    assertEquals(dispNames.get(10), "BitBucketPPRPullRequestServerDeclinedActionFilter");
+    assertEquals("BitBucketPPRPullRequestServerCreatedActionFilter", dispNames.get(0));
+    assertEquals("BitBucketPPRPullRequestServerUpdatedActionFilter", dispNames.get(1));
+    assertEquals("BitBucketPPRPullRequestServerSourceUpdatedActionFilter", dispNames.get(2));
+    assertEquals("BitBucketPPRPullRequestServerApprovedActionFilter", dispNames.get(3));
+    assertEquals("BitBucketPPRPullRequestServerMergedActionFilter", dispNames.get(4));
+    assertEquals("BitBucketPPRPullRequestServerCreatedActionFilter", dispNames.get(5));
+    assertEquals("BitBucketPPRPullRequestServerUpdatedActionFilter", dispNames.get(6));
+    assertEquals("BitBucketPPRPullRequestServerSourceUpdatedActionFilter", dispNames.get(7));
+    assertEquals("BitBucketPPRPullRequestServerApprovedActionFilter", dispNames.get(8));
+    assertEquals("BitBucketPPRPullRequestServerMergedActionFilter", dispNames.get(9));
+    assertEquals("BitBucketPPRPullRequestServerDeclinedActionFilter", dispNames.get(10));
   }
 
   @Ignore
@@ -1182,7 +1182,7 @@ public class BitBucketPPRHookJobDslExtensionTest {
     /* Fetch the newly created job and check its trigger configuration */
     WorkflowJob createdJob = (WorkflowJob) j.getInstance().getItem("test-job");
     /* Go through all triggers to validate DSL */
-    PipelineTriggersJobProperty pipelineTriggers = (PipelineTriggersJobProperty) createdJob.getProperty(PipelineTriggersJobProperty.class);
+    PipelineTriggersJobProperty pipelineTriggers = createdJob.getProperty(PipelineTriggersJobProperty.class);
     Map<TriggerDescriptor, Trigger<?>> triggers = pipelineTriggers.getTriggersMap();
     /* Only one 'triggers{}' closure */
     assertEquals(1, triggers.size());
@@ -1205,10 +1205,10 @@ public class BitBucketPPRHookJobDslExtensionTest {
       dispNames.add(dispName);
     }
     assertEquals(4, dispNames.size());
-    assertEquals(dispNames.get(0), "BitBucketPPRPullRequestCreatedActionFilter");
-    assertEquals(dispNames.get(1), "BitBucketPPRPullRequestUpdatedActionFilter");
-    assertEquals(dispNames.get(2), "BitBucketPPRPullRequestMergedActionFilter");
-    assertEquals(dispNames.get(3), "BitBucketPPRPullRequestApprovedActionFilter");
+    assertEquals("BitBucketPPRPullRequestCreatedActionFilter", dispNames.get(0));
+    assertEquals("BitBucketPPRPullRequestUpdatedActionFilter", dispNames.get(1));
+    assertEquals("BitBucketPPRPullRequestMergedActionFilter", dispNames.get(2));
+    assertEquals("BitBucketPPRPullRequestApprovedActionFilter", dispNames.get(3));
   }
 
   @Test
@@ -1218,7 +1218,7 @@ public class BitBucketPPRHookJobDslExtensionTest {
     /* Fetch the newly created job and check its trigger configuration */
     WorkflowJob createdJob = (WorkflowJob) j.getInstance().getItem("test-job");
     /* Go through all triggers to validate DSL */
-    PipelineTriggersJobProperty pipelineTriggers = (PipelineTriggersJobProperty) createdJob.getProperty(PipelineTriggersJobProperty.class);
+    PipelineTriggersJobProperty pipelineTriggers = createdJob.getProperty(PipelineTriggersJobProperty.class);
     Map<TriggerDescriptor, Trigger<?>> triggers = pipelineTriggers.getTriggersMap();
     /* Only one 'triggers{}' closure */
     assertEquals(1, triggers.size());
@@ -1229,7 +1229,7 @@ public class BitBucketPPRHookJobDslExtensionTest {
       assertEquals(1, tmp2.getTriggers().size());
       String tmpNname = tmp2.getTriggers().get(0).getActionFilter().getClass().getName();
       String dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
-      assertEquals(dispName, "BitBucketPPRPullRequestDeclinedActionFilter");
+      assertEquals("BitBucketPPRPullRequestDeclinedActionFilter", dispName);
 
       BitBucketPPRPullRequestDeclinedActionFilter actionFilter = (BitBucketPPRPullRequestDeclinedActionFilter) tmp2.getTriggers().get(0).getActionFilter();
       assertEquals("**", actionFilter.allowedBranches);
@@ -1243,7 +1243,7 @@ public class BitBucketPPRHookJobDslExtensionTest {
     /* Fetch the newly created job and check its trigger configuration */
     WorkflowJob createdJob = (WorkflowJob) j.getInstance().getItem("test-job");
     /* Go through all triggers to validate DSL */
-    PipelineTriggersJobProperty pipelineTriggers = (PipelineTriggersJobProperty) createdJob.getProperty(PipelineTriggersJobProperty.class);
+    PipelineTriggersJobProperty pipelineTriggers = createdJob.getProperty(PipelineTriggersJobProperty.class);
     Map<TriggerDescriptor, Trigger<?>> triggers = pipelineTriggers.getTriggersMap();
     assertEquals(1, triggers.size());
     List<String> dispNames = new ArrayList<>();
@@ -1260,7 +1260,7 @@ public class BitBucketPPRHookJobDslExtensionTest {
       isToApprove = tmp3.shouldSendApprove();
     }
     assertEquals(1, dispNames.size());
-    assertEquals(dispNames.get(0), "BitBucketPPRRepositoryPushActionFilter");
+    assertEquals("BitBucketPPRRepositoryPushActionFilter", dispNames.get(0));
     assertFalse(isToApprove);
   }
 
@@ -1284,7 +1284,7 @@ public class BitBucketPPRHookJobDslExtensionTest {
       dispNames.add(dispName);
     }
     assertEquals(1, dispNames.size());
-    assertEquals(dispNames.get(0), "BitBucketPPRPullRequestCreatedActionFilter");
+    assertEquals("BitBucketPPRPullRequestCreatedActionFilter", dispNames.get(0));
 
     /* Verify second job content */
     createdJob = (FreeStyleProject) j.getInstance().getItem("test-job2");
@@ -1300,12 +1300,12 @@ public class BitBucketPPRHookJobDslExtensionTest {
       dispNames.add(dispName);
     }
     assertEquals(1, dispNames.size());
-    assertEquals(dispNames.get(0), "BitBucketPPRPullRequestUpdatedActionFilter");
+    assertEquals("BitBucketPPRPullRequestUpdatedActionFilter", dispNames.get(0));
 
     /* Verify third job content */
     createdPipelineJob = (WorkflowJob) j.getInstance().getItem("test-job3");
     /* Go through all triggers to validate DSL */
-    pipelineTriggers = (PipelineTriggersJobProperty) createdPipelineJob.getProperty(PipelineTriggersJobProperty.class);
+    pipelineTriggers = createdPipelineJob.getProperty(PipelineTriggersJobProperty.class);
     triggers = pipelineTriggers.getTriggersMap();
     assertEquals(1, triggers.size());
     dispNames.clear();
@@ -1320,7 +1320,7 @@ public class BitBucketPPRHookJobDslExtensionTest {
       dispNames.add(dispName);
     }
     assertEquals(2, dispNames.size());
-    assertEquals(dispNames.get(0), "BitBucketPPRRepositoryPushActionFilter");
-    assertEquals(dispNames.get(1), "BitBucketPPRPullRequestCommentDeletedActionFilter");
+    assertEquals("BitBucketPPRRepositoryPushActionFilter", dispNames.get(0));
+    assertEquals("BitBucketPPRPullRequestCommentDeletedActionFilter", dispNames.get(1));
   }
 }
