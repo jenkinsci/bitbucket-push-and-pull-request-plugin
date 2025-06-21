@@ -28,6 +28,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.logging.Logger;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 
@@ -125,6 +126,7 @@ public class BitBucketPPRRepositoryPushActionFilter extends BitBucketPPRReposito
   @Extension
   public static class ActionFilterDescriptorImpl extends BitBucketPPRRepositoryActionDescriptor {
 
+    @NonNull
     @Override
     public String getDisplayName() {
       return "Bitbucket Cloud Push";

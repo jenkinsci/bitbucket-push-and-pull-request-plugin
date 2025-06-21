@@ -55,7 +55,7 @@ import jenkins.triggers.SCMTriggerItem;
 import org.eclipse.jgit.transport.URIish;
 
 /**
- * 
+ *
  * @author cdelmonte
  *
  */
@@ -92,7 +92,7 @@ public class BitBucketPPRJobProbe {
     List<URIish> remoteScmUrls = bitbucketAction.getScmUrls().stream().map(makeUrl)
         .filter(Objects::nonNull).collect(Collectors.toList());
 
-    try (ACLContext ctx = ACL.as(ACL.SYSTEM)) {
+    try (ACLContext ctx = ACL.as2(ACL.SYSTEM2)) {
       if (globalConfig.isSingleJobSet()) {
         try {
           Job job = (Job) Jenkins.get().getItemByFullName(globalConfig.getSingleJob());
@@ -159,7 +159,7 @@ public class BitBucketPPRJobProbe {
         return;
       }
 
-      Predicate<URIish> checkSCM = (url) -> scm instanceof GitSCM && matchGitScm(scm, url);
+      Predicate<URIish> checkSCM = url -> scm instanceof GitSCM && matchGitScm(scm, url);
 
       if (remotes.stream().anyMatch(checkSCM) && !scmTriggered.contains(scm)) {
         scmTriggered.add(scm);
@@ -230,11 +230,9 @@ public class BitBucketPPRJobProbe {
   }
 
   private Optional<BitBucketPPRTrigger> getBitBucketTrigger(Job<?, ?> job) {
-    if (job instanceof ParameterizedJobMixIn.ParameterizedJob) {
-      ParameterizedJobMixIn.ParameterizedJob<?, ?> pJob =
-          (ParameterizedJobMixIn.ParameterizedJob<?, ?>) job;
+    if (job instanceof ParameterizedJobMixIn.ParameterizedJob<?, ?> pJob) {
 
-      return pJob.getTriggers().values().stream().filter(BitBucketPPRTrigger.class::isInstance)
+        return pJob.getTriggers().values().stream().filter(BitBucketPPRTrigger.class::isInstance)
           .findFirst().map(BitBucketPPRTrigger.class::cast);
     }
     return Optional.empty();

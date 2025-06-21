@@ -21,8 +21,6 @@
 
 package io.jenkins.plugins.bitbucketpushandpullrequest.processor;
 
-import static java.util.Objects.nonNull;
-
 import io.jenkins.plugins.bitbucketpushandpullrequest.BitBucketPPRJobProbe;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRPullRequestServerAction;
@@ -41,7 +39,7 @@ public class BitBucketPPRPullRequestServerPayloadProcessor extends BitBucketPPRP
   public BitBucketPPRPullRequestServerPayloadProcessor(
       @Nonnull BitBucketPPRJobProbe jobProbe, @Nonnull BitBucketPPRHookEvent bitbucketEvent) {
     super(jobProbe, bitbucketEvent);
-    logger.fine(() -> "Processing " + bitbucketEvent.toString());
+    logger.fine(() -> "Processing " + bitbucketEvent);
   }
 
   private BitBucketPPRAction buildActionForJobs(

@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.jenkins-ci.plugins</groupId>
         <artifactId>plugin</artifactId>
-        <version>4.88</version>
+        <version>5.17</version>
         <relativePath />
     </parent>
 
@@ -16,15 +16,14 @@
 
     <properties>
         <!-- https://www.jenkins.io/doc/developer/plugin-development/choosing-jenkins-baseline/ -->
-        <jenkins.baseline>2.440</jenkins.baseline>
+        <jenkins.baseline>2.479</jenkins.baseline>
         <jenkins.version>${jenkins.baseline}.3</jenkins.version>
-        <powermock.version>2.0.0</powermock.version>
         <hpi.compatibleSinceVersion>2.9.0</hpi.compatibleSinceVersion>
         <jenkins.java.level>17</jenkins.java.level>
     </properties>
 
     <name>Bitbucket Push and Pull Request Plugin</name>
-    <description>Bitbucket plugin for Jenkins v2.138.2 or later, allowing push and pull requests</description>
+    <description>Bitbucket plugin for Jenkins allowing push and pull requests</description>
 
     <licenses>
         <license>
@@ -49,7 +48,7 @@
             <dependency>
                 <groupId>io.jenkins.tools.bom</groupId>
                 <artifactId>bom-${jenkins.baseline}.x</artifactId>
-                <version>3435.v238d66a_043fb_</version>
+                <version>4770.v9a_2b_7a_9d8b_7f</version>
                 <scope>import</scope>
                 <type>pom</type>
             </dependency>
@@ -198,7 +197,6 @@
             <version>5.2.0</version>
             <scope>test</scope>
         </dependency>
-
     </dependencies>
 
     <url>https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin</url>
@@ -243,5 +241,4 @@
             </plugin>
         </plugins>
     </build>
-
 </project>

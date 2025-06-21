@@ -21,6 +21,7 @@
 
 package io.jenkins.plugins.bitbucketpushandpullrequest.action;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
 import io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRUtils;
 import io.jenkins.plugins.bitbucketpushandpullrequest.exception.BitBucketPPRRepositoryNotParsedException;
 
@@ -127,6 +128,7 @@ public class BitBucketPPRPullRequestAction extends BitBucketPPRActionAbstract
     return payload.getPullRequest().getDescription();
   }
 
+  @NonNull
   @Override
   public BitBucketPPRPayload getPayload() {
     return payload;

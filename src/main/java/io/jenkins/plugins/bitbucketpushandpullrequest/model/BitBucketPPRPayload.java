@@ -56,7 +56,7 @@ public interface BitBucketPPRPayload extends Serializable {
   default BitBucketPPRApproval getApproval() {
     return null;
   }
-  
+
   default BitBucketPPRComment getComment() {
     return null;
   }

@@ -23,7 +23,9 @@ package io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.cloud;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Objects;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
 import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
@@ -44,11 +46,7 @@ public class BitBucketPPRPullRequestCommentDeletedActionFilter
 
   @DataBoundSetter
   public void setAllowedBranches(String allowedBranches) {
-    if (allowedBranches == null) {
-      this.allowedBranches = "";
-    } else {
-      this.allowedBranches = allowedBranches;
-    }
+      this.allowedBranches = Objects.requireNonNullElse(allowedBranches, "");
   }
 
   @Override
@@ -78,6 +76,7 @@ public class BitBucketPPRPullRequestCommentDeletedActionFilter
   @Extension
   public static class ActionFilterDescriptorImpl extends BitBucketPPRPullRequestActionDescriptor {
 
+    @NonNull
     @Override
     public String getDisplayName() {
       return "Comment Deleted";

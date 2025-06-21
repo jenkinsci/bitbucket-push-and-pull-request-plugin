@@ -23,11 +23,8 @@ package io.jenkins.plugins.bitbucketpushandpullrequest.processor;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
-import hudson.ExtensionList;
 import io.jenkins.plugins.bitbucketpushandpullrequest.config.BitBucketPPRPluginConfig;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -37,10 +34,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
-import org.mockito.Mock;
-import org.mockito.MockedConstruction;
 import org.mockito.MockedStatic;
-import org.mockito.MockedStatic.Verification;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import com.google.gson.Gson;
