@@ -47,3 +47,4 @@ node_modules/*
 # Others
 /.sts4-cache/
 .checkstyle
+.aider*
