@@ -1,8 +1,22 @@
 package io.jenkins.plugins.bitbucketpushandpullrequest.config;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Collections;
+import java.util.logging.Logger;
+
+import javax.annotation.CheckForNull;
+
+import static org.apache.commons.lang3.StringUtils.isEmpty;
+import org.kohsuke.stapler.AncestorInPath;
+import org.kohsuke.stapler.DataBoundSetter;
+import org.kohsuke.stapler.QueryParameter;
+import org.kohsuke.stapler.StaplerRequest;
+
 import com.cloudbees.plugins.credentials.CredentialsMatchers;
 import com.cloudbees.plugins.credentials.common.StandardCredentials;
 import com.cloudbees.plugins.credentials.common.StandardListBoxModel;
+
 import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;
 import hudson.ExtensionList;
@@ -13,18 +27,6 @@ import hudson.util.ListBoxModel;
 import jenkins.model.GlobalConfiguration;
 import jenkins.model.Jenkins;
 import net.sf.json.JSONObject;
-import org.kohsuke.stapler.AncestorInPath;
-import org.kohsuke.stapler.DataBoundSetter;
-import org.kohsuke.stapler.QueryParameter;
-import org.kohsuke.stapler.StaplerRequest2;
-
-import javax.annotation.CheckForNull;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Collections;
-import java.util.logging.Logger;
-
-import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 @Extension
 public class BitBucketPPRPluginConfig extends GlobalConfiguration {
@@ -154,7 +156,7 @@ public class BitBucketPPRPluginConfig extends GlobalConfiguration {
   }
 
   @Override
-  public boolean configure(StaplerRequest2 req, JSONObject formData) {
+  public boolean configure(StaplerRequest req, JSONObject formData) {
     req.bindJSON(this, formData);
     save();
     return true;

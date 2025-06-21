@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.jenkins-ci.plugins</groupId>
         <artifactId>plugin</artifactId>
-        <version>5.17</version>
+        <version>4.88</version>
         <relativePath />
     </parent>
 
@@ -16,8 +16,9 @@
 
     <properties>
         <!-- https://www.jenkins.io/doc/developer/plugin-development/choosing-jenkins-baseline/ -->
-        <jenkins.baseline>2.479</jenkins.baseline>
+        <jenkins.baseline>2.440</jenkins.baseline>
         <jenkins.version>${jenkins.baseline}.3</jenkins.version>
+        <powermock.version>2.0.0</powermock.version>
         <hpi.compatibleSinceVersion>2.9.0</hpi.compatibleSinceVersion>
         <jenkins.java.level>17</jenkins.java.level>
     </properties>
@@ -48,7 +49,7 @@
             <dependency>
                 <groupId>io.jenkins.tools.bom</groupId>
                 <artifactId>bom-${jenkins.baseline}.x</artifactId>
-                <version>4770.v9a_2b_7a_9d8b_7f</version>
+                <version>3435.v238d66a_043fb_</version>
                 <scope>import</scope>
                 <type>pom</type>
             </dependency>
