@@ -92,5 +92,9 @@ THE SOFTWARE.
   <t:buildEnvVar name="BITBUCKET_PULL_REQUEST_LATEST_COMMIT_FROM_TARGET_BRANCH">
     <j:out value="${%blurb.BITBUCKET_PULL_REQUEST_LATEST_COMMIT_FROM_TARGET_BRANCH}"/>
   </t:buildEnvVar>
+
+  <t:buildEnvVar name="BITBUCKET_PULL_REQUEST_IS_DRAFT">
+    <j:out value="${%blurb.BITBUCKET_PULL_REQUEST_IS_DRAFT}"/>
+  </t:buildEnvVar>
   
 </j:jelly>
