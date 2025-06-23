@@ -1,30 +1,40 @@
 package io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.cloud;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import hudson.EnvVars;
+import hudson.triggers.Trigger;
+import hudson.triggers.TriggerDescriptor;
+import io.jenkins.plugins.bitbucketpushandpullrequest.BitBucketPPRTrigger;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import hudson.triggers.Trigger;
-import hudson.triggers.TriggerDescriptor;
-import io.jenkins.plugins.bitbucketpushandpullrequest.BitBucketPPRTrigger;
 import org.apache.commons.io.IOUtils;
 import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.jvnet.hudson.test.JenkinsRule;
-import org.mockito.junit.MockitoJUnitRunner;
-import hudson.EnvVars;
+import org.jvnet.hudson.test.junit.jupiter.WithJenkins;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.junit.Assert.*;
+@ExtendWith(MockitoExtension.class)
+@WithJenkins
+class BitBucketPPRPullRequestApprovedActionFilterTest {
 
-@RunWith(MockitoJUnitRunner.class)
-public class BitBucketPPRPullRequestApprovedActionFilterTest {
-  @Rule public JenkinsRule j = new JenkinsRule();
+  private JenkinsRule j;
+
+  @BeforeEach
+  void setUp(JenkinsRule rule) {
+    j = rule;
+  }
 
   private void createSeedJob(String script) throws Exception {
     WorkflowJob pipelineJob = j.createProject(WorkflowJob.class, "pipelineJob");
@@ -37,7 +47,7 @@ public class BitBucketPPRPullRequestApprovedActionFilterTest {
   }
 
   @Test
-  public void testMatches() {
+  void testMatches() {
     String allowedBranches = "master";
 
     BitBucketPPRPullRequestApprovedActionFilter c =
@@ -87,7 +97,7 @@ public class BitBucketPPRPullRequestApprovedActionFilterTest {
   }
 
   @Test
-  public void testMatchEnv() {
+  void testMatchEnv() {
     HashMap<String, String> envMap = new HashMap<>();
     envMap.put("master", "master");
     envMap.put("origin", "origin");
@@ -151,7 +161,7 @@ public class BitBucketPPRPullRequestApprovedActionFilterTest {
   }
 
   @Test
-  public void testUsesRefsHeads() {
+  void testUsesRefsHeads() {
     String allowedBranches = "refs/heads/j*n*";
 
     BitBucketPPRPullRequestApprovedActionFilter c =
@@ -166,7 +176,7 @@ public class BitBucketPPRPullRequestApprovedActionFilterTest {
   }
 
   @Test
-  public void testUsesJavaPatternDirectlyIfPrefixedWithColon() {
+  void testUsesJavaPatternDirectlyIfPrefixedWithColon() {
 
     String allowedBranches = ":^(?!(origin/prefix)).*";
 
@@ -183,7 +193,7 @@ public class BitBucketPPRPullRequestApprovedActionFilterTest {
   }
 
   @Test
-  public void testMatchesNot1() {
+  void testMatchesNot1() {
     String allowedBranches = "*/master";
 
     BitBucketPPRPullRequestApprovedActionFilter c =
@@ -194,7 +204,7 @@ public class BitBucketPPRPullRequestApprovedActionFilterTest {
   }
 
   @Test
-  public void testMatchesNot2() {
+  void testMatchesNot2() {
     String allowedBranches = "develop, :^(?!master$).*";
 
     BitBucketPPRPullRequestApprovedActionFilter c =
@@ -208,7 +218,7 @@ public class BitBucketPPRPullRequestApprovedActionFilterTest {
   }
 
   @Test
-  public void testMatchesEmptyBranches() {
+  void testMatchesEmptyBranches() {
 
     String allowedBranches = "";
 
@@ -222,7 +232,7 @@ public class BitBucketPPRPullRequestApprovedActionFilterTest {
   }
 
   @Test
-  public void testUsesJavaPatternWithRepetition() {
+  void testUsesJavaPatternWithRepetition() {
     String allowedBranches = ":origin/release-\\d{8}";
 
     BitBucketPPRPullRequestApprovedActionFilter c =
@@ -236,7 +246,7 @@ public class BitBucketPPRPullRequestApprovedActionFilterTest {
   }
 
   @Test
-  public void testUsesJavaPatternToExcludeMultipleBranches() {
+  void testUsesJavaPatternToExcludeMultipleBranches() {
     String allowedBranches = ":^(?!origin/master$|origin/develop$).*";
 
     BitBucketPPRPullRequestApprovedActionFilter c =
@@ -251,21 +261,15 @@ public class BitBucketPPRPullRequestApprovedActionFilterTest {
     assertFalse(c.matches(allowedBranches, "origin/develop", null));
   }
 
-  private String readScript(String path) {
-    String script = null;
-    try {
-      ClassLoader classloader = Thread.currentThread().getContextClassLoader();
-      InputStream is = classloader.getResourceAsStream(path);
-      script = IOUtils.toString(is, StandardCharsets.UTF_8);
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-    return script;
+  private String readScript(String path) throws Exception {
+    ClassLoader classloader = Thread.currentThread().getContextClassLoader();
+    InputStream is = classloader.getResourceAsStream(path);
+    assertNotNull(is);
+    return IOUtils.toString(is, StandardCharsets.UTF_8);
   }
 
   @Test
-  public void testPipelineTrigger() throws Exception {
-
+  void testPipelineTrigger() throws Exception {
     createSeedJob(
         readScript("./pipelines/testPipelineCloudTriggerPullRequestApprovedActionFilter"));
     // get newly created pipeline job
@@ -282,7 +286,8 @@ public class BitBucketPPRPullRequestApprovedActionFilterTest {
       String dispName = tmpName.substring(tmpName.lastIndexOf(".") + 1);
       dispNames.add(dispName);
       BitBucketPPRPullRequestApprovedActionFilter tmp3 =
-          (BitBucketPPRPullRequestApprovedActionFilter) tmp2.getTriggers().get(0).getActionFilter();
+          (BitBucketPPRPullRequestApprovedActionFilter) tmp2.getTriggers().get(0)
+              .getActionFilter();
       isToApprove = tmp3.shouldSendApprove();
     }
 

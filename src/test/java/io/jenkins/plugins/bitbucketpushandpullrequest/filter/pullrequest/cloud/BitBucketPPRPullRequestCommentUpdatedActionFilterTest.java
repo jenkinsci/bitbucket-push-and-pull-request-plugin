@@ -1,17 +1,18 @@
 package io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.cloud;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.junit.MockitoJUnitRunner;
-import hudson.EnvVars;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@RunWith(MockitoJUnitRunner.class)
-public class BitBucketPPRPullRequestCommentUpdatedActionFilterTest {
+import hudson.EnvVars;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+@ExtendWith(MockitoExtension.class)
+class BitBucketPPRPullRequestCommentUpdatedActionFilterTest {
 
   @Test
-  public void testEmptyHayStack() {
+  void testEmptyHayStack() {
     String allowedBranches = "master";
 
     String haystack = "";
@@ -27,7 +28,7 @@ public class BitBucketPPRPullRequestCommentUpdatedActionFilterTest {
   }
 
   @Test
-  public void testEmptyPattern() {
+  void testEmptyPattern() {
     String allowedBranches = "master";
 
     String haystack = "Comment";
@@ -43,7 +44,7 @@ public class BitBucketPPRPullRequestCommentUpdatedActionFilterTest {
   }
 
   @Test
-  public void testPattern001() {
+  void testPattern001() {
     String allowedBranches = "master";
 
     String haystack = "I need to find a reason to X.Y 1#a";
@@ -59,7 +60,7 @@ public class BitBucketPPRPullRequestCommentUpdatedActionFilterTest {
   }
 
   @Test
-  public void testPattern002() {
+  void testPattern002() {
     String allowedBranches = "master";
 
     String haystack = "I need to find a reason to X.Y 1#a";
@@ -75,7 +76,7 @@ public class BitBucketPPRPullRequestCommentUpdatedActionFilterTest {
   }
 
   @Test
-  public void testPattern003() {
+  void testPattern003() {
     String allowedBranches = "master";
 
     String haystack = "I need to find a reason to X.Y 1#a";
@@ -91,7 +92,7 @@ public class BitBucketPPRPullRequestCommentUpdatedActionFilterTest {
   }
 
   @Test
-  public void testPattern004() {
+  void testPattern004() {
     String allowedBranches = "master";
 
     String haystack = "I need to find fI a reason to X.Y 1#a";
@@ -107,7 +108,7 @@ public class BitBucketPPRPullRequestCommentUpdatedActionFilterTest {
   }
 
   @Test
-  public void testPattern005() {
+  void testPattern005() {
     String allowedBranches = "master";
 
     String haystack = "I need to find fI a reason to X.Y 1#a";
@@ -123,7 +124,7 @@ public class BitBucketPPRPullRequestCommentUpdatedActionFilterTest {
   }
 
   @Test
-  public void testPattern006() {
+  void testPattern006() {
     String allowedBranches = "master";
 
     String haystack = "I need to find fI a reason to X Y 1#a";
