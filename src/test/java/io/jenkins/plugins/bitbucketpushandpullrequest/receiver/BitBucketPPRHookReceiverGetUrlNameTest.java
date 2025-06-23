@@ -20,31 +20,33 @@
  */
 package io.jenkins.plugins.bitbucketpushandpullrequest.receiver;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.MockedStatic;
-import org.mockito.MockedStatic.Verification;
-import org.mockito.junit.MockitoJUnitRunner;
+
 import hudson.ExtensionList;
 import io.jenkins.plugins.bitbucketpushandpullrequest.config.BitBucketPPRPluginConfig;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.MockedStatic;
+import org.mockito.MockedStatic.Verification;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 
-@RunWith(MockitoJUnitRunner.class)
-public class BitBucketPPRHookReceiverGetUrlNameTest {
+@ExtendWith(MockitoExtension.class)
+class BitBucketPPRHookReceiverGetUrlNameTest {
 
   @Test
-  public void testAGetUrlName() {
+  void testAGetUrlName() {
     try (MockedStatic<ExtensionList> mocked = mockStatic(ExtensionList.class)) {
       BitBucketPPRPluginConfig config = mock(BitBucketPPRPluginConfig.class);
       when(config.isHookUrlSet()).thenReturn(true);
       when(config.getHookUrl()).thenReturn("ABc");
-      
-      mocked.when((Verification) ExtensionList.lookupSingleton(BitBucketPPRPluginConfig.class))
+
+      mocked.when(
+              (Verification) ExtensionList.lookupSingleton(BitBucketPPRPluginConfig.class))
           .thenReturn(config);
 
       BitBucketPPRHookReceiver bitBucketPPRHookReceiver = new BitBucketPPRHookReceiver();

@@ -21,67 +21,52 @@
 
 package io.jenkins.plugins.bitbucketpushandpullrequest.processor;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
-import hudson.ExtensionList;
-import io.jenkins.plugins.bitbucketpushandpullrequest.config.BitBucketPPRPluginConfig;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
-import javax.naming.OperationNotSupportedException;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
-import org.mockito.Mock;
-import org.mockito.MockedConstruction;
-import org.mockito.MockedStatic;
-import org.mockito.MockedStatic.Verification;
-import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
 import io.jenkins.plugins.bitbucketpushandpullrequest.BitBucketPPRJobProbe;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
+import io.jenkins.plugins.bitbucketpushandpullrequest.config.BitBucketPPRPluginConfig;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRHookEvent;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud.BitBucketPPRCloudPayload;
 import io.jenkins.plugins.bitbucketpushandpullrequest.observer.BitBucketPPRObservable;
 import io.jenkins.plugins.bitbucketpushandpullrequest.observer.BitBucketPPRObserverFactory;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 
-@RunWith(MockitoJUnitRunner.class)
-public class BitBucketPPRPullRequestPayloadProcessorTest {
+@ExtendWith(MockitoExtension.class)
+class BitBucketPPRPullRequestPayloadProcessorTest {
 
   @Captor
   private ArgumentCaptor<BitBucketPPRHookEvent> eventCaptor;
-
   @Captor
   private ArgumentCaptor<BitBucketPPRAction> actionCaptor;
-
   @Captor
   private ArgumentCaptor<BitBucketPPRObservable> observableCaptor;
 
-  BitBucketPPRPullRequestCloudPayloadProcessor pullRequestPayloadProcessor;
-
+  private BitBucketPPRPullRequestCloudPayloadProcessor pullRequestPayloadProcessor;
 
   @Test
-  public void testProcessPullRequestApprovalWebhookGit() throws OperationNotSupportedException {
-    JsonReader reader = null;
-
-    try {
-      ClassLoader classloader = Thread.currentThread().getContextClassLoader();
-      InputStream is = classloader.getResourceAsStream("./cloud/pr_approved.json");
-      assert is != null;
-      InputStreamReader isr = new InputStreamReader(is, StandardCharsets.UTF_8);
-      reader = new JsonReader(isr);
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
+  void testProcessPullRequestApprovalWebhookGit() throws Exception {
+    ClassLoader classloader = Thread.currentThread().getContextClassLoader();
+    InputStream is = classloader.getResourceAsStream("./cloud/pr_approved.json");
+    assertNotNull(is);
+    InputStreamReader isr = new InputStreamReader(is, StandardCharsets.UTF_8);
+    JsonReader reader = new JsonReader(isr);
 
     try (MockedStatic<BitBucketPPRPluginConfig> config = Mockito.mockStatic(
         BitBucketPPRPluginConfig.class)) {
@@ -91,10 +76,10 @@ public class BitBucketPPRPullRequestPayloadProcessorTest {
       BitBucketPPRJobProbe probe = mock(BitBucketPPRJobProbe.class);
 
       Gson gson = new Gson();
-      assert reader != null;
       BitBucketPPRPayload payload = gson.fromJson(reader, BitBucketPPRCloudPayload.class);
 
-      BitBucketPPRHookEvent bitbucketEvent = new BitBucketPPRHookEvent("pullrequest:approved");
+      BitBucketPPRHookEvent bitbucketEvent = new BitBucketPPRHookEvent(
+          "pullrequest:approved");
       pullRequestPayloadProcessor =
           new BitBucketPPRPullRequestCloudPayloadProcessor(probe, bitbucketEvent);
 

@@ -21,48 +21,56 @@
 
 package io.jenkins.plugins.bitbucketpushandpullrequest.receiver;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst.HOOK_URL;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import org.apache.commons.io.IOUtils;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.jvnet.hudson.test.JenkinsRule;
-import org.mockito.junit.jupiter.MockitoExtension;
-
 import org.htmlunit.HttpMethod;
 import org.htmlunit.WebRequest;
 import org.htmlunit.WebResponse;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.jvnet.hudson.test.JenkinsRule;
+import org.jvnet.hudson.test.junit.jupiter.WithJenkins;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-public class BitBucketPPRCrumbExclusionTest {
+@WithJenkins
+class BitBucketPPRCrumbExclusionTest {
+
   private static final int SUCCESS_RESPONSE = 200;
 
-  @Rule
-  public JenkinsRule jenkins = new JenkinsRule();
+  private JenkinsRule j;
 
-  @Test
-  public void testTest() throws IOException {
-    JenkinsRule.WebClient wc = jenkins.createWebClient();
-    WebRequest req = new WebRequest(new URL(wc.getContextPath() + HOOK_URL + "/"), HttpMethod.POST);
-
-    InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream("./cloud/pr_updated.json");
-    String jenkinsFileContent = IOUtils.toString(is, StandardCharsets.UTF_8);
-    assertNotNull(jenkinsFileContent);
-
-    req.setAdditionalHeader("x-event-key", "pullrequest:updated");
-    req.setAdditionalHeader("content-type", "application/json");
-    req.setRequestBody(jenkinsFileContent);
-
-    WebResponse resp = wc.getPage(req).getWebResponse();
-    assertNotNull(resp.getContentAsString());
-    assertEquals(SUCCESS_RESPONSE, resp.getStatusCode());
+  @BeforeEach
+  void setUp(JenkinsRule rule) {
+    j = rule;
   }
 
+  @Test
+  void testTest() throws Exception {
+    try (JenkinsRule.WebClient wc = j.createWebClient()) {
+      WebRequest req = new WebRequest(new URL(wc.getContextPath() + HOOK_URL + "/"),
+          HttpMethod.POST);
+
+      InputStream is = Thread.currentThread().getContextClassLoader()
+          .getResourceAsStream("./cloud/pr_updated.json");
+      assertNotNull(is);
+      String jenkinsFileContent = IOUtils.toString(is, StandardCharsets.UTF_8);
+      assertNotNull(jenkinsFileContent);
+
+      req.setAdditionalHeader("x-event-key", "pullrequest:updated");
+      req.setAdditionalHeader("content-type", "application/json");
+      req.setRequestBody(jenkinsFileContent);
+
+      WebResponse resp = wc.getPage(req).getWebResponse();
+      assertNotNull(resp.getContentAsString());
+      assertEquals(SUCCESS_RESPONSE, resp.getStatusCode());
+    }
+  }
 }
