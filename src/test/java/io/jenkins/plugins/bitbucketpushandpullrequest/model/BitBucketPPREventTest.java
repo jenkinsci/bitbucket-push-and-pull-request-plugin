@@ -21,17 +21,17 @@
 
 package io.jenkins.plugins.bitbucketpushandpullrequest.model;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import javax.naming.OperationNotSupportedException;
+import org.junit.jupiter.api.Test;
 
-import org.junit.Test;
 
-
-public class BitBucketPPREventTest {
+class BitBucketPPREventTest {
 
   @Test
-  public void testRepositoryEvent() throws OperationNotSupportedException {
+  void testRepositoryEvent() throws Exception {
     String event = "repo";
     String action = "push";
     BitBucketPPRHookEvent bitbucketEvent = createEvent(event, action);
@@ -41,7 +41,7 @@ public class BitBucketPPREventTest {
   }
 
   @Test
-  public void testRepositoryEventPushAction() throws OperationNotSupportedException {
+  void testRepositoryEventPushAction() throws Exception {
     String event = "repo";
     String action = "push";
     BitBucketPPRHookEvent bitbucketEvent = createEvent(event, action);
@@ -51,7 +51,7 @@ public class BitBucketPPREventTest {
   }
 
   @Test
-  public void testPullRequestEventCreated() throws OperationNotSupportedException {
+  void testPullRequestEventCreated() throws Exception {
     String event = "pullrequest";
     String action = "created";
     BitBucketPPRHookEvent bitbucketEvent = createEvent(event, action);
@@ -61,7 +61,7 @@ public class BitBucketPPREventTest {
   }
 
   @Test
-  public void testPullRequestEventUpdated() throws OperationNotSupportedException {
+  void testPullRequestEventUpdated() throws Exception {
     String event = "pullrequest";
     String action = "updated";
     BitBucketPPRHookEvent bitbucketEvent = createEvent(event, action);
@@ -71,7 +71,7 @@ public class BitBucketPPREventTest {
   }
 
   @Test
-  public void testPullRequestEventApprovedAction() throws OperationNotSupportedException {
+  void testPullRequestEventApprovedAction() throws Exception {
     String event = "pullrequest";
     String action = "approved";
     BitBucketPPRHookEvent bitbucketEvent = createEvent(event, action);
@@ -80,24 +80,24 @@ public class BitBucketPPREventTest {
     assertEquals(action, bitbucketEvent.getAction());
   }
 
-  @Test(expected = OperationNotSupportedException.class)
-  public void testUnknownEvent() throws OperationNotSupportedException {
+  @Test
+  void testUnknownEvent() {
     String event = "fake";
     String action = "created";
-    createEvent(event, action);
+    assertThrows(OperationNotSupportedException.class, () ->
+        createEvent(event, action));
   }
 
-  @Test(expected = OperationNotSupportedException.class)
-  public void testUnknownAction() throws OperationNotSupportedException {
+  @Test
+  void testUnknownAction() {
     String event = "repo";
     String action = "fake";
-    createEvent(event, action);
+    assertThrows(OperationNotSupportedException.class, () ->
+        createEvent(event, action));
   }
 
   private BitBucketPPRHookEvent createEvent(String event, String action)
-      throws OperationNotSupportedException {
-    BitBucketPPRHookEvent bitbucketEvent = new BitBucketPPRHookEvent(event + ":" + action);
-
-    return bitbucketEvent;
+      throws Exception {
+    return new BitBucketPPRHookEvent(event + ":" + action);
   }
 }

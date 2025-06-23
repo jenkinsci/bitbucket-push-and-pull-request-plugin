@@ -1,5 +1,10 @@
 package io.jenkins.plugins.bitbucketpushandpullrequest;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import hudson.scm.SCM;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRPullRequestServerAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.config.BitBucketPPRPluginConfig;
@@ -8,25 +13,22 @@ import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRHookEven
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.server.BitBucketPPRServerClone;
 import io.jenkins.plugins.bitbucketpushandpullrequest.observer.BitBucketPPRObservable;
-import org.junit.Test;
+import java.util.ArrayList;
+import java.util.List;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.when;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 @ExtendWith(MockitoExtension.class)
-public class BitBucketPPRTriggerTest {
+@MockitoSettings(strictness = Strictness.LENIENT)
+class BitBucketPPRTriggerTest {
 
   @Test
-  public void testTriggerUrlOverridesBaseUrl() {
+  void testTriggerUrlOverridesBaseUrl() throws Exception {
     try (MockedStatic<BitBucketPPRPluginConfig> config =
         Mockito.mockStatic(BitBucketPPRPluginConfig.class)) {
       BitBucketPPRPluginConfig c = mock(BitBucketPPRPluginConfig.class);
@@ -41,11 +43,13 @@ public class BitBucketPPRTriggerTest {
       when(mockServerClone.getHref())
           .thenReturn("ssh://git@example.org/some-namespace/some-repo.git");
       clones.add(mockServerClone);
-      when(payloadMock.getServerRepository().getLinks().getCloneProperty()).thenReturn(clones);
+      when(payloadMock.getServerRepository().getLinks().getCloneProperty()).thenReturn(
+          clones);
       BitBucketPPRHookEvent bitbucketEvent = mock(BitBucketPPRHookEvent.class);
       BitBucketPPRPullRequestServerAction bitBucketPPRServerRepositoryAction =
           new BitBucketPPRPullRequestServerAction(payloadMock, bitbucketEvent);
-      BitBucketPPRTriggerFilter bitBucketPPRTriggerFilter = mock(BitBucketPPRTriggerFilter.class);
+      BitBucketPPRTriggerFilter bitBucketPPRTriggerFilter = mock(
+          BitBucketPPRTriggerFilter.class);
       BitBucketPPRTrigger bitBucketPPRTrigger =
           new BitBucketPPRTrigger(List.of(bitBucketPPRTriggerFilter));
       bitBucketPPRTrigger.setPropagationUrl(
@@ -60,9 +64,6 @@ public class BitBucketPPRTriggerTest {
           "https://example2.org:-1",
           bitBucketPPRServerRepositoryAction.getCommitLink()
               .split("/rest/build-status/1.0/commits/")[0]);
-
-    } catch (Exception e) {
-      throw new RuntimeException(e);
     }
   }
 }

@@ -1,8 +1,21 @@
 package io.jenkins.plugins.bitbucketpushandpullrequest.observer;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.mock;
 
+import com.google.gson.Gson;
+import com.google.gson.stream.JsonReader;
+import hudson.model.Job;
+import hudson.model.Run;
+import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
+import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRRepositoryAction;
+import io.jenkins.plugins.bitbucketpushandpullrequest.config.BitBucketPPRPluginConfig;
+import io.jenkins.plugins.bitbucketpushandpullrequest.event.BitBucketPPREvent;
+import io.jenkins.plugins.bitbucketpushandpullrequest.event.BitBucketPPREventContext;
+import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRHookEvent;
+import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
+import io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud.BitBucketPPRCloudPayload;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
@@ -10,59 +23,34 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.naming.OperationNotSupportedException;
-
-import com.google.gson.Gson;
-import com.google.gson.stream.JsonReader;
-
-import hudson.model.Job;
-import hudson.model.Run;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
-import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRRepositoryAction;
-import io.jenkins.plugins.bitbucketpushandpullrequest.event.BitBucketPPREvent;
-import io.jenkins.plugins.bitbucketpushandpullrequest.event.BitBucketPPREventContext;
-import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRHookEvent;
-import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
-import io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud.BitBucketPPRCloudPayload;
-import io.jenkins.plugins.bitbucketpushandpullrequest.config.BitBucketPPRPluginConfig;
+@ExtendWith(MockitoExtension.class)
+class BitBucketPPRCloudObserverTest {
 
-@RunWith(MockitoJUnitRunner.class)
-public class BitBucketPPRCloudObserverTest {
-  public BitBucketPPRPayload payload;
-  public BitBucketPPRHookEvent bitbucketEvent;
+  private BitBucketPPRPayload payload;
+  private BitBucketPPRHookEvent bitbucketEvent;
 
-  @Before
-  public void readPayload() {
-    JsonReader reader = null;
-
-    try {
-      ClassLoader classloader = Thread.currentThread().getContextClassLoader();
-      InputStream is = classloader.getResourceAsStream("./cloud/repo_push.json");
-      InputStreamReader isr = new InputStreamReader(is, StandardCharsets.UTF_8);
-      reader = new JsonReader(isr);
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
+  @BeforeEach
+  void setUp() throws Exception {
+    ClassLoader classloader = Thread.currentThread().getContextClassLoader();
+    InputStream is = classloader.getResourceAsStream("./cloud/repo_push.json");
+    assertNotNull(is);
+    InputStreamReader isr = new InputStreamReader(is, StandardCharsets.UTF_8);
+    JsonReader reader = new JsonReader(isr);
 
     Gson gson = new Gson();
     this.payload = gson.fromJson(reader, BitBucketPPRCloudPayload.class);
-
-    try {
-      this.bitbucketEvent = new BitBucketPPRHookEvent("repo:push");
-    } catch (OperationNotSupportedException e) {
-      e.printStackTrace();
-    }
+    this.bitbucketEvent = new BitBucketPPRHookEvent("repo:push");
   }
 
   @Test
-  public void testPushCloudObserver() throws Throwable {
+  void testPushCloudObserver() throws Exception {
     try (MockedStatic<BitBucketPPRPluginConfig> config =
         Mockito.mockStatic(BitBucketPPRPluginConfig.class)) {
       BitBucketPPRPluginConfig c = mock(BitBucketPPRPluginConfig.class);
@@ -74,7 +62,8 @@ public class BitBucketPPRCloudObserverTest {
 
       assertEquals(links, action.getCommitLinks());
 
-      BitBucketPPRPushCloudObserver spyObserver = Mockito.spy(BitBucketPPRPushCloudObserver.class);
+      BitBucketPPRPushCloudObserver spyObserver = Mockito.spy(
+          BitBucketPPRPushCloudObserver.class);
       BitBucketPPREvent event = Mockito.mock(BitBucketPPREvent.class);
       BitBucketPPREventContext context = Mockito.mock(BitBucketPPREventContext.class);
 
@@ -100,8 +89,9 @@ public class BitBucketPPRCloudObserverTest {
   }
 
   @Test
-  public void testComputeBitBucketBuildKeyForInProgressBuild() {
-    BitBucketPPRPushCloudObserver spyObserver = Mockito.spy(BitBucketPPRPushCloudObserver.class);
+  void testComputeBitBucketBuildKeyForInProgressBuild() {
+    BitBucketPPRPushCloudObserver spyObserver = Mockito.spy(
+        BitBucketPPRPushCloudObserver.class);
     BitBucketPPREventContext context = Mockito.mock(BitBucketPPREventContext.class);
     BitBucketPPRPluginConfig config = Mockito.mock(BitBucketPPRPluginConfig.class);
     Run run = Mockito.mock(Run.class);
@@ -130,8 +120,9 @@ public class BitBucketPPRCloudObserverTest {
   }
 
   @Test
-  public void testComputeBitBucketBuildKeyForFinishedBuild() {
-    BitBucketPPRPushCloudObserver spyObserver = Mockito.spy(BitBucketPPRPushCloudObserver.class);
+  void testComputeBitBucketBuildKeyForFinishedBuild() {
+    BitBucketPPRPushCloudObserver spyObserver = Mockito.spy(
+        BitBucketPPRPushCloudObserver.class);
     BitBucketPPREventContext context = Mockito.mock(BitBucketPPREventContext.class);
     BitBucketPPRPluginConfig config = Mockito.mock(BitBucketPPRPluginConfig.class);
     Run run = Mockito.mock(Run.class);

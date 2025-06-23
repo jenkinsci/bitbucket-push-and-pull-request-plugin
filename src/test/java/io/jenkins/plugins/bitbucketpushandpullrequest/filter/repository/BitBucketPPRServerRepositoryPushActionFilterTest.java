@@ -1,22 +1,22 @@
 package io.jenkins.plugins.bitbucketpushandpullrequest.filter.repository;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import hudson.EnvVars;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
 import java.util.HashMap;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
-import hudson.EnvVars;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 
-@RunWith(MockitoJUnitRunner.class)
-public class BitBucketPPRServerRepositoryPushActionFilterTest {
+@ExtendWith(MockitoExtension.class)
+class BitBucketPPRServerRepositoryPushActionFilterTest {
 
   @Test
-  public void testMatches() {
+  void testMatches() {
     String allowedBranches = "master";
 
     BitBucketPPRServerRepositoryPushActionFilter c =
@@ -60,7 +60,7 @@ public class BitBucketPPRServerRepositoryPushActionFilterTest {
   }
 
   @Test
-  public void testMatchEnv() {
+  void testMatchEnv() {
     HashMap<String, String> envMap = new HashMap<>();
     envMap.put("master", "master");
     envMap.put("origin", "origin");
@@ -117,7 +117,7 @@ public class BitBucketPPRServerRepositoryPushActionFilterTest {
   }
 
   @Test
-  public void testUsesRefsHeads() {
+  void testUsesRefsHeads() {
     String allowedBranches = "refs/heads/j*n*";
 
     BitBucketPPRServerRepositoryPushActionFilter c =
@@ -131,7 +131,7 @@ public class BitBucketPPRServerRepositoryPushActionFilterTest {
   }
 
   @Test
-  public void testUsesJavaPatternDirectlyIfPrefixedWithColon() {
+  void testUsesJavaPatternDirectlyIfPrefixedWithColon() {
     String allowedBranches = ":^(?!(origin/prefix)).*";
 
     BitBucketPPRServerRepositoryPushActionFilter m =
@@ -146,7 +146,7 @@ public class BitBucketPPRServerRepositoryPushActionFilterTest {
   }
 
   @Test
-  public void testMatchesNot1() {
+  void testMatchesNot1() {
     String allowedBranches = "*/master";
 
     BitBucketPPRServerRepositoryPushActionFilter c =
@@ -156,7 +156,7 @@ public class BitBucketPPRServerRepositoryPushActionFilterTest {
   }
 
   @Test
-  public void testMatchesNot2() {
+  void testMatchesNot2() {
     String allowedBranches = "develop, :^(?!master$).*";
 
     BitBucketPPRServerRepositoryPushActionFilter c =
@@ -168,7 +168,7 @@ public class BitBucketPPRServerRepositoryPushActionFilterTest {
   }
 
   @Test
-  public void testMatchesEmptyBranches() {
+  void testMatchesEmptyBranches() {
     String allowedBranches = "";
     BitBucketPPRServerRepositoryPushActionFilter c =
         new BitBucketPPRServerRepositoryPushActionFilter(false, false, allowedBranches);
@@ -179,7 +179,7 @@ public class BitBucketPPRServerRepositoryPushActionFilterTest {
   }
 
   @Test
-  public void testUsesJavaPatternWithRepetition() {
+  void testUsesJavaPatternWithRepetition() {
     String allowedBranches = ":origin/release-\\d{8}";
 
     BitBucketPPRServerRepositoryPushActionFilter m =
@@ -191,7 +191,7 @@ public class BitBucketPPRServerRepositoryPushActionFilterTest {
   }
 
   @Test
-  public void testUsesJavaPatternToExcludeMultipleBranches() {
+  void testUsesJavaPatternToExcludeMultipleBranches() {
     String allowedBranches = ":^(?!origin/master$|origin/develop$).*";
 
     BitBucketPPRServerRepositoryPushActionFilter m =
@@ -206,10 +206,11 @@ public class BitBucketPPRServerRepositoryPushActionFilterTest {
   }
 
   @Test
-  public void shouldTriggerBuildReturnsFalseIsTypeNotSet() {
+  void shouldTriggerBuildReturnsFalseIsTypeNotSet() {
     BitBucketPPRAction bitbucketAction = Mockito.mock(BitBucketPPRAction.class);
     Mockito.when(bitbucketAction.getType()).thenReturn(null);
-    BitBucketPPRServerRepositoryPushActionFilter c = new BitBucketPPRServerRepositoryPushActionFilter(false, false, "master");
+    BitBucketPPRServerRepositoryPushActionFilter c = new BitBucketPPRServerRepositoryPushActionFilter(
+        false, false, "master");
     assertFalse(c.shouldTriggerBuild(bitbucketAction));
   }
 }
