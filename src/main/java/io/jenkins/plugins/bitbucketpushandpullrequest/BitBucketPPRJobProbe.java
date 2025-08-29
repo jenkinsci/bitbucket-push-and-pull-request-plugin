@@ -21,11 +21,6 @@
 
 package io.jenkins.plugins.bitbucketpushandpullrequest;
 
-import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst.PULL_REQUEST_MERGED;
-import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst.PULL_REQUEST_SERVER_MERGED;
-import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst.REPOSITORY_CLOUD_PUSH;
-import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst.REPOSITORY_SERVER_PUSH;
-
 import hudson.model.Job;
 import hudson.plugins.git.GitSCM;
 import hudson.plugins.git.GitStatus;
@@ -53,6 +48,9 @@ import jenkins.model.Jenkins;
 import jenkins.model.ParameterizedJobMixIn;
 import jenkins.triggers.SCMTriggerItem;
 import org.eclipse.jgit.transport.URIish;
+import org.jenkinsci.plugins.workflow.multibranch.WorkflowMultiBranchProject;
+
+import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst.*;
 
 /**
  *
@@ -152,6 +150,8 @@ public class BitBucketPPRJobProbe {
 
     jobTrigger.scmTriggerItem.ifPresent(it -> it.getSCMs().forEach(scm -> {
 
+      triggerMultibranchScan(job, bitbucketAction);
+
       // @todo add comments to explain what is this check for
       if (job.getParent() instanceof MultiBranchProject
           && mPJobShouldNotBeTriggered(job, bitbucketEvent, bitbucketAction)) {
@@ -244,4 +244,36 @@ public class BitBucketPPRJobProbe {
         .anyMatch((repo) -> repo.getURIs().stream().anyMatch((repoUrl) -> GitStatus.looselyMatches(repoUrl, remote)));
   }
 
+  private void triggerMultibranchScan(@Nonnull Job<?, ?> job,
+                                      BitBucketPPRAction bitbucketAction) {
+
+      String getLatestCommit = bitbucketAction.getLatestCommit();
+      String getLatestFromCommit = bitbucketAction.getLatestFromCommit();
+      String pipelineName = job.getParent().getFullName();
+      String getPayldChgType = bitbucketAction.getPayloadChangeType();
+
+      logger.log(Level.INFO,
+              "Pipeline Name : {0}, To Hash : {1}, From Hash : {2}, Payload Change Type : {3}",
+              new String[] {pipelineName, getLatestCommit, getLatestFromCommit, getPayldChgType});
+
+      if ((getLatestFromCommit.equals(EMPTY_HASH) && PAYLOAD_CHANGE_TYPE_ADD.equals(getPayldChgType)) ||
+          (getLatestCommit.equals(EMPTY_HASH) && PAYLOAD_CHANGE_TYPE_DELETE.equals(getPayldChgType))) {
+
+          Jenkins jenkins = Jenkins.get();
+
+          WorkflowMultiBranchProject mbp = (WorkflowMultiBranchProject) jenkins.getItemByFullName(pipelineName);
+
+          if (mbp != null) {
+              mbp.scheduleBuild2(0);
+
+              logger.log(Level.INFO,
+                      "Triggered branch indexing for: {0}",
+                      new String[] { pipelineName });
+          } else {
+              logger.log(Level.WARNING,
+                      "Multibranch job not found: {0}",
+                      new String[] { pipelineName });
+          }
+      }
+  }
 }
