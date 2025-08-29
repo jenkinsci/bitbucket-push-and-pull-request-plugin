@@ -61,6 +61,10 @@ public final class BitBucketPPRConst {
   public static final String APPLICATION_X_WWW_FORM_URLENCODED =
       "application/x-www-form-urlencoded";
 
+  public static final String PAYLOAD_CHANGE_TYPE_ADD = "ADD";
+  public static final String PAYLOAD_CHANGE_TYPE_DELETE = "DELETE";
+  public static final String EMPTY_HASH = "0000000000000000000000000000000000000000";
+
   private BitBucketPPRConst() {
     throw new AssertionError();
   }
