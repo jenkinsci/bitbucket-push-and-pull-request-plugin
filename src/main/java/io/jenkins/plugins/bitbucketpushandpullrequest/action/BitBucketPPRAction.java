@@ -141,4 +141,8 @@ public interface BitBucketPPRAction extends Action {
   default String getLatestCommitToRef() {
     return null;
   }
+
+  default String getLatestFromCommit() { return null; }
+
+  default String getPayloadChangeType() { return null; }
 }
