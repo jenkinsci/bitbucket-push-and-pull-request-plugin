@@ -1,22 +1,21 @@
 package io.jenkins.plugins.bitbucketpushandpullrequest.config;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.junit.MockitoJUnitRunner;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.junit.Assert.assertTrue;
+@ExtendWith(MockitoExtension.class)
+class BitBucketPPRConfigAttributesTest {
 
-@RunWith(MockitoJUnitRunner.class)
-public class BitBucketPPRConfigAttributesTest {
-
-  final private Class<BitBucketPPRPluginConfig> config = BitBucketPPRPluginConfig.class;
+  private final Class<BitBucketPPRPluginConfig> config = BitBucketPPRPluginConfig.class;
 
   @Test
-  public void settersHaveGetters() {
+  void settersHaveGetters() {
     for (Method method : config.getMethods()) {
       final String methodName = method.getName();
       if (method.getParameterCount() != 1 || !methodName.startsWith("set")) {
@@ -25,7 +24,7 @@ public class BitBucketPPRConfigAttributesTest {
       }
 
       final String s = methodName.substring(3);
-      assertTrue(s, hasGetter(s));
+      assertTrue(hasGetter(s), s);
     }
   }
 

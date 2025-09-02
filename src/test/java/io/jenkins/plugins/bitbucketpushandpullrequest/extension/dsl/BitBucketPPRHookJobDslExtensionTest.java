@@ -21,23 +21,11 @@
 
 package io.jenkins.plugins.bitbucketpushandpullrequest.extension.dsl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import org.apache.commons.io.IOUtils;
-import org.jenkinsci.plugins.workflow.job.WorkflowJob;
-import org.jenkinsci.plugins.workflow.job.properties.PipelineTriggersJobProperty;
-import org.junit.Ignore;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.jvnet.hudson.test.JenkinsRule;
-import org.mockito.junit.MockitoJUnitRunner;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import hudson.model.FreeStyleProject;
 import hudson.triggers.Trigger;
 import hudson.triggers.TriggerDescriptor;
@@ -48,15 +36,35 @@ import io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.cloud.B
 import io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.cloud.BitBucketPPRPullRequestMergedActionFilter;
 import io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.cloud.BitBucketPPRPullRequestUpdatedActionFilter;
 import io.jenkins.plugins.bitbucketpushandpullrequest.filter.repository.BitBucketPPRRepositoryPushActionFilter;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import javaposse.jobdsl.plugin.ExecuteDslScripts;
 import javaposse.jobdsl.plugin.RemovedJobAction;
+import org.apache.commons.io.IOUtils;
+import org.jenkinsci.plugins.workflow.job.WorkflowJob;
+import org.jenkinsci.plugins.workflow.job.properties.PipelineTriggersJobProperty;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.jvnet.hudson.test.JenkinsRule;
+import org.jvnet.hudson.test.junit.jupiter.WithJenkins;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 
-@RunWith(MockitoJUnitRunner.class)
-public class BitBucketPPRHookJobDslExtensionTest {
-  /* Global Jenkins instance mock */
-  @Rule
-  public JenkinsRule j = new JenkinsRule();
+@ExtendWith(MockitoExtension.class)
+@WithJenkins
+class BitBucketPPRHookJobDslExtensionTest {
+
+  private JenkinsRule j;
+
+  @BeforeEach
+  void setUp(JenkinsRule rule) {
+    j = rule;
+  }
 
   private void createSeedJob(String desc) throws Exception {
     /* Create seed job which will process DSL */
@@ -72,20 +80,15 @@ public class BitBucketPPRHookJobDslExtensionTest {
     j.buildAndAssertSuccess(seedJob);
   }
 
-  private String readDslScript(String path) {
-    String script = null;
-    try {
-        ClassLoader classloader = Thread.currentThread().getContextClassLoader();
-        InputStream is = classloader.getResourceAsStream(path);
-        script = IOUtils.toString(is, StandardCharsets.UTF_8);
-    } catch (Exception e) {
-        e.printStackTrace();
-    }
-    return script;
+  private String readDslScript(String path) throws Exception {
+    ClassLoader classloader = Thread.currentThread().getContextClassLoader();
+    InputStream is = classloader.getResourceAsStream(path);
+    assertNotNull(is);
+    return IOUtils.toString(is, StandardCharsets.UTF_8);
   }
 
   @Test
-  public void testDslTriggerPushActionFreeStyle() throws Exception {
+  void testDslTriggerPushActionFreeStyle() throws Exception {
     /* Create seed job which will process DSL */
     createSeedJob(readDslScript("./dsl/testDslTriggerPushActionFreeStyle.groovy"));
     /* Fetch the newly created job and check its trigger configuration */
@@ -98,11 +101,12 @@ public class BitBucketPPRHookJobDslExtensionTest {
     for (Trigger<?> entry : triggers.values()) {
       BitBucketPPRTrigger tmp2 = (BitBucketPPRTrigger) entry;
       assertEquals(1, tmp2.getTriggers().size());
-      String tmpNname = tmp2.getTriggers().get(0).getActionFilter().getClass().getName();
-      String dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      String tmpName = tmp2.getTriggers().get(0).getActionFilter().getClass().getName();
+      String dispName = tmpName.substring(tmpName.lastIndexOf(".") + 1);
       dispNames.add(dispName);
 
-      BitBucketPPRRepositoryPushActionFilter tmp3 = (BitBucketPPRRepositoryPushActionFilter) tmp2.getTriggers().get(0)
+      BitBucketPPRRepositoryPushActionFilter tmp3 = (BitBucketPPRRepositoryPushActionFilter) tmp2.getTriggers()
+          .get(0)
           .getActionFilter();
       isToApprove = tmp3.shouldSendApprove();
     }
@@ -112,7 +116,7 @@ public class BitBucketPPRHookJobDslExtensionTest {
   }
 
   @Test
-  public void testDslTriggerIsToApprovePushActionFreeStyle() throws Exception {
+  void testDslTriggerIsToApprovePushActionFreeStyle() throws Exception {
     /* Create seed job which will process DSL */
     createSeedJob(readDslScript("./dsl/testDslTriggerIsToApprovePushActionFreeStyle.groovy"));
     /* Fetch the newly created job and check its trigger configuration */
@@ -125,11 +129,12 @@ public class BitBucketPPRHookJobDslExtensionTest {
     for (Trigger<?> entry : triggers.values()) {
       BitBucketPPRTrigger tmp2 = (BitBucketPPRTrigger) entry;
       assertEquals(1, tmp2.getTriggers().size());
-      String tmpNname = tmp2.getTriggers().get(0).getActionFilter().getClass().getName();
-      String dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      String tmpName = tmp2.getTriggers().get(0).getActionFilter().getClass().getName();
+      String dispName = tmpName.substring(tmpName.lastIndexOf(".") + 1);
       dispNames.add(dispName);
 
-      BitBucketPPRRepositoryPushActionFilter tmp3 =  (BitBucketPPRRepositoryPushActionFilter) tmp2.getTriggers().get(0).getActionFilter();
+      BitBucketPPRRepositoryPushActionFilter tmp3 = (BitBucketPPRRepositoryPushActionFilter) tmp2.getTriggers()
+          .get(0).getActionFilter();
       isToApprove = tmp3.shouldSendApprove();
     }
     assertEquals(1, dispNames.size());
@@ -138,7 +143,7 @@ public class BitBucketPPRHookJobDslExtensionTest {
   }
 
   @Test
-  public void testDslTriggerPRApprovedFreeStyle() throws Exception {
+  void testDslTriggerPRApprovedFreeStyle() throws Exception {
     /* Create seed job which will process DSL */
     createSeedJob(readDslScript("./dsl/testDslTriggerPRApprovedFreeStyle.groovy"));
     /* Fetch the newly created job and check its trigger configuration */
@@ -164,8 +169,8 @@ public class BitBucketPPRHookJobDslExtensionTest {
   }
 
   @Test
-  @Ignore
-  public void testDslTriggerPRIsToApproveApprovedFreeStyle() throws Exception {
+  @Disabled
+  void testDslTriggerPRIsToApproveApprovedFreeStyle() throws Exception {
     /* Create seed job which will process DSL */
     createSeedJob(readDslScript("./dsl/testDslTriggerPRIsToApproveApprovedFreeStyle.groovy"));
     /* Fetch the newly created job and check its trigger configuration */
@@ -178,10 +183,11 @@ public class BitBucketPPRHookJobDslExtensionTest {
     for (Trigger<?> entry : triggers.values()) {
       BitBucketPPRTrigger tmp2 = (BitBucketPPRTrigger) entry;
       assertEquals(1, tmp2.getTriggers().size());
-      String tmpNname = tmp2.getTriggers().get(0).getActionFilter().getClass().getName();
-      String dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      String tmpName = tmp2.getTriggers().get(0).getActionFilter().getClass().getName();
+      String dispName = tmpName.substring(tmpName.lastIndexOf(".") + 1);
       dispNames.add(dispName);
-      BitBucketPPRPullRequestApprovedActionFilter tmp3 = (BitBucketPPRPullRequestApprovedActionFilter) tmp2.getTriggers().get(0)
+      BitBucketPPRPullRequestApprovedActionFilter tmp3 = (BitBucketPPRPullRequestApprovedActionFilter) tmp2.getTriggers()
+          .get(0)
           .getActionFilter();
       isToApprove = tmp3.shouldSendApprove();
     }
@@ -191,9 +197,10 @@ public class BitBucketPPRHookJobDslExtensionTest {
   }
 
   @Test
-  public void testDslTriggerPRAllowedBranchesApprovedFreeStyle() throws Exception {
+  void testDslTriggerPRAllowedBranchesApprovedFreeStyle() throws Exception {
     /* Create seed job which will process DSL */
-    createSeedJob(readDslScript("./dsl/testDslTriggerPRAllowedBranchesApprovedFreeStyle.groovy"));
+    createSeedJob(
+        readDslScript("./dsl/testDslTriggerPRAllowedBranchesApprovedFreeStyle.groovy"));
     /* Fetch the newly created job and check its trigger configuration */
     FreeStyleProject createdJob = (FreeStyleProject) j.getInstance().getItem("test-job");
     /* Go through all triggers to validate DSL */
@@ -203,8 +210,8 @@ public class BitBucketPPRHookJobDslExtensionTest {
     for (Trigger<?> entry : triggers.values()) {
       BitBucketPPRTrigger tmp2 = (BitBucketPPRTrigger) entry;
       assertEquals(1, tmp2.getTriggers().size());
-      String tmpNname = tmp2.getTriggers().get(0).getActionFilter().getClass().getName();
-      String dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      String tmpName = tmp2.getTriggers().get(0).getActionFilter().getClass().getName();
+      String dispName = tmpName.substring(tmpName.lastIndexOf(".") + 1);
       dispNames.add(dispName);
     }
     assertEquals(1, dispNames.size());
@@ -212,7 +219,7 @@ public class BitBucketPPRHookJobDslExtensionTest {
   }
 
   @Test
-  public void testDslTriggerPRCommentCreatedFreeStyle() throws Exception {
+  void testDslTriggerPRCommentCreatedFreeStyle() throws Exception {
     /* Create seed job which will process DSL */
     createSeedJob(readDslScript("./dsl/testDslTriggerPRCommentCreatedFreeStyle.groovy"));
     /* Fetch the newly created job and check its trigger configuration */
@@ -224,8 +231,8 @@ public class BitBucketPPRHookJobDslExtensionTest {
     for (Trigger<?> entry : triggers.values()) {
       BitBucketPPRTrigger tmp2 = (BitBucketPPRTrigger) entry;
       assertEquals(1, tmp2.getTriggers().size());
-      String tmpNname = tmp2.getTriggers().get(0).getActionFilter().getClass().getName();
-      String dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      String tmpName = tmp2.getTriggers().get(0).getActionFilter().getClass().getName();
+      String dispName = tmpName.substring(tmpName.lastIndexOf(".") + 1);
       dispNames.add(dispName);
     }
     assertEquals(1, dispNames.size());
@@ -233,9 +240,10 @@ public class BitBucketPPRHookJobDslExtensionTest {
   }
 
   @Test
-  public void testDslTriggerPRAllowedBranchesCommentCreatedFreeStyle() throws Exception {
+  void testDslTriggerPRAllowedBranchesCommentCreatedFreeStyle() throws Exception {
     /* Create seed job which will process DSL */
-    createSeedJob(readDslScript("./dsl/testDslTriggerPRAllowedBranchesCommentCreatedFreeStyle.groovy"));
+    createSeedJob(
+        readDslScript("./dsl/testDslTriggerPRAllowedBranchesCommentCreatedFreeStyle.groovy"));
     /* Fetch the newly created job and check its trigger configuration */
     FreeStyleProject createdJob = (FreeStyleProject) j.getInstance().getItem("test-job");
     /* Go through all triggers to validate DSL */
@@ -245,8 +253,8 @@ public class BitBucketPPRHookJobDslExtensionTest {
     for (Trigger<?> entry : triggers.values()) {
       BitBucketPPRTrigger tmp2 = (BitBucketPPRTrigger) entry;
       assertEquals(1, tmp2.getTriggers().size());
-      String tmpNname = tmp2.getTriggers().get(0).getActionFilter().getClass().getName();
-      String dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      String tmpName = tmp2.getTriggers().get(0).getActionFilter().getClass().getName();
+      String dispName = tmpName.substring(tmpName.lastIndexOf(".") + 1);
       dispNames.add(dispName);
     }
     assertEquals(1, dispNames.size());
@@ -254,9 +262,10 @@ public class BitBucketPPRHookJobDslExtensionTest {
   }
 
   @Test
-  public void testDslTriggerPRCommentFilterCommentCreatedFreeStyle() throws Exception {
+  void testDslTriggerPRCommentFilterCommentCreatedFreeStyle() throws Exception {
     /* Create seed job which will process DSL */
-    createSeedJob(readDslScript("./dsl/testDslTriggerPRCommentFilterCommentCreatedFreeStyle.groovy"));
+    createSeedJob(
+        readDslScript("./dsl/testDslTriggerPRCommentFilterCommentCreatedFreeStyle.groovy"));
     /* Fetch the newly created job and check its trigger configuration */
     FreeStyleProject createdJob = (FreeStyleProject) j.getInstance().getItem("test-job");
     /* Go through all triggers to validate DSL */
@@ -266,8 +275,8 @@ public class BitBucketPPRHookJobDslExtensionTest {
     for (Trigger<?> entry : triggers.values()) {
       BitBucketPPRTrigger tmp2 = (BitBucketPPRTrigger) entry;
       assertEquals(1, tmp2.getTriggers().size());
-      String tmpNname = tmp2.getTriggers().get(0).getActionFilter().getClass().getName();
-      String dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      String tmpName = tmp2.getTriggers().get(0).getActionFilter().getClass().getName();
+      String dispName = tmpName.substring(tmpName.lastIndexOf(".") + 1);
       dispNames.add(dispName);
     }
     assertEquals(1, dispNames.size());
@@ -275,7 +284,7 @@ public class BitBucketPPRHookJobDslExtensionTest {
   }
 
   @Test
-  public void testDslTriggerPRCommentUpdatedFreeStyle() throws Exception {
+  void testDslTriggerPRCommentUpdatedFreeStyle() throws Exception {
     /* Create seed job which will process DSL */
     createSeedJob(readDslScript("./dsl/testDslTriggerPRCommentUpdatedFreeStyle.groovy"));
     /* Fetch the newly created job and check its trigger configuration */
@@ -287,8 +296,8 @@ public class BitBucketPPRHookJobDslExtensionTest {
     for (Trigger<?> entry : triggers.values()) {
       BitBucketPPRTrigger tmp2 = (BitBucketPPRTrigger) entry;
       assertEquals(1, tmp2.getTriggers().size());
-      String tmpNname = tmp2.getTriggers().get(0).getActionFilter().getClass().getName();
-      String dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      String tmpName = tmp2.getTriggers().get(0).getActionFilter().getClass().getName();
+      String dispName = tmpName.substring(tmpName.lastIndexOf(".") + 1);
       dispNames.add(dispName);
     }
     assertEquals(1, dispNames.size());
@@ -296,9 +305,10 @@ public class BitBucketPPRHookJobDslExtensionTest {
   }
 
   @Test
-  public void testDslTriggerPRAllowedBranchesCommentUpdatedFreeStyle() throws Exception {
+  void testDslTriggerPRAllowedBranchesCommentUpdatedFreeStyle() throws Exception {
     /* Create seed job which will process DSL */
-    createSeedJob(readDslScript("./dsl/testDslTriggerPRAllowedBranchesCommentUpdatedFreeStyle.groovy"));
+    createSeedJob(
+        readDslScript("./dsl/testDslTriggerPRAllowedBranchesCommentUpdatedFreeStyle.groovy"));
     /* Fetch the newly created job and check its trigger configuration */
     FreeStyleProject createdJob = (FreeStyleProject) j.getInstance().getItem("test-job");
     /* Go through all triggers to validate DSL */
@@ -308,8 +318,8 @@ public class BitBucketPPRHookJobDslExtensionTest {
     for (Trigger<?> entry : triggers.values()) {
       BitBucketPPRTrigger tmp2 = (BitBucketPPRTrigger) entry;
       assertEquals(1, tmp2.getTriggers().size());
-      String tmpNname = tmp2.getTriggers().get(0).getActionFilter().getClass().getName();
-      String dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      String tmpName = tmp2.getTriggers().get(0).getActionFilter().getClass().getName();
+      String dispName = tmpName.substring(tmpName.lastIndexOf(".") + 1);
       dispNames.add(dispName);
     }
     assertEquals(1, dispNames.size());
@@ -317,9 +327,10 @@ public class BitBucketPPRHookJobDslExtensionTest {
   }
 
   @Test
-  public void testDslTriggerPRCommentFilterCommentUpdatedFreeStyle() throws Exception {
+  void testDslTriggerPRCommentFilterCommentUpdatedFreeStyle() throws Exception {
     /* Create seed job which will process DSL */
-    createSeedJob(readDslScript("./dsl/testDslTriggerPRCommentFilterCommentUpdatedFreeStyle.groovy"));
+    createSeedJob(
+        readDslScript("./dsl/testDslTriggerPRCommentFilterCommentUpdatedFreeStyle.groovy"));
     /* Fetch the newly created job and check its trigger configuration */
     FreeStyleProject createdJob = (FreeStyleProject) j.getInstance().getItem("test-job");
     /* Go through all triggers to validate DSL */
@@ -329,8 +340,8 @@ public class BitBucketPPRHookJobDslExtensionTest {
     for (Trigger<?> entry : triggers.values()) {
       BitBucketPPRTrigger tmp2 = (BitBucketPPRTrigger) entry;
       assertEquals(1, tmp2.getTriggers().size());
-      String tmpNname = tmp2.getTriggers().get(0).getActionFilter().getClass().getName();
-      String dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      String tmpName = tmp2.getTriggers().get(0).getActionFilter().getClass().getName();
+      String dispName = tmpName.substring(tmpName.lastIndexOf(".") + 1);
       dispNames.add(dispName);
     }
     assertEquals(1, dispNames.size());
@@ -338,7 +349,7 @@ public class BitBucketPPRHookJobDslExtensionTest {
   }
 
   @Test
-  public void testDslTriggerPRCommentDeletedFreeStyle() throws Exception {
+  void testDslTriggerPRCommentDeletedFreeStyle() throws Exception {
     /* Create seed job which will process DSL */
     createSeedJob(readDslScript("./dsl/testDslTriggerPRCommentDeletedFreeStyle.groovy"));
     /* Fetch the newly created job and check its trigger configuration */
@@ -350,8 +361,8 @@ public class BitBucketPPRHookJobDslExtensionTest {
     for (Trigger<?> entry : triggers.values()) {
       BitBucketPPRTrigger tmp2 = (BitBucketPPRTrigger) entry;
       assertEquals(1, tmp2.getTriggers().size());
-      String tmpNname = tmp2.getTriggers().get(0).getActionFilter().getClass().getName();
-      String dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      String tmpName = tmp2.getTriggers().get(0).getActionFilter().getClass().getName();
+      String dispName = tmpName.substring(tmpName.lastIndexOf(".") + 1);
       dispNames.add(dispName);
     }
     assertEquals(1, dispNames.size());
@@ -359,9 +370,10 @@ public class BitBucketPPRHookJobDslExtensionTest {
   }
 
   @Test
-  public void testDslTriggerPRAllowedBranchesCommentDeletedFreeStyle() throws Exception {
+  void testDslTriggerPRAllowedBranchesCommentDeletedFreeStyle() throws Exception {
     /* Create seed job which will process DSL */
-    createSeedJob(readDslScript("./dsl/testDslTriggerPRAllowedBranchesCommentDeletedFreeStyle.groovy"));
+    createSeedJob(
+        readDslScript("./dsl/testDslTriggerPRAllowedBranchesCommentDeletedFreeStyle.groovy"));
     /* Fetch the newly created job and check its trigger configuration */
     FreeStyleProject createdJob = (FreeStyleProject) j.getInstance().getItem("test-job");
     /* Go through all triggers to validate DSL */
@@ -371,8 +383,8 @@ public class BitBucketPPRHookJobDslExtensionTest {
     for (Trigger<?> entry : triggers.values()) {
       BitBucketPPRTrigger tmp2 = (BitBucketPPRTrigger) entry;
       assertEquals(1, tmp2.getTriggers().size());
-      String tmpNname = tmp2.getTriggers().get(0).getActionFilter().getClass().getName();
-      String dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      String tmpName = tmp2.getTriggers().get(0).getActionFilter().getClass().getName();
+      String dispName = tmpName.substring(tmpName.lastIndexOf(".") + 1);
       dispNames.add(dispName);
     }
     assertEquals(1, dispNames.size());
@@ -380,7 +392,7 @@ public class BitBucketPPRHookJobDslExtensionTest {
   }
 
   @Test
-  public void testDslTriggerPRCreatedFreeStyle() throws Exception {
+  void testDslTriggerPRCreatedFreeStyle() throws Exception {
     /* Create seed job which will process DSL */
     createSeedJob(readDslScript("./dsl/testDslTriggerPRCreatedFreeStyle.groovy"));
     /* Fetch the newly created job and check its trigger configuration */
@@ -392,8 +404,8 @@ public class BitBucketPPRHookJobDslExtensionTest {
     for (Trigger<?> entry : triggers.values()) {
       BitBucketPPRTrigger tmp2 = (BitBucketPPRTrigger) entry;
       assertEquals(1, tmp2.getTriggers().size());
-      String tmpNname = tmp2.getTriggers().get(0).getActionFilter().getClass().getName();
-      String dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      String tmpName = tmp2.getTriggers().get(0).getActionFilter().getClass().getName();
+      String dispName = tmpName.substring(tmpName.lastIndexOf(".") + 1);
       dispNames.add(dispName);
     }
     assertEquals(1, dispNames.size());
@@ -401,7 +413,7 @@ public class BitBucketPPRHookJobDslExtensionTest {
   }
 
   @Test
-  public void testDslTriggerPRAllowBranchesCreatedFreeStyle() throws Exception {
+  void testDslTriggerPRAllowBranchesCreatedFreeStyle() throws Exception {
     /* Create seed job which will process DSL */
     createSeedJob(readDslScript("./dsl/testDslTriggerPRAllowBranchesCreatedFreeStyle.groovy"));
     /* Fetch the newly created job and check its trigger configuration */
@@ -414,8 +426,8 @@ public class BitBucketPPRHookJobDslExtensionTest {
     for (Trigger<?> entry : triggers.values()) {
       BitBucketPPRTrigger tmp2 = (BitBucketPPRTrigger) entry;
       assertEquals(1, tmp2.getTriggers().size());
-      String tmpNname = tmp2.getTriggers().get(0).getActionFilter().getClass().getName();
-      String dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      String tmpName = tmp2.getTriggers().get(0).getActionFilter().getClass().getName();
+      String dispName = tmpName.substring(tmpName.lastIndexOf(".") + 1);
       dispNames.add(dispName);
       BitBucketPPRPullRequestCreatedActionFilter tmp3 = (BitBucketPPRPullRequestCreatedActionFilter) tmp2.getTriggers()
           .get(0).getActionFilter();
@@ -427,9 +439,10 @@ public class BitBucketPPRHookJobDslExtensionTest {
   }
 
   @Test
-  public void testDslTriggerPRAllowBranchesWithApproveCreatedFreeStyle() throws Exception {
+  void testDslTriggerPRAllowBranchesWithApproveCreatedFreeStyle() throws Exception {
     /* Create seed job which will process DSL */
-    createSeedJob(readDslScript("./dsl/testDslTriggerPRAllowBranchesWithApproveCreatedFreeStyle.groovy"));
+    createSeedJob(
+        readDslScript("./dsl/testDslTriggerPRAllowBranchesWithApproveCreatedFreeStyle.groovy"));
     /* Fetch the newly created job and check its trigger configuration */
     FreeStyleProject createdJob = (FreeStyleProject) j.getInstance().getItem("test-job");
     /* Go through all triggers to validate DSL */
@@ -440,8 +453,8 @@ public class BitBucketPPRHookJobDslExtensionTest {
     for (Trigger<?> entry : triggers.values()) {
       BitBucketPPRTrigger tmp2 = (BitBucketPPRTrigger) entry;
       assertEquals(1, tmp2.getTriggers().size());
-      String tmpNname = tmp2.getTriggers().get(0).getActionFilter().getClass().getName();
-      String dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      String tmpName = tmp2.getTriggers().get(0).getActionFilter().getClass().getName();
+      String dispName = tmpName.substring(tmpName.lastIndexOf(".") + 1);
       dispNames.add(dispName);
       BitBucketPPRPullRequestCreatedActionFilter tmp3 = (BitBucketPPRPullRequestCreatedActionFilter) tmp2
           .getTriggers().get(0).getActionFilter();
@@ -453,7 +466,7 @@ public class BitBucketPPRHookJobDslExtensionTest {
   }
 
   @Test
-  public void testDslTriggerPRUpdatedFreeeStyle() throws Exception {
+  void testDslTriggerPRUpdatedFreeeStyle() throws Exception {
     /* Create seed job which will process DSL */
     createSeedJob(readDslScript("./dsl/testDslTriggerPRUpdatedFreeeStyle.groovy"));
     /* Fetch the newly created job and check its trigger configuration */
@@ -465,8 +478,8 @@ public class BitBucketPPRHookJobDslExtensionTest {
     for (Trigger<?> entry : triggers.values()) {
       BitBucketPPRTrigger tmp2 = (BitBucketPPRTrigger) entry;
       assertEquals(1, tmp2.getTriggers().size());
-      String tmpNname = tmp2.getTriggers().get(0).getActionFilter().getClass().getName();
-      String dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      String tmpName = tmp2.getTriggers().get(0).getActionFilter().getClass().getName();
+      String dispName = tmpName.substring(tmpName.lastIndexOf(".") + 1);
       dispNames.add(dispName);
     }
     assertEquals(1, dispNames.size());
@@ -474,9 +487,10 @@ public class BitBucketPPRHookJobDslExtensionTest {
   }
 
   @Test
-  public void testDslTriggerPRAllowedBranchesUpdatedFreeStyle() throws Exception {
+  void testDslTriggerPRAllowedBranchesUpdatedFreeStyle() throws Exception {
     /* Create seed job which will process DSL */
-    createSeedJob(readDslScript("./dsl/testDslTriggerPRAllowedBranchesUpdatedFreeStyle.groovy"));
+    createSeedJob(
+        readDslScript("./dsl/testDslTriggerPRAllowedBranchesUpdatedFreeStyle.groovy"));
     /* Fetch the newly created job and check its trigger configuration */
     FreeStyleProject createdJob = (FreeStyleProject) j.getInstance().getItem("test-job");
     /* Go through all triggers to validate DSL */
@@ -487,8 +501,8 @@ public class BitBucketPPRHookJobDslExtensionTest {
     for (Trigger<?> entry : triggers.values()) {
       BitBucketPPRTrigger tmp2 = (BitBucketPPRTrigger) entry;
       assertEquals(1, tmp2.getTriggers().size());
-      String tmpNname = tmp2.getTriggers().get(0).getActionFilter().getClass().getName();
-      String dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      String tmpName = tmp2.getTriggers().get(0).getActionFilter().getClass().getName();
+      String dispName = tmpName.substring(tmpName.lastIndexOf(".") + 1);
       dispNames.add(dispName);
       BitBucketPPRPullRequestUpdatedActionFilter tmp3 = (BitBucketPPRPullRequestUpdatedActionFilter) tmp2.getTriggers()
           .get(0).getActionFilter();
@@ -500,9 +514,10 @@ public class BitBucketPPRHookJobDslExtensionTest {
   }
 
   @Test
-  public void testDslTriggerPRAllowedBranchesWithApproveUpdatedFreeStyle() throws Exception {
+  void testDslTriggerPRAllowedBranchesWithApproveUpdatedFreeStyle() throws Exception {
     /* Create seed job which will process DSL */
-    createSeedJob(readDslScript("./dsl/testDslTriggerPRAllowedBranchesWithApproveUpdatedFreeStyle.groovy"));
+    createSeedJob(readDslScript(
+        "./dsl/testDslTriggerPRAllowedBranchesWithApproveUpdatedFreeStyle.groovy"));
     /* Fetch the newly created job and check its trigger configuration */
     FreeStyleProject createdJob = (FreeStyleProject) j.getInstance().getItem("test-job");
     /* Go through all triggers to validate DSL */
@@ -513,8 +528,8 @@ public class BitBucketPPRHookJobDslExtensionTest {
     for (Trigger<?> entry : triggers.values()) {
       BitBucketPPRTrigger tmp2 = (BitBucketPPRTrigger) entry;
       assertEquals(1, tmp2.getTriggers().size());
-      String tmpNname = tmp2.getTriggers().get(0).getActionFilter().getClass().getName();
-      String dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      String tmpName = tmp2.getTriggers().get(0).getActionFilter().getClass().getName();
+      String dispName = tmpName.substring(tmpName.lastIndexOf(".") + 1);
       dispNames.add(dispName);
       BitBucketPPRPullRequestUpdatedActionFilter tmp3 = (BitBucketPPRPullRequestUpdatedActionFilter) tmp2.getTriggers()
           .get(0).getActionFilter();
@@ -527,7 +542,7 @@ public class BitBucketPPRHookJobDslExtensionTest {
 
 
   @Test
-  public void testDslTriggerPRMergedFreeStyle() throws Exception {
+  void testDslTriggerPRMergedFreeStyle() throws Exception {
     /* Create seed job which will process DSL */
     createSeedJob(readDslScript("./dsl/testDslTriggerPRMergedFreeStyle.groovy"));
     /* Fetch the newly created job and check its trigger configuration */
@@ -539,8 +554,8 @@ public class BitBucketPPRHookJobDslExtensionTest {
     for (Trigger<?> entry : triggers.values()) {
       BitBucketPPRTrigger tmp2 = (BitBucketPPRTrigger) entry;
       assertEquals(1, tmp2.getTriggers().size());
-      String tmpNname = tmp2.getTriggers().get(0).getActionFilter().getClass().getName();
-      String dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      String tmpName = tmp2.getTriggers().get(0).getActionFilter().getClass().getName();
+      String dispName = tmpName.substring(tmpName.lastIndexOf(".") + 1);
       dispNames.add(dispName);
     }
     assertEquals(1, dispNames.size());
@@ -548,7 +563,7 @@ public class BitBucketPPRHookJobDslExtensionTest {
   }
 
   @Test
-  public void testDslTriggerPRDeclinedFreeStyle() throws Exception {
+  void testDslTriggerPRDeclinedFreeStyle() throws Exception {
     /* Create seed job which will process DSL */
     createSeedJob(readDslScript("./dsl/testDslTriggerPRDeclinedFreeStyle.groovy"));
     /* Fetch the newly created job and check its trigger configuration */
@@ -560,8 +575,8 @@ public class BitBucketPPRHookJobDslExtensionTest {
     for (Trigger<?> entry : triggers.values()) {
       BitBucketPPRTrigger tmp2 = (BitBucketPPRTrigger) entry;
       assertEquals(1, tmp2.getTriggers().size());
-      String tmpNname = tmp2.getTriggers().get(0).getActionFilter().getClass().getName();
-      String dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      String tmpName = tmp2.getTriggers().get(0).getActionFilter().getClass().getName();
+      String dispName = tmpName.substring(tmpName.lastIndexOf(".") + 1);
       dispNames.add(dispName);
     }
     assertEquals(1, dispNames.size());
@@ -569,7 +584,7 @@ public class BitBucketPPRHookJobDslExtensionTest {
   }
 
   @Test
-  public void testDslTriggerPRAllowedBranchesMergedFreeStyle() throws Exception {
+  void testDslTriggerPRAllowedBranchesMergedFreeStyle() throws Exception {
     /* Create seed job which will process DSL */
     createSeedJob(readDslScript("./dsl/testDslTriggerPRAllowedBranchesMergedFreeStyle.groovy"));
     /* Fetch the newly created job and check its trigger configuration */
@@ -582,8 +597,8 @@ public class BitBucketPPRHookJobDslExtensionTest {
     for (Trigger<?> entry : triggers.values()) {
       BitBucketPPRTrigger tmp2 = (BitBucketPPRTrigger) entry;
       assertEquals(1, tmp2.getTriggers().size());
-      String tmpNname = tmp2.getTriggers().get(0).getActionFilter().getClass().getName();
-      String dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      String tmpName = tmp2.getTriggers().get(0).getActionFilter().getClass().getName();
+      String dispName = tmpName.substring(tmpName.lastIndexOf(".") + 1);
       dispNames.add(dispName);
       BitBucketPPRPullRequestMergedActionFilter tmp3 = (BitBucketPPRPullRequestMergedActionFilter) tmp2.getTriggers()
           .get(0).getActionFilter();
@@ -595,9 +610,10 @@ public class BitBucketPPRHookJobDslExtensionTest {
   }
 
   @Test
-  public void testDslTriggerPRAllowedBranchesDeclinedFreeStyle() throws Exception {
+  void testDslTriggerPRAllowedBranchesDeclinedFreeStyle() throws Exception {
     /* Create seed job which will process DSL */
-    createSeedJob(readDslScript("./dsl/testDslTriggerPRAllowedBranchesDeclinedFreeStyle.groovy"));
+    createSeedJob(
+        readDslScript("./dsl/testDslTriggerPRAllowedBranchesDeclinedFreeStyle.groovy"));
     /* Fetch the newly created job and check its trigger configuration */
     FreeStyleProject createdJob = (FreeStyleProject) j.getInstance().getItem("test-job");
     /* Go through all triggers to validate DSL */
@@ -608,11 +624,11 @@ public class BitBucketPPRHookJobDslExtensionTest {
     for (Trigger<?> entry : triggers.values()) {
       BitBucketPPRTrigger tmp2 = (BitBucketPPRTrigger) entry;
       assertEquals(1, tmp2.getTriggers().size());
-      String tmpNname = tmp2.getTriggers().get(0).getActionFilter().getClass().getName();
-      String dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      String tmpName = tmp2.getTriggers().get(0).getActionFilter().getClass().getName();
+      String dispName = tmpName.substring(tmpName.lastIndexOf(".") + 1);
       dispNames.add(dispName);
       BitBucketPPRPullRequestDeclinedActionFilter tmp3 = (BitBucketPPRPullRequestDeclinedActionFilter) tmp2.getTriggers()
-              .get(0).getActionFilter();
+          .get(0).getActionFilter();
       isToApprove = tmp3.shouldSendApprove();
     }
     assertEquals(1, dispNames.size());
@@ -621,9 +637,10 @@ public class BitBucketPPRHookJobDslExtensionTest {
   }
 
   @Test
-  public void testDslTriggerPRAllowedBranchesWithApproveMergedFreeStyle() throws Exception {
+  void testDslTriggerPRAllowedBranchesWithApproveMergedFreeStyle() throws Exception {
     /* Create seed job which will process DSL */
-    createSeedJob(readDslScript("./dsl/testDslTriggerPRAllowedBranchesWithApproveMergedFreeStyle.groovy"));
+    createSeedJob(readDslScript(
+        "./dsl/testDslTriggerPRAllowedBranchesWithApproveMergedFreeStyle.groovy"));
     /* Fetch the newly created job and check its trigger configuration */
     FreeStyleProject createdJob = (FreeStyleProject) j.getInstance().getItem("test-job");
     /* Go through all triggers to validate DSL */
@@ -634,8 +651,8 @@ public class BitBucketPPRHookJobDslExtensionTest {
     for (Trigger<?> entry : triggers.values()) {
       BitBucketPPRTrigger tmp2 = (BitBucketPPRTrigger) entry;
       assertEquals(1, tmp2.getTriggers().size());
-      String tmpNname = tmp2.getTriggers().get(0).getActionFilter().getClass().getName();
-      String dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      String tmpName = tmp2.getTriggers().get(0).getActionFilter().getClass().getName();
+      String dispName = tmpName.substring(tmpName.lastIndexOf(".") + 1);
       dispNames.add(dispName);
       BitBucketPPRPullRequestMergedActionFilter tmp3 = (BitBucketPPRPullRequestMergedActionFilter) tmp2.getTriggers()
           .get(0).getActionFilter();
@@ -647,9 +664,10 @@ public class BitBucketPPRHookJobDslExtensionTest {
   }
 
   @Test
-  public void testDslTriggerCreateUpdatedApprovedPRActionsFreeStyle() throws Exception {
+  void testDslTriggerCreateUpdatedApprovedPRActionsFreeStyle() throws Exception {
     /* Create seed job which will process DSL */
-    createSeedJob(readDslScript("./dsl/testDslTriggerCreateUpdatedApprovedPRActionsFreeStyle.groovy"));
+    createSeedJob(
+        readDslScript("./dsl/testDslTriggerCreateUpdatedApprovedPRActionsFreeStyle.groovy"));
     /* Fetch the newly created job and check its trigger configuration */
     FreeStyleProject createdJob = (FreeStyleProject) j.getInstance().getItem("test-job");
     /* Go through all triggers to validate DSL */
@@ -661,14 +679,14 @@ public class BitBucketPPRHookJobDslExtensionTest {
       BitBucketPPRTrigger tmp2 = (BitBucketPPRTrigger) entry;
       /* Three different triggers expected */
       assertEquals(3, tmp2.getTriggers().size());
-      String tmpNname = tmp2.getTriggers().get(0).getActionFilter().getClass().getName();
-      String dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      String tmpName = tmp2.getTriggers().get(0).getActionFilter().getClass().getName();
+      String dispName = tmpName.substring(tmpName.lastIndexOf(".") + 1);
       dispNames.add(dispName);
-      tmpNname = tmp2.getTriggers().get(1).getActionFilter().getClass().getName();
-      dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      tmpName = tmp2.getTriggers().get(1).getActionFilter().getClass().getName();
+      dispName = tmpName.substring(tmpName.lastIndexOf(".") + 1);
       dispNames.add(dispName);
-      tmpNname = tmp2.getTriggers().get(2).getActionFilter().getClass().getName();
-      dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      tmpName = tmp2.getTriggers().get(2).getActionFilter().getClass().getName();
+      dispName = tmpName.substring(tmpName.lastIndexOf(".") + 1);
       dispNames.add(dispName);
     }
     assertEquals(3, dispNames.size());
@@ -678,9 +696,11 @@ public class BitBucketPPRHookJobDslExtensionTest {
   }
 
   @Test
-  public void testDslTriggerCreateUpdatedMergedApprovedPRAllowBranchesActionsFreeStyle() throws Exception {
+  void testDslTriggerCreateUpdatedMergedApprovedPRAllowBranchesActionsFreeStyle()
+      throws Exception {
     /* Create seed job which will process DSL */
-    createSeedJob(readDslScript("./dsl/testDslTriggerCreateUpdatedMergedDeclinedApprovedPRAllowBranchesActionsFreeStyle.groovy"));
+    createSeedJob(readDslScript(
+        "./dsl/testDslTriggerCreateUpdatedMergedDeclinedApprovedPRAllowBranchesActionsFreeStyle.groovy"));
     /* Fetch the newly created job and check its trigger configuration */
     FreeStyleProject createdJob = (FreeStyleProject) j.getInstance().getItem("test-job");
     /* Go through all triggers to validate DSL */
@@ -692,20 +712,20 @@ public class BitBucketPPRHookJobDslExtensionTest {
       BitBucketPPRTrigger tmp2 = (BitBucketPPRTrigger) entry;
       /* Five different triggers expected */
       assertEquals(5, tmp2.getTriggers().size());
-      String tmpNname = tmp2.getTriggers().get(0).getActionFilter().getClass().getName();
-      String dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      String tmpName = tmp2.getTriggers().get(0).getActionFilter().getClass().getName();
+      String dispName = tmpName.substring(tmpName.lastIndexOf(".") + 1);
       dispNames.add(dispName);
-      tmpNname = tmp2.getTriggers().get(1).getActionFilter().getClass().getName();
-      dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      tmpName = tmp2.getTriggers().get(1).getActionFilter().getClass().getName();
+      dispName = tmpName.substring(tmpName.lastIndexOf(".") + 1);
       dispNames.add(dispName);
-      tmpNname = tmp2.getTriggers().get(2).getActionFilter().getClass().getName();
-      dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      tmpName = tmp2.getTriggers().get(2).getActionFilter().getClass().getName();
+      dispName = tmpName.substring(tmpName.lastIndexOf(".") + 1);
       dispNames.add(dispName);
-      tmpNname = tmp2.getTriggers().get(3).getActionFilter().getClass().getName();
-      dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      tmpName = tmp2.getTriggers().get(3).getActionFilter().getClass().getName();
+      dispName = tmpName.substring(tmpName.lastIndexOf(".") + 1);
       dispNames.add(dispName);
-      tmpNname = tmp2.getTriggers().get(4).getActionFilter().getClass().getName();
-      dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      tmpName = tmp2.getTriggers().get(4).getActionFilter().getClass().getName();
+      dispName = tmpName.substring(tmpName.lastIndexOf(".") + 1);
       dispNames.add(dispName);
     }
     assertEquals(5, dispNames.size());
@@ -717,9 +737,11 @@ public class BitBucketPPRHookJobDslExtensionTest {
   }
 
   @Test
-  public void testDslTriggerCreateUpdatedMergedApprovedPRAllowBranchesWithApproveActionsFreeStyle() throws Exception {
+  void testDslTriggerCreateUpdatedMergedApprovedPRAllowBranchesWithApproveActionsFreeStyle()
+      throws Exception {
     /* Create seed job which will process DSL */
-    createSeedJob(readDslScript("./dsl/testDslTriggerCreateUpdatedMergedApprovedPRAllowBranchesWithApproveActionsFreeStyle.groovy"));
+    createSeedJob(readDslScript(
+        "./dsl/testDslTriggerCreateUpdatedMergedApprovedPRAllowBranchesWithApproveActionsFreeStyle.groovy"));
     /* Fetch the newly created job and check its trigger configuration */
     FreeStyleProject createdJob = (FreeStyleProject) j.getInstance().getItem("test-job");
     /* Go through all triggers to validate DSL */
@@ -731,17 +753,17 @@ public class BitBucketPPRHookJobDslExtensionTest {
       BitBucketPPRTrigger tmp2 = (BitBucketPPRTrigger) entry;
       /* Three different triggers expected */
       assertEquals(4, tmp2.getTriggers().size());
-      String tmpNname = tmp2.getTriggers().get(0).getActionFilter().getClass().getName();
-      String dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      String tmpName = tmp2.getTriggers().get(0).getActionFilter().getClass().getName();
+      String dispName = tmpName.substring(tmpName.lastIndexOf(".") + 1);
       dispNames.add(dispName);
-      tmpNname = tmp2.getTriggers().get(1).getActionFilter().getClass().getName();
-      dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      tmpName = tmp2.getTriggers().get(1).getActionFilter().getClass().getName();
+      dispName = tmpName.substring(tmpName.lastIndexOf(".") + 1);
       dispNames.add(dispName);
-      tmpNname = tmp2.getTriggers().get(2).getActionFilter().getClass().getName();
-      dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      tmpName = tmp2.getTriggers().get(2).getActionFilter().getClass().getName();
+      dispName = tmpName.substring(tmpName.lastIndexOf(".") + 1);
       dispNames.add(dispName);
-      tmpNname = tmp2.getTriggers().get(3).getActionFilter().getClass().getName();
-      dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      tmpName = tmp2.getTriggers().get(3).getActionFilter().getClass().getName();
+      dispName = tmpName.substring(tmpName.lastIndexOf(".") + 1);
       dispNames.add(dispName);
     }
     assertEquals(4, dispNames.size());
@@ -752,7 +774,7 @@ public class BitBucketPPRHookJobDslExtensionTest {
   }
 
   @Test
-  public void testDslMultipleJobsInSeedFreeStyle() throws Exception {
+  void testDslMultipleJobsInSeedFreeStyle() throws Exception {
     /* Create seed job which will process DSL */
     createSeedJob(readDslScript("./dsl/testDslMultipleJobsInSeedFreeStyle.groovy"));
     /* Fetch the newly created job and check its trigger configuration */
@@ -764,8 +786,8 @@ public class BitBucketPPRHookJobDslExtensionTest {
     for (Trigger<?> entry : triggers.values()) {
       BitBucketPPRTrigger tmp2 = (BitBucketPPRTrigger) entry;
       assertEquals(1, tmp2.getTriggers().size());
-      String tmpNname = tmp2.getTriggers().get(0).getActionFilter().getClass().getName();
-      String dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      String tmpName = tmp2.getTriggers().get(0).getActionFilter().getClass().getName();
+      String dispName = tmpName.substring(tmpName.lastIndexOf(".") + 1);
       dispNames.add(dispName);
     }
     assertEquals(1, dispNames.size());
@@ -780,8 +802,8 @@ public class BitBucketPPRHookJobDslExtensionTest {
     for (Trigger<?> entry : triggers.values()) {
       BitBucketPPRTrigger tmp2 = (BitBucketPPRTrigger) entry;
       assertEquals(1, tmp2.getTriggers().size());
-      String tmpNname = tmp2.getTriggers().get(0).getActionFilter().getClass().getName();
-      String dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      String tmpName = tmp2.getTriggers().get(0).getActionFilter().getClass().getName();
+      String dispName = tmpName.substring(tmpName.lastIndexOf(".") + 1);
       dispNames.add(dispName);
     }
     assertEquals(1, dispNames.size());
@@ -789,7 +811,7 @@ public class BitBucketPPRHookJobDslExtensionTest {
   }
 
   @Test
-  public void testDslServerAllPRActionsFreeStyle() throws Exception {
+  void testDslServerAllPRActionsFreeStyle() throws Exception {
     /* Create seed job which will process DSL */
     createSeedJob(readDslScript("./dsl/testDslServerAllPRActionsFreeStyle.groovy"));
     /* Fetch the newly created job and check its trigger configuration */
@@ -803,20 +825,20 @@ public class BitBucketPPRHookJobDslExtensionTest {
       BitBucketPPRTrigger tmp2 = (BitBucketPPRTrigger) entry;
       /* Five different triggers expected */
       assertEquals(5, tmp2.getTriggers().size());
-      String tmpNname = tmp2.getTriggers().get(0).getActionFilter().getClass().getName();
-      String dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      String tmpName = tmp2.getTriggers().get(0).getActionFilter().getClass().getName();
+      String dispName = tmpName.substring(tmpName.lastIndexOf(".") + 1);
       dispNames.add(dispName);
-      tmpNname = tmp2.getTriggers().get(1).getActionFilter().getClass().getName();
-      dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      tmpName = tmp2.getTriggers().get(1).getActionFilter().getClass().getName();
+      dispName = tmpName.substring(tmpName.lastIndexOf(".") + 1);
       dispNames.add(dispName);
-      tmpNname = tmp2.getTriggers().get(2).getActionFilter().getClass().getName();
-      dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      tmpName = tmp2.getTriggers().get(2).getActionFilter().getClass().getName();
+      dispName = tmpName.substring(tmpName.lastIndexOf(".") + 1);
       dispNames.add(dispName);
-      tmpNname = tmp2.getTriggers().get(3).getActionFilter().getClass().getName();
-      dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      tmpName = tmp2.getTriggers().get(3).getActionFilter().getClass().getName();
+      dispName = tmpName.substring(tmpName.lastIndexOf(".") + 1);
       dispNames.add(dispName);
-      tmpNname = tmp2.getTriggers().get(4).getActionFilter().getClass().getName();
-      dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      tmpName = tmp2.getTriggers().get(4).getActionFilter().getClass().getName();
+      dispName = tmpName.substring(tmpName.lastIndexOf(".") + 1);
       dispNames.add(dispName);
     }
     assertEquals(5, dispNames.size());
@@ -828,9 +850,10 @@ public class BitBucketPPRHookJobDslExtensionTest {
   }
 
   @Test
-  public void testDslServerAllPRAllowedBranchesActionsFreeStyle() throws Exception {
+  void testDslServerAllPRAllowedBranchesActionsFreeStyle() throws Exception {
     /* Create seed job which will process DSL */
-    createSeedJob(readDslScript("./dsl/testDslServerAllPRAllowedBranchesActionsFreeStyle.groovy"));
+    createSeedJob(
+        readDslScript("./dsl/testDslServerAllPRAllowedBranchesActionsFreeStyle.groovy"));
     /* Fetch the newly created job and check its trigger configuration */
     FreeStyleProject createdJob = (FreeStyleProject) j.getInstance().getItem("test-job");
     /* Go through all triggers to validate DSL */
@@ -842,25 +865,25 @@ public class BitBucketPPRHookJobDslExtensionTest {
       BitBucketPPRTrigger tmp2 = (BitBucketPPRTrigger) entry;
       /* Six different triggers expected */
       assertEquals(6, tmp2.getTriggers().size());
-      String tmpNname = tmp2.getTriggers().get(0).getActionFilter().getClass().getName();
-      String dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      String tmpName = tmp2.getTriggers().get(0).getActionFilter().getClass().getName();
+      String dispName = tmpName.substring(tmpName.lastIndexOf(".") + 1);
       dispNames.add(dispName);
-      tmpNname = tmp2.getTriggers().get(1).getActionFilter().getClass().getName();
-      dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
-      dispNames.add(dispName);
-
-      tmpNname = tmp2.getTriggers().get(2).getActionFilter().getClass().getName();
-      dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      tmpName = tmp2.getTriggers().get(1).getActionFilter().getClass().getName();
+      dispName = tmpName.substring(tmpName.lastIndexOf(".") + 1);
       dispNames.add(dispName);
 
-      tmpNname = tmp2.getTriggers().get(3).getActionFilter().getClass().getName();
-      dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      tmpName = tmp2.getTriggers().get(2).getActionFilter().getClass().getName();
+      dispName = tmpName.substring(tmpName.lastIndexOf(".") + 1);
       dispNames.add(dispName);
-      tmpNname = tmp2.getTriggers().get(4).getActionFilter().getClass().getName();
-      dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+
+      tmpName = tmp2.getTriggers().get(3).getActionFilter().getClass().getName();
+      dispName = tmpName.substring(tmpName.lastIndexOf(".") + 1);
       dispNames.add(dispName);
-      tmpNname = tmp2.getTriggers().get(5).getActionFilter().getClass().getName();
-      dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      tmpName = tmp2.getTriggers().get(4).getActionFilter().getClass().getName();
+      dispName = tmpName.substring(tmpName.lastIndexOf(".") + 1);
+      dispNames.add(dispName);
+      tmpName = tmp2.getTriggers().get(5).getActionFilter().getClass().getName();
+      dispName = tmpName.substring(tmpName.lastIndexOf(".") + 1);
       dispNames.add(dispName);
     }
     assertEquals(6, dispNames.size());
@@ -873,9 +896,10 @@ public class BitBucketPPRHookJobDslExtensionTest {
   }
 
   @Test
-  public void testDslServerAllPRAllowedBranchesWithApproveActionsFreeStyle() throws Exception {
+  void testDslServerAllPRAllowedBranchesWithApproveActionsFreeStyle() throws Exception {
     /* Create seed job which will process DSL */
-    createSeedJob(readDslScript("./dsl/testDslServerAllPRAllowedBranchesWithApproveActionsFreeStyle.groovy"));
+    createSeedJob(readDslScript(
+        "./dsl/testDslServerAllPRAllowedBranchesWithApproveActionsFreeStyle.groovy"));
     /* Fetch the newly created job and check its trigger configuration */
     FreeStyleProject createdJob = (FreeStyleProject) j.getInstance().getItem("test-job");
     /* Go through all triggers to validate DSL */
@@ -887,22 +911,22 @@ public class BitBucketPPRHookJobDslExtensionTest {
       BitBucketPPRTrigger tmp2 = (BitBucketPPRTrigger) entry;
       /* Four different triggers expected */
       assertEquals(5, tmp2.getTriggers().size());
-      String tmpNname = tmp2.getTriggers().get(0).getActionFilter().getClass().getName();
-      String dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      String tmpName = tmp2.getTriggers().get(0).getActionFilter().getClass().getName();
+      String dispName = tmpName.substring(tmpName.lastIndexOf(".") + 1);
       dispNames.add(dispName);
-      tmpNname = tmp2.getTriggers().get(1).getActionFilter().getClass().getName();
-      dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
-      dispNames.add(dispName);
-
-      tmpNname = tmp2.getTriggers().get(2).getActionFilter().getClass().getName();
-      dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      tmpName = tmp2.getTriggers().get(1).getActionFilter().getClass().getName();
+      dispName = tmpName.substring(tmpName.lastIndexOf(".") + 1);
       dispNames.add(dispName);
 
-      tmpNname = tmp2.getTriggers().get(3).getActionFilter().getClass().getName();
-      dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      tmpName = tmp2.getTriggers().get(2).getActionFilter().getClass().getName();
+      dispName = tmpName.substring(tmpName.lastIndexOf(".") + 1);
       dispNames.add(dispName);
-      tmpNname = tmp2.getTriggers().get(4).getActionFilter().getClass().getName();
-      dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+
+      tmpName = tmp2.getTriggers().get(3).getActionFilter().getClass().getName();
+      dispName = tmpName.substring(tmpName.lastIndexOf(".") + 1);
+      dispNames.add(dispName);
+      tmpName = tmp2.getTriggers().get(4).getActionFilter().getClass().getName();
+      dispName = tmpName.substring(tmpName.lastIndexOf(".") + 1);
       dispNames.add(dispName);
     }
     assertEquals(5, dispNames.size());
@@ -914,9 +938,10 @@ public class BitBucketPPRHookJobDslExtensionTest {
   }
 
   @Test
-  public void testDslServerAllPRUnfilteredAndAllowedBranchesActionsFreeStyle() throws Exception {
+  void testDslServerAllPRUnfilteredAndAllowedBranchesActionsFreeStyle() throws Exception {
     /* Create seed job which will process DSL */
-    createSeedJob(readDslScript("./dsl/testDslServerAllPRUnfilteredAndAllowedBranchesActionsFreeStyle.groovy"));
+    createSeedJob(readDslScript(
+        "./dsl/testDslServerAllPRUnfilteredAndAllowedBranchesActionsFreeStyle.groovy"));
     /* Fetch the newly created job and check its trigger configuration */
     FreeStyleProject createdJob = (FreeStyleProject) j.getInstance().getItem("test-job");
     /* Go through all triggers to validate DSL */
@@ -928,41 +953,41 @@ public class BitBucketPPRHookJobDslExtensionTest {
       BitBucketPPRTrigger tmp2 = (BitBucketPPRTrigger) entry;
       /* Twelve different triggers expected */
       assertEquals(12, tmp2.getTriggers().size());
-      String tmpNname = tmp2.getTriggers().get(0).getActionFilter().getClass().getName();
-      String dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      String tmpName = tmp2.getTriggers().get(0).getActionFilter().getClass().getName();
+      String dispName = tmpName.substring(tmpName.lastIndexOf(".") + 1);
       dispNames.add(dispName);
-      tmpNname = tmp2.getTriggers().get(1).getActionFilter().getClass().getName();
-      dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      tmpName = tmp2.getTriggers().get(1).getActionFilter().getClass().getName();
+      dispName = tmpName.substring(tmpName.lastIndexOf(".") + 1);
       dispNames.add(dispName);
-      tmpNname = tmp2.getTriggers().get(2).getActionFilter().getClass().getName();
-      dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      tmpName = tmp2.getTriggers().get(2).getActionFilter().getClass().getName();
+      dispName = tmpName.substring(tmpName.lastIndexOf(".") + 1);
       dispNames.add(dispName);
-      tmpNname = tmp2.getTriggers().get(3).getActionFilter().getClass().getName();
-      dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      tmpName = tmp2.getTriggers().get(3).getActionFilter().getClass().getName();
+      dispName = tmpName.substring(tmpName.lastIndexOf(".") + 1);
       dispNames.add(dispName);
-      tmpNname = tmp2.getTriggers().get(4).getActionFilter().getClass().getName();
-      dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      tmpName = tmp2.getTriggers().get(4).getActionFilter().getClass().getName();
+      dispName = tmpName.substring(tmpName.lastIndexOf(".") + 1);
       dispNames.add(dispName);
-      tmpNname = tmp2.getTriggers().get(5).getActionFilter().getClass().getName();
-      dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      tmpName = tmp2.getTriggers().get(5).getActionFilter().getClass().getName();
+      dispName = tmpName.substring(tmpName.lastIndexOf(".") + 1);
       dispNames.add(dispName);
-      tmpNname = tmp2.getTriggers().get(6).getActionFilter().getClass().getName();
-      dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      tmpName = tmp2.getTriggers().get(6).getActionFilter().getClass().getName();
+      dispName = tmpName.substring(tmpName.lastIndexOf(".") + 1);
       dispNames.add(dispName);
-      tmpNname = tmp2.getTriggers().get(7).getActionFilter().getClass().getName();
-      dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      tmpName = tmp2.getTriggers().get(7).getActionFilter().getClass().getName();
+      dispName = tmpName.substring(tmpName.lastIndexOf(".") + 1);
       dispNames.add(dispName);
-      tmpNname = tmp2.getTriggers().get(8).getActionFilter().getClass().getName();
-      dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      tmpName = tmp2.getTriggers().get(8).getActionFilter().getClass().getName();
+      dispName = tmpName.substring(tmpName.lastIndexOf(".") + 1);
       dispNames.add(dispName);
-      tmpNname = tmp2.getTriggers().get(9).getActionFilter().getClass().getName();
-      dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      tmpName = tmp2.getTriggers().get(9).getActionFilter().getClass().getName();
+      dispName = tmpName.substring(tmpName.lastIndexOf(".") + 1);
       dispNames.add(dispName);
-      tmpNname = tmp2.getTriggers().get(10).getActionFilter().getClass().getName();
-      dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      tmpName = tmp2.getTriggers().get(10).getActionFilter().getClass().getName();
+      dispName = tmpName.substring(tmpName.lastIndexOf(".") + 1);
       dispNames.add(dispName);
-      tmpNname = tmp2.getTriggers().get(11).getActionFilter().getClass().getName();
-      dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      tmpName = tmp2.getTriggers().get(11).getActionFilter().getClass().getName();
+      dispName = tmpName.substring(tmpName.lastIndexOf(".") + 1);
       dispNames.add(dispName);
     }
     assertEquals(12, dispNames.size());
@@ -982,13 +1007,14 @@ public class BitBucketPPRHookJobDslExtensionTest {
   }
 
   @Test
-  public void testDslServerAllPRActionsPipeline() throws Exception {
+  void testDslServerAllPRActionsPipeline() throws Exception {
     /* Create seed job which will process DSL */
     createSeedJob(readDslScript("./dsl/testDslServerAllPRActionsPipeline.groovy"));
     /* Fetch the newly created job and check its trigger configuration */
     WorkflowJob createdJob = (WorkflowJob) j.getInstance().getItem("test-job");
     /* Go through all triggers to validate DSL */
-    PipelineTriggersJobProperty pipelineTriggers = createdJob.getProperty(PipelineTriggersJobProperty.class);
+    PipelineTriggersJobProperty pipelineTriggers = createdJob.getProperty(
+        PipelineTriggersJobProperty.class);
     Map<TriggerDescriptor, Trigger<?>> triggers = pipelineTriggers.getTriggersMap();
     /* Only one 'triggers{}' closure */
     assertEquals(1, triggers.size());
@@ -997,20 +1023,20 @@ public class BitBucketPPRHookJobDslExtensionTest {
       BitBucketPPRTrigger tmp2 = (BitBucketPPRTrigger) entry;
       /* Five different triggers expected */
       assertEquals(5, tmp2.getTriggers().size());
-      String tmpNname = tmp2.getTriggers().get(0).getActionFilter().getClass().getName();
-      String dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      String tmpName = tmp2.getTriggers().get(0).getActionFilter().getClass().getName();
+      String dispName = tmpName.substring(tmpName.lastIndexOf(".") + 1);
       dispNames.add(dispName);
-      tmpNname = tmp2.getTriggers().get(1).getActionFilter().getClass().getName();
-      dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      tmpName = tmp2.getTriggers().get(1).getActionFilter().getClass().getName();
+      dispName = tmpName.substring(tmpName.lastIndexOf(".") + 1);
       dispNames.add(dispName);
-      tmpNname = tmp2.getTriggers().get(2).getActionFilter().getClass().getName();
-      dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      tmpName = tmp2.getTriggers().get(2).getActionFilter().getClass().getName();
+      dispName = tmpName.substring(tmpName.lastIndexOf(".") + 1);
       dispNames.add(dispName);
-      tmpNname = tmp2.getTriggers().get(3).getActionFilter().getClass().getName();
-      dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      tmpName = tmp2.getTriggers().get(3).getActionFilter().getClass().getName();
+      dispName = tmpName.substring(tmpName.lastIndexOf(".") + 1);
       dispNames.add(dispName);
-      tmpNname = tmp2.getTriggers().get(4).getActionFilter().getClass().getName();
-      dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      tmpName = tmp2.getTriggers().get(4).getActionFilter().getClass().getName();
+      dispName = tmpName.substring(tmpName.lastIndexOf(".") + 1);
       dispNames.add(dispName);
     }
     assertEquals(5, dispNames.size());
@@ -1022,13 +1048,15 @@ public class BitBucketPPRHookJobDslExtensionTest {
   }
 
   @Test
-  public void testDslServerAllPRAllowedBranchesActionsPipeline() throws Exception {
+  void testDslServerAllPRAllowedBranchesActionsPipeline() throws Exception {
     /* Create seed job which will process DSL */
-    createSeedJob(readDslScript("./dsl/testDslServerAllPRAllowedBranchesActionsPipeline.groovy"));
+    createSeedJob(
+        readDslScript("./dsl/testDslServerAllPRAllowedBranchesActionsPipeline.groovy"));
     /* Fetch the newly created job and check its trigger configuration */
     WorkflowJob createdJob = (WorkflowJob) j.getInstance().getItem("test-job");
     /* Go through all triggers to validate DSL */
-    PipelineTriggersJobProperty pipelineTriggers = createdJob.getProperty(PipelineTriggersJobProperty.class);
+    PipelineTriggersJobProperty pipelineTriggers = createdJob.getProperty(
+        PipelineTriggersJobProperty.class);
     Map<TriggerDescriptor, Trigger<?>> triggers = pipelineTriggers.getTriggersMap();
     /* Only one 'triggers{}' closure */
     assertEquals(1, triggers.size());
@@ -1037,25 +1065,25 @@ public class BitBucketPPRHookJobDslExtensionTest {
       BitBucketPPRTrigger tmp2 = (BitBucketPPRTrigger) entry;
       /* Six different triggers expected */
       assertEquals(6, tmp2.getTriggers().size());
-      String tmpNname = tmp2.getTriggers().get(0).getActionFilter().getClass().getName();
-      String dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      String tmpName = tmp2.getTriggers().get(0).getActionFilter().getClass().getName();
+      String dispName = tmpName.substring(tmpName.lastIndexOf(".") + 1);
       dispNames.add(dispName);
-      tmpNname = tmp2.getTriggers().get(1).getActionFilter().getClass().getName();
-      dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
-      dispNames.add(dispName);
-
-      tmpNname = tmp2.getTriggers().get(2).getActionFilter().getClass().getName();
-      dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      tmpName = tmp2.getTriggers().get(1).getActionFilter().getClass().getName();
+      dispName = tmpName.substring(tmpName.lastIndexOf(".") + 1);
       dispNames.add(dispName);
 
-      tmpNname = tmp2.getTriggers().get(3).getActionFilter().getClass().getName();
-      dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      tmpName = tmp2.getTriggers().get(2).getActionFilter().getClass().getName();
+      dispName = tmpName.substring(tmpName.lastIndexOf(".") + 1);
       dispNames.add(dispName);
-      tmpNname = tmp2.getTriggers().get(4).getActionFilter().getClass().getName();
-      dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+
+      tmpName = tmp2.getTriggers().get(3).getActionFilter().getClass().getName();
+      dispName = tmpName.substring(tmpName.lastIndexOf(".") + 1);
       dispNames.add(dispName);
-      tmpNname = tmp2.getTriggers().get(5).getActionFilter().getClass().getName();
-      dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      tmpName = tmp2.getTriggers().get(4).getActionFilter().getClass().getName();
+      dispName = tmpName.substring(tmpName.lastIndexOf(".") + 1);
+      dispNames.add(dispName);
+      tmpName = tmp2.getTriggers().get(5).getActionFilter().getClass().getName();
+      dispName = tmpName.substring(tmpName.lastIndexOf(".") + 1);
       dispNames.add(dispName);
     }
     assertEquals(6, dispNames.size());
@@ -1067,15 +1095,17 @@ public class BitBucketPPRHookJobDslExtensionTest {
     assertEquals("BitBucketPPRPullRequestServerDeclinedActionFilter", dispNames.get(5));
   }
 
-  @Ignore
+  @Disabled
   @Test
-  public void testDslServerAllPRAllowedBranchesWithApproveActionsPipeline() throws Exception {
+  void testDslServerAllPRAllowedBranchesWithApproveActionsPipeline() throws Exception {
     /* Create seed job which will process DSL */
-    createSeedJob(readDslScript("./dsl/testDslServerAllPRAllowedBranchesWithApproveActionsPipeline.groovy"));
+    createSeedJob(readDslScript(
+        "./dsl/testDslServerAllPRAllowedBranchesWithApproveActionsPipeline.groovy"));
     /* Fetch the newly created job and check its trigger configuration */
     WorkflowJob createdJob = (WorkflowJob) j.getInstance().getItem("test-job");
     /* Go through all triggers to validate DSL */
-    PipelineTriggersJobProperty pipelineTriggers = createdJob.getProperty(PipelineTriggersJobProperty.class);
+    PipelineTriggersJobProperty pipelineTriggers = createdJob.getProperty(
+        PipelineTriggersJobProperty.class);
     Map<TriggerDescriptor, Trigger<?>> triggers = pipelineTriggers.getTriggersMap();
     /* Only one 'triggers{}' closure */
     assertEquals(1, triggers.size());
@@ -1084,22 +1114,22 @@ public class BitBucketPPRHookJobDslExtensionTest {
       BitBucketPPRTrigger tmp2 = (BitBucketPPRTrigger) entry;
       /* Four different triggers expected */
       assertEquals(5, tmp2.getTriggers().size());
-      String tmpNname = tmp2.getTriggers().get(0).getActionFilter().getClass().getName();
-      String dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      String tmpName = tmp2.getTriggers().get(0).getActionFilter().getClass().getName();
+      String dispName = tmpName.substring(tmpName.lastIndexOf(".") + 1);
       dispNames.add(dispName);
-      tmpNname = tmp2.getTriggers().get(1).getActionFilter().getClass().getName();
-      dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
-      dispNames.add(dispName);
-
-      tmpNname = tmp2.getTriggers().get(2).getActionFilter().getClass().getName();
-      dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      tmpName = tmp2.getTriggers().get(1).getActionFilter().getClass().getName();
+      dispName = tmpName.substring(tmpName.lastIndexOf(".") + 1);
       dispNames.add(dispName);
 
-      tmpNname = tmp2.getTriggers().get(3).getActionFilter().getClass().getName();
-      dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      tmpName = tmp2.getTriggers().get(2).getActionFilter().getClass().getName();
+      dispName = tmpName.substring(tmpName.lastIndexOf(".") + 1);
       dispNames.add(dispName);
-      tmpNname = tmp2.getTriggers().get(4).getActionFilter().getClass().getName();
-      dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+
+      tmpName = tmp2.getTriggers().get(3).getActionFilter().getClass().getName();
+      dispName = tmpName.substring(tmpName.lastIndexOf(".") + 1);
+      dispNames.add(dispName);
+      tmpName = tmp2.getTriggers().get(4).getActionFilter().getClass().getName();
+      dispName = tmpName.substring(tmpName.lastIndexOf(".") + 1);
       dispNames.add(dispName);
     }
     assertEquals(5, dispNames.size());
@@ -1111,13 +1141,15 @@ public class BitBucketPPRHookJobDslExtensionTest {
   }
 
   @Test
-  public void testDslServerAllPRUnfilteredAndAllowedBranchesActionsPipeline() throws Exception {
+  void testDslServerAllPRUnfilteredAndAllowedBranchesActionsPipeline() throws Exception {
     /* Create seed job which will process DSL */
-    createSeedJob(readDslScript("./dsl/testDslServerAllPRUnfilteredAndAllowedBranchesActionsPipeline.groovy"));
+    createSeedJob(readDslScript(
+        "./dsl/testDslServerAllPRUnfilteredAndAllowedBranchesActionsPipeline.groovy"));
     /* Fetch the newly created job and check its trigger configuration */
     WorkflowJob createdJob = (WorkflowJob) j.getInstance().getItem("test-job");
     /* Go through all triggers to validate DSL */
-    PipelineTriggersJobProperty pipelineTriggers = createdJob.getProperty(PipelineTriggersJobProperty.class);
+    PipelineTriggersJobProperty pipelineTriggers = createdJob.getProperty(
+        PipelineTriggersJobProperty.class);
     Map<TriggerDescriptor, Trigger<?>> triggers = pipelineTriggers.getTriggersMap();
     /* Only one 'triggers{}' closure */
     assertEquals(1, triggers.size());
@@ -1126,38 +1158,38 @@ public class BitBucketPPRHookJobDslExtensionTest {
       BitBucketPPRTrigger tmp2 = (BitBucketPPRTrigger) entry;
       /* Eleven different triggers expected */
       assertEquals(11, tmp2.getTriggers().size());
-      String tmpNname = tmp2.getTriggers().get(0).getActionFilter().getClass().getName();
-      String dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      String tmpName = tmp2.getTriggers().get(0).getActionFilter().getClass().getName();
+      String dispName = tmpName.substring(tmpName.lastIndexOf(".") + 1);
       dispNames.add(dispName);
-      tmpNname = tmp2.getTriggers().get(1).getActionFilter().getClass().getName();
-      dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      tmpName = tmp2.getTriggers().get(1).getActionFilter().getClass().getName();
+      dispName = tmpName.substring(tmpName.lastIndexOf(".") + 1);
       dispNames.add(dispName);
-      tmpNname = tmp2.getTriggers().get(2).getActionFilter().getClass().getName();
-      dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      tmpName = tmp2.getTriggers().get(2).getActionFilter().getClass().getName();
+      dispName = tmpName.substring(tmpName.lastIndexOf(".") + 1);
       dispNames.add(dispName);
-      tmpNname = tmp2.getTriggers().get(3).getActionFilter().getClass().getName();
-      dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      tmpName = tmp2.getTriggers().get(3).getActionFilter().getClass().getName();
+      dispName = tmpName.substring(tmpName.lastIndexOf(".") + 1);
       dispNames.add(dispName);
-      tmpNname = tmp2.getTriggers().get(4).getActionFilter().getClass().getName();
-      dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      tmpName = tmp2.getTriggers().get(4).getActionFilter().getClass().getName();
+      dispName = tmpName.substring(tmpName.lastIndexOf(".") + 1);
       dispNames.add(dispName);
-      tmpNname = tmp2.getTriggers().get(5).getActionFilter().getClass().getName();
-      dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      tmpName = tmp2.getTriggers().get(5).getActionFilter().getClass().getName();
+      dispName = tmpName.substring(tmpName.lastIndexOf(".") + 1);
       dispNames.add(dispName);
-      tmpNname = tmp2.getTriggers().get(6).getActionFilter().getClass().getName();
-      dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      tmpName = tmp2.getTriggers().get(6).getActionFilter().getClass().getName();
+      dispName = tmpName.substring(tmpName.lastIndexOf(".") + 1);
       dispNames.add(dispName);
-      tmpNname = tmp2.getTriggers().get(7).getActionFilter().getClass().getName();
-      dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      tmpName = tmp2.getTriggers().get(7).getActionFilter().getClass().getName();
+      dispName = tmpName.substring(tmpName.lastIndexOf(".") + 1);
       dispNames.add(dispName);
-      tmpNname = tmp2.getTriggers().get(8).getActionFilter().getClass().getName();
-      dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      tmpName = tmp2.getTriggers().get(8).getActionFilter().getClass().getName();
+      dispName = tmpName.substring(tmpName.lastIndexOf(".") + 1);
       dispNames.add(dispName);
-      tmpNname = tmp2.getTriggers().get(9).getActionFilter().getClass().getName();
-      dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      tmpName = tmp2.getTriggers().get(9).getActionFilter().getClass().getName();
+      dispName = tmpName.substring(tmpName.lastIndexOf(".") + 1);
       dispNames.add(dispName);
-      tmpNname = tmp2.getTriggers().get(10).getActionFilter().getClass().getName();
-      dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      tmpName = tmp2.getTriggers().get(10).getActionFilter().getClass().getName();
+      dispName = tmpName.substring(tmpName.lastIndexOf(".") + 1);
       dispNames.add(dispName);
     }
     assertEquals(11, dispNames.size());
@@ -1174,15 +1206,18 @@ public class BitBucketPPRHookJobDslExtensionTest {
     assertEquals("BitBucketPPRPullRequestServerDeclinedActionFilter", dispNames.get(10));
   }
 
-  @Ignore
+  @Disabled
   @Test
-  public void testDslTriggerCreateUpdatedMergedApprovedPRAllowBranchesWithApproveActionsPipeline() throws Exception {
+  void testDslTriggerCreateUpdatedMergedApprovedPRAllowBranchesWithApproveActionsPipeline()
+      throws Exception {
     /* Create seed job which will process DSL */
-    createSeedJob(readDslScript("./dsl/testDslTriggerCreateUpdatedMergedApprovedPRAllowBranchesWithApproveActionsPipeline.groovy"));
+    createSeedJob(readDslScript(
+        "./dsl/testDslTriggerCreateUpdatedMergedApprovedPRAllowBranchesWithApproveActionsPipeline.groovy"));
     /* Fetch the newly created job and check its trigger configuration */
     WorkflowJob createdJob = (WorkflowJob) j.getInstance().getItem("test-job");
     /* Go through all triggers to validate DSL */
-    PipelineTriggersJobProperty pipelineTriggers = createdJob.getProperty(PipelineTriggersJobProperty.class);
+    PipelineTriggersJobProperty pipelineTriggers = createdJob.getProperty(
+        PipelineTriggersJobProperty.class);
     Map<TriggerDescriptor, Trigger<?>> triggers = pipelineTriggers.getTriggersMap();
     /* Only one 'triggers{}' closure */
     assertEquals(1, triggers.size());
@@ -1191,17 +1226,17 @@ public class BitBucketPPRHookJobDslExtensionTest {
       BitBucketPPRTrigger tmp2 = (BitBucketPPRTrigger) entry;
       /* Three different triggers expected */
       assertEquals(4, tmp2.getTriggers().size());
-      String tmpNname = tmp2.getTriggers().get(0).getActionFilter().getClass().getName();
-      String dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      String tmpName = tmp2.getTriggers().get(0).getActionFilter().getClass().getName();
+      String dispName = tmpName.substring(tmpName.lastIndexOf(".") + 1);
       dispNames.add(dispName);
-      tmpNname = tmp2.getTriggers().get(1).getActionFilter().getClass().getName();
-      dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      tmpName = tmp2.getTriggers().get(1).getActionFilter().getClass().getName();
+      dispName = tmpName.substring(tmpName.lastIndexOf(".") + 1);
       dispNames.add(dispName);
-      tmpNname = tmp2.getTriggers().get(2).getActionFilter().getClass().getName();
-      dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      tmpName = tmp2.getTriggers().get(2).getActionFilter().getClass().getName();
+      dispName = tmpName.substring(tmpName.lastIndexOf(".") + 1);
       dispNames.add(dispName);
-      tmpNname = tmp2.getTriggers().get(3).getActionFilter().getClass().getName();
-      dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      tmpName = tmp2.getTriggers().get(3).getActionFilter().getClass().getName();
+      dispName = tmpName.substring(tmpName.lastIndexOf(".") + 1);
       dispNames.add(dispName);
     }
     assertEquals(4, dispNames.size());
@@ -1212,38 +1247,40 @@ public class BitBucketPPRHookJobDslExtensionTest {
   }
 
   @Test
-  public void testDslTriggerDeclinedPRAllowBranchesPipeline() throws Exception {
+  void testDslTriggerDeclinedPRAllowBranchesPipeline() throws Exception {
     /* Create seed job which will process DSL */
     createSeedJob(readDslScript("./dsl/testDslTriggerDeclinedPRAllowBranchesPipeline.groovy"));
     /* Fetch the newly created job and check its trigger configuration */
     WorkflowJob createdJob = (WorkflowJob) j.getInstance().getItem("test-job");
     /* Go through all triggers to validate DSL */
-    PipelineTriggersJobProperty pipelineTriggers = createdJob.getProperty(PipelineTriggersJobProperty.class);
+    PipelineTriggersJobProperty pipelineTriggers = createdJob.getProperty(
+        PipelineTriggersJobProperty.class);
     Map<TriggerDescriptor, Trigger<?>> triggers = pipelineTriggers.getTriggersMap();
     /* Only one 'triggers{}' closure */
     assertEquals(1, triggers.size());
-    List<String> dispNames = new ArrayList<>();
     for (Trigger<?> entry : triggers.values()) {
       BitBucketPPRTrigger tmp2 = (BitBucketPPRTrigger) entry;
       /* One triggers expected */
       assertEquals(1, tmp2.getTriggers().size());
-      String tmpNname = tmp2.getTriggers().get(0).getActionFilter().getClass().getName();
-      String dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      String tmpName = tmp2.getTriggers().get(0).getActionFilter().getClass().getName();
+      String dispName = tmpName.substring(tmpName.lastIndexOf(".") + 1);
       assertEquals("BitBucketPPRPullRequestDeclinedActionFilter", dispName);
 
-      BitBucketPPRPullRequestDeclinedActionFilter actionFilter = (BitBucketPPRPullRequestDeclinedActionFilter) tmp2.getTriggers().get(0).getActionFilter();
+      BitBucketPPRPullRequestDeclinedActionFilter actionFilter = (BitBucketPPRPullRequestDeclinedActionFilter) tmp2.getTriggers()
+          .get(0).getActionFilter();
       assertEquals("**", actionFilter.allowedBranches);
     }
   }
 
   @Test
-  public void testDslTriggerPushActionPipeline() throws Exception {
+  void testDslTriggerPushActionPipeline() throws Exception {
     /* Create seed job which will process DSL */
     createSeedJob(readDslScript("./dsl/testDslTriggerPushActionPipeline.groovy"));
     /* Fetch the newly created job and check its trigger configuration */
     WorkflowJob createdJob = (WorkflowJob) j.getInstance().getItem("test-job");
     /* Go through all triggers to validate DSL */
-    PipelineTriggersJobProperty pipelineTriggers = createdJob.getProperty(PipelineTriggersJobProperty.class);
+    PipelineTriggersJobProperty pipelineTriggers = createdJob.getProperty(
+        PipelineTriggersJobProperty.class);
     Map<TriggerDescriptor, Trigger<?>> triggers = pipelineTriggers.getTriggersMap();
     assertEquals(1, triggers.size());
     List<String> dispNames = new ArrayList<>();
@@ -1251,11 +1288,12 @@ public class BitBucketPPRHookJobDslExtensionTest {
     for (Trigger<?> entry : triggers.values()) {
       BitBucketPPRTrigger tmp2 = (BitBucketPPRTrigger) entry;
       assertEquals(1, tmp2.getTriggers().size());
-      String tmpNname = tmp2.getTriggers().get(0).getActionFilter().getClass().getName();
-      String dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      String tmpName = tmp2.getTriggers().get(0).getActionFilter().getClass().getName();
+      String dispName = tmpName.substring(tmpName.lastIndexOf(".") + 1);
       dispNames.add(dispName);
 
-      BitBucketPPRRepositoryPushActionFilter tmp3 = (BitBucketPPRRepositoryPushActionFilter) tmp2.getTriggers().get(0)
+      BitBucketPPRRepositoryPushActionFilter tmp3 = (BitBucketPPRRepositoryPushActionFilter) tmp2.getTriggers()
+          .get(0)
           .getActionFilter();
       isToApprove = tmp3.shouldSendApprove();
     }
@@ -1265,7 +1303,7 @@ public class BitBucketPPRHookJobDslExtensionTest {
   }
 
   @Test
-  public void testDslMultipleJobsInSeedVarious() throws Exception {
+  void testDslMultipleJobsInSeedVarious() throws Exception {
     /* Create seed job which will process DSL */
     createSeedJob(readDslScript("./dsl/testDslMultipleJobsInSeedVarious.groovy"));
     /* Fetch the newly created job and check its trigger configuration */
@@ -1279,8 +1317,8 @@ public class BitBucketPPRHookJobDslExtensionTest {
     for (Trigger<?> entry : triggers.values()) {
       BitBucketPPRTrigger tmp2 = (BitBucketPPRTrigger) entry;
       assertEquals(1, tmp2.getTriggers().size());
-      String tmpNname = tmp2.getTriggers().get(0).getActionFilter().getClass().getName();
-      String dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      String tmpName = tmp2.getTriggers().get(0).getActionFilter().getClass().getName();
+      String dispName = tmpName.substring(tmpName.lastIndexOf(".") + 1);
       dispNames.add(dispName);
     }
     assertEquals(1, dispNames.size());
@@ -1295,8 +1333,8 @@ public class BitBucketPPRHookJobDslExtensionTest {
     for (Trigger<?> entry : triggers.values()) {
       BitBucketPPRTrigger tmp2 = (BitBucketPPRTrigger) entry;
       assertEquals(1, tmp2.getTriggers().size());
-      String tmpNname = tmp2.getTriggers().get(0).getActionFilter().getClass().getName();
-      String dispName = tmpNname.substring(tmpNname.lastIndexOf(".") + 1);
+      String tmpName = tmp2.getTriggers().get(0).getActionFilter().getClass().getName();
+      String dispName = tmpName.substring(tmpName.lastIndexOf(".") + 1);
       dispNames.add(dispName);
     }
     assertEquals(1, dispNames.size());
@@ -1305,7 +1343,8 @@ public class BitBucketPPRHookJobDslExtensionTest {
     /* Verify third job content */
     createdPipelineJob = (WorkflowJob) j.getInstance().getItem("test-job3");
     /* Go through all triggers to validate DSL */
-    pipelineTriggers = createdPipelineJob.getProperty(PipelineTriggersJobProperty.class);
+    pipelineTriggers = createdPipelineJob.getProperty(
+        PipelineTriggersJobProperty.class);
     triggers = pipelineTriggers.getTriggersMap();
     assertEquals(1, triggers.size());
     dispNames.clear();

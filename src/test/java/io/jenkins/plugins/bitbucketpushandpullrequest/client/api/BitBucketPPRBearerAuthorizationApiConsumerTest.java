@@ -1,24 +1,23 @@
 package io.jenkins.plugins.bitbucketpushandpullrequest.client.api;
 
-
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
+
+import com.github.scribejava.core.model.Verb;
 import org.apache.http.HttpResponse;
 import org.jenkinsci.plugins.plaincredentials.StringCredentials;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.github.scribejava.core.model.Verb;
-
 @ExtendWith(MockitoExtension.class)
-public class BitBucketPPRBearerAuthorizationApiConsumerTest {
+class BitBucketPPRBearerAuthorizationApiConsumerTest {
 
-  @Ignore
+  @Disabled
   @Test
-  public void testSend() throws Exception {
+  void testSend() throws Exception {
     StringCredentials credentials = Mockito.mock(StringCredentials.class, RETURNS_DEEP_STUBS);
     Mockito.when(credentials.getSecret().getPlainText()).thenReturn("");
 

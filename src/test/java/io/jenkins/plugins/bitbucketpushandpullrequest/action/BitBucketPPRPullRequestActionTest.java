@@ -1,19 +1,21 @@
 package io.jenkins.plugins.bitbucketpushandpullrequest.action;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import io.jenkins.plugins.bitbucketpushandpullrequest.config.BitBucketPPRPluginConfig;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRHookEvent;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.*;
-
-public class BitBucketPPRPullRequestActionTest {
+class BitBucketPPRPullRequestActionTest {
 
   @Test
-  public void testGetMergeCommit() {
+  void testGetMergeCommit() {
     try (MockedStatic<BitBucketPPRPluginConfig> config =
         Mockito.mockStatic(BitBucketPPRPluginConfig.class)) {
       BitBucketPPRPluginConfig c = mock(BitBucketPPRPluginConfig.class);
@@ -24,7 +26,8 @@ public class BitBucketPPRPullRequestActionTest {
       when(payloadMock.getPullRequest().getMergeCommit().getHash()).thenReturn("123456");
       BitBucketPPRHookEvent event = mock(BitBucketPPRHookEvent.class);
       when(event.getAction()).thenReturn("fulfilled");
-      BitBucketPPRPullRequestAction action = new BitBucketPPRPullRequestAction(payloadMock, event);
+      BitBucketPPRPullRequestAction action = new BitBucketPPRPullRequestAction(payloadMock,
+          event);
       assertEquals("123456", action.getLatestCommit());
     }
   }
