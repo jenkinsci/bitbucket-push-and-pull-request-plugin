@@ -49,6 +49,8 @@ import jenkins.model.ParameterizedJobMixIn;
 import jenkins.triggers.SCMTriggerItem;
 import org.eclipse.jgit.transport.URIish;
 import org.jenkinsci.plugins.workflow.multibranch.WorkflowMultiBranchProject;
+import jenkins.branch.BranchSource;
+import jenkins.scm.api.SCMSource;
 
 import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst.*;
 
@@ -252,23 +254,44 @@ public class BitBucketPPRJobProbe {
       String pipelineName = job.getParent().getFullName();
       String getPayldChgType = bitbucketAction.getPayloadChangeType();
 
-      logger.log(Level.INFO,
-              "Pipeline Name : {0}, To Hash : {1}, From Hash : {2}, Payload Change Type : {3}",
-              new String[] {pipelineName, getLatestCommit, getLatestFromCommit, getPayldChgType});
-
       if ((getLatestFromCommit.equals(EMPTY_HASH) && PAYLOAD_CHANGE_TYPE_ADD.equals(getPayldChgType)) ||
           (getLatestCommit.equals(EMPTY_HASH) && PAYLOAD_CHANGE_TYPE_DELETE.equals(getPayldChgType))) {
 
           Jenkins jenkins = Jenkins.get();
 
-          WorkflowMultiBranchProject mbp = (WorkflowMultiBranchProject) jenkins.getItemByFullName(pipelineName);
+          WorkflowMultiBranchProject mbp = jenkins.getInstance().getItemByFullName(pipelineName, WorkflowMultiBranchProject.class);
 
           if (mbp != null) {
-              mbp.scheduleBuild2(0);
+            for (BranchSource bs : mbp.getSourcesList()) {
+              SCMSource src = bs.getSource();
+              String getOPT1CloneUrl = bitbucketAction.getOPT1CloneUrl();
+              String getOPT2CloneUrl = bitbucketAction.getOPT2CloneUrl();
 
-              logger.log(Level.INFO,
+              logger.log(Level.FINEST,
+                      "Source Type: {0}",
+                      new String[] { src.getDescriptor().getDisplayName() });
+
+              if (src instanceof jenkins.plugins.git.GitSCMSource) {
+                jenkins.plugins.git.GitSCMSource git = (jenkins.plugins.git.GitSCMSource) src;
+                String gitRemote = git.getRemote();
+
+                logger.log(Level.FINEST,
+                      "Branch Source URL: {0}",
+                      new String[] { gitRemote });
+
+                if (gitRemote.equals(getOPT1CloneUrl) || gitRemote.equals(getOPT2CloneUrl)) {
+                  logger.log(Level.FINEST,
+                          "Branch Source URL: {0}, getOPT1CloneUrl: {1}, getOPT2CloneUrl: {2}",
+                          new String[] { gitRemote, getOPT1CloneUrl, getOPT2CloneUrl });
+
+                  mbp.scheduleBuild2(0);
+
+                  logger.log(Level.INFO,
                       "Triggered branch indexing for: {0}",
                       new String[] { pipelineName });
+                }
+              }
+            }
           } else {
               logger.log(Level.WARNING,
                       "Multibranch job not found: {0}",
