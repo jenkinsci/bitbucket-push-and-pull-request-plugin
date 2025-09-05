@@ -206,4 +206,14 @@ public class BitBucketPPRServerRepositoryAction extends BitBucketPPRActionAbstra
       }
       return null;
   }
+
+  @Override
+  public String getOPT1CloneUrl() {
+    return payload.getServerRepository().getLinks().getCloneProperty().get(0).getHref();
+  }
+
+  @Override
+  public String getOPT2CloneUrl() {
+    return payload.getServerRepository().getLinks().getCloneProperty().get(1).getHref();
+  }
 }
