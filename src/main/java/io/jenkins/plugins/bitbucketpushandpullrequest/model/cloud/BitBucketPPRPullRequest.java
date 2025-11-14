@@ -34,6 +34,7 @@ public class BitBucketPPRPullRequest implements Serializable {
   private String title;
   private String description;
   private String state;
+  private Boolean draft = false;
   private BitBucketPPRActor author;
   private @SerializedName("created_on") Date createdOn;
   private @SerializedName("updated_on") Date updatedOn;
@@ -76,6 +77,9 @@ public class BitBucketPPRPullRequest implements Serializable {
   public void setState(final String state) {
     this.state = state;
   }
+
+  public Boolean getDraft() { return draft; }
+  public void setDraft(final Boolean draft) { this.draft = draft; }
 
   public BitBucketPPRCommit getMergeCommit() {
     return mergeCommit;
@@ -167,6 +171,8 @@ public class BitBucketPPRPullRequest implements Serializable {
         + description
         + ", state="
         + state
+        + ", draft="
+        + draft
         + ", author="
         + author
         + ", createdOn="

@@ -67,6 +67,7 @@ public class BitBucketPPREnvironmentContributor extends EnvironmentContributor {
       "BITBUCKET_PULL_REQUEST_LATEST_COMMIT_FROM_SOURCE_BRANCH";
   static final String BITBUCKET_PULL_REQUEST_LATEST_COMMIT_FROM_TARGET_BRANCH =
       "BITBUCKET_PULL_REQUEST_LATEST_COMMIT_FROM_TARGET_BRANCH";
+  static final String BITBUCKET_PULL_REQUEST_IS_DRAFT = "BITBUCKET_PULL_REQUEST_IS_DRAFT";
 
   static final Logger logger = Logger.getLogger(BitBucketPPREnvironmentContributor.class.getName());
 
@@ -186,6 +187,9 @@ public class BitBucketPPREnvironmentContributor extends EnvironmentContributor {
 
     String pullRequestId = action.getPullRequestId();
     putEnvVar(envVars, BITBUCKET_PULL_REQUEST_ID, pullRequestId);
+
+    Boolean isPullRequestDraft = action.getPayload().getPullRequest().getDraft();
+    putEnvVar(envVars, BITBUCKET_PULL_REQUEST_IS_DRAFT, isPullRequestDraft ? "true" : "false");
 
     String actor = action.getUser();
     putEnvVar(envVars, BITBUCKET_ACTOR, actor);
