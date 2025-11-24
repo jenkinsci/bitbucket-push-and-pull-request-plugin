@@ -242,6 +242,7 @@ Talking generally, there are two filters used to 'control the branches':
 | BITBUCKET_PULL_REQUEST_COMMENT_TEXT                     | Comment of BB Cloud Pull Request        | PR     | C + S   |                              |
 | BITBUCKET_PULL_REQUEST_LATEST_COMMIT_FROM_SOURCE_BRANCH | Latest commit hash on the source branch | PR     | C + S   |                              |
 | BITBUCKET_PULL_REQUEST_LATEST_COMMIT_FROM_TARGET_BRANCH | Latest commit hash on the target branch | PR     | C + S   |                              |
+| BITBUCKET_PULL_REQUEST_IS_DRAFT                         | "true" if PR is draft, "false" otherwise| PR     | C       | Since 3.3.0                  |
 | BITBUCKET_REPOSITORY_UUID                               | Repository identifier                   | P      | C       |                              |
 | BITBUCKET_REPOSITORY_ID                                 | Repository identifier                   | P      | S       |                              |
 | BITBUCKET_REPOSITORY_URL                                | Repository URL                          | PR     | C       |                              |
@@ -1214,6 +1215,7 @@ pipeline {
                 echo "BITBUCKET_TARGET_BRANCH ${env.BITBUCKET_TARGET_BRANCH}"
                 echo "BITBUCKET_PULL_REQUEST_LINK ${env.BITBUCKET_PULL_REQUEST_LINK}"
                 echo "BITBUCKET_PULL_REQUEST_ID ${env.BITBUCKET_PULL_REQUEST_ID}"
+                echo "BITBUCKET_PULL_REQUEST_IS_DRAFT ${env.BITBUCKET_PULL_REQUEST_IS_DRAFT}"
                 echo "BITBUCKET_PAYLOAD ${env.BITBUCKET_PAYLOAD}"
 
                 echo 'Env vars for cloud push...'
@@ -1229,6 +1231,76 @@ pipeline {
                 echo "BITBUCKET_REPOSITORY_URL ${env.BITBUCKET_REPOSITORY_URL}"
                 echo "BITBUCKET_PUSH_REPOSITORY_UUID ${env.BITBUCKET_PUSH_REPOSITORY_UUID}"
                 echo "BITBUCKET_PAYLOAD ${env.BITBUCKET_PAYLOAD}"
+            }
+        }
+    }
+}
+```
+
+## Example: Skip builds for draft pull requests (Bitbucket Cloud)
+
+Since version 3.3.0, you can detect and skip builds for draft pull requests using the `BITBUCKET_PULL_REQUEST_IS_DRAFT` environment variable:
+
+```groovy
+pipeline {
+    agent any
+
+    stages {
+        stage('Check if Draft') {
+            when {
+                environment name: 'BITBUCKET_PULL_REQUEST_IS_DRAFT', value: 'true'
+            }
+            steps {
+                echo 'Skipping build for draft PR'
+                script {
+                    currentBuild.result = 'NOT_BUILT'
+                    error('Draft PRs are not built')
+                }
+            }
+        }
+
+        stage('Build') {
+            when {
+                environment name: 'BITBUCKET_PULL_REQUEST_IS_DRAFT', value: 'false'
+            }
+            steps {
+                echo 'Building non-draft PR...'
+                // Your build steps here
+            }
+        }
+
+        stage('Test') {
+            when {
+                environment name: 'BITBUCKET_PULL_REQUEST_IS_DRAFT', value: 'false'
+            }
+            steps {
+                echo 'Running tests...'
+                // Your test steps here
+            }
+        }
+    }
+}
+```
+
+Or simply skip the entire pipeline at the beginning:
+
+```groovy
+pipeline {
+    agent any
+
+    stages {
+        stage('Build') {
+            steps {
+                script {
+                    if (env.BITBUCKET_PULL_REQUEST_IS_DRAFT == 'true') {
+                        echo 'Skipping build for draft PR'
+                        currentBuild.result = 'NOT_BUILT'
+                        return
+                    }
+
+                    echo 'Building...'
+                    // Your build steps here
+                }
             }
         }
     }

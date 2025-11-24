@@ -48,3 +48,4 @@ node_modules/*
 /.sts4-cache/
 .checkstyle
 .aider*
+.claude

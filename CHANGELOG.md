@@ -1,5 +1,28 @@
 # Change Log
 
+## 3.3.0 (2025-11-24)
+
+### What's Changed
+
+**New Features:**
+* **Draft Pull Request Support** - Add ability to detect if a Pull Request is Draft (Bitbucket Cloud only) by @nazzer23 in https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/pull/367
+  - New environment variable: `BITBUCKET_PULL_REQUEST_IS_DRAFT`
+  - Returns `"true"` or `"false"` (defaults to `false` if not provided by Bitbucket)
+  - Allows filtering/skipping builds for draft PRs in pipeline scripts
+
+**Internal Improvements:**
+* Migrate tests from JUnit4 to JUnit5 by @strangelookingnerd in https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/pull/369
+* Fix build issue in pom.xml by @s78258819-svg in https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/pull/371
+
+### Compatibility
+* Jenkins version: >= **2.440.3** (unchanged)
+* Java version: **17**
+
+### New Contributors
+* @nazzer23 made their first contribution in https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/pull/367
+
+**Full Changelog**: https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/compare/bitbucket-push-and-pull-request-3.1.4...bitbucket-push-and-pull-request-3.3.0
+
 ## 3.1.4 (2024-10-29)
 
 ### Closed Issues
