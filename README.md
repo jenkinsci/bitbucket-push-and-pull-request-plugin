@@ -33,6 +33,11 @@
 
 # Compatibility
 
+**Starting from version 3.3.0** the Plugin is compatible with:
+
+- Jenkins version: >= **2.440.3**
+- Java version: **17**
+
 **Starting from version 3.2.0** the Plugin is compatible with:
 
 - Jenkins version: >= **2.401.3**
@@ -50,7 +55,7 @@ The version 2.x.x of the Plugin is compatible with:
 
 # Introduction
 
-Plugin for Jenkins **v2.361.4 or later**, that triggers builds on Bitbucket's push and pull requests events.
+Plugin for Jenkins **v2.440.3 or later**, that triggers builds on Bitbucket's push and pull requests events.
 
 Some of the features introduced by Bitbucket Push and Pull Request are:
 
@@ -74,10 +79,15 @@ The version 2.x.x of the Plugin is compatible with:
 - Jenkins >= v2.138.2
 - Java 8
 
-Otherwise, The version 3.x.x of the Plugin compatible with:
+The version 3.0.0 - 3.2.x of the Plugin is compatible with:
 
 - Jenkins version: >= 2.361.4
 - Java version: 11
+
+Starting from version 3.3.0, the Plugin requires:
+
+- Jenkins version: >= 2.440.3
+- Java version: 17
 
 Bitbucket Push And Pull Request Plugin will not work if the old Bitbucket plugin <https://plugins.jenkins.io/bitbucket>
 is still installed. So, please de-install from Jenkins the previous Bitbucket plugin if you want to use this new one.

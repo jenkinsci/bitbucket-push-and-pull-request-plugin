@@ -7,7 +7,7 @@
 [![Jenkins Plugin Installs](https://img.shields.io/jenkins/plugin/i/bitbucket-push-and-pull-request.svg?color=blue)](https://plugins.jenkins.io/bitbucket-push-and-pull-request)
 [![Gitter](https://badges.gitter.im/jenkinsci/bitbucket-push-and-pull-request-plugin.svg)](https://gitter.im/jenkinsci/bitbucket-push-and-pull-request-plugin)
 
-<img src="./img/logo-head.svg" width="192">
+<img src="./img/logo-head.svg" width="192" alt="jenkins logo">
 
 - [Bitbucket Push and Pull Request Plugin](#bitbucket-push-and-pull-request-plugin)
 - [Introduction](#introduction)
@@ -33,7 +33,17 @@
 
 # Compatibility
 
-**Starting from version 3.x.x** the Plugin is compatible with:
+**Starting from version 3.3.0** the Plugin is compatible with:
+
+- Jenkins version: >= **2.440.3**
+- Java version: **17**
+
+**Starting from version 3.2.0** the Plugin is compatible with:
+
+- Jenkins version: >= **2.401.3**
+- Java version: **11**
+
+**Starting from version 3.0.0** the Plugin is compatible with:
 
 - Jenkins version: >= **2.361.4**
 - Java version: **11**
@@ -45,15 +55,15 @@ The version 2.x.x of the Plugin is compatible with:
 
 # Introduction
 
-Plugin for Jenkins **v2.361.4 or later**, that triggers builds on Bitbucket's push and pull requests events.
+Plugin for Jenkins **v2.440.3 or later**, that triggers builds on Bitbucket's push and pull requests events.
 
 Some of the features introduced by Bitbucket Push and Pull Request are:
 
 - build state notification
 - support of pull requests for Bitbucket cloud (rest api v2.x+ with mercurial and git) and bitbucket Server (from
-  version 5.14 to version 7.21)
+  version 5.14 to version 7.21 - with git)
 - support of pushs for Bitbucket cloud (rest api v2.x+ with mercurial and git) and Bitbucket server (from version 5.14
-  to version 7.21)
+  to version 7.21 - with git)
 - usage of Gson instead of net.sf.json.JSONObject
 - Introduction of models and major security improvements
 
@@ -69,10 +79,15 @@ The version 2.x.x of the Plugin is compatible with:
 - Jenkins >= v2.138.2
 - Java 8
 
-Otherwise, The version 3.x.x of the Plugin compatible with:
+The version 3.0.0 - 3.2.x of the Plugin is compatible with:
 
 - Jenkins version: >= 2.361.4
 - Java version: 11
+
+Starting from version 3.3.0, the Plugin requires:
+
+- Jenkins version: >= 2.440.3
+- Java version: 17
 
 Bitbucket Push And Pull Request Plugin will not work if the old Bitbucket plugin <https://plugins.jenkins.io/bitbucket>
 is still installed. So, please de-install from Jenkins the previous Bitbucket plugin if you want to use this new one.
@@ -144,11 +159,11 @@ in the __Jenkins Global Configurations__:
 
 ### Authentication for state notification and generally when using the Bitbucket REST API
 
- TYPE                | BB CLOUD | BB SERVER | JENKINS CREDENTIALS    | NOTES                                                                                                              
----------------------|:---------|:----------|:-----------------------|--------------------------------------------------------------------------------------------------------------------
- Username & Password | X        | X         | Username with password | deprecated by bbc, will be removed in march 2022                                                                   
- HTTP access token   | -        | X         | Secret Text            | [learn more about HTTP tokens](https://confluence.atlassian.com/bitbucketserver/http-access-tokens-939515499.html) 
- OAuth consumers     | X        | -         | Secret Text            | [Oauth configuration](./oauth_config.md)                                                                           
+| TYPE                | BB CLOUD | BB SERVER | JENKINS CREDENTIALS    | NOTES                                                                                                              |
+|---------------------|:---------|:----------|:-----------------------|--------------------------------------------------------------------------------------------------------------------|
+| Username & Password | X        | X         | Username with password | deprecated by bbc, will be removed in march 2022                                                                   |
+| HTTP access token   | -        | X         | Secret Text            | [learn more about HTTP tokens](https://confluence.atlassian.com/bitbucketserver/http-access-tokens-939515499.html) |
+| OAuth consumers     | X        | -         | Secret Text            | [Oauth Consumers example config](./docs/oauth_config.md)                                                           |
 
 1. you can set globally the credentials used by the plugin for the state notification
 2. you can set for each job the credentials used by the plugin for the state notification, overwriting the global
@@ -157,16 +172,22 @@ in the __Jenkins Global Configurations__:
 
 ## Bitbucket Events supported by the plugin
 
- FILTER                | BB CLOUD | BB SERVER | NOTES                                                                                                                                           
------------------------|:---------|:----------|-------------------------------------------------------------------------------------------------------------------------------------------------
- Pull Request Created  | X        | X         |
- Pull Request Updated  | X        | X         |
- Pull Request Declined | X        | X         |
- Pull Request Merged   | X        | X         |
- Push                  | X        | X         |
- Comment Created       | X        | X         |
- Comment Updated       | X        | -         | If a user updates the same comment with not much time in between, Bitbucket only sends the event request the first time the comment is updated. 
- Comment Deleted       | X        | -         |
+| FILTER                | BB CLOUD | BB SERVER | NOTES                                                                                                                                           |
+|-----------------------|:---------|:----------|-------------------------------------------------------------------------------------------------------------------------------------------------|
+| Pull Request Created  | X        | X         |                                                                                                                                                 |
+| Pull Request Updated  | X        | X         |                                                                                                                                                 |
+| Pull Request Declined | X        | X         |                                                                                                                                                 |
+| Pull Request Merged   | X        | X         |                                                                                                                                                 |
+| Push                  | X        | X         |                                                                                                                                                 |
+| Comment Created       | X        | X         |                                                                                                                                                 |
+| Comment Updated       | X        | -         | If a user updates the same comment with not much time in between, Bitbucket only sends the event request the first time the comment is updated. |
+| Comment Deleted       | X        | -         |                                                                                                                                                 |
+
+### Interaction with the git plugin
+
+This plugin forwards events from Bitbucket to the Git plugin, which manages all Git-related operations such as cloning,
+checking out, and fetching repositories. By delegating Git tasks to the Git plugin, this plugin focuses solely on
+handling Bitbucket events and trigger logic.
 
 ### Some examples
 
@@ -174,12 +195,6 @@ in the __Jenkins Global Configurations__:
 ![example config jenkins bb ppr 2](./img/example_config_jenkins_bb_ppr_2.png)
 ![example config jenkins bb ppr 3](./img/example_config_jenkins_bb_ppr_3.png)
 ![example config jenkins bb ppr 4](./img/example_config_jenkins_bb_ppr_4.png)
-
-### Interaction with the git plugin
-
-This plugin forwards events from Bitbucket to the Git plugin, which manages all Git-related operations such as cloning,
-checking out, and fetching repositories. By delegating Git tasks to the Git plugin, this plugin focuses solely on
-handling Bitbucket events and trigger logic.
 
 # Troubleshooting: Some important aspects to keep in mind
 
@@ -223,25 +238,26 @@ Talking generally, there are two filters used to 'control the branches':
 
 # Environment variables
 
- NAME                                                    | VALUE                                   | SCOPE  | BB TYPE | NOTES                        
----------------------------------------------------------|:----------------------------------------|:-------|:--------|------------------------------
- BITBUCKET_TARGET_BRANCH                                 | target branch                           | PR + P | C + S   |
- BITBUCKET_ACTOR                                         | actor name                              | PR + P | C + S   |
- BITBUCKET_PAYLOAD                                       | Complete payload as json string         | PR + P | C + S   |
- BITBUCKET_X_EVENT                                       | x-event which triggered the plugin      | PR + P | C + S   |
- BITBUCKET_SOURCE_BRANCH                                 | source branch                           | PR     | C + S   |
- BITBUCKET_PULL_REQUEST_TITLE                            | PR title                                | PR     | C + S   |
- BITBUCKET_PULL_REQUEST_ID                               | id                                      | PR     | C + S   |
- BITBUCKET_PULL_REQUEST_LINK                             | link                                    | PR     | C + S   |
- BITBUCKET_PULL_REQUEST_DESCRIPTION                      | PR description                          | PR     | C + S   |
- BITBUCKET_PULL_REQUEST_COMMENT_TEXT                     | Comment of BB Cloud Pull Request        | PR     | C + S   |
- BITBUCKET_PULL_REQUEST_LATEST_COMMIT_FROM_SOURCE_BRANCH | Latest commit hash on the source branch | PR     | C + S   |
- BITBUCKET_PULL_REQUEST_LATEST_COMMIT_FROM_TARGET_BRANCH | Latest commit hash on the target branch | PR     | C + S   |
- BITBUCKET_REPOSITORY_UUID                               | Repository identifier                   | P      | C       |
- BITBUCKET_REPOSITORY_ID                                 | Repository identifier                   | P      | S       |
- BITBUCKET_REPOSITORY_URL                                | Repository URL                          | PR     | C       |
- REPOSITORY_LINK                                         | Repository link                         | P      | C       | Deprecated: to remove in 2.6 
- REPOSITORY_NAME                                         | Repository name                         | P      | S       | Deprecated: to remove in 2.6 
+| NAME                                                    | VALUE                                   | SCOPE  | BB TYPE | NOTES                        |
+|---------------------------------------------------------|:----------------------------------------|:-------|:--------|------------------------------|
+| BITBUCKET_TARGET_BRANCH                                 | target branch                           | PR + P | C + S   |                              |
+| BITBUCKET_ACTOR                                         | actor name                              | PR + P | C + S   |                              |
+| BITBUCKET_PAYLOAD                                       | Complete payload as json string         | PR + P | C + S   |                              |
+| BITBUCKET_X_EVENT                                       | x-event which triggered the plugin      | PR + P | C + S   |                              |
+| BITBUCKET_SOURCE_BRANCH                                 | source branch                           | PR     | C + S   |                              |
+| BITBUCKET_PULL_REQUEST_TITLE                            | PR title                                | PR     | C + S   |                              |
+| BITBUCKET_PULL_REQUEST_ID                               | id                                      | PR     | C + S   |                              |
+| BITBUCKET_PULL_REQUEST_LINK                             | link                                    | PR     | C + S   |                              |
+| BITBUCKET_PULL_REQUEST_DESCRIPTION                      | PR description                          | PR     | C + S   |                              |
+| BITBUCKET_PULL_REQUEST_COMMENT_TEXT                     | Comment of BB Cloud Pull Request        | PR     | C + S   |                              |
+| BITBUCKET_PULL_REQUEST_LATEST_COMMIT_FROM_SOURCE_BRANCH | Latest commit hash on the source branch | PR     | C + S   |                              |
+| BITBUCKET_PULL_REQUEST_LATEST_COMMIT_FROM_TARGET_BRANCH | Latest commit hash on the target branch | PR     | C + S   |                              |
+| BITBUCKET_PULL_REQUEST_IS_DRAFT                         | "true" if PR is draft, "false" otherwise| PR     | C       | Since 3.3.0                  |
+| BITBUCKET_REPOSITORY_UUID                               | Repository identifier                   | P      | C       |                              |
+| BITBUCKET_REPOSITORY_ID                                 | Repository identifier                   | P      | S       |                              |
+| BITBUCKET_REPOSITORY_URL                                | Repository URL                          | PR     | C       |                              |
+| REPOSITORY_LINK                                         | Repository link                         | P      | C       | Deprecated: to remove in 2.6 |
+| REPOSITORY_NAME                                         | Repository name                         | P      | S       | Deprecated: to remove in 2.6 |
 
 # Dsl Job actions for Bitbucket Push and Pull Request Trigger
 
@@ -619,6 +635,7 @@ job('example-pull-request-updated-with-filter-on-branches') {
             shell('echo START pull request created')
         }
     }
+
 ```
 
 ### Valid for pipeline with job-dsl 1.77+ (and before)
@@ -1208,6 +1225,7 @@ pipeline {
                 echo "BITBUCKET_TARGET_BRANCH ${env.BITBUCKET_TARGET_BRANCH}"
                 echo "BITBUCKET_PULL_REQUEST_LINK ${env.BITBUCKET_PULL_REQUEST_LINK}"
                 echo "BITBUCKET_PULL_REQUEST_ID ${env.BITBUCKET_PULL_REQUEST_ID}"
+                echo "BITBUCKET_PULL_REQUEST_IS_DRAFT ${env.BITBUCKET_PULL_REQUEST_IS_DRAFT}"
                 echo "BITBUCKET_PAYLOAD ${env.BITBUCKET_PAYLOAD}"
 
                 echo 'Env vars for cloud push...'
@@ -1223,6 +1241,76 @@ pipeline {
                 echo "BITBUCKET_REPOSITORY_URL ${env.BITBUCKET_REPOSITORY_URL}"
                 echo "BITBUCKET_PUSH_REPOSITORY_UUID ${env.BITBUCKET_PUSH_REPOSITORY_UUID}"
                 echo "BITBUCKET_PAYLOAD ${env.BITBUCKET_PAYLOAD}"
+            }
+        }
+    }
+}
+```
+
+## Example: Skip builds for draft pull requests (Bitbucket Cloud)
+
+Since version 3.3.0, you can detect and skip builds for draft pull requests using the `BITBUCKET_PULL_REQUEST_IS_DRAFT` environment variable:
+
+```groovy
+pipeline {
+    agent any
+
+    stages {
+        stage('Check if Draft') {
+            when {
+                environment name: 'BITBUCKET_PULL_REQUEST_IS_DRAFT', value: 'true'
+            }
+            steps {
+                echo 'Skipping build for draft PR'
+                script {
+                    currentBuild.result = 'NOT_BUILT'
+                    error('Draft PRs are not built')
+                }
+            }
+        }
+
+        stage('Build') {
+            when {
+                environment name: 'BITBUCKET_PULL_REQUEST_IS_DRAFT', value: 'false'
+            }
+            steps {
+                echo 'Building non-draft PR...'
+                // Your build steps here
+            }
+        }
+
+        stage('Test') {
+            when {
+                environment name: 'BITBUCKET_PULL_REQUEST_IS_DRAFT', value: 'false'
+            }
+            steps {
+                echo 'Running tests...'
+                // Your test steps here
+            }
+        }
+    }
+}
+```
+
+Or simply skip the entire pipeline at the beginning:
+
+```groovy
+pipeline {
+    agent any
+
+    stages {
+        stage('Build') {
+            steps {
+                script {
+                    if (env.BITBUCKET_PULL_REQUEST_IS_DRAFT == 'true') {
+                        echo 'Skipping build for draft PR'
+                        currentBuild.result = 'NOT_BUILT'
+                        return
+                    }
+
+                    echo 'Building...'
+                    // Your build steps here
+                }
             }
         }
     }
