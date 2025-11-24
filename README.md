@@ -55,7 +55,9 @@ The version 2.x.x of the Plugin is compatible with:
 
 # Introduction
 
-Plugin for Jenkins **v2.440.3 or later**, that triggers builds on Bitbucket's push and pull requests events.
+Plugin for Jenkins **v2.138.2 or later**, that triggers builds on Bitbucket's push and pull requests events.
+
+**Note:** Different plugin versions require different minimum Jenkins versions. See the [Compatibility](#compatibility) section for details.
 
 Some of the features introduced by Bitbucket Push and Pull Request are:
 
