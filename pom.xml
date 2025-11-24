@@ -11,7 +11,7 @@
 
     <groupId>io.jenkins.plugins</groupId>
     <artifactId>bitbucket-push-and-pull-request</artifactId>
-    <version>3.2.1-SNAPSHOT</version>
+    <version>3.3.0</version>
     <packaging>hpi</packaging>
 
     <properties>
