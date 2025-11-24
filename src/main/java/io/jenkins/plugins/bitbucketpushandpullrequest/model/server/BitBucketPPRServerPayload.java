@@ -1,5 +1,6 @@
 package io.jenkins.plugins.bitbucketpushandpullrequest.model.server;
 
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -7,6 +8,7 @@ import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
 
 
 public class BitBucketPPRServerPayload implements BitBucketPPRPayload {
+  @Serial
   private static final long serialVersionUID = -5088466617368578337L;
   private BitBucketPPRServerActor actor;
   private BitBucketPPRServerPullRequest pullRequest;

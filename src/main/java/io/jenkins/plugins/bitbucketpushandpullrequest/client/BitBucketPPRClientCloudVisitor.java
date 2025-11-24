@@ -1,17 +1,17 @@
 /*******************************************************************************
  * The MIT License
- * 
+ *
  * Copyright (C) 2021, CloudBees, Inc.
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
  * including without limitation the rights to use, copy, modify, merge, publish, distribute,
  * sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in all copies or
  * substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT
  * NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
@@ -49,10 +49,10 @@ public class BitBucketPPRClientCloudVisitor implements BitBucketPPRClientVisitor
   @Override
   public void send(StandardCredentials credentials, Verb verb, String url, String payload)
       throws InterruptedException, NoSuchMethodException {
-    if (credentials instanceof StandardUsernamePasswordCredentials)
+    if (credentials instanceof StandardUsernamePasswordCredentials usernamePasswordCredentials)
       try {
         final HttpResponse response =
-            this.send((StandardUsernamePasswordCredentials) credentials, verb, url, payload);
+            this.send(usernamePasswordCredentials, verb, url, payload);
         HttpEntity responseEntity = response.getEntity();
         final String responseBody =
             responseEntity == null ? "empty" : EntityUtils.toString(responseEntity);
@@ -62,16 +62,14 @@ public class BitBucketPPRClientCloudVisitor implements BitBucketPPRClientVisitor
       } catch (IOException e) {
         logger.log(Level.WARNING, "Error during state notification: {0} ", e.getMessage());
       }
-    else if (credentials instanceof StringCredentials) {
+    else if (credentials instanceof StringCredentials stringCredentials) {
       try {
-        Response response = this.send((StringCredentials) credentials, verb, url, payload);
+        Response response = this.send(stringCredentials, verb, url, payload);
 
         logger.log(Level.FINEST, "Result of the state notification is: {0}, with status code: {1}",
             new Object[] {response.getBody(), response.getCode()});
       } catch (ExecutionException | IOException e) {
         logger.log(Level.WARNING, "Error during state notification: {0} ", e.getMessage());
-      } catch (InterruptedException e) {
-        throw e;
       }
     } else
       throw new NotImplementedException("Credentials provider for state notification not found");

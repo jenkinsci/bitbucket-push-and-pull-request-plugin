@@ -60,7 +60,7 @@ public final class BitBucketPPRPayloadProcessorFactory {
           logger.info("Create BitBucketPPRRepositoryServerPayloadProcessor");
       return new BitBucketPPRRepositoryServerPayloadProcessor(probe, bitbucketEvent);
     }
-    
+
     // @todo: will be removed in version 3.0.0
     if (REPOSITORY_EVENT.equalsIgnoreCase(bitbucketEvent.getEvent())
         && REPOSITORY_POST.equalsIgnoreCase(bitbucketEvent.getAction())) {

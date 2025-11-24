@@ -18,13 +18,12 @@
         <!-- https://www.jenkins.io/doc/developer/plugin-development/choosing-jenkins-baseline/ -->
         <jenkins.baseline>2.440</jenkins.baseline>
         <jenkins.version>${jenkins.baseline}.3</jenkins.version>
-        <powermock.version>2.0.0</powermock.version>
         <hpi.compatibleSinceVersion>2.9.0</hpi.compatibleSinceVersion>
         <jenkins.java.level>17</jenkins.java.level>
     </properties>
 
     <name>Bitbucket Push and Pull Request Plugin</name>
-    <description>Bitbucket plugin for Jenkins v2.138.2 or later, allowing push and pull requests</description>
+    <description>Bitbucket plugin for Jenkins allowing push and pull requests</description>
 
     <licenses>
         <license>
@@ -192,13 +191,6 @@
             <artifactId>mockito-junit-jupiter</artifactId>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-inline</artifactId>
-            <version>5.2.0</version>
-            <scope>test</scope>
-        </dependency>
-
     </dependencies>
 
     <url>https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin</url>
@@ -213,13 +205,13 @@
     <repositories>
         <repository>
             <id>repo.jenkins-ci.org</id>
-            <url>https://repo.jenkins.io/public/</url>
+            <url>https://repo.jenkins-ci.org/public/</url>
         </repository>
     </repositories>
     <pluginRepositories>
         <pluginRepository>
             <id>repo.jenkins-ci.org</id>
-            <url>https://repo.jenkins.io/public/</url>
+            <url>https://repo.jenkins-ci.org/public/</url>
         </pluginRepository>
     </pluginRepositories>
 
@@ -243,5 +235,4 @@
             </plugin>
         </plugins>
     </build>
-
 </project>

@@ -1,24 +1,25 @@
 package io.jenkins.plugins.bitbucketpushandpullrequest.action;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import io.jenkins.plugins.bitbucketpushandpullrequest.config.BitBucketPPRPluginConfig;
-import io.jenkins.plugins.bitbucketpushandpullrequest.exception.BitBucketPPRPayloadPropertyNotFoundException;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRHookEvent;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.server.BitBucketPPRServerClone;
-import org.junit.Test;
+import java.util.ArrayList;
+import java.util.List;
+import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
-import java.util.ArrayList;
-import java.util.List;
+class BitBucketPPRPullRequestServerActionTest {
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.mockito.Mockito.*;
-
-public class BitBucketPPRPullRequestServerActionTest {
   @Test
-  public void testBaseUrlSet() {
+  void testBaseUrlSet() throws Exception {
     try (MockedStatic<BitBucketPPRPluginConfig> config =
         Mockito.mockStatic(BitBucketPPRPluginConfig.class)) {
       BitBucketPPRPluginConfig c = mock(BitBucketPPRPluginConfig.class);
@@ -34,31 +35,27 @@ public class BitBucketPPRPullRequestServerActionTest {
       when(mockServerClone.getHref())
           .thenReturn("ssh://git@example.org/some-namespace/some-repo.git");
       clones.add(mockServerClone);
-      when(payloadMock.getServerRepository().getLinks().getCloneProperty()).thenReturn(clones);
-      BitBucketPPRPullRequestServerAction bitBucketPPRPullRequestServerAction;
-      try {
-        BitBucketPPRHookEvent bitbucketEvent = mock(BitBucketPPRHookEvent.class);
-        when(bitbucketEvent.getAction()).thenReturn("created");
-        bitBucketPPRPullRequestServerAction =
-            new BitBucketPPRPullRequestServerAction(payloadMock, bitbucketEvent);
-        assertDoesNotThrow(
-            () -> {
-              bitBucketPPRPullRequestServerAction.getCommitLink();
-            });
-      } catch (BitBucketPPRPayloadPropertyNotFoundException e) {
-        e.printStackTrace();
-      }
+      when(payloadMock.getServerRepository().getLinks().getCloneProperty()).thenReturn(
+          clones);
+
+      BitBucketPPRHookEvent bitbucketEvent = mock(BitBucketPPRHookEvent.class);
+      when(bitbucketEvent.getAction()).thenReturn("created");
+      BitBucketPPRPullRequestServerAction bitBucketPPRPullRequestServerAction =
+          new BitBucketPPRPullRequestServerAction(payloadMock, bitbucketEvent);
+
+      assertDoesNotThrow(bitBucketPPRPullRequestServerAction::getCommitLink);
     }
   }
 
   @Test
-  public void testGetMergeCommit() throws BitBucketPPRPayloadPropertyNotFoundException {
+  void testGetMergeCommit() throws Exception {
     try (MockedStatic<BitBucketPPRPluginConfig> config =
         Mockito.mockStatic(BitBucketPPRPluginConfig.class)) {
       BitBucketPPRPluginConfig c = mock(BitBucketPPRPluginConfig.class);
       config.when(BitBucketPPRPluginConfig::getInstance).thenReturn(c);
       BitBucketPPRPayload payloadMock = mock(BitBucketPPRPayload.class, RETURNS_DEEP_STUBS);
-      when(payloadMock.getServerPullRequest().getProperties().getMergeCommit().getId()).thenReturn("123456");
+      when(payloadMock.getServerPullRequest().getProperties().getMergeCommit()
+          .getId()).thenReturn("123456");
       BitBucketPPRHookEvent event = mock(BitBucketPPRHookEvent.class);
       when(event.getAction()).thenReturn("merged");
       BitBucketPPRPullRequestServerAction action =

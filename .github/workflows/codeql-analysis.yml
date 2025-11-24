@@ -36,17 +36,17 @@ jobs:
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v2
-    
+      uses: actions/checkout@v4
+
     - name: Setup Java JDK
-      uses: actions/setup-java@v2.3.1
+      uses: actions/setup-java@v4
       with:
-        java-version: 11
-        distribution: 'adopt'
-    
+        java-version: 17
+        distribution: 'temurin'
+
     # Initializes the CodeQL tools for scanning.
     - name: Initialize CodeQL
-      uses: github/codeql-action/init@v2
+      uses: github/codeql-action/init@v3
       with:
         languages: ${{ matrix.language }}
         # If you wish to specify custom queries, you can do so here or in a config file.
@@ -57,7 +57,7 @@ jobs:
     # Autobuild attempts to build any compiled languages  (C/C++, C#, or Java).
     # If this step fails, then you should remove it and run the build manually (see below)
     # - name: Autobuild
-    #  uses: github/codeql-action/autobuild@v2
+    #  uses: github/codeql-action/autobuild@v3
 
     # ℹ️ Command-line programs to run using the OS shell.
     # 📚 https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idstepsrun
@@ -65,9 +65,9 @@ jobs:
     # ✏️ If the Autobuild fails above, remove it and uncomment the following three lines
     #    and modify them (or add more) to build your code if your project
     #    uses a compiled language
-    
+
     - name: Build with Maven
       run: mvn -DskipTests=true -V -ntp install
 
     - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@v2
+      uses: github/codeql-action/analyze@v3

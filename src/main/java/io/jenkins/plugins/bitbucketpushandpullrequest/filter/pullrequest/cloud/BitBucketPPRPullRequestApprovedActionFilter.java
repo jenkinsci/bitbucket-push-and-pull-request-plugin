@@ -24,8 +24,10 @@ package io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.cloud;
 import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst.PULL_REQUEST_REVIEWER;
 import java.io.File;
 import java.io.IOException;
+import java.util.Objects;
 import java.util.logging.Logger;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
 import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
@@ -52,11 +54,7 @@ public class BitBucketPPRPullRequestApprovedActionFilter
 
   @DataBoundSetter
   public void setAllowedBranches(String allowedBranches) {
-    if (allowedBranches == null) {
-      this.allowedBranches = "";
-    } else {
-      this.allowedBranches = allowedBranches;
-    }
+      this.allowedBranches = Objects.requireNonNullElse(allowedBranches, "");
   }
 
   @Override
@@ -90,6 +88,7 @@ public class BitBucketPPRPullRequestApprovedActionFilter
   @Extension
   public static class ActionFilterDescriptorImpl extends BitBucketPPRPullRequestActionDescriptor {
 
+    @NonNull
     @Override
     public String getDisplayName() {
       return "Approved";
@@ -101,10 +100,7 @@ public class BitBucketPPRPullRequestApprovedActionFilter
   }
 
   private boolean allReviewersHaveApproved(BitBucketPPRAction pullRequestAction) {
-    return pullRequestAction.getPayload().getPullRequest().getParticipants().stream()
-            .filter(p -> isReviewer(p) && !p.getApproved())
-            .count()
-        == 0;
+    return pullRequestAction.getPayload().getPullRequest().getParticipants().stream().noneMatch(p -> isReviewer(p) && !p.getApproved());
   }
 
   private boolean isReviewer(BitBucketPPRParticipant pullRequestParticipant) {

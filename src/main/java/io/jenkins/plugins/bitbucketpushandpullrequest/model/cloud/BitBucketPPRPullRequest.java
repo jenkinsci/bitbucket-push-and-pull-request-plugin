@@ -20,6 +20,7 @@
  ******************************************************************************/
 package io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
@@ -27,11 +28,13 @@ import java.util.List;
 import com.google.gson.annotations.SerializedName;
 
 public class BitBucketPPRPullRequest implements Serializable {
+  @Serial
   private static final long serialVersionUID = -530740975503014281L;
   private String id;
   private String title;
   private String description;
   private String state;
+  private Boolean draft = false;
   private BitBucketPPRActor author;
   private @SerializedName("created_on") Date createdOn;
   private @SerializedName("updated_on") Date updatedOn;
@@ -74,6 +77,9 @@ public class BitBucketPPRPullRequest implements Serializable {
   public void setState(final String state) {
     this.state = state;
   }
+
+  public Boolean getDraft() { return draft; }
+  public void setDraft(final Boolean draft) { this.draft = draft; }
 
   public BitBucketPPRCommit getMergeCommit() {
     return mergeCommit;
@@ -165,6 +171,8 @@ public class BitBucketPPRPullRequest implements Serializable {
         + description
         + ", state="
         + state
+        + ", draft="
+        + draft
         + ", author="
         + author
         + ", createdOn="

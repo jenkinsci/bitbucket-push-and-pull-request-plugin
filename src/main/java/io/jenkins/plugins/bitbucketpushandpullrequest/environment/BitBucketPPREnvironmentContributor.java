@@ -21,10 +21,11 @@
 
 package io.jenkins.plugins.bitbucketpushandpullrequest.environment;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.logging.Logger;
 import javax.annotation.Nonnull;
+
+import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.EnvVars;
 import hudson.Extension;
 import hudson.matrix.MatrixBuild;
@@ -66,23 +67,22 @@ public class BitBucketPPREnvironmentContributor extends EnvironmentContributor {
       "BITBUCKET_PULL_REQUEST_LATEST_COMMIT_FROM_SOURCE_BRANCH";
   static final String BITBUCKET_PULL_REQUEST_LATEST_COMMIT_FROM_TARGET_BRANCH =
       "BITBUCKET_PULL_REQUEST_LATEST_COMMIT_FROM_TARGET_BRANCH";
+  static final String BITBUCKET_PULL_REQUEST_IS_DRAFT = "BITBUCKET_PULL_REQUEST_IS_DRAFT";
 
   static final Logger logger = Logger.getLogger(BitBucketPPREnvironmentContributor.class.getName());
 
   @Override
-  public void buildEnvironmentFor(Job job, EnvVars envVars, TaskListener taskListener)
-      throws IOException, InterruptedException {
+  public void buildEnvironmentFor(@NonNull Job job, @NonNull EnvVars envVars, @NonNull TaskListener taskListener) {
     // NOTHING TO DO HERE
   }
 
   @Override
-  public void buildEnvironmentFor(@Nonnull Run run, EnvVars envVars, TaskListener taskListener)
-      throws IOException, InterruptedException {
+  public void buildEnvironmentFor(@Nonnull Run run, @NonNull EnvVars envVars, @NonNull TaskListener taskListener) {
 
     List<Cause> causes = null;
 
-    if (run instanceof MatrixRun) {
-      MatrixBuild parent = ((MatrixRun) run).getParentBuild();
+    if (run instanceof MatrixRun matrixRun) {
+      MatrixBuild parent = matrixRun.getParentBuild();
       if (parent != null) {
         causes = parent.getCauses();
       }
@@ -94,30 +94,25 @@ public class BitBucketPPREnvironmentContributor extends EnvironmentContributor {
       return;
     }
 
-    causes.stream().forEach((Cause cause) -> {
+    causes.forEach((Cause cause) -> {
       try {
-        if (cause instanceof BitBucketPPRPullRequestCause) {
-          BitBucketPPRPullRequestCause castedCause = (BitBucketPPRPullRequestCause) cause;
-          setEnvVarsForCloudPullRequest(envVars, castedCause.getPullRequestPayLoad(),
+        if (cause instanceof BitBucketPPRPullRequestCause castedCause) {
+            setEnvVarsForCloudPullRequest(envVars, castedCause.getPullRequestPayLoad(),
               castedCause.getHookEvent());
-        } else if (cause instanceof BitBucketPPRPullRequestServerCause) {
-          BitBucketPPRPullRequestServerCause castedCause =
-              (BitBucketPPRPullRequestServerCause) cause;
-          setEnvVarsForServerPullRequest(envVars, castedCause.getPullRequestPayLoad(),
+        } else if (cause instanceof BitBucketPPRPullRequestServerCause castedCause) {
+            setEnvVarsForServerPullRequest(envVars, castedCause.getPullRequestPayLoad(),
               castedCause.getHookEvent());
-        } else if (cause instanceof BitBucketPPRRepositoryCause) {
-          BitBucketPPRRepositoryCause castedCause = (BitBucketPPRRepositoryCause) cause;
-          setEnvVarsForCloudRepository(envVars, castedCause.getRepositoryPayLoad(),
+        } else if (cause instanceof BitBucketPPRRepositoryCause castedCause) {
+            setEnvVarsForCloudRepository(envVars, castedCause.getRepositoryPayLoad(),
               castedCause.getHookEvent());
-        } else if (cause instanceof BitBucketPPRServerRepositoryCause) {
-          BitBucketPPRServerRepositoryCause castedCause = (BitBucketPPRServerRepositoryCause) cause;
-          setEnvVarsForServerRepository(envVars, castedCause.getServerRepositoryPayLoad(),
+        } else if (cause instanceof BitBucketPPRServerRepositoryCause castedCause) {
+            setEnvVarsForServerRepository(envVars, castedCause.getServerRepositoryPayLoad(),
               castedCause.getHookEvent());
         }
       } catch (Exception e) {
         e.printStackTrace();
         logger.warning(String.format("Cannot build environment variables for cause %s %s.",
-            cause.getShortDescription(), e.toString()));
+            cause.getShortDescription(), e));
       }
     });
   }
@@ -192,6 +187,9 @@ public class BitBucketPPREnvironmentContributor extends EnvironmentContributor {
 
     String pullRequestId = action.getPullRequestId();
     putEnvVar(envVars, BITBUCKET_PULL_REQUEST_ID, pullRequestId);
+
+    Boolean isPullRequestDraft = action.getPayload().getPullRequest().getDraft();
+    putEnvVar(envVars, BITBUCKET_PULL_REQUEST_IS_DRAFT, isPullRequestDraft ? "true" : "false");
 
     String actor = action.getUser();
     putEnvVar(envVars, BITBUCKET_ACTOR, actor);

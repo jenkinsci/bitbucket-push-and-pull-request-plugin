@@ -65,7 +65,7 @@ public class BitBucketPPRPayloadFactory {
     if (PULL_REQUEST_SERVER_EVENT.equals(bitbucketEvent.getEvent())) {
       return new BitBucketPPRServerPayload();
     }
-    
+
     if (DIAGNOSTICS.equals(bitbucketEvent.getEvent())) {
       return new BitBucketPPRServerPayload();
     }
