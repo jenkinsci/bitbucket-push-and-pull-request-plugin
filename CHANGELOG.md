@@ -13,9 +13,10 @@
 **Internal Improvements:**
 * Migrate tests from JUnit4 to JUnit5 by @strangelookingnerd in https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/pull/369
 * Fix build issue in pom.xml by @s78258819-svg in https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/pull/371
+* Upgrade to Jenkins plugin parent POM 5.0 for Java 17 support (requires Jenkins >= 2.479.3)
 
 ### Compatibility
-* Jenkins version: >= **2.440.3** (unchanged)
+* Jenkins version: >= **2.479.3** (upgraded from 2.440.3)
 * Java version: **17**
 
 ### New Contributors

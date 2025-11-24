@@ -35,7 +35,7 @@
 
 **Starting from version 3.3.0** the Plugin is compatible with:
 
-- Jenkins version: >= **2.440.3**
+- Jenkins version: >= **2.479.3**
 - Java version: **17**
 
 **Starting from version 3.2.0** the Plugin is compatible with:
