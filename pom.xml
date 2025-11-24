@@ -20,6 +20,7 @@
         <jenkins.version>${jenkins.baseline}.3</jenkins.version>
         <hpi.compatibleSinceVersion>2.9.0</hpi.compatibleSinceVersion>
         <jenkins.java.level>17</jenkins.java.level>
+        <maven.compiler.release>17</maven.compiler.release>
     </properties>
 
     <name>Bitbucket Push and Pull Request Plugin</name>
