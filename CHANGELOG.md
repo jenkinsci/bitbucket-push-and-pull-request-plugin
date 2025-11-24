@@ -22,7 +22,17 @@
 ### New Contributors
 * @nazzer23 made their first contribution in https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/pull/367
 
-**Full Changelog**: https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/compare/bitbucket-push-and-pull-request-3.1.4...bitbucket-push-and-pull-request-3.3.0
+**Full Changelog**: https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/compare/bitbucket-push-and-pull-request-3.2.0...bitbucket-push-and-pull-request-3.3.0
+
+## 3.2.0 (2025-02-26)
+
+### What's Changed
+* Plugin modernization to reduce hpi size by @mawinter69 in https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/pull/355
+
+### New Contributors
+* @mawinter69 made their first contribution in https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/pull/355
+
+**Full Changelog**: https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/compare/bitbucket-push-and-pull-request-3.1.5...bitbucket-push-and-pull-request-3.2.0
 
 ## 3.1.4 (2024-10-29)
 

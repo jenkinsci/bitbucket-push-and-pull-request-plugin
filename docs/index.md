@@ -1323,3 +1323,9 @@ pipeline {
 
 This plugin is originally based on the Sazo's fork (<https://github.com/sazo/bitbucket-plugin>)
 of the Bitbucket plugin: <https://plugins.jenkins.io/bitbucket>.
+
+# Legal Disclaimer
+
+This software is provided under the MIT License and is offered "AS IS", without warranty of any kind, express or implied, including but not limited to the warranties of merchantability, fitness for a particular purpose, and noninfringement. In no event shall the authors or copyright holders be liable for any claim, damages, or other liability, whether in an action of contract, tort, or otherwise, arising from, out of, or in connection with the software or the use or other dealings in the software.
+
+Users are solely responsible for determining the appropriateness of using this plugin and assume all risks associated with its use, including but not limited to the risks of program errors, damage to or loss of data, and unavailability or interruption of operations.
