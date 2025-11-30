@@ -186,4 +186,34 @@ public class BitBucketPPRServerRepositoryAction extends BitBucketPPRActionAbstra
   private String getBaseUrl() {
     return baseUrl.getProtocol() + "://" + baseUrl.getHost() + ":" + baseUrl.getPort();
   }
+
+  @Override
+  public String getLatestFromCommit() {
+      for (BitBucketPPRServerChange change : payload.getServerChanges()) {
+          if(change.getRefId() != null) {
+              return change.getFromHash();
+          }
+      }
+      return null;
+  }
+
+  @Override
+  public String getPayloadChangeType() {
+      for (BitBucketPPRServerChange change : payload.getServerChanges()) {
+          if(change.getRefId() != null) {
+              return change.getType();
+          }
+      }
+      return null;
+  }
+
+  @Override
+  public String getOPT1CloneUrl() {
+    return payload.getServerRepository().getLinks().getCloneProperty().get(0).getHref();
+  }
+
+  @Override
+  public String getOPT2CloneUrl() {
+    return payload.getServerRepository().getLinks().getCloneProperty().get(1).getHref();
+  }
 }
