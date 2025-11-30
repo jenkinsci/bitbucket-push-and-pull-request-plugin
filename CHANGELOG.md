@@ -1,5 +1,13 @@
 # Change Log
 
+## 3.3.1 (2025-11-30)
+
+### What's Changed
+* **Ban JUnit 4 imports** by @strangelookingnerd in https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/pull/373
+* **Feature/multibranch scan** (#372) by @s78258819-svg in https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/pull/374
+
+**Full Changelog**: https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/compare/bitbucket-push-and-pull-request-3.3.0...bitbucket-push-and-pull-request-3.3.1
+
 ## 3.3.0 (2025-11-24)
 
 ### What's Changed
