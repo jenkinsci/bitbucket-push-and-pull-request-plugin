@@ -22,6 +22,8 @@
 package io.jenkins.plugins.bitbucketpushandpullrequest.environment;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.collection.IsMapContaining.hasEntry;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -82,6 +84,7 @@ class BitBucketPPREnvironmentContributorTest {
         Mockito.mockStatic(BitBucketPPRPluginConfig.class)) {
       BitBucketPPRPluginConfig c = mock(BitBucketPPRPluginConfig.class);
       config.when(BitBucketPPRPluginConfig::getInstance).thenReturn(c);
+      when(c.getSetBitbucketPayload()).thenReturn(true);
       BitBucketPPRPayload payload = getCloudPayload("./cloud/repo_push.json");
 
       BitBucketPPRRepositoryCause cause = mock(BitBucketPPRRepositoryCause.class);
@@ -131,6 +134,8 @@ class BitBucketPPREnvironmentContributorTest {
         Mockito.mockStatic(BitBucketPPRPluginConfig.class)) {
       BitBucketPPRPluginConfig c = mock(BitBucketPPRPluginConfig.class);
       config.when(BitBucketPPRPluginConfig::getInstance).thenReturn(c);
+      when(c.getSetBitbucketPayload()).thenReturn(true);
+      when(c.getSetBitbucketPrDescription()).thenReturn(true);
       BitBucketPPRPayload payload = getCloudPayload("./cloud/pr_created.json");
 
       BitBucketPPRPullRequestCause cause = mock(BitBucketPPRPullRequestCause.class);
@@ -186,6 +191,8 @@ class BitBucketPPREnvironmentContributorTest {
         Mockito.mockStatic(BitBucketPPRPluginConfig.class)) {
       BitBucketPPRPluginConfig c = mock(BitBucketPPRPluginConfig.class);
       config.when(BitBucketPPRPluginConfig::getInstance).thenReturn(c);
+      when(c.getSetBitbucketPayload()).thenReturn(true);
+      when(c.getSetBitbucketPrDescription()).thenReturn(true);
       BitBucketPPRPayload payload = getCloudPayload("./cloud/pr_fulfilled.json");
 
       BitBucketPPRPullRequestCause cause = mock(BitBucketPPRPullRequestCause.class);
@@ -241,6 +248,8 @@ class BitBucketPPREnvironmentContributorTest {
         Mockito.mockStatic(BitBucketPPRPluginConfig.class)) {
       BitBucketPPRPluginConfig c = mock(BitBucketPPRPluginConfig.class);
       config.when(BitBucketPPRPluginConfig::getInstance).thenReturn(c);
+      when(c.getSetBitbucketPayload()).thenReturn(true);
+      when(c.getSetBitbucketPrDescription()).thenReturn(true);
       BitBucketPPRPayload payload = getCloudPayload("./cloud/pr_rejected.json");
 
       BitBucketPPRPullRequestCause cause = mock(BitBucketPPRPullRequestCause.class);
@@ -296,6 +305,8 @@ class BitBucketPPREnvironmentContributorTest {
         Mockito.mockStatic(BitBucketPPRPluginConfig.class)) {
       BitBucketPPRPluginConfig c = mock(BitBucketPPRPluginConfig.class);
       config.when(BitBucketPPRPluginConfig::getInstance).thenReturn(c);
+      when(c.getSetBitbucketPayload()).thenReturn(true);
+      when(c.getSetBitbucketPrDescription()).thenReturn(true);
       BitBucketPPRPayload payload = getCloudPayload("./cloud/pr_updated.json");
 
       BitBucketPPRPullRequestCause cause = mock(BitBucketPPRPullRequestCause.class);
@@ -351,6 +362,8 @@ class BitBucketPPREnvironmentContributorTest {
         Mockito.mockStatic(BitBucketPPRPluginConfig.class)) {
       BitBucketPPRPluginConfig c = mock(BitBucketPPRPluginConfig.class);
       config.when(BitBucketPPRPluginConfig::getInstance).thenReturn(c);
+      when(c.getSetBitbucketPayload()).thenReturn(true);
+      when(c.getSetBitbucketPrDescription()).thenReturn(true);
 
       BitBucketPPRPayload payload = getCloudPayload("./cloud/pr_approved.json");
 
@@ -407,6 +420,8 @@ class BitBucketPPREnvironmentContributorTest {
         Mockito.mockStatic(BitBucketPPRPluginConfig.class)) {
       BitBucketPPRPluginConfig c = mock(BitBucketPPRPluginConfig.class);
       config.when(BitBucketPPRPluginConfig::getInstance).thenReturn(c);
+      when(c.getSetBitbucketPayload()).thenReturn(true);
+      when(c.getSetBitbucketPrDescription()).thenReturn(true);
       BitBucketPPRPayload payload = getCloudPayload("./cloud/pr_comment_created.json");
 
       BitBucketPPRPullRequestCause cause = mock(BitBucketPPRPullRequestCause.class);
@@ -455,6 +470,72 @@ class BitBucketPPREnvironmentContributorTest {
           hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PAYLOAD, payload.toString()));
       assertThat(
           envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_X_EVENT, "X-EVENT"));
+    }
+  }
+
+  @Test
+  void buildEnvironmentForCloudPullRequestWithEnvVarsDisabledTest() throws Exception {
+    try (MockedStatic<BitBucketPPRPluginConfig> config =
+        Mockito.mockStatic(BitBucketPPRPluginConfig.class)) {
+      BitBucketPPRPluginConfig c = mock(BitBucketPPRPluginConfig.class);
+      config.when(BitBucketPPRPluginConfig::getInstance).thenReturn(c);
+      when(c.getSetBitbucketPayload()).thenReturn(false);
+      when(c.getSetBitbucketPrDescription()).thenReturn(false);
+      BitBucketPPRPayload payload = getCloudPayload("./cloud/pr_created.json");
+
+      BitBucketPPRPullRequestCause cause = mock(BitBucketPPRPullRequestCause.class);
+      BitBucketPPRPullRequestAction bitBucketPPRPullRequestAction =
+          new BitBucketPPRPullRequestAction(payload, mock(BitBucketPPRHookEvent.class));
+      when(cause.getPullRequestPayLoad()).thenReturn(bitBucketPPRPullRequestAction);
+      when(cause.getHookEvent()).thenReturn("X-EVENT");
+
+      // do
+      runEnvironmentContributorForCause(cause);
+
+      // assert - these should NOT be set
+      assertThat(envVars, not(hasKey(BitBucketPPREnvironmentContributor.BITBUCKET_PAYLOAD)));
+      assertThat(envVars,
+          not(hasKey(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_DESCRIPTION)));
+
+      // assert - other vars should still be set
+      assertThat(envVars,
+          hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_SOURCE_BRANCH,
+              "feature/do-not-merge"));
+      assertThat(envVars,
+          hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_TITLE,
+              "I have to push the pram a lot X."));
+      assertThat(envVars,
+          hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_X_EVENT, "X-EVENT"));
+    }
+  }
+
+  @Test
+  void buildEnvironmentForCloudRepoPushWithPayloadDisabledTest() throws Exception {
+    try (MockedStatic<BitBucketPPRPluginConfig> config =
+        Mockito.mockStatic(BitBucketPPRPluginConfig.class)) {
+      BitBucketPPRPluginConfig c = mock(BitBucketPPRPluginConfig.class);
+      config.when(BitBucketPPRPluginConfig::getInstance).thenReturn(c);
+      when(c.getSetBitbucketPayload()).thenReturn(false);
+      BitBucketPPRPayload payload = getCloudPayload("./cloud/repo_push.json");
+
+      BitBucketPPRRepositoryCause cause = mock(BitBucketPPRRepositoryCause.class);
+      BitBucketPPRRepositoryAction bitBucketPPRRepositoryAction =
+          new BitBucketPPRRepositoryAction(payload);
+      when(cause.getRepositoryPayLoad()).thenReturn(bitBucketPPRRepositoryAction);
+      when(cause.getHookEvent()).thenReturn("X-EVENT");
+
+      // do
+      runEnvironmentContributorForCause(cause);
+
+      // assert - BITBUCKET_PAYLOAD should NOT be set
+      assertThat(envVars, not(hasKey(BitBucketPPREnvironmentContributor.BITBUCKET_PAYLOAD)));
+
+      // assert - other vars should still be set
+      assertThat(envVars,
+          hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_SOURCE_BRANCH,
+              "feature/do-not-merge"));
+      assertThat(envVars,
+          hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_X_EVENT, "X-EVENT"));
     }
   }
 

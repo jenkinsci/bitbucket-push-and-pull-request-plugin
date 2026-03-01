@@ -67,9 +67,15 @@ public class BitBucketPPRPluginConfig extends GlobalConfiguration {
 
   public String propagationUrl;
 
+  public boolean setBitbucketPayload;
+
+  public boolean setBitbucketPrDescription;
+
   public BitBucketPPRPluginConfig() {
     logger.fine("Read bitbucket push and pull request plugin global configuration.");
     this.notifyBitBucket = true;
+    this.setBitbucketPayload = true;
+    this.setBitbucketPrDescription = true;
     load();
   }
 
@@ -131,6 +137,24 @@ public class BitBucketPPRPluginConfig extends GlobalConfiguration {
   @DataBoundSetter
   public void setNotifyBitBucket(boolean notifyBitBucket) {
     this.notifyBitBucket = notifyBitBucket;
+  }
+
+  public boolean getSetBitbucketPayload() {
+    return setBitbucketPayload;
+  }
+
+  @DataBoundSetter
+  public void setSetBitbucketPayload(boolean setBitbucketPayload) {
+    this.setBitbucketPayload = setBitbucketPayload;
+  }
+
+  public boolean getSetBitbucketPrDescription() {
+    return setBitbucketPrDescription;
+  }
+
+  @DataBoundSetter
+  public void setSetBitbucketPrDescription(boolean setBitbucketPrDescription) {
+    this.setBitbucketPrDescription = setBitbucketPrDescription;
   }
 
   public boolean getUseJobNameAsBuildKey() {

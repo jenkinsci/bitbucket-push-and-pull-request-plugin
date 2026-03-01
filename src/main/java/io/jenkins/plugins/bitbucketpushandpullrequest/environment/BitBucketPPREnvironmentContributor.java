@@ -35,6 +35,7 @@ import hudson.model.EnvironmentContributor;
 import hudson.model.Job;
 import hudson.model.Run;
 import hudson.model.TaskListener;
+import io.jenkins.plugins.bitbucketpushandpullrequest.config.BitBucketPPRPluginConfig;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRPullRequestAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRPullRequestServerAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRRepositoryAction;
@@ -135,8 +136,11 @@ public class BitBucketPPREnvironmentContributor extends EnvironmentContributor {
 
     putEnvVar(envVars, BITBUCKET_X_EVENT, hookEvent);
 
-    String payload = action.getPayload().toString();
-    putEnvVar(envVars, BITBUCKET_PAYLOAD, payload);
+    BitBucketPPRPluginConfig config = BitBucketPPRPluginConfig.getInstance();
+    if (config.getSetBitbucketPayload()) {
+      String payload = action.getPayload().toString();
+      putEnvVar(envVars, BITBUCKET_PAYLOAD, payload);
+    }
   }
 
   private static void setEnvVarsForCloudRepository(EnvVars envVars,
@@ -161,8 +165,11 @@ public class BitBucketPPREnvironmentContributor extends EnvironmentContributor {
 
     putEnvVar(envVars, BITBUCKET_X_EVENT, hookEvent);
 
-    String payload = action.getPayload().toString();
-    putEnvVar(envVars, BITBUCKET_PAYLOAD, payload);
+    BitBucketPPRPluginConfig config = BitBucketPPRPluginConfig.getInstance();
+    if (config.getSetBitbucketPayload()) {
+      String payload = action.getPayload().toString();
+      putEnvVar(envVars, BITBUCKET_PAYLOAD, payload);
+    }
   }
 
   private static void setEnvVarsForCloudPullRequest(EnvVars envVars,
@@ -197,13 +204,18 @@ public class BitBucketPPREnvironmentContributor extends EnvironmentContributor {
     String title = action.getTitle();
     putEnvVar(envVars, BITBUCKET_PULL_REQUEST_TITLE, title);
 
-    String description = action.getDescription();
-    putEnvVar(envVars, BITBUCKET_PULL_REQUEST_DESCRIPTION, description);
+    BitBucketPPRPluginConfig config = BitBucketPPRPluginConfig.getInstance();
+    if (config.getSetBitbucketPrDescription()) {
+      String description = action.getDescription();
+      putEnvVar(envVars, BITBUCKET_PULL_REQUEST_DESCRIPTION, description);
+    }
 
     putEnvVar(envVars, BITBUCKET_X_EVENT, hookEvent);
 
-    String payload = action.getPayload().toString();
-    putEnvVar(envVars, BITBUCKET_PAYLOAD, payload);
+    if (config.getSetBitbucketPayload()) {
+      String payload = action.getPayload().toString();
+      putEnvVar(envVars, BITBUCKET_PAYLOAD, payload);
+    }
   }
 
   private static void setEnvVarsForServerPullRequest(EnvVars envVars,
@@ -235,11 +247,16 @@ public class BitBucketPPREnvironmentContributor extends EnvironmentContributor {
     String title = action.getTitle();
     putEnvVar(envVars, BITBUCKET_PULL_REQUEST_TITLE, title);
 
-    String description = action.getDescription();
-    putEnvVar(envVars, BITBUCKET_PULL_REQUEST_DESCRIPTION, description);
+    BitBucketPPRPluginConfig config = BitBucketPPRPluginConfig.getInstance();
+    if (config.getSetBitbucketPrDescription()) {
+      String description = action.getDescription();
+      putEnvVar(envVars, BITBUCKET_PULL_REQUEST_DESCRIPTION, description);
+    }
 
-    String payload = action.getPayload().toString();
-    putEnvVar(envVars, BITBUCKET_PAYLOAD, payload);
+    if (config.getSetBitbucketPayload()) {
+      String payload = action.getPayload().toString();
+      putEnvVar(envVars, BITBUCKET_PAYLOAD, payload);
+    }
 
     putEnvVar(envVars, BITBUCKET_X_EVENT, hookEvent);
 
