@@ -1,5 +1,12 @@
 # Change Log
 
+## 3.3.2 (2026-03-01)
+
+### What's Changed
+* **Optional environment variables** - Add global configuration options to disable `BITBUCKET_PAYLOAD` and `BITBUCKET_PULL_REQUEST_DESCRIPTION` environment variables, which can exceed the Linux `MAX_ARG_STRLEN` limit (128KB) and cause build failures. Both are enabled by default for backward compatibility. Fixes #375
+
+**Full Changelog**: https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/compare/bitbucket-push-and-pull-request-3.3.1...bitbucket-push-and-pull-request-3.3.2
+
 ## 3.3.1 (2025-11-30)
 
 ### What's Changed

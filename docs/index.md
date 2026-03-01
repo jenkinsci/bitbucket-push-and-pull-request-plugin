@@ -141,6 +141,12 @@ in the __Jenkins Global Configurations__:
 6. you can set a propagation url to send the build status notification to a different url than the one used for the
    webhook
 
+7. you can disable the `BITBUCKET_PAYLOAD` environment variable to avoid exceeding the Linux `MAX_ARG_STRLEN` limit
+   (128KB) when the webhook payload is too large
+
+8. you can disable the `BITBUCKET_PULL_REQUEST_DESCRIPTION` environment variable to avoid exceeding the Linux
+   `MAX_ARG_STRLEN` limit when the pull request description is too large
+
 ![example global config jenkins bb ppr 1](./img/global-config.png)
 
 ## Configure your Jenkins job
@@ -244,13 +250,13 @@ Talking generally, there are two filters used to 'control the branches':
 |---------------------------------------------------------|:----------------------------------------|:-------|:--------|------------------------------|
 | BITBUCKET_TARGET_BRANCH                                 | target branch                           | PR + P | C + S   |                              |
 | BITBUCKET_ACTOR                                         | actor name                              | PR + P | C + S   |                              |
-| BITBUCKET_PAYLOAD                                       | Complete payload as json string         | PR + P | C + S   |                              |
+| BITBUCKET_PAYLOAD                                       | Complete payload as json string         | PR + P | C + S   | Can be disabled in 3.3.2     |
 | BITBUCKET_X_EVENT                                       | x-event which triggered the plugin      | PR + P | C + S   |                              |
 | BITBUCKET_SOURCE_BRANCH                                 | source branch                           | PR     | C + S   |                              |
 | BITBUCKET_PULL_REQUEST_TITLE                            | PR title                                | PR     | C + S   |                              |
 | BITBUCKET_PULL_REQUEST_ID                               | id                                      | PR     | C + S   |                              |
 | BITBUCKET_PULL_REQUEST_LINK                             | link                                    | PR     | C + S   |                              |
-| BITBUCKET_PULL_REQUEST_DESCRIPTION                      | PR description                          | PR     | C + S   |                              |
+| BITBUCKET_PULL_REQUEST_DESCRIPTION                      | PR description                          | PR     | C + S   | Can be disabled in 3.3.2     |
 | BITBUCKET_PULL_REQUEST_COMMENT_TEXT                     | Comment of BB Cloud Pull Request        | PR     | C + S   |                              |
 | BITBUCKET_PULL_REQUEST_LATEST_COMMIT_FROM_SOURCE_BRANCH | Latest commit hash on the source branch | PR     | C + S   |                              |
 | BITBUCKET_PULL_REQUEST_LATEST_COMMIT_FROM_TARGET_BRANCH | Latest commit hash on the target branch | PR     | C + S   |                              |
