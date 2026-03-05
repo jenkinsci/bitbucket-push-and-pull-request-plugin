@@ -161,7 +161,7 @@ public class BitBucketPPRJobProbe {
         return;
       }
 
-      Predicate<URIish> checkSCM = url -> scm instanceof GitSCM && matchGitScm(scm, url);
+      Predicate<URIish> checkSCM = url -> scm instanceof GitSCM && !isLibrarySCM(scm) && matchGitScm(scm, url);
 
       if (remotes.stream().anyMatch(checkSCM) && !scmTriggered.contains(scm)) {
         scmTriggered.add(scm);
@@ -241,6 +241,22 @@ public class BitBucketPPRJobProbe {
   }
 
 
+  private boolean isLibrarySCM(SCM scm) {
+    if (!(scm instanceof GitSCM)) {
+      return false;
+    }
+    GitSCM gitScm = (GitSCM) scm;
+    for (var repo : gitScm.getRepositories()) {
+      String remoteName = repo.getName();
+      if (remoteName != null && !remoteName.isEmpty() && !"origin".equals(remoteName)) {
+        logger.log(Level.FINE, "Skipping SCM with remote name ''{0}'' as it appears to be a shared library.",
+            remoteName);
+        return true;
+      }
+    }
+    return false;
+  }
+
   private boolean matchGitScm(SCM scm, URIish remote) {
     return ((GitSCM) scm).getRepositories().stream()
         .anyMatch((repo) -> repo.getURIs().stream().anyMatch((repoUrl) -> GitStatus.looselyMatches(repoUrl, remote)));
@@ -265,8 +281,6 @@ public class BitBucketPPRJobProbe {
             if (mbp != null) {
               for (BranchSource bs : mbp.getSourcesList()) {
                 SCMSource src = bs.getSource();
-                String getOPT1CloneUrl = bitbucketAction.getOPT1CloneUrl();
-                String getOPT2CloneUrl = bitbucketAction.getOPT2CloneUrl();
 
                 logger.log(Level.FINEST,
                       "Source Type: {0}",
@@ -280,10 +294,11 @@ public class BitBucketPPRJobProbe {
                       "Branch Source URL: {0}",
                       new String[] { gitRemote });
 
-                  if (gitRemote.equals(getOPT1CloneUrl) || gitRemote.equals(getOPT2CloneUrl)) {
+                  List<String> cloneUrls = bitbucketAction.getScmUrls();
+                  if (cloneUrls != null && cloneUrls.contains(gitRemote)) {
                     logger.log(Level.FINEST,
-                          "Branch Source URL: {0}, getOPT1CloneUrl: {1}, getOPT2CloneUrl: {2}",
-                          new String[] { gitRemote, getOPT1CloneUrl, getOPT2CloneUrl });
+                          "Branch Source URL: {0}, clone URLs: {1}",
+                          new Object[] { gitRemote, cloneUrls });
 
                     mbp.scheduleBuild2(0);
 

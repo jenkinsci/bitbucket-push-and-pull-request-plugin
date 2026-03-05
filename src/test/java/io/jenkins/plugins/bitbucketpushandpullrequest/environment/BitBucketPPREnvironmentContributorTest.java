@@ -470,6 +470,11 @@ class BitBucketPPREnvironmentContributorTest {
           hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_PAYLOAD, payload.toString()));
       assertThat(
           envVars, hasEntry(BitBucketPPREnvironmentContributor.BITBUCKET_X_EVENT, "X-EVENT"));
+      assertThat(
+          envVars,
+          hasEntry(
+              BitBucketPPREnvironmentContributor.BITBUCKET_PULL_REQUEST_COMMENT_TEXT,
+              "test general commen"));
     }
   }
 

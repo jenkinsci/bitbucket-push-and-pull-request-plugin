@@ -93,6 +93,22 @@ public class BitBucketPPRPullRequestServerAction extends BitBucketPPRActionAbstr
       }
     }
 
+    // Include fromRef clone URLs for forked PRs
+    if (!isNull(payload.getServerPullRequest().getFromRef())
+        && !isNull(payload.getServerPullRequest().getFromRef().getRepository())
+        && !isNull(payload.getServerPullRequest().getFromRef().getRepository().getLinks())
+        && !isNull(payload.getServerPullRequest().getFromRef().getRepository().getLinks()
+            .getCloneProperty())) {
+      List<BitBucketPPRServerClone> fromClones =
+          payload.getServerPullRequest().getFromRef().getRepository().getLinks().getCloneProperty();
+      for (BitBucketPPRServerClone clone : fromClones) {
+        String href = clone.getHref();
+        if (!this.scmUrls.contains(href)) {
+          this.scmUrls.add(href);
+        }
+      }
+    }
+
     if (globalConfig.isPropagationUrlSet()) {
       try {
         this.baseUrl = new URL(globalConfig.getPropagationUrl());

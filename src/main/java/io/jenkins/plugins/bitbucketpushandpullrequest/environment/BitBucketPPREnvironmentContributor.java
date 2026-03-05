@@ -210,6 +210,9 @@ public class BitBucketPPREnvironmentContributor extends EnvironmentContributor {
       putEnvVar(envVars, BITBUCKET_PULL_REQUEST_DESCRIPTION, description);
     }
 
+    String pullRequestCommentText = action.getComment();
+    putEnvVar(envVars, BITBUCKET_PULL_REQUEST_COMMENT_TEXT, pullRequestCommentText);
+
     putEnvVar(envVars, BITBUCKET_X_EVENT, hookEvent);
 
     if (config.getSetBitbucketPayload()) {

@@ -174,6 +174,12 @@ public class BitBucketPPRServerRepositoryAction extends BitBucketPPRActionAbstra
     URL baseCommitLink =
         isEmpty(this.getPropagationUrl()) ? baseUrl : new URL(this.getPropagationUrl());
 
+    if (baseCommitLink == null) {
+      logger.log(Level.WARNING,
+          "No HTTP(S) clone URL or propagation URL configured. Cannot generate commit links.");
+      return new ArrayList<>();
+    }
+
     List<BitBucketPPRServerChange> changes = payload.getServerChanges();
     List<String> links = new ArrayList<>();
     for (BitBucketPPRServerChange change : changes) {
@@ -184,6 +190,9 @@ public class BitBucketPPRServerRepositoryAction extends BitBucketPPRActionAbstra
   }
 
   private String getBaseUrl() {
+    if (baseUrl == null) {
+      return null;
+    }
     return baseUrl.getProtocol() + "://" + baseUrl.getHost() + ":" + baseUrl.getPort();
   }
 
@@ -209,11 +218,15 @@ public class BitBucketPPRServerRepositoryAction extends BitBucketPPRActionAbstra
 
   @Override
   public String getOPT1CloneUrl() {
-    return payload.getServerRepository().getLinks().getCloneProperty().get(0).getHref();
+    List<BitBucketPPRServerClone> clones =
+        payload.getServerRepository().getLinks().getCloneProperty();
+    return clones.isEmpty() ? null : clones.get(0).getHref();
   }
 
   @Override
   public String getOPT2CloneUrl() {
-    return payload.getServerRepository().getLinks().getCloneProperty().get(1).getHref();
+    List<BitBucketPPRServerClone> clones =
+        payload.getServerRepository().getLinks().getCloneProperty();
+    return clones.size() < 2 ? null : clones.get(1).getHref();
   }
 }

@@ -23,6 +23,7 @@ package io.jenkins.plugins.bitbucketpushandpullrequest.action;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -82,6 +83,50 @@ class BitBucketPPRPullRequestServerActionTest {
       BitBucketPPRPullRequestServerAction action =
           new BitBucketPPRPullRequestServerAction(payloadMock, event);
       assertEquals("123456", action.getLatestCommit());
+    }
+  }
+
+  @Test
+  void testScmUrlsIncludeFromRefForForkedPR() throws Exception {
+    try (MockedStatic<BitBucketPPRPluginConfig> config =
+        Mockito.mockStatic(BitBucketPPRPluginConfig.class)) {
+      BitBucketPPRPluginConfig c = mock(BitBucketPPRPluginConfig.class);
+      config.when(BitBucketPPRPluginConfig::getInstance).thenReturn(c);
+
+      BitBucketPPRPayload payloadMock = mock(BitBucketPPRPayload.class, RETURNS_DEEP_STUBS);
+
+      // toRef clones (target repo)
+      List<BitBucketPPRServerClone> toClones = new ArrayList<>();
+      BitBucketPPRServerClone toHttpClone = mock(BitBucketPPRServerClone.class);
+      when(toHttpClone.getName()).thenReturn("https");
+      when(toHttpClone.getHref()).thenReturn("https://bitbucket.example.org/scm/target/repo.git");
+      toClones.add(toHttpClone);
+      when(payloadMock.getServerPullRequest().getToRef().getRepository().getLinks()
+          .getCloneProperty()).thenReturn(toClones);
+
+      // fromRef clones (fork repo - different URL)
+      List<BitBucketPPRServerClone> fromClones = new ArrayList<>();
+      BitBucketPPRServerClone fromHttpClone = mock(BitBucketPPRServerClone.class);
+      when(fromHttpClone.getName()).thenReturn("https");
+      when(fromHttpClone.getHref()).thenReturn("https://bitbucket.example.org/scm/fork/repo.git");
+      fromClones.add(fromHttpClone);
+      BitBucketPPRServerClone fromSshClone = mock(BitBucketPPRServerClone.class);
+      when(fromSshClone.getName()).thenReturn("ssh");
+      when(fromSshClone.getHref()).thenReturn("ssh://git@bitbucket.example.org/fork/repo.git");
+      fromClones.add(fromSshClone);
+      when(payloadMock.getServerPullRequest().getFromRef().getRepository().getLinks()
+          .getCloneProperty()).thenReturn(fromClones);
+
+      BitBucketPPRHookEvent bitbucketEvent = mock(BitBucketPPRHookEvent.class);
+      when(bitbucketEvent.getAction()).thenReturn("created");
+      BitBucketPPRPullRequestServerAction action =
+          new BitBucketPPRPullRequestServerAction(payloadMock, bitbucketEvent);
+
+      List<String> scmUrls = action.getScmUrls();
+      assertTrue(scmUrls.contains("https://bitbucket.example.org/scm/target/repo.git"));
+      assertTrue(scmUrls.contains("https://bitbucket.example.org/scm/fork/repo.git"));
+      assertTrue(scmUrls.contains("ssh://git@bitbucket.example.org/fork/repo.git"));
+      assertEquals(3, scmUrls.size());
     }
   }
 }

@@ -22,6 +22,8 @@
 package io.jenkins.plugins.bitbucketpushandpullrequest.action;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -65,6 +67,75 @@ class BitBucketPPRServerRepositoryActionTest {
           payloadMock);
 
       assertDoesNotThrow(bitBucketPPRServerRepositoryAction::getCommitLinks);
+    }
+  }
+
+  @Test
+  void testGetCommitLinksWithNullBaseUrlAndNoPropagationUrl() {
+    try (MockedStatic<BitBucketPPRPluginConfig> config = Mockito.mockStatic(
+        BitBucketPPRPluginConfig.class)) {
+      BitBucketPPRPluginConfig c = mock(BitBucketPPRPluginConfig.class);
+      config.when(BitBucketPPRPluginConfig::getInstance).thenReturn(c);
+
+      BitBucketPPRPayload payloadMock = mock(BitBucketPPRPayload.class, RETURNS_DEEP_STUBS);
+      List<BitBucketPPRServerClone> clones = new ArrayList<>();
+      BitBucketPPRServerClone sshClone = mock(BitBucketPPRServerClone.class);
+      when(sshClone.getName()).thenReturn("ssh");
+      when(sshClone.getHref()).thenReturn("ssh://git@example.org/ns/repo.git");
+      clones.add(sshClone);
+      when(payloadMock.getServerRepository().getLinks().getCloneProperty()).thenReturn(clones);
+
+      BitBucketPPRServerRepositoryAction action = new BitBucketPPRServerRepositoryAction(payloadMock);
+
+      assertDoesNotThrow(() -> {
+        List<String> links = action.getCommitLinks();
+        assertTrue(links.isEmpty());
+      });
+    }
+  }
+
+  @Test
+  void testGetOPT1CloneUrlWithEmptyClones() {
+    try (MockedStatic<BitBucketPPRPluginConfig> config = Mockito.mockStatic(
+        BitBucketPPRPluginConfig.class)) {
+      BitBucketPPRPluginConfig c = mock(BitBucketPPRPluginConfig.class);
+      config.when(BitBucketPPRPluginConfig::getInstance).thenReturn(c);
+
+      BitBucketPPRPayload payloadMock = mock(BitBucketPPRPayload.class, RETURNS_DEEP_STUBS);
+      // Constructor needs at least one clone
+      List<BitBucketPPRServerClone> constructorClones = new ArrayList<>();
+      BitBucketPPRServerClone sshClone = mock(BitBucketPPRServerClone.class);
+      when(sshClone.getName()).thenReturn("ssh");
+      when(sshClone.getHref()).thenReturn("ssh://git@example.org/ns/repo.git");
+      constructorClones.add(sshClone);
+      when(payloadMock.getServerRepository().getLinks().getCloneProperty())
+          .thenReturn(constructorClones)
+          .thenReturn(new ArrayList<>());
+
+      BitBucketPPRServerRepositoryAction action = new BitBucketPPRServerRepositoryAction(payloadMock);
+
+      assertNull(action.getOPT1CloneUrl());
+    }
+  }
+
+  @Test
+  void testGetOPT2CloneUrlWithSingleClone() {
+    try (MockedStatic<BitBucketPPRPluginConfig> config = Mockito.mockStatic(
+        BitBucketPPRPluginConfig.class)) {
+      BitBucketPPRPluginConfig c = mock(BitBucketPPRPluginConfig.class);
+      config.when(BitBucketPPRPluginConfig::getInstance).thenReturn(c);
+
+      BitBucketPPRPayload payloadMock = mock(BitBucketPPRPayload.class, RETURNS_DEEP_STUBS);
+      List<BitBucketPPRServerClone> clones = new ArrayList<>();
+      BitBucketPPRServerClone sshClone = mock(BitBucketPPRServerClone.class);
+      when(sshClone.getName()).thenReturn("ssh");
+      when(sshClone.getHref()).thenReturn("ssh://git@example.org/ns/repo.git");
+      clones.add(sshClone);
+      when(payloadMock.getServerRepository().getLinks().getCloneProperty()).thenReturn(clones);
+
+      BitBucketPPRServerRepositoryAction action = new BitBucketPPRServerRepositoryAction(payloadMock);
+
+      assertNull(action.getOPT2CloneUrl());
     }
   }
 }
