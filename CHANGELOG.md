@@ -1,5 +1,16 @@
 # Change Log
 
+## 3.3.4 (2026-03-05)
+
+### Security Fixes
+* **Add `@POST` annotations to Stapler endpoints** - `doCheckPropagationUrl()`, `doFillCredentialsIdItems()` (in both `BitBucketPPRPluginConfig` and `BitBucketPPRTrigger`), and `doIndex()` webhook receiver now require POST requests, preventing CSRF attacks.
+* **Add permission checks to admin endpoints** - `doCheckPropagationUrl()` and `doFillCredentialsIdItems()` now enforce `Jenkins.ADMINISTER` permission.
+
+### Bug Fixes
+* **Fix UNSTABLE builds reported as FAILED on Bitbucket** - Builds with `UNSTABLE` result are now correctly mapped to `SUCCESSFUL` status on Bitbucket (both Cloud and Server). `ABORTED` builds are mapped to `STOPPED`. Fixes #361
+
+**Full Changelog**: https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/compare/bitbucket-push-and-pull-request-3.3.3...bitbucket-push-and-pull-request-3.3.4
+
 ## 3.3.3 (2026-03-05)
 
 ### Bug Fixes
