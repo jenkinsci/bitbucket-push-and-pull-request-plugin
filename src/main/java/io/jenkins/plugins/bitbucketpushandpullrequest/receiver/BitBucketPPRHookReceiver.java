@@ -39,6 +39,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
+import org.kohsuke.stapler.verb.POST;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
@@ -69,6 +70,7 @@ public class BitBucketPPRHookReceiver extends CrumbExclusion implements Unprotec
   private static final BitBucketPPRPluginConfig globalConfig =
       BitBucketPPRPluginConfig.getInstance();
 
+  @POST
   public void doIndex(@Nonnull StaplerRequest request, @Nonnull StaplerResponse response)
       throws IOException {
     // log request URL

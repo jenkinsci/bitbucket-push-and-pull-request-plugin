@@ -33,6 +33,7 @@ import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
+import org.kohsuke.stapler.verb.POST;
 
 import com.cloudbees.plugins.credentials.CredentialsMatchers;
 import com.cloudbees.plugins.credentials.common.StandardCredentials;
@@ -101,7 +102,9 @@ public class BitBucketPPRPluginConfig extends GlobalConfiguration {
     save();
   }
 
+  @POST
   public FormValidation doCheckPropagationUrl(@QueryParameter String value) {
+    Jenkins.get().checkPermission(Jenkins.ADMINISTER);
     if (value == null || value.isEmpty()) {
       return FormValidation.ok();
     }
@@ -207,6 +210,7 @@ public class BitBucketPPRPluginConfig extends GlobalConfiguration {
     return true;
   }
 
+  @POST
   public ListBoxModel doFillCredentialsIdItems(
       @AncestorInPath Item context,
       @QueryParameter String remote,

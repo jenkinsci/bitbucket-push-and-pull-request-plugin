@@ -41,6 +41,7 @@ import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
+import org.kohsuke.stapler.verb.POST;
 import com.cloudbees.plugins.credentials.CredentialsMatchers;
 import com.cloudbees.plugins.credentials.common.StandardCredentials;
 import com.cloudbees.plugins.credentials.common.StandardListBoxModel;
@@ -338,6 +339,7 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
     private final SequentialExecutionQueue queue =
         new SequentialExecutionQueue(Jenkins.MasterComputer.threadPoolForRemoting);
 
+    @POST
     public ListBoxModel doFillCredentialsIdItems(
         @AncestorInPath Item context,
         @QueryParameter String remote,
