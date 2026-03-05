@@ -49,8 +49,8 @@ public class BitBucketPPRPushCloudObserver extends BitBucketPPRHandlerTemplate
   public void setBuildStatusOnFinished() throws MalformedURLException {
     BitBucketPPRAction bitbucketAction = context.getAction();
     Result result = context.getRun().getResult();
-    String state =
-        result == Result.SUCCESS ? "SUCCESSFUL" : result == Result.ABORTED ? "STOPPED" : "FAILED";
+    String state = result == Result.SUCCESS || result == Result.UNSTABLE
+        ? "SUCCESSFUL" : result == Result.ABORTED ? "STOPPED" : "FAILED";
 
     Map<String, String> map = new HashMap<>();
     map.put("key", computeBitBucketBuildKey(context));

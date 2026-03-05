@@ -80,8 +80,8 @@ public class BitBucketPPRPullRequestCloudObserver extends BitBucketPPRHandlerTem
     BitBucketPPRAction bitbucketAction = context.getAction();
     String url = bitbucketAction.getCommitLink() + "/statuses/build";
     Result result = context.getRun().getResult();
-    String state =
-        result == Result.SUCCESS ? "SUCCESSFUL" : result == Result.ABORTED ? "STOPPED" : "FAILED";
+    String state = result == Result.SUCCESS || result == Result.UNSTABLE
+        ? "SUCCESSFUL" : result == Result.ABORTED ? "STOPPED" : "FAILED";
 
     Map<String, String> map = new HashMap<>();
     map.put("key", computeBitBucketBuildKey(context));
