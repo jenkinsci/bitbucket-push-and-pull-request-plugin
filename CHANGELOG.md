@@ -1,5 +1,16 @@
 # Change Log
 
+## 3.3.3 (2026-03-05)
+
+### Bug Fixes
+* **Fix NPE in `getCommitLinks()` and bounds checking** - Added null guards for `baseCommitLink` and `baseUrl`, and bounds checking for clone URL list access in `BitBucketPPRServerRepositoryAction`. Fixes #352
+* **Fix missing `BITBUCKET_PULL_REQUEST_COMMENT_TEXT` for Cloud PR comments** - The environment variable was only set for Server PR comment events but not for Cloud. Now properly populated for Cloud `pullrequest:comment_created`, `pullrequest:comment_updated`, and `pullrequest:comment_deleted` events. Fixes #252
+* **Fix clone URL resolution for forked repositories (Server)** - When a PR originates from a forked repository, the source repo clone URLs are now included in SCM URL matching, allowing Jenkins to correctly identify and trigger builds. Fixes #279
+* **Fix hardcoded clone URL indices in `triggerMultibranchScan()`** - Replaced `getOPT1CloneUrl()`/`getOPT2CloneUrl()` with dynamic `getScmUrls()` iteration, supporting repositories with any number of clone URL protocols. Fixes #287
+* **Filter shared library SCM from build triggers** - Jenkins shared library SCMs (identified by non-standard remote names) are now excluded from webhook-triggered builds, preventing unintended builds when shared libraries share the same repository URL. Fixes #281, #196
+
+**Full Changelog**: https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/compare/bitbucket-push-and-pull-request-3.3.2...bitbucket-push-and-pull-request-3.3.3
+
 ## 3.3.2 (2026-03-01)
 
 ### What's Changed
