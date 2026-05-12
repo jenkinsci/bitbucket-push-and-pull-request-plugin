@@ -27,14 +27,11 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import hudson.plugins.git.GitSCM;
-import hudson.plugins.git.UserRemoteConfig;
 import hudson.scm.SCM;
 import io.jenkins.plugins.bitbucketpushandpullrequest.config.BitBucketPPRPluginConfig;
 import java.lang.reflect.Method;
-import java.util.Collections;
 import java.util.List;
 import org.eclipse.jgit.transport.RemoteConfig;
-import org.eclipse.jgit.transport.URIish;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.MockedStatic;
@@ -54,7 +51,7 @@ class BitBucketPPRJobProbeTest {
   }
 
   @Test
-  void testIsLibrarySCMWithOriginRemote() throws Exception {
+  void testIsLibrarySCMWithSingleOriginRemoteIsNotLibrary() throws Exception {
     try (MockedStatic<BitBucketPPRPluginConfig> config =
         Mockito.mockStatic(BitBucketPPRPluginConfig.class)) {
       BitBucketPPRPluginConfig c = mock(BitBucketPPRPluginConfig.class);
@@ -65,15 +62,17 @@ class BitBucketPPRJobProbeTest {
       GitSCM gitScm = mock(GitSCM.class);
       RemoteConfig remoteConfig = mock(RemoteConfig.class);
       when(remoteConfig.getName()).thenReturn("origin");
-      when(remoteConfig.getURIs()).thenReturn(List.of(new URIish("https://example.org/repo.git")));
       when(gitScm.getRepositories()).thenReturn(List.of(remoteConfig));
 
       assertFalse(invokeIsLibrarySCM(probe, gitScm));
     }
   }
 
+  // Also acts as regression guard for issue #281: a single-remote SCM whose
+  // name is non-origin is still treated as a Pipeline shared-library candidate,
+  // preserving the existing filter behavior.
   @Test
-  void testIsLibrarySCMWithLibraryRemote() throws Exception {
+  void testIsLibrarySCMWithSingleNonOriginRemoteIsClassifiedAsLibrary() throws Exception {
     try (MockedStatic<BitBucketPPRPluginConfig> config =
         Mockito.mockStatic(BitBucketPPRPluginConfig.class)) {
       BitBucketPPRPluginConfig c = mock(BitBucketPPRPluginConfig.class);
@@ -84,7 +83,6 @@ class BitBucketPPRJobProbeTest {
       GitSCM gitScm = mock(GitSCM.class);
       RemoteConfig remoteConfig = mock(RemoteConfig.class);
       when(remoteConfig.getName()).thenReturn("my-shared-lib");
-      when(remoteConfig.getURIs()).thenReturn(List.of(new URIish("https://example.org/lib.git")));
       when(gitScm.getRepositories()).thenReturn(List.of(remoteConfig));
 
       assertTrue(invokeIsLibrarySCM(probe, gitScm));
@@ -103,7 +101,6 @@ class BitBucketPPRJobProbeTest {
       GitSCM gitScm = mock(GitSCM.class);
       RemoteConfig remoteConfig = mock(RemoteConfig.class);
       when(remoteConfig.getName()).thenReturn(null);
-      when(remoteConfig.getURIs()).thenReturn(List.of(new URIish("https://example.org/repo.git")));
       when(gitScm.getRepositories()).thenReturn(List.of(remoteConfig));
 
       assertFalse(invokeIsLibrarySCM(probe, gitScm));
@@ -123,4 +120,29 @@ class BitBucketPPRJobProbeTest {
       assertFalse(invokeIsLibrarySCM(probe, nonGitScm));
     }
   }
+
+  // Regression test for issue #378: a multi-remote GitSCM must not be
+  // classified as a shared library, even though JGit's RemoteConfig deduplicates
+  // remote names as origin, origin1, origin2, ... at runtime.
+  @Test
+  void testIsLibrarySCMWithMultipleRemotesIsNotClassifiedAsLibrary() throws Exception {
+    try (MockedStatic<BitBucketPPRPluginConfig> config =
+        Mockito.mockStatic(BitBucketPPRPluginConfig.class)) {
+      BitBucketPPRPluginConfig c = mock(BitBucketPPRPluginConfig.class);
+      config.when(BitBucketPPRPluginConfig::getInstance).thenReturn(c);
+
+      BitBucketPPRJobProbe probe = new BitBucketPPRJobProbe();
+
+      GitSCM gitScm = mock(GitSCM.class);
+      RemoteConfig origin = mock(RemoteConfig.class);
+      when(origin.getName()).thenReturn("origin");
+      RemoteConfig origin1 = mock(RemoteConfig.class);
+      when(origin1.getName()).thenReturn("origin1");
+      when(gitScm.getRepositories()).thenReturn(List.of(origin, origin1));
+
+      assertFalse(invokeIsLibrarySCM(probe, gitScm),
+          "Multi-remote GitSCM must not be classified as a shared library solely from remote names (issue #378)");
+    }
+  }
+
 }

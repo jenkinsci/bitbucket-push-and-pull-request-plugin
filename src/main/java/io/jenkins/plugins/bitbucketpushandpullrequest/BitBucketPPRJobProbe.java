@@ -47,6 +47,7 @@ import jenkins.branch.MultiBranchProject;
 import jenkins.model.Jenkins;
 import jenkins.model.ParameterizedJobMixIn;
 import jenkins.triggers.SCMTriggerItem;
+import org.eclipse.jgit.transport.RemoteConfig;
 import org.eclipse.jgit.transport.URIish;
 import org.jenkinsci.plugins.workflow.multibranch.WorkflowMultiBranchProject;
 import jenkins.branch.BranchSource;
@@ -246,13 +247,22 @@ public class BitBucketPPRJobProbe {
       return false;
     }
     GitSCM gitScm = (GitSCM) scm;
-    for (var repo : gitScm.getRepositories()) {
-      String remoteName = repo.getName();
-      if (remoteName != null && !remoteName.isEmpty() && !"origin".equals(remoteName)) {
-        logger.log(Level.FINE, "Skipping SCM with remote name ''{0}'' as it appears to be a shared library.",
-            remoteName);
-        return true;
-      }
+    List<RemoteConfig> repositories = gitScm.getRepositories();
+
+    // A multi-remote GitSCM is a valid Jenkins configuration and must not be
+    // classified as a shared library solely from remote names. JGit may expose
+    // multiple remotes as origin, origin1, origin2, ... at runtime, which would
+    // make the non-origin heuristic skip the entire SCM before URL matching
+    // has a chance to run (issue #378).
+    if (repositories.size() != 1) {
+      return false;
+    }
+
+    String remoteName = repositories.get(0).getName();
+    if (remoteName != null && !remoteName.isEmpty() && !"origin".equals(remoteName)) {
+      logger.log(Level.FINE, "Skipping SCM with remote name ''{0}'' as it appears to be a shared library.",
+          remoteName);
+      return true;
     }
     return false;
   }
