@@ -1,5 +1,12 @@
 # Change Log
 
+## 3.3.5 (2026-05-12)
+
+### Bug Fixes
+* **Fix shared-library false positive for multi-remote `GitSCM`** - The shared-library filter introduced in 3.3.3 classified any `GitSCM` as a library whenever it had at least one `RemoteConfig` with a non-`origin` remote name. That assumption broke down for multi-remote `GitSCM` jobs, because JGit exposes configured remotes as `origin`, `origin1`, `origin2`, ... at runtime, causing the whole SCM to be skipped before URL matching could run. Webhook-triggered builds were silently dropped for any freestyle job with more than one user remote. The non-`origin` remote heuristic is now applied only to single-remote `GitSCM` instances; multi-remote SCMs are left to the existing URL matching logic. Preserves the shared-library filtering behavior from #281 / #196. Fixes #378.
+
+**Full Changelog**: https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/compare/bitbucket-push-and-pull-request-3.3.4...bitbucket-push-and-pull-request-3.3.5
+
 ## 3.3.4 (2026-03-05)
 
 ### Security Fixes
