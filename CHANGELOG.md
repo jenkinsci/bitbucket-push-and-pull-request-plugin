@@ -1,5 +1,10 @@
 # Change Log
 
+## Unreleased
+
+### Bug Fixes
+* **Fix shared-library false positive for Pipeline libraries checked out under `@libs`** - The plugin now records, at checkout time, the role each `GitSCM` plays in a build (Pipeline shared library vs. explicit checkout) and excludes from webhook matching only repositories that were used *exclusively* as a library. This preserves the multi-remote behaviour from #378, the legacy filter from #281 / #196, and triggers for jobs that use the same repository both as a library and as an explicit checkout. Note: protection starts after a job has run at least once under this version. Fixes #380.
+
 ## 3.3.5 (2026-05-12)
 
 ### Bug Fixes

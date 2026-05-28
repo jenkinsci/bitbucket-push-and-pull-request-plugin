@@ -22,12 +22,14 @@
 package io.jenkins.plugins.bitbucketpushandpullrequest;
 
 import hudson.model.Job;
+import hudson.model.Run;
 import hudson.plugins.git.GitSCM;
 import hudson.plugins.git.GitStatus;
 import hudson.scm.SCM;
 import hudson.security.ACL;
 import hudson.security.ACLContext;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
+import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRPipelineLibrarySCMAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.config.BitBucketPPRPluginConfig;
 import io.jenkins.plugins.bitbucketpushandpullrequest.exception.TriggerNotSetException;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRHookEvent;
@@ -38,7 +40,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -126,6 +127,19 @@ public class BitBucketPPRJobProbe {
 
     jobTrigger.scmTriggerItem.ifPresent(it -> it.getSCMs().forEach(scm -> {
 
+      // Single-job mode does not match webhook URLs against the job's SCM (the job is
+      // pre-selected by the caller), but the Pipeline-shared-library exclusion still
+      // applies: a library SCM that happens to be in this job's getSCMs() must not
+      // become an onPost target (issue #380).
+      if (scm instanceof GitSCM && isExcludedAsPipelineLibrary(job, (GitSCM) scm)) {
+        if (logger.isLoggable(Level.FINE)) {
+          logger.log(Level.FINE,
+              "Skipping SCM for single-job {0}: classified as a Pipeline shared library.",
+              job.getName());
+        }
+        return;
+      }
+
       if (!scmTriggered.contains(scm)) {
         scmTriggered.add(scm);
 
@@ -162,13 +176,34 @@ public class BitBucketPPRJobProbe {
         return;
       }
 
-      Predicate<URIish> checkSCM = url -> scm instanceof GitSCM && !isLibrarySCM(scm) && matchGitScm(scm, url);
+      if (!(scm instanceof GitSCM)) {
+        return;
+      }
+      GitSCM gitScm = (GitSCM) scm;
 
-      if (remotes.stream().anyMatch(checkSCM) && !scmTriggered.contains(scm)) {
-        scmTriggered.add(scm);
+      // Filter ordering: match the webhook URL against the SCM FIRST. The library
+      // checks depend only on (job, scm) — running them inside the per-URI stream
+      // would re-evaluate them for every URI in `remotes`, and running them at all
+      // for jobs whose SCM URL does not even overlap the webhook payload wastes work
+      // on every unrelated job in a large Jenkins instance.
+      if (remotes.stream().noneMatch(url -> matchGitScm(gitScm, url))) {
+        if (logger.isLoggable(Level.FINE)) {
+          logger.log(Level.FINE, "{0} SCM doesn't match remote repo {1}.",
+              new Object[] {job.getName(),
+                  remotes.stream().map(URIish::toString).collect(Collectors.joining(", "))});
+        }
+        return;
+      }
+
+      if (isExcludedAsPipelineLibrary(job, gitScm)) {
+        return;
+      }
+
+      if (!scmTriggered.contains(gitScm)) {
+        scmTriggered.add(gitScm);
 
         try {
-          jobTrigger.bitbucketTrigger.onPost(bitbucketEvent, bitbucketAction, scm, observable);
+          jobTrigger.bitbucketTrigger.onPost(bitbucketEvent, bitbucketAction, gitScm, observable);
           return;
 
         } catch (Exception e) {
@@ -176,8 +211,11 @@ public class BitBucketPPRJobProbe {
         }
       }
 
-      logger.log(Level.FINE, "{0} SCM doesn't match remote repo {1} or it was already triggered.",
-          new Object[] { job.getName(), remotes.stream().map(URIish::toString).collect(Collectors.joining(", ")) });
+      if (logger.isLoggable(Level.FINE)) {
+        logger.log(Level.FINE, "{0} SCM was already triggered for remote repo {1}.",
+            new Object[] {job.getName(),
+                remotes.stream().map(URIish::toString).collect(Collectors.joining(", "))});
+      }
 
     }));
   }
@@ -242,6 +280,34 @@ public class BitBucketPPRJobProbe {
   }
 
 
+  // Two-counter scan budget:
+  //
+  // RECENT_BUILDS_WINDOW bounds the *semantic* lookback — how many builds with
+  // an informative-but-UNKNOWN verdict we are willing to look past before
+  // giving up. Pre-upgrade builds (action == null) and in-progress builds are
+  // skipped and do NOT consume this budget; otherwise their noise would mask
+  // the first informative verdict.
+  //
+  // MAX_BUILDS_TO_SCAN bounds the *operational* lookback — the absolute
+  // number of Run objects the scan will walk through, regardless of their
+  // state. Pre-upgrade and in-progress builds do not consume the semantic
+  // budget, but they still consume MAX_BUILDS_TO_SCAN. A job with thousands of
+  // pre-upgrade builds would otherwise let the semantic counter alone walk
+  // arbitrarily far; this cap keeps the per-webhook cost finite.
+  private static final int RECENT_BUILDS_WINDOW = 10;
+  private static final int MAX_BUILDS_TO_SCAN = 50;
+
+  // Together with isRecordedOnlyAsPipelineLibrary, this method participates in
+  // the Pipeline-shared-library exclusion: both gates are always evaluated and
+  // either returning true skips the SCM. isLibrarySCM is the older, narrower
+  // heuristic (single-remote with a non-origin remote name); it is retained
+  // because it still covers cases the listener cannot: builds executed before
+  // this plugin version (no recorded action) and jobs whose recent builds did
+  // not exercise the library code path (action absent from the entire window).
+  // Do NOT remove this method: deleting it would silently reintroduce #281 for
+  // those jobs. Do NOT extend it either — remote names are not a reliable
+  // signal for Pipeline shared libraries (see #378 and #380); for new shapes,
+  // extend BitBucketPPRSCMCheckoutListener / BitBucketPPRPipelineLibrarySCMAction.
   private boolean isLibrarySCM(SCM scm) {
     if (!(scm instanceof GitSCM)) {
       return false;
@@ -260,9 +326,74 @@ public class BitBucketPPRJobProbe {
 
     String remoteName = repositories.get(0).getName();
     if (remoteName != null && !remoteName.isEmpty() && !"origin".equals(remoteName)) {
-      logger.log(Level.FINE, "Skipping SCM with remote name ''{0}'' as it appears to be a shared library.",
-          remoteName);
+      if (logger.isLoggable(Level.FINE)) {
+        logger.log(Level.FINE,
+            "Skipping SCM with remote name ''{0}'' as it appears to be a shared library.",
+            remoteName);
+      }
       return true;
+    }
+    return false;
+  }
+
+  // Returns true if `scm` is recognised as a Pipeline shared library for `job`,
+  // either by the legacy remote-name heuristic (isLibrarySCM) or by an entry
+  // recorded ONLY as a library (not also as an explicit checkout) by
+  // BitBucketPPRSCMCheckoutListener within the recent-builds window.
+  private boolean isExcludedAsPipelineLibrary(Job<?, ?> job, GitSCM scm) {
+    return isLibrarySCM(scm) || isRecordedOnlyAsPipelineLibrary(job, scm);
+  }
+
+  // Scans recent builds for an authoritative verdict from
+  // BitBucketPPRPipelineLibrarySCMAction.classify(scm). The scan stops on the
+  // FIRST build whose classify is informative:
+  //   ONLY_LIBRARY         -> return true  (skip the SCM)
+  //   NON_LIBRARY_OR_MIXED -> return false (do NOT skip — the most recent build
+  //                                         with an opinion says the SCM is
+  //                                         consumed as a real source too)
+  //   UNKNOWN              -> keep scanning earlier builds
+  //
+  // The tri-state is what prevents an older "library-only" snapshot from
+  // shadowing a newer "library+explicit" snapshot — collapsing to a boolean
+  // would return true on the older entry and silently filter a webhook the
+  // user expects to fire (issue #380 corollary).
+  //
+  // In-progress builds are skipped: their action reflects whatever checkouts
+  // have completed so far and can return ONLY_LIBRARY prematurely (e.g. the
+  // library was checked out at the top of the Jenkinsfile but the explicit
+  // checkout step has not run yet). Pre-upgrade builds (action == null)
+  // contribute nothing and also do not consume the semantic window.
+  //
+  // Two budgets bound the walk: see RECENT_BUILDS_WINDOW / MAX_BUILDS_TO_SCAN.
+  private boolean isRecordedOnlyAsPipelineLibrary(Job<?, ?> job, GitSCM scm) {
+    int informativeRemaining = RECENT_BUILDS_WINDOW;
+    int scannedRemaining = MAX_BUILDS_TO_SCAN;
+    for (Run<?, ?> run = job.getLastBuild();
+         run != null && informativeRemaining > 0 && scannedRemaining > 0;
+         run = run.getPreviousBuild(), scannedRemaining--) {
+      if (run.isBuilding()) {
+        continue;
+      }
+      BitBucketPPRPipelineLibrarySCMAction action =
+          run.getAction(BitBucketPPRPipelineLibrarySCMAction.class);
+      if (action == null) {
+        continue;
+      }
+      switch (action.classify(scm)) {
+        case ONLY_LIBRARY:
+          if (logger.isLoggable(Level.FINE)) {
+            logger.log(Level.FINE,
+                "Skipping SCM {0} as it was recorded exclusively as a Pipeline shared library on build {1}.",
+                new Object[] {scm.getKey(), run.getFullDisplayName()});
+          }
+          return true;
+        case NON_LIBRARY_OR_MIXED:
+          return false;
+        case UNKNOWN:
+        default:
+          informativeRemaining--;
+          break;
+      }
     }
     return false;
   }
