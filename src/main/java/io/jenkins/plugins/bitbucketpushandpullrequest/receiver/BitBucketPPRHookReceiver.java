@@ -22,11 +22,13 @@
 package io.jenkins.plugins.bitbucketpushandpullrequest.receiver;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.zip.GZIPInputStream;
 
 import javax.annotation.Nonnull;
 import javax.naming.OperationNotSupportedException;
@@ -127,8 +129,11 @@ public class BitBucketPPRHookReceiver extends CrumbExclusion implements Unprotec
   }
 
   String getInputStream(@Nonnull StaplerRequest request) throws IOException, InputStreamException {
-    // replace The deprecated method toString(InputStream) from the type IOUtils
-    String inputStream = IOUtils.toString(request.getInputStream(), StandardCharsets.UTF_8);
+    InputStream raw = request.getInputStream();
+    if ("gzip".equalsIgnoreCase(request.getHeader("Content-Encoding"))) {
+      raw = new GZIPInputStream(raw);
+    }
+    String inputStream = IOUtils.toString(raw, StandardCharsets.UTF_8);
     if (StringUtils.isBlank(inputStream)) {
       logger.severe("The Jenkins job cannot be triggered. The input stream is empty.");
       throw new InputStreamException("The input stream is empty");

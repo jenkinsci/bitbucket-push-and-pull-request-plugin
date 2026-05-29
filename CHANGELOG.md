@@ -1,5 +1,10 @@
 # Change Log
 
+## 3.3.7 (unreleased)
+
+### Bug Fixes
+* **Handle gzip-compressed webhook payloads from Bitbucket Cloud** - When Bitbucket Cloud sends a webhook with `Content-Encoding: gzip`, the plugin now decompresses the request body before parsing it. Previously, the raw gzip bytes were read as UTF-8, corrupting the payload and causing GSON deserialization to fail silently — `getPullRequest()` returned `null`, the job was never triggered, and Jenkins still returned HTTP 200 to Bitbucket. Fixes #382.
+
 ## 3.3.6 (2026-05-28)
 
 ### Bug Fixes

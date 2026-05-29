@@ -24,15 +24,21 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.when;
 
 import hudson.ExtensionList;
 import io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst;
 import io.jenkins.plugins.bitbucketpushandpullrequest.config.BitBucketPPRPluginConfig;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.util.stream.Stream;
+import java.util.zip.GZIPOutputStream;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.kohsuke.stapler.StaplerRequest;
 import org.mockito.MockedStatic;
 import org.mockito.MockedStatic.Verification;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -51,6 +57,52 @@ class BitBucketPPRHookReceiverTest {
           .thenReturn(mock(BitBucketPPRPluginConfig.class));
       assertEquals(expected,
           BitBucketPPRHookReceiver.decodeInputStream(inputStream, contentType));
+    }
+  }
+
+  @Test
+  void getInputStream_handlesGzipContentEncoding() throws Exception {
+    String expectedJson = "{\"pullrequest\":{\"id\":1}}";
+    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    try (GZIPOutputStream gzip = new GZIPOutputStream(baos)) {
+      gzip.write(expectedJson.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+    }
+
+    javax.servlet.ServletInputStream gzipServletStream =
+        new javax.servlet.ServletInputStream() {
+          private final ByteArrayInputStream delegate =
+              new ByteArrayInputStream(baos.toByteArray());
+
+          @Override
+          public int read() {
+            return delegate.read();
+          }
+
+          @Override
+          public boolean isFinished() {
+            return delegate.available() == 0;
+          }
+
+          @Override
+          public boolean isReady() {
+            return true;
+          }
+
+          @Override
+          public void setReadListener(javax.servlet.ReadListener listener) {}
+        };
+
+    StaplerRequest request = mock(StaplerRequest.class);
+    when(request.getHeader("Content-Encoding")).thenReturn("gzip");
+    when(request.getInputStream()).thenReturn(gzipServletStream);
+    when(request.getContentType()).thenReturn("application/json");
+
+    try (MockedStatic<ExtensionList> mocked = mockStatic(ExtensionList.class)) {
+      mocked.when(
+              (Verification) ExtensionList.lookupSingleton(BitBucketPPRPluginConfig.class))
+          .thenReturn(mock(BitBucketPPRPluginConfig.class));
+      BitBucketPPRHookReceiver receiver = new BitBucketPPRHookReceiver();
+      assertEquals(expectedJson, receiver.getInputStream(request));
     }
   }
 
