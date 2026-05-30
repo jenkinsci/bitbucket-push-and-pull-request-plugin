@@ -24,6 +24,7 @@ package io.jenkins.plugins.bitbucketpushandpullrequest.receiver;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
+import java.io.PushbackInputStream;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.logging.Level;
@@ -130,15 +131,24 @@ public class BitBucketPPRHookReceiver extends CrumbExclusion implements Unprotec
 
   String getInputStream(@Nonnull StaplerRequest request) throws IOException, InputStreamException {
     InputStream raw = request.getInputStream();
-    if ("gzip".equalsIgnoreCase(request.getHeader("Content-Encoding"))) {
-      raw = new GZIPInputStream(raw);
+    boolean gzipHeader = "gzip".equalsIgnoreCase(request.getHeader("Content-Encoding"));
+    try (InputStream body = gzipHeader ? maybeGunzip(raw) : raw) {
+      String inputStream = IOUtils.toString(body, StandardCharsets.UTF_8);
+      if (StringUtils.isBlank(inputStream)) {
+        logger.severe("The Jenkins job cannot be triggered. The input stream is empty.");
+        throw new InputStreamException("The input stream is empty");
+      }
+      return decodeInputStream(inputStream, request.getContentType());
     }
-    String inputStream = IOUtils.toString(raw, StandardCharsets.UTF_8);
-    if (StringUtils.isBlank(inputStream)) {
-      logger.severe("The Jenkins job cannot be triggered. The input stream is empty.");
-      throw new InputStreamException("The input stream is empty");
-    }
-    return decodeInputStream(inputStream, request.getContentType());
+  }
+
+  private static InputStream maybeGunzip(@Nonnull InputStream in) throws IOException {
+    PushbackInputStream pb = new PushbackInputStream(in, 2);
+    byte[] magic = new byte[2];
+    int read = pb.read(magic, 0, 2);
+    pb.unread(magic, 0, read);
+    boolean isGzip = read == 2 && (magic[0] & 0xFF) == 0x1f && (magic[1] & 0xFF) == 0x8b;
+    return isGzip ? new GZIPInputStream(pb) : pb;
   }
 
   BitBucketPPRPayload getPayload(
