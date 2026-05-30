@@ -65,7 +65,7 @@ class BitBucketPPRHookReceiverTest {
   @Test
   void maybeGunzip_decompressesGzipStream() throws Exception {
     String expected = "{\"pullrequest\":{\"id\":1}}";
-    try (InputStream result = BitBucketPPRHookReceiver.maybeGunzip(
+    try (InputStream result = GzipUtils.maybeGunzip(
         new ByteArrayInputStream(gzip(expected)))) {
       assertEquals(expected, IOUtils.toString(result, StandardCharsets.UTF_8));
     }
@@ -74,9 +74,9 @@ class BitBucketPPRHookReceiverTest {
   @Test
   void maybeGunzip_passesPlainStreamThrough() throws Exception {
     // Simulates a proxy that already decompressed the body but left Content-Encoding: gzip.
-    // maybeGunzip() must detect plain JSON via magic bytes and skip decompression.
+    // GzipUtils.maybeGunzip() detects plain JSON via magic bytes and skips decompression.
     String expected = "{\"pullrequest\":{\"id\":1}}";
-    try (InputStream result = BitBucketPPRHookReceiver.maybeGunzip(
+    try (InputStream result = GzipUtils.maybeGunzip(
         new ByteArrayInputStream(expected.getBytes(StandardCharsets.UTF_8)))) {
       assertEquals(expected, IOUtils.toString(result, StandardCharsets.UTF_8));
     }
