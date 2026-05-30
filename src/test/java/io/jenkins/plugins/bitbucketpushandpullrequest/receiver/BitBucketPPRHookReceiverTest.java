@@ -24,25 +24,26 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
-import static org.mockito.Mockito.when;
 
 import hudson.ExtensionList;
 import io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst;
 import io.jenkins.plugins.bitbucketpushandpullrequest.config.BitBucketPPRPluginConfig;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.stream.Stream;
 import java.util.zip.GZIPOutputStream;
+import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.kohsuke.stapler.StaplerRequest;
 import org.mockito.MockedStatic;
 import org.mockito.MockedStatic.Verification;
 import org.mockito.junit.jupiter.MockitoExtension;
+
 
 
 @ExtendWith(MockitoExtension.class)
@@ -62,40 +63,23 @@ class BitBucketPPRHookReceiverTest {
   }
 
   @Test
-  void getInputStream_decompressesGzipBody() throws Exception {
-    String expectedJson = "{\"pullrequest\":{\"id\":1}}";
-    StaplerRequest request = mock(StaplerRequest.class);
-    when(request.getHeader("Content-Encoding")).thenReturn("gzip");
-    when(request.getInputStream()).thenReturn(toServletStream(gzip(expectedJson)));
-    when(request.getContentType()).thenReturn("application/json");
-
-    assertEquals(expectedJson, new BitBucketPPRHookReceiver().getInputStream(request));
+  void maybeGunzip_decompressesGzipStream() throws Exception {
+    String expected = "{\"pullrequest\":{\"id\":1}}";
+    try (InputStream result = BitBucketPPRHookReceiver.maybeGunzip(
+        new ByteArrayInputStream(gzip(expected)))) {
+      assertEquals(expected, IOUtils.toString(result, StandardCharsets.UTF_8));
+    }
   }
 
   @Test
-  void getInputStream_doesNotDoubleDecompress_whenProxyAlreadyInflated() throws Exception {
-    // Proxy already decompressed the body but left Content-Encoding: gzip header in place.
+  void maybeGunzip_passesPlainStreamThrough() throws Exception {
+    // Simulates a proxy that already decompressed the body but left Content-Encoding: gzip.
     // maybeGunzip() must detect plain JSON via magic bytes and skip decompression.
-    String expectedJson = "{\"pullrequest\":{\"id\":1}}";
-    StaplerRequest request = mock(StaplerRequest.class);
-    when(request.getHeader("Content-Encoding")).thenReturn("gzip");
-    when(request.getInputStream()).thenReturn(
-        toServletStream(expectedJson.getBytes(StandardCharsets.UTF_8)));
-    when(request.getContentType()).thenReturn("application/json");
-
-    assertEquals(expectedJson, new BitBucketPPRHookReceiver().getInputStream(request));
-  }
-
-  @Test
-  void getInputStream_handlesPlainJsonWithoutContentEncodingHeader() throws Exception {
-    String expectedJson = "{\"pullrequest\":{\"id\":1}}";
-    StaplerRequest request = mock(StaplerRequest.class);
-    when(request.getHeader("Content-Encoding")).thenReturn(null);
-    when(request.getInputStream()).thenReturn(
-        toServletStream(expectedJson.getBytes(StandardCharsets.UTF_8)));
-    when(request.getContentType()).thenReturn("application/json");
-
-    assertEquals(expectedJson, new BitBucketPPRHookReceiver().getInputStream(request));
+    String expected = "{\"pullrequest\":{\"id\":1}}";
+    try (InputStream result = BitBucketPPRHookReceiver.maybeGunzip(
+        new ByteArrayInputStream(expected.getBytes(StandardCharsets.UTF_8)))) {
+      assertEquals(expected, IOUtils.toString(result, StandardCharsets.UTF_8));
+    }
   }
 
   private static byte[] gzip(String input) throws java.io.IOException {
@@ -104,16 +88,6 @@ class BitBucketPPRHookReceiverTest {
       gz.write(input.getBytes(StandardCharsets.UTF_8));
     }
     return baos.toByteArray();
-  }
-
-  private static javax.servlet.ServletInputStream toServletStream(byte[] bytes) {
-    return new javax.servlet.ServletInputStream() {
-      private final ByteArrayInputStream delegate = new ByteArrayInputStream(bytes);
-      @Override public int read() { return delegate.read(); }
-      @Override public boolean isFinished() { return delegate.available() == 0; }
-      @Override public boolean isReady() { return true; }
-      @Override public void setReadListener(javax.servlet.ReadListener l) {}
-    };
   }
 
   static Stream<Arguments> paramsProvider() {

@@ -142,7 +142,7 @@ public class BitBucketPPRHookReceiver extends CrumbExclusion implements Unprotec
     }
   }
 
-  private static InputStream maybeGunzip(@Nonnull InputStream in) throws IOException {
+  static InputStream maybeGunzip(@Nonnull InputStream in) throws IOException {
     PushbackInputStream pb = new PushbackInputStream(in, 2);
     byte[] magic = new byte[2];
     int read = pb.read(magic, 0, 2);
