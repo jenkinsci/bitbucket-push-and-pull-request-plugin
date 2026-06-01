@@ -22,6 +22,7 @@
 package io.jenkins.plugins.bitbucketpushandpullrequest.receiver;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
@@ -127,13 +128,16 @@ public class BitBucketPPRHookReceiver extends CrumbExclusion implements Unprotec
   }
 
   String getInputStream(@Nonnull StaplerRequest request) throws IOException, InputStreamException {
-    // replace The deprecated method toString(InputStream) from the type IOUtils
-    String inputStream = IOUtils.toString(request.getInputStream(), StandardCharsets.UTF_8);
-    if (StringUtils.isBlank(inputStream)) {
-      logger.severe("The Jenkins job cannot be triggered. The input stream is empty.");
-      throw new InputStreamException("The input stream is empty");
+    boolean gzipHeader = "gzip".equalsIgnoreCase(request.getHeader("Content-Encoding"));
+    try (InputStream body = gzipHeader ? GzipUtils.maybeGunzip(request.getInputStream())
+        : request.getInputStream()) {
+      String inputStream = IOUtils.toString(body, StandardCharsets.UTF_8);
+      if (StringUtils.isBlank(inputStream)) {
+        logger.severe("The Jenkins job cannot be triggered. The input stream is empty.");
+        throw new InputStreamException("The input stream is empty");
+      }
+      return decodeInputStream(inputStream, request.getContentType());
     }
-    return decodeInputStream(inputStream, request.getContentType());
   }
 
   BitBucketPPRPayload getPayload(
