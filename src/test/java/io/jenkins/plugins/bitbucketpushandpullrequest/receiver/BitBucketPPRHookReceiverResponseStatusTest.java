@@ -55,7 +55,7 @@ class BitBucketPPRHookReceiverResponseStatusTest {
   static Stream<Arguments> cases() {
     return Stream.of(
         arguments("pullrequest:created", "{}", 400, "cloud PR without pullrequest -> 400"),
-        arguments("pullrequest:created", "{\"pullrequest\":{\"id\":\"1\"}}", 400,
+        arguments("pullrequest:created", "{\"pullrequest\":{\"id\":1}}", 400,
             "cloud PR with pullrequest but no repository -> 400"),
         arguments("repo:push", "{}", 400, "cloud push without push -> 400"),
         arguments("repo:push", "{\"push\":{}}", 400, "cloud push with push but no changes -> 400"),

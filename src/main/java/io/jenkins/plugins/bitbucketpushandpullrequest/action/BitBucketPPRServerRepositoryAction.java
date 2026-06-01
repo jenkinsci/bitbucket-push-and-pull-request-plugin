@@ -28,6 +28,7 @@ import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.server.BitBucketPPRServerChange;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.server.BitBucketPPRServerClone;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.server.BitBucketPPRServerLinks;
+import io.jenkins.plugins.bitbucketpushandpullrequest.model.server.BitBucketPPRServerRef;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.server.BitBucketPPRServerRepository;
 
 import javax.annotation.Nonnull;
@@ -68,23 +69,27 @@ public class BitBucketPPRServerRepositoryAction extends BitBucketPPRActionAbstra
         requirePayloadProperty(serverLinks.getCloneProperty(), "repository.links.clone");
 
     for (BitBucketPPRServerClone clone : clones) {
-      if (clone.getName().equalsIgnoreCase("http") || clone.getName().equalsIgnoreCase("https")) {
+      requirePayloadProperty(clone, "repository.links.clone[]");
+      String cloneName = requirePayloadProperty(clone.getName(), "repository.links.clone[].name");
+      if ("http".equalsIgnoreCase(cloneName) || "https".equalsIgnoreCase(cloneName)) {
         try {
           this.baseUrl = new URL(clone.getHref());
           this.scmUrls.add(clone.getHref());
         } catch (MalformedURLException e) {
           throw new RuntimeException(e);
         }
-      } else if (clone.getName().equalsIgnoreCase("ssh")) {
+      } else if ("ssh".equalsIgnoreCase(cloneName)) {
         this.scmUrls.add(clone.getHref());
       }
     }
 
     for (BitBucketPPRServerChange change : serverChanges) {
+      requirePayloadProperty(change, "changes[]");
       if (change.getRefId() != null) {
-        this.targetBranchName = change.getRef().getDisplayId();
+        BitBucketPPRServerRef ref = requirePayloadProperty(change.getRef(), "changes[].ref");
+        this.targetBranchName = ref.getDisplayId();
         this.targetBranchRefId = change.getRefId();
-        this.type = change.getRef().getType();
+        this.type = ref.getType();
         break;
       }
     }

@@ -87,8 +87,6 @@ public class BitBucketPPRHookReceiver extends CrumbExclusion implements Unprotec
       try {
         BitBucketPPRHookEvent bitbucketEvent = getBitbucketEvent(request);
         BitBucketPPRPayload payload = getPayload(getInputStream(request), bitbucketEvent);
-        BitBucketPPRObservable observable =
-            BitBucketPPRObserverFactory.createObservable(bitbucketEvent);
 
         BitBucketPPRPayloadProcessor processor;
         try {
@@ -136,6 +134,10 @@ public class BitBucketPPRHookReceiver extends CrumbExclusion implements Unprotec
 
         writeSuccessResponse(response);
 
+        // The observable is only needed to trigger jobs, so create it after the ack: an
+        // unsupported event (no processor) or a malformed payload never reaches this point.
+        BitBucketPPRObservable observable =
+            BitBucketPPRObserverFactory.createObservable(bitbucketEvent);
         processor.triggerMatchingJobs(action, observable);
       } catch (IOException
           | InputStreamException

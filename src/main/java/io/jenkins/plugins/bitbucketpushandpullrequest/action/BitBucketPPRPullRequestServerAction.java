@@ -82,14 +82,17 @@ public class BitBucketPPRPullRequestServerAction extends BitBucketPPRActionAbstr
           "Number of clone urls in JSON payload is zero.");
 
     for (BitBucketPPRServerClone clone : clones) {
-      if (clone.getName().equalsIgnoreCase("http") || clone.getName().equalsIgnoreCase("https")) {
+      requirePayloadProperty(clone, "pullRequest.toRef.repository.links.clone[]");
+      String cloneName =
+          requirePayloadProperty(clone.getName(), "pullRequest.toRef.repository.links.clone[].name");
+      if ("http".equalsIgnoreCase(cloneName) || "https".equalsIgnoreCase(cloneName)) {
         try {
           this.baseUrl = new URL(clone.getHref());
           this.scmUrls.add(clone.getHref());
         } catch (MalformedURLException e) {
           throw new RuntimeException(e);
         }
-      } else if (clone.getName().equalsIgnoreCase("ssh")) {
+      } else if ("ssh".equalsIgnoreCase(cloneName)) {
         this.scmUrls.add(clone.getHref());
       }
     }
