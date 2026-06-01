@@ -46,6 +46,7 @@ class BitBucketPPRPullRequestActionTest {
       BitBucketPPRPayload payloadMock = mock(BitBucketPPRPayload.class, RETURNS_DEEP_STUBS);
       when(payloadMock.getRepository().getLinks().getHtml().getHref())
           .thenReturn("https://bitbucket.org/testproject/test-repo");
+      when(payloadMock.getPullRequest().getId()).thenReturn("1");
       when(payloadMock.getPullRequest().getMergeCommit().getHash()).thenReturn("123456");
       BitBucketPPRHookEvent event = mock(BitBucketPPRHookEvent.class);
       when(event.getAction()).thenReturn("fulfilled");

@@ -134,8 +134,10 @@ public class BitBucketPPRHookReceiver extends CrumbExclusion implements Unprotec
 
         writeSuccessResponse(response);
 
-        // The observable is only needed to trigger jobs, so create it after the ack: an
-        // unsupported event (no processor) or a malformed payload never reaches this point.
+        // The observable is only needed for job triggering. At this point the request has already
+        // been validated and acknowledged; anything from here on (observable creation, job
+        // matching/notification) is internal post-ack processing and keeps the previous semantics
+        // of failing after the 200 rather than affecting the acknowledged response.
         BitBucketPPRObservable observable =
             BitBucketPPRObserverFactory.createObservable(bitbucketEvent);
         processor.triggerMatchingJobs(action, observable);

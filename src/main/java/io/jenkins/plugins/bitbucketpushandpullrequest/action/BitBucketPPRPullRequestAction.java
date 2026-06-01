@@ -78,7 +78,7 @@ public class BitBucketPPRPullRequestAction extends BitBucketPPRActionAbstract
     BitBucketPPRLinkHtml html = requirePayloadProperty(links.getHtml(), "repository.links.html");
     String htmlHref = requirePayloadProperty(html.getHref(), "repository.links.html.href");
     this.payload = payload;
-    this.pullRequestId = pullRequest.getId();
+    this.pullRequestId = requirePayloadProperty(pullRequest.getId(), "pullrequest.id");
     this.bitbucketEvent = event;
 
     Map<String, String> workspaceRepo;

@@ -86,14 +86,17 @@ public class BitBucketPPRPullRequestServerAction extends BitBucketPPRActionAbstr
       String cloneName =
           requirePayloadProperty(clone.getName(), "pullRequest.toRef.repository.links.clone[].name");
       if ("http".equalsIgnoreCase(cloneName) || "https".equalsIgnoreCase(cloneName)) {
+        String cloneHref = requirePayloadProperty(
+            clone.getHref(), "pullRequest.toRef.repository.links.clone[].href");
         try {
-          this.baseUrl = new URL(clone.getHref());
-          this.scmUrls.add(clone.getHref());
+          this.baseUrl = new URL(cloneHref);
+          this.scmUrls.add(cloneHref);
         } catch (MalformedURLException e) {
           throw new RuntimeException(e);
         }
       } else if ("ssh".equalsIgnoreCase(cloneName)) {
-        this.scmUrls.add(clone.getHref());
+        this.scmUrls.add(requirePayloadProperty(
+            clone.getHref(), "pullRequest.toRef.repository.links.clone[].href"));
       }
     }
 
