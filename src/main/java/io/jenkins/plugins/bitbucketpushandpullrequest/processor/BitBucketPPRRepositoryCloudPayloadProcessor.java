@@ -25,9 +25,9 @@ import javax.annotation.Nonnull;
 import io.jenkins.plugins.bitbucketpushandpullrequest.BitBucketPPRJobProbe;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRRepositoryAction;
+import io.jenkins.plugins.bitbucketpushandpullrequest.exception.BitBucketPPRPayloadPropertyNotFoundException;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRHookEvent;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
-import io.jenkins.plugins.bitbucketpushandpullrequest.observer.BitBucketPPRObservable;
 
 
 public class BitBucketPPRRepositoryCloudPayloadProcessor extends BitBucketPPRPayloadProcessor {
@@ -39,15 +39,10 @@ public class BitBucketPPRRepositoryCloudPayloadProcessor extends BitBucketPPRPay
     super(jobProbe, bitbucketEvent);
   }
 
-  private BitBucketPPRAction buildActionForJobs(@Nonnull BitBucketPPRPayload payload) {
+  @Override
+  public BitBucketPPRAction buildActionForJobs(@Nonnull BitBucketPPRPayload payload)
+      throws BitBucketPPRPayloadPropertyNotFoundException {
     logger.info("Instantiate BitBucketPPRRepositoryAction");
     return new BitBucketPPRRepositoryAction(payload);
-  }
-
-  @Override
-  public void processPayload(@Nonnull BitBucketPPRPayload payload,
-      BitBucketPPRObservable observable) {
-    BitBucketPPRAction action = buildActionForJobs(payload);
-    jobProbe.triggerMatchingJobs(bitbucketEvent, action, observable);
   }
 }

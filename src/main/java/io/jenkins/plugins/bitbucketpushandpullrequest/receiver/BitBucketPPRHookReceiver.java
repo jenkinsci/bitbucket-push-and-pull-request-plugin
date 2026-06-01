@@ -56,8 +56,10 @@ import io.jenkins.plugins.bitbucketpushandpullrequest.exception.InputStreamExcep
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRHookEvent;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayloadFactory;
+import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.observer.BitBucketPPRObservable;
 import io.jenkins.plugins.bitbucketpushandpullrequest.observer.BitBucketPPRObserverFactory;
+import io.jenkins.plugins.bitbucketpushandpullrequest.processor.BitBucketPPRPayloadProcessor;
 import io.jenkins.plugins.bitbucketpushandpullrequest.processor.BitBucketPPRPayloadProcessorFactory;
 
 /**
@@ -88,21 +90,48 @@ public class BitBucketPPRHookReceiver extends CrumbExclusion implements Unprotec
         BitBucketPPRObservable observable =
             BitBucketPPRObserverFactory.createObservable(bitbucketEvent);
 
+        BitBucketPPRPayloadProcessor processor;
+        try {
+          processor = BitBucketPPRPayloadProcessorFactory.createProcessor(bitbucketEvent);
+        } catch (OperationNotSupportedException e) {
+          // No processor handles this event (e.g. a diagnostics ping, the deprecated repo:post
+          // action, or an unknown/future event whose body still parsed): acknowledge with 200 and
+          // stop, preserving the previous behaviour for unsupported-but-harmless events.
+          logger.info(
+              "No processor for the bitbucket event; acknowledging without processing. "
+                  + e.getMessage());
+          writeSuccessResponse(response);
+          return;
+        }
+
+        // Build (and thereby validate) the action BEFORE acknowledging the webhook, so a
+        // malformed or unusable payload is rejected with a 4xx instead of a silent HTTP 200
+        // followed by a dropped job (issue #384). Any failure to build the action -- a missing
+        // property (BitBucketPPRPayloadPropertyNotFoundException) or an unparseable field that
+        // surfaces as a RuntimeException (e.g. an unparseable repository/clone URL) -- maps to a
+        // 400 here, before the acknowledgement.
+        BitBucketPPRAction action;
+        try {
+          action = processor.buildActionForJobs(payload);
+        } catch (BitBucketPPRPayloadPropertyNotFoundException | RuntimeException e) {
+          logger.log(Level.WARNING,
+              "The Jenkins job cannot be triggered: the webhook payload is malformed or missing a "
+                  + "required property, so the request is rejected. It could also be that the "
+                  + "Bitbucket Client / Server version is not currently supported by the plugin.",
+              e);
+          writeFailResponse(response);
+          return;
+        }
+
         writeSuccessResponse(response);
 
-        BitBucketPPRPayloadProcessorFactory.createProcessor(bitbucketEvent)
-            .processPayload(payload, observable);
+        processor.triggerMatchingJobs(action, observable);
       } catch (IOException
           | InputStreamException
           | JsonSyntaxException
           | OperationNotSupportedException e) {
         System.out.println(">>> Exception: " + e.getMessage());
         writeFailResponse(response);
-      } catch (BitBucketPPRPayloadPropertyNotFoundException e) {
-        logger.info(
-            "Payload Property doesn't exists. It could be that the "
-                + "Bitbucket Client / Server version is not currently supported by the plugin. "
-                + e.getMessage());
       }
     }
   }

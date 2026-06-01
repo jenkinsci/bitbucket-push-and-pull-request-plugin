@@ -66,14 +66,8 @@ public class BitBucketPPRPullRequestAction extends BitBucketPPRActionAbstract
   public BitBucketPPRPullRequestAction(
       @Nonnull BitBucketPPRPayload payload, @Nonnull BitBucketPPRHookEvent event)
       throws BitBucketPPRPayloadPropertyNotFoundException {
-    if (payload.getPullRequest() == null) {
-      logger.severe(
-          "The Jenkins job cannot be triggered. The 'pullrequest' property is missing from "
-              + "the deserialized payload. The webhook body is malformed or does not match a "
-              + "Bitbucket Cloud pull request event.");
-      throw new BitBucketPPRPayloadPropertyNotFoundException(
-          "The property 'pullrequest' was not found in the JSON payload.");
-    }
+    requirePayloadProperty(payload.getPullRequest(), "pullrequest");
+    requirePayloadProperty(payload.getRepository(), "repository");
     this.payload = payload;
     this.pullRequestId = payload.getPullRequest().getId();
     this.bitbucketEvent = event;

@@ -23,6 +23,7 @@ package io.jenkins.plugins.bitbucketpushandpullrequest.action;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
 import io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRUtils;
+import io.jenkins.plugins.bitbucketpushandpullrequest.exception.BitBucketPPRPayloadPropertyNotFoundException;
 import io.jenkins.plugins.bitbucketpushandpullrequest.exception.BitBucketPPRRepositoryNotParsedException;
 
 import java.util.ArrayList;
@@ -55,7 +56,10 @@ public class BitBucketPPRRepositoryAction extends BitBucketPPRActionAbstract
 
   private String repositoryUuid;
 
-  public BitBucketPPRRepositoryAction(@Nonnull BitBucketPPRPayload payload) {
+  public BitBucketPPRRepositoryAction(@Nonnull BitBucketPPRPayload payload)
+      throws BitBucketPPRPayloadPropertyNotFoundException {
+    requirePayloadProperty(payload.getPush(), "push");
+    requirePayloadProperty(payload.getRepository(), "repository");
     this.payload = payload;
 
     for (BitBucketPPRChange change : payload.getPush().getChanges()) {

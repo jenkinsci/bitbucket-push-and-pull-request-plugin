@@ -71,4 +71,20 @@ class BitBucketPPRPullRequestActionTest {
           () -> new BitBucketPPRPullRequestAction(payloadMock, event));
     }
   }
+
+  @Test
+  void constructorThrowsWhenRepositoryMissing() {
+    // 'pullrequest' present but 'repository' missing must also be rejected: the constructor
+    // dereferences payload.getRepository() and would otherwise NPE (issue #384 follow-up).
+    try (MockedStatic<BitBucketPPRPluginConfig> config =
+        Mockito.mockStatic(BitBucketPPRPluginConfig.class)) {
+      BitBucketPPRPluginConfig c = mock(BitBucketPPRPluginConfig.class);
+      config.when(BitBucketPPRPluginConfig::getInstance).thenReturn(c);
+      BitBucketPPRPayload payloadMock = mock(BitBucketPPRPayload.class, RETURNS_DEEP_STUBS);
+      when(payloadMock.getRepository()).thenReturn(null);
+      BitBucketPPRHookEvent event = mock(BitBucketPPRHookEvent.class);
+      assertThrows(BitBucketPPRPayloadPropertyNotFoundException.class,
+          () -> new BitBucketPPRPullRequestAction(payloadMock, event));
+    }
+  }
 }

@@ -23,11 +23,27 @@ package io.jenkins.plugins.bitbucketpushandpullrequest.action;
 
 import hudson.model.InvisibleAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.config.BitBucketPPRPluginConfig;
+import io.jenkins.plugins.bitbucketpushandpullrequest.exception.BitBucketPPRPayloadPropertyNotFoundException;
 
 import static org.apache.commons.lang3.ObjectUtils.isEmpty;
 
 public class BitBucketPPRActionAbstract extends InvisibleAction {
   private String propagationUrl = "";
+
+  /**
+   * Returns {@code value} if it is non-null, otherwise throws a
+   * {@link BitBucketPPRPayloadPropertyNotFoundException} naming the missing property. Action
+   * constructors use this to reject a payload that is missing a property they need, turning a
+   * cryptic downstream {@link NullPointerException} into a clear, catchable error.
+   */
+  protected static <T> T requirePayloadProperty(T value, String property)
+      throws BitBucketPPRPayloadPropertyNotFoundException {
+    if (value == null) {
+      throw new BitBucketPPRPayloadPropertyNotFoundException(
+          "The property '" + property + "' was not found in the JSON payload.");
+    }
+    return value;
+  }
 
   public BitBucketPPRActionAbstract() {
     if (!isEmpty(getGlobalConfig().propagationUrl)) {
