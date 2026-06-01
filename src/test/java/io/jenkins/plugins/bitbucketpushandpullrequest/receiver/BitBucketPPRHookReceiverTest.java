@@ -82,6 +82,34 @@ class BitBucketPPRHookReceiverTest {
     }
   }
 
+  @Test
+  void maybeGunzip_decompressesWhenMagicBytesArrivedOneAtATime() throws Exception {
+    // Simulates a real socket where a single read() may return fewer bytes than requested
+    // (e.g. TCP segment boundary splits the two gzip magic bytes across two reads).
+    // The fill-loop in maybeGunzip() must still detect gzip correctly.
+    String expected = "{\"pullrequest\":{\"id\":1}}";
+    byte[] gzipped = gzip(expected);
+    InputStream oneByteAtATime = new InputStream() {
+      private int pos = 0;
+      @Override public int read() { return pos < gzipped.length ? (gzipped[pos++] & 0xFF) : -1; }
+      @Override public int read(byte[] b, int off, int len) {
+        if (pos >= gzipped.length) return -1;
+        b[off] = gzipped[pos++]; // deliberately return only 1 byte per call
+        return 1;
+      }
+    };
+    try (InputStream result = GzipUtils.maybeGunzip(oneByteAtATime)) {
+      assertEquals(expected, IOUtils.toString(result, StandardCharsets.UTF_8));
+    }
+  }
+
+  @Test
+  void maybeGunzip_handlesEmptyStream() throws Exception {
+    try (InputStream result = GzipUtils.maybeGunzip(new ByteArrayInputStream(new byte[0]))) {
+      assertEquals("", IOUtils.toString(result, StandardCharsets.UTF_8));
+    }
+  }
+
   private static byte[] gzip(String input) throws java.io.IOException {
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
     try (GZIPOutputStream gz = new GZIPOutputStream(baos)) {
