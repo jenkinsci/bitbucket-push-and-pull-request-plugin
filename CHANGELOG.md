@@ -1,9 +1,11 @@
 # Change Log
 
-## 3.3.7 (unreleased)
+## 3.3.7 (2026-06-01)
 
 ### Bug Fixes
 * **Handle gzip-compressed webhook payloads from Bitbucket Cloud** - When Bitbucket Cloud sends a webhook with `Content-Encoding: gzip`, the plugin now decompresses the request body before parsing it. Previously, the raw gzip bytes were read as UTF-8, corrupting the payload and causing GSON deserialization to fail silently — `getPullRequest()` returned `null`, the job was never triggered, and Jenkins still returned HTTP 200 to Bitbucket. Fixes #382.
+
+**Full Changelog**: https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/compare/bitbucket-push-and-pull-request-3.3.6...bitbucket-push-and-pull-request-3.3.7
 
 ## 3.3.6 (2026-05-28)
 
