@@ -22,11 +22,13 @@
 package io.jenkins.plugins.bitbucketpushandpullrequest.action;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import io.jenkins.plugins.bitbucketpushandpullrequest.config.BitBucketPPRPluginConfig;
+import io.jenkins.plugins.bitbucketpushandpullrequest.exception.BitBucketPPRPayloadPropertyNotFoundException;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRHookEvent;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
 import org.junit.jupiter.api.Test;
@@ -36,7 +38,7 @@ import org.mockito.Mockito;
 class BitBucketPPRPullRequestActionTest {
 
   @Test
-  void testGetMergeCommit() {
+  void testGetMergeCommit() throws Exception {
     try (MockedStatic<BitBucketPPRPluginConfig> config =
         Mockito.mockStatic(BitBucketPPRPluginConfig.class)) {
       BitBucketPPRPluginConfig c = mock(BitBucketPPRPluginConfig.class);
@@ -50,6 +52,23 @@ class BitBucketPPRPullRequestActionTest {
       BitBucketPPRPullRequestAction action = new BitBucketPPRPullRequestAction(payloadMock,
           event);
       assertEquals("123456", action.getLatestCommit());
+    }
+  }
+
+  @Test
+  void constructorThrowsWhenPullRequestMissing() {
+    // A malformed/truncated webhook body can deserialize to a payload whose 'pullrequest'
+    // property is null. The constructor must reject it with a clear, checked exception instead
+    // of throwing a cryptic NullPointerException downstream (issue #384).
+    try (MockedStatic<BitBucketPPRPluginConfig> config =
+        Mockito.mockStatic(BitBucketPPRPluginConfig.class)) {
+      BitBucketPPRPluginConfig c = mock(BitBucketPPRPluginConfig.class);
+      config.when(BitBucketPPRPluginConfig::getInstance).thenReturn(c);
+      BitBucketPPRPayload payloadMock = mock(BitBucketPPRPayload.class);
+      when(payloadMock.getPullRequest()).thenReturn(null);
+      BitBucketPPRHookEvent event = mock(BitBucketPPRHookEvent.class);
+      assertThrows(BitBucketPPRPayloadPropertyNotFoundException.class,
+          () -> new BitBucketPPRPullRequestAction(payloadMock, event));
     }
   }
 }

@@ -59,6 +59,11 @@ public class BitBucketPPRPullRequestServerAction extends BitBucketPPRActionAbstr
     this.payload = payload;
     this.bitbucketEvent = bitbucketEvent;
 
+    if (isNull(payload.getServerPullRequest())) {
+      throw new BitBucketPPRPayloadPropertyNotFoundException(
+          "The property 'pullRequest' was not found in the JSON payload.");
+    }
+
     if (isNull(payload.getServerPullRequest().getToRef())
         || isNull(payload.getServerPullRequest().getToRef().getRepository())
         || isNull(payload.getServerPullRequest().getToRef().getRepository().getLinks())

@@ -147,6 +147,13 @@ public class BitBucketPPRHookReceiver extends CrumbExclusion implements Unprotec
         new Gson()
             .fromJson(
                 inputStream, BitBucketPPRPayloadFactory.getInstance(bitbucketEvent).getClass());
+    if (pl == null) {
+      logger.severe(
+          "The Jenkins job cannot be triggered. The request body could not be deserialized "
+              + "into a usable Bitbucket payload (got null). The body is malformed, truncated, "
+              + "or does not match the expected shape for this event.");
+      throw new JsonSyntaxException("The deserialized Bitbucket payload is null.");
+    }
     logger.log(Level.FINEST, "the payload is: {0}", pl);
     return pl;
   }

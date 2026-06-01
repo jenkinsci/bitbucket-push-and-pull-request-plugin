@@ -1,5 +1,10 @@
 # Change Log
 
+## 3.3.8 (unreleased)
+
+### Bug Fixes
+* **Reject undeserializable webhook payloads with a 4xx instead of a silent HTTP 200** - When a webhook body could not be deserialized into a usable payload (malformed, truncated, or unexpected shape), GSON returned a `null` (or structurally incomplete) payload. The receiver then dereferenced it downstream — e.g. `payload.getPullRequest().getId()` — throwing a `NullPointerException` *after* the success response had already been written, so Jenkins answered HTTP 200, the job was never triggered, and the failure was silent on both sides. The receiver now rejects a `null` payload at the deserialization boundary (HTTP 400 + a clear log), and the pull request action constructors (cloud and server) throw a descriptive `BitBucketPPRPayloadPropertyNotFoundException` instead of a cryptic `NullPointerException` when the `pullrequest` property is missing. Fixes #384.
+
 ## 3.3.7 (2026-06-01)
 
 ### Bug Fixes

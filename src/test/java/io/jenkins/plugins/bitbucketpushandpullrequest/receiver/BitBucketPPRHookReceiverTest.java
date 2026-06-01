@@ -21,13 +21,17 @@
 package io.jenkins.plugins.bitbucketpushandpullrequest.receiver;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.when;
 
+import com.google.gson.JsonSyntaxException;
 import hudson.ExtensionList;
 import io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst;
 import io.jenkins.plugins.bitbucketpushandpullrequest.config.BitBucketPPRPluginConfig;
+import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRHookEvent;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
@@ -59,6 +63,23 @@ class BitBucketPPRHookReceiverTest {
           .thenReturn(mock(BitBucketPPRPluginConfig.class));
       assertEquals(expected,
           BitBucketPPRHookReceiver.decodeInputStream(inputStream, contentType));
+    }
+  }
+
+  @Test
+  void getPayload_throwsWhenPayloadDeserializesToNull() throws Exception {
+    // GSON deserializes an unusable body (e.g. the literal "null", or a corrupted/truncated
+    // payload) to a null object. The receiver must reject it at the deserialization boundary
+    // so the request maps to a 4xx, instead of proceeding to a silent HTTP 200 followed by a
+    // downstream NullPointerException (issue #384).
+    try (MockedStatic<ExtensionList> mocked = mockStatic(ExtensionList.class)) {
+      mocked.when(
+              (Verification) ExtensionList.lookupSingleton(BitBucketPPRPluginConfig.class))
+          .thenReturn(mock(BitBucketPPRPluginConfig.class));
+      BitBucketPPRHookReceiver receiver = new BitBucketPPRHookReceiver();
+      BitBucketPPRHookEvent event = mock(BitBucketPPRHookEvent.class);
+      when(event.getEvent()).thenReturn(BitBucketPPRConst.PULL_REQUEST_CLOUD_EVENT);
+      assertThrows(JsonSyntaxException.class, () -> receiver.getPayload("null", event));
     }
   }
 
