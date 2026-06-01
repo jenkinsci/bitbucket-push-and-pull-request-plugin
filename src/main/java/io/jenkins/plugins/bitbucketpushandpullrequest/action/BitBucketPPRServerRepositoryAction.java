@@ -71,6 +71,8 @@ public class BitBucketPPRServerRepositoryAction extends BitBucketPPRActionAbstra
     for (BitBucketPPRServerClone clone : clones) {
       requirePayloadProperty(clone, "repository.links.clone[]");
       String cloneName = requirePayloadProperty(clone.getName(), "repository.links.clone[].name");
+      // href is required only where it is parsed into a URL (http/https); the ssh branch merely
+      // collects it, so a null href is tolerated there (consistent with the fromRef handling).
       if ("http".equalsIgnoreCase(cloneName) || "https".equalsIgnoreCase(cloneName)) {
         String cloneHref =
             requirePayloadProperty(clone.getHref(), "repository.links.clone[].href");
@@ -81,7 +83,7 @@ public class BitBucketPPRServerRepositoryAction extends BitBucketPPRActionAbstra
           throw new RuntimeException(e);
         }
       } else if ("ssh".equalsIgnoreCase(cloneName)) {
-        this.scmUrls.add(requirePayloadProperty(clone.getHref(), "repository.links.clone[].href"));
+        this.scmUrls.add(clone.getHref());
       }
     }
 
