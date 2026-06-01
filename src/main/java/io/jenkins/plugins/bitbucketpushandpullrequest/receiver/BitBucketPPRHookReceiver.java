@@ -113,11 +113,22 @@ public class BitBucketPPRHookReceiver extends CrumbExclusion implements Unprotec
         BitBucketPPRAction action;
         try {
           action = processor.buildActionForJobs(payload);
-        } catch (BitBucketPPRPayloadPropertyNotFoundException | RuntimeException e) {
+        } catch (BitBucketPPRPayloadPropertyNotFoundException e) {
+          // The payload is missing a property the event requires (descriptive validation).
           logger.log(Level.WARNING,
-              "The Jenkins job cannot be triggered: the webhook payload is malformed or missing a "
-                  + "required property, so the request is rejected. It could also be that the "
-                  + "Bitbucket Client / Server version is not currently supported by the plugin.",
+              "The webhook payload is missing a required property; the request is rejected. It "
+                  + "could also be that the Bitbucket Client / Server version is not currently "
+                  + "supported by the plugin.",
+              e);
+          writeFailResponse(response);
+          return;
+        } catch (RuntimeException e) {
+          // Safety net: the action could not be built from this payload for some other reason
+          // (e.g. an unparseable repository/clone URL). Reject rather than ack a request we cannot
+          // act on; this is NOT necessarily a missing property.
+          logger.log(Level.WARNING,
+              "The webhook payload could not be converted into a usable action; the request is "
+                  + "rejected.",
               e);
           writeFailResponse(response);
           return;

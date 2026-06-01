@@ -35,6 +35,10 @@ import javax.annotation.Nonnull;
 
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRHookEvent;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
+import io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud.BitBucketPPRLinkHtml;
+import io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud.BitBucketPPRLinks;
+import io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud.BitBucketPPRPullRequest;
+import io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud.BitBucketPPRRepository;
 
 import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst.PULL_REQUEST_MERGED;
 import static java.util.Objects.nonNull;
@@ -66,17 +70,20 @@ public class BitBucketPPRPullRequestAction extends BitBucketPPRActionAbstract
   public BitBucketPPRPullRequestAction(
       @Nonnull BitBucketPPRPayload payload, @Nonnull BitBucketPPRHookEvent event)
       throws BitBucketPPRPayloadPropertyNotFoundException {
-    requirePayloadProperty(payload.getPullRequest(), "pullrequest");
-    requirePayloadProperty(payload.getRepository(), "repository");
+    BitBucketPPRPullRequest pullRequest =
+        requirePayloadProperty(payload.getPullRequest(), "pullrequest");
+    BitBucketPPRRepository repository =
+        requirePayloadProperty(payload.getRepository(), "repository");
+    BitBucketPPRLinks links = requirePayloadProperty(repository.getLinks(), "repository.links");
+    BitBucketPPRLinkHtml html = requirePayloadProperty(links.getHtml(), "repository.links.html");
+    String htmlHref = requirePayloadProperty(html.getHref(), "repository.links.html.href");
     this.payload = payload;
-    this.pullRequestId = payload.getPullRequest().getId();
+    this.pullRequestId = pullRequest.getId();
     this.bitbucketEvent = event;
 
     Map<String, String> workspaceRepo;
     try {
-      workspaceRepo =
-          BitBucketPPRUtils.extractRepositoryNameFromHTTPSUrl(
-              payload.getRepository().getLinks().getHtml().getHref());
+      workspaceRepo = BitBucketPPRUtils.extractRepositoryNameFromHTTPSUrl(htmlHref);
     } catch (BitBucketPPRRepositoryNotParsedException e) {
       throw new RuntimeException(e);
     }

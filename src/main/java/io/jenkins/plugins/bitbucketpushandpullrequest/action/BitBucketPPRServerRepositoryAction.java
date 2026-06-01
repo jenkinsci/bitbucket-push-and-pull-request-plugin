@@ -27,6 +27,8 @@ import io.jenkins.plugins.bitbucketpushandpullrequest.exception.BitBucketPPRPayl
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.server.BitBucketPPRServerChange;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.server.BitBucketPPRServerClone;
+import io.jenkins.plugins.bitbucketpushandpullrequest.model.server.BitBucketPPRServerLinks;
+import io.jenkins.plugins.bitbucketpushandpullrequest.model.server.BitBucketPPRServerRepository;
 
 import javax.annotation.Nonnull;
 import java.net.MalformedURLException;
@@ -53,13 +55,17 @@ public class BitBucketPPRServerRepositoryAction extends BitBucketPPRActionAbstra
 
   public BitBucketPPRServerRepositoryAction(@NonNull BitBucketPPRPayload payload)
       throws BitBucketPPRPayloadPropertyNotFoundException {
-    requirePayloadProperty(payload.getServerRepository(), "repository");
-    requirePayloadProperty(payload.getServerChanges(), "changes");
+    BitBucketPPRServerRepository serverRepository =
+        requirePayloadProperty(payload.getServerRepository(), "repository");
+    List<BitBucketPPRServerChange> serverChanges =
+        requirePayloadProperty(payload.getServerChanges(), "changes");
+    BitBucketPPRServerLinks serverLinks =
+        requirePayloadProperty(serverRepository.getLinks(), "repository.links");
     this.payload = payload;
 
     // TODO: do we need link clones or link self is enough??
     List<BitBucketPPRServerClone> clones =
-        payload.getServerRepository().getLinks().getCloneProperty();
+        requirePayloadProperty(serverLinks.getCloneProperty(), "repository.links.clone");
 
     for (BitBucketPPRServerClone clone : clones) {
       if (clone.getName().equalsIgnoreCase("http") || clone.getName().equalsIgnoreCase("https")) {
@@ -74,7 +80,7 @@ public class BitBucketPPRServerRepositoryAction extends BitBucketPPRActionAbstra
       }
     }
 
-    for (BitBucketPPRServerChange change : payload.getServerChanges()) {
+    for (BitBucketPPRServerChange change : serverChanges) {
       if (change.getRefId() != null) {
         this.targetBranchName = change.getRef().getDisplayId();
         this.targetBranchRefId = change.getRefId();

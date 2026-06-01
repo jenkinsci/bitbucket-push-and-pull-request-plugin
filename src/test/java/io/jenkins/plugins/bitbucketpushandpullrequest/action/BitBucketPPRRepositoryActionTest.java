@@ -26,10 +26,12 @@ package io.jenkins.plugins.bitbucketpushandpullrequest.action;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import io.jenkins.plugins.bitbucketpushandpullrequest.config.BitBucketPPRPluginConfig;
 import io.jenkins.plugins.bitbucketpushandpullrequest.exception.BitBucketPPRPayloadPropertyNotFoundException;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
+import io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud.BitBucketPPRPush;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
@@ -45,6 +47,21 @@ class BitBucketPPRRepositoryActionTest {
       BitBucketPPRPluginConfig c = mock(BitBucketPPRPluginConfig.class);
       config.when(BitBucketPPRPluginConfig::getInstance).thenReturn(c);
       BitBucketPPRPayload payloadMock = mock(BitBucketPPRPayload.class);
+      assertThrows(BitBucketPPRPayloadPropertyNotFoundException.class,
+          () -> new BitBucketPPRRepositoryAction(payloadMock));
+    }
+  }
+
+  @Test
+  void constructorThrowsWhenPushChangesMissing() {
+    // 'push' is present but 'push.changes' is null. The constructor iterates the changes
+    // immediately, so this nested property is validated too (issue #384 follow-up).
+    try (MockedStatic<BitBucketPPRPluginConfig> config =
+        Mockito.mockStatic(BitBucketPPRPluginConfig.class)) {
+      BitBucketPPRPluginConfig c = mock(BitBucketPPRPluginConfig.class);
+      config.when(BitBucketPPRPluginConfig::getInstance).thenReturn(c);
+      BitBucketPPRPayload payloadMock = mock(BitBucketPPRPayload.class);
+      when(payloadMock.getPush()).thenReturn(mock(BitBucketPPRPush.class)); // getChanges() == null
       assertThrows(BitBucketPPRPayloadPropertyNotFoundException.class,
           () -> new BitBucketPPRRepositoryAction(payloadMock));
     }
