@@ -23,12 +23,14 @@ package io.jenkins.plugins.bitbucketpushandpullrequest.action;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import io.jenkins.plugins.bitbucketpushandpullrequest.config.BitBucketPPRPluginConfig;
+import io.jenkins.plugins.bitbucketpushandpullrequest.exception.BitBucketPPRPayloadPropertyNotFoundException;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.server.BitBucketPPRServerClone;
 import java.util.ArrayList;
@@ -46,7 +48,21 @@ import org.mockito.quality.Strictness;
 class BitBucketPPRServerRepositoryActionTest {
 
   @Test
-  void testBaseUrlSet() {
+  void constructorThrowsWhenServerRepositoryMissing() {
+    // A malformed push payload with a null server 'repository' must be rejected with a clear
+    // checked exception instead of a cryptic NullPointerException downstream (issue #384).
+    try (MockedStatic<BitBucketPPRPluginConfig> config = Mockito.mockStatic(
+        BitBucketPPRPluginConfig.class)) {
+      BitBucketPPRPluginConfig c = mock(BitBucketPPRPluginConfig.class);
+      config.when(BitBucketPPRPluginConfig::getInstance).thenReturn(c);
+      BitBucketPPRPayload payloadMock = mock(BitBucketPPRPayload.class);
+      assertThrows(BitBucketPPRPayloadPropertyNotFoundException.class,
+          () -> new BitBucketPPRServerRepositoryAction(payloadMock));
+    }
+  }
+
+  @Test
+  void testBaseUrlSet() throws Exception {
     try (MockedStatic<BitBucketPPRPluginConfig> config = Mockito.mockStatic(
         BitBucketPPRPluginConfig.class)) {
       BitBucketPPRPluginConfig c = mock(BitBucketPPRPluginConfig.class);
@@ -71,7 +87,7 @@ class BitBucketPPRServerRepositoryActionTest {
   }
 
   @Test
-  void testGetCommitLinksWithNullBaseUrlAndNoPropagationUrl() {
+  void testGetCommitLinksWithNullBaseUrlAndNoPropagationUrl() throws Exception {
     try (MockedStatic<BitBucketPPRPluginConfig> config = Mockito.mockStatic(
         BitBucketPPRPluginConfig.class)) {
       BitBucketPPRPluginConfig c = mock(BitBucketPPRPluginConfig.class);
@@ -95,7 +111,7 @@ class BitBucketPPRServerRepositoryActionTest {
   }
 
   @Test
-  void testGetOPT1CloneUrlWithEmptyClones() {
+  void testGetOPT1CloneUrlWithEmptyClones() throws Exception {
     try (MockedStatic<BitBucketPPRPluginConfig> config = Mockito.mockStatic(
         BitBucketPPRPluginConfig.class)) {
       BitBucketPPRPluginConfig c = mock(BitBucketPPRPluginConfig.class);
@@ -119,7 +135,7 @@ class BitBucketPPRServerRepositoryActionTest {
   }
 
   @Test
-  void testGetOPT2CloneUrlWithSingleClone() {
+  void testGetOPT2CloneUrlWithSingleClone() throws Exception {
     try (MockedStatic<BitBucketPPRPluginConfig> config = Mockito.mockStatic(
         BitBucketPPRPluginConfig.class)) {
       BitBucketPPRPluginConfig c = mock(BitBucketPPRPluginConfig.class);

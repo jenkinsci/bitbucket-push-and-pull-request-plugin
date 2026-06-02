@@ -75,7 +75,7 @@ class BitBucketPPRRepositoryPayloadProcessorTest {
   }
 
   @Test
-  void testRepositoryPushWebhookGit() {
+  void testRepositoryPushWebhookGit() throws Exception {
     try (MockedStatic<BitBucketPPRPluginConfig> config =
         mockStatic(BitBucketPPRPluginConfig.class)) {
       BitBucketPPRPluginConfig configInstance = mock(BitBucketPPRPluginConfig.class);

@@ -56,6 +56,7 @@ public class BitBucketPPRPullRequestServerAction extends BitBucketPPRActionAbstr
   public BitBucketPPRPullRequestServerAction(
       @Nonnull BitBucketPPRPayload payload, BitBucketPPRHookEvent bitbucketEvent)
       throws BitBucketPPRPayloadPropertyNotFoundException {
+    requirePayloadProperty(payload.getServerPullRequest(), "pullRequest");
     this.payload = payload;
     this.bitbucketEvent = bitbucketEvent;
 
@@ -81,14 +82,21 @@ public class BitBucketPPRPullRequestServerAction extends BitBucketPPRActionAbstr
           "Number of clone urls in JSON payload is zero.");
 
     for (BitBucketPPRServerClone clone : clones) {
-      if (clone.getName().equalsIgnoreCase("http") || clone.getName().equalsIgnoreCase("https")) {
+      requirePayloadProperty(clone, "pullRequest.toRef.repository.links.clone[]");
+      String cloneName =
+          requirePayloadProperty(clone.getName(), "pullRequest.toRef.repository.links.clone[].name");
+      // href is required only where it is parsed into a URL (http/https); the ssh branch merely
+      // collects it, so a null href is tolerated there (consistent with the fromRef handling).
+      if ("http".equalsIgnoreCase(cloneName) || "https".equalsIgnoreCase(cloneName)) {
+        String cloneHref = requirePayloadProperty(
+            clone.getHref(), "pullRequest.toRef.repository.links.clone[].href");
         try {
-          this.baseUrl = new URL(clone.getHref());
-          this.scmUrls.add(clone.getHref());
+          this.baseUrl = new URL(cloneHref);
+          this.scmUrls.add(cloneHref);
         } catch (MalformedURLException e) {
           throw new RuntimeException(e);
         }
-      } else if (clone.getName().equalsIgnoreCase("ssh")) {
+      } else if ("ssh".equalsIgnoreCase(cloneName)) {
         this.scmUrls.add(clone.getHref());
       }
     }

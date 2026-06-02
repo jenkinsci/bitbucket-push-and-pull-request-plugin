@@ -1,5 +1,10 @@
 # Change Log
 
+## 3.3.8 (unreleased)
+
+### Bug Fixes
+* **Reject malformed webhook payloads before acknowledging the request** - Webhook payloads that deserialize to `null` or lack required properties were previously dereferenced downstream — e.g. `payload.getPullRequest().getId()` — throwing a `NullPointerException` *after* the HTTP 200 had already been written, so the event was acknowledged and then silently failed without triggering any job. The receiver now builds the event action *before* acknowledging the webhook: a `null` payload is rejected at the parsing boundary, and the action constructors (pull request and push, cloud and server) validate the properties they dereference and throw a descriptive `BitBucketPPRPayloadPropertyNotFoundException` naming the missing one. Such requests now return **HTTP 400** with a clear log instead of a dropped job; any other failure to build the action is also rejected rather than acknowledged. Unsupported events without a processor, such as diagnostics pings, continue to be acknowledged with HTTP 200, and valid payloads are still acknowledged before job matching runs. Fixes #384.
+
 ## 3.3.7 (2026-06-01)
 
 ### Bug Fixes

@@ -23,9 +23,13 @@ package io.jenkins.plugins.bitbucketpushandpullrequest.action;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
 import io.jenkins.plugins.bitbucketpushandpullrequest.config.BitBucketPPRPluginConfig;
+import io.jenkins.plugins.bitbucketpushandpullrequest.exception.BitBucketPPRPayloadPropertyNotFoundException;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.server.BitBucketPPRServerChange;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.server.BitBucketPPRServerClone;
+import io.jenkins.plugins.bitbucketpushandpullrequest.model.server.BitBucketPPRServerLinks;
+import io.jenkins.plugins.bitbucketpushandpullrequest.model.server.BitBucketPPRServerRef;
+import io.jenkins.plugins.bitbucketpushandpullrequest.model.server.BitBucketPPRServerRepository;
 
 import javax.annotation.Nonnull;
 import java.net.MalformedURLException;
@@ -50,31 +54,46 @@ public class BitBucketPPRServerRepositoryAction extends BitBucketPPRActionAbstra
   private String targetBranchRefId = null;
   private String type;
 
-  public BitBucketPPRServerRepositoryAction(@NonNull BitBucketPPRPayload payload) {
+  public BitBucketPPRServerRepositoryAction(@NonNull BitBucketPPRPayload payload)
+      throws BitBucketPPRPayloadPropertyNotFoundException {
+    BitBucketPPRServerRepository serverRepository =
+        requirePayloadProperty(payload.getServerRepository(), "repository");
+    List<BitBucketPPRServerChange> serverChanges =
+        requirePayloadProperty(payload.getServerChanges(), "changes");
+    BitBucketPPRServerLinks serverLinks =
+        requirePayloadProperty(serverRepository.getLinks(), "repository.links");
     this.payload = payload;
 
     // TODO: do we need link clones or link self is enough??
     List<BitBucketPPRServerClone> clones =
-        payload.getServerRepository().getLinks().getCloneProperty();
+        requirePayloadProperty(serverLinks.getCloneProperty(), "repository.links.clone");
 
     for (BitBucketPPRServerClone clone : clones) {
-      if (clone.getName().equalsIgnoreCase("http") || clone.getName().equalsIgnoreCase("https")) {
+      requirePayloadProperty(clone, "repository.links.clone[]");
+      String cloneName = requirePayloadProperty(clone.getName(), "repository.links.clone[].name");
+      // href is required only where it is parsed into a URL (http/https); the ssh branch merely
+      // collects it, so a null href is tolerated there (consistent with the fromRef handling).
+      if ("http".equalsIgnoreCase(cloneName) || "https".equalsIgnoreCase(cloneName)) {
+        String cloneHref =
+            requirePayloadProperty(clone.getHref(), "repository.links.clone[].href");
         try {
-          this.baseUrl = new URL(clone.getHref());
-          this.scmUrls.add(clone.getHref());
+          this.baseUrl = new URL(cloneHref);
+          this.scmUrls.add(cloneHref);
         } catch (MalformedURLException e) {
           throw new RuntimeException(e);
         }
-      } else if (clone.getName().equalsIgnoreCase("ssh")) {
+      } else if ("ssh".equalsIgnoreCase(cloneName)) {
         this.scmUrls.add(clone.getHref());
       }
     }
 
-    for (BitBucketPPRServerChange change : payload.getServerChanges()) {
+    for (BitBucketPPRServerChange change : serverChanges) {
+      requirePayloadProperty(change, "changes[]");
       if (change.getRefId() != null) {
-        this.targetBranchName = change.getRef().getDisplayId();
+        BitBucketPPRServerRef ref = requirePayloadProperty(change.getRef(), "changes[].ref");
+        this.targetBranchName = ref.getDisplayId();
         this.targetBranchRefId = change.getRefId();
-        this.type = change.getRef().getType();
+        this.type = ref.getType();
         break;
       }
     }

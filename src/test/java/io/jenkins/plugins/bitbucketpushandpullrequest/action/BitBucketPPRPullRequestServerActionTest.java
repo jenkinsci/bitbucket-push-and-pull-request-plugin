@@ -23,12 +23,14 @@ package io.jenkins.plugins.bitbucketpushandpullrequest.action;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import io.jenkins.plugins.bitbucketpushandpullrequest.config.BitBucketPPRPluginConfig;
+import io.jenkins.plugins.bitbucketpushandpullrequest.exception.BitBucketPPRPayloadPropertyNotFoundException;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRHookEvent;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.server.BitBucketPPRServerClone;
@@ -66,6 +68,23 @@ class BitBucketPPRPullRequestServerActionTest {
           new BitBucketPPRPullRequestServerAction(payloadMock, bitbucketEvent);
 
       assertDoesNotThrow(bitBucketPPRPullRequestServerAction::getCommitLink);
+    }
+  }
+
+  @Test
+  void constructorThrowsWhenServerPullRequestMissing() {
+    // A malformed/truncated webhook body can deserialize to a payload whose server 'pullRequest'
+    // property is null. The constructor must reject it with a clear, checked exception instead
+    // of throwing a cryptic NullPointerException downstream (issue #384).
+    try (MockedStatic<BitBucketPPRPluginConfig> config =
+        Mockito.mockStatic(BitBucketPPRPluginConfig.class)) {
+      BitBucketPPRPluginConfig c = mock(BitBucketPPRPluginConfig.class);
+      config.when(BitBucketPPRPluginConfig::getInstance).thenReturn(c);
+      BitBucketPPRPayload payloadMock = mock(BitBucketPPRPayload.class);
+      when(payloadMock.getServerPullRequest()).thenReturn(null);
+      BitBucketPPRHookEvent event = mock(BitBucketPPRHookEvent.class);
+      assertThrows(BitBucketPPRPayloadPropertyNotFoundException.class,
+          () -> new BitBucketPPRPullRequestServerAction(payloadMock, event));
     }
   }
 

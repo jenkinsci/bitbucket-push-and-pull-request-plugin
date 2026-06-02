@@ -23,6 +23,7 @@ package io.jenkins.plugins.bitbucketpushandpullrequest.action;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
 import io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRUtils;
+import io.jenkins.plugins.bitbucketpushandpullrequest.exception.BitBucketPPRPayloadPropertyNotFoundException;
 import io.jenkins.plugins.bitbucketpushandpullrequest.exception.BitBucketPPRRepositoryNotParsedException;
 
 import java.util.ArrayList;
@@ -34,6 +35,10 @@ import javax.annotation.Nonnull;
 
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud.BitBucketPPRChange;
+import io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud.BitBucketPPRLinkHtml;
+import io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud.BitBucketPPRLinks;
+import io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud.BitBucketPPRPush;
+import io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud.BitBucketPPRRepository;
 import java.util.stream.Collectors;
 
 import static org.apache.commons.lang3.ObjectUtils.isEmpty;
@@ -55,23 +60,29 @@ public class BitBucketPPRRepositoryAction extends BitBucketPPRActionAbstract
 
   private String repositoryUuid;
 
-  public BitBucketPPRRepositoryAction(@Nonnull BitBucketPPRPayload payload) {
+  public BitBucketPPRRepositoryAction(@Nonnull BitBucketPPRPayload payload)
+      throws BitBucketPPRPayloadPropertyNotFoundException {
+    BitBucketPPRPush push = requirePayloadProperty(payload.getPush(), "push");
+    List<BitBucketPPRChange> changes = requirePayloadProperty(push.getChanges(), "push.changes");
+    BitBucketPPRRepository repository =
+        requirePayloadProperty(payload.getRepository(), "repository");
+    BitBucketPPRLinks links = requirePayloadProperty(repository.getLinks(), "repository.links");
+    BitBucketPPRLinkHtml html = requirePayloadProperty(links.getHtml(), "repository.links.html");
+    String htmlHref = requirePayloadProperty(html.getHref(), "repository.links.html.href");
     this.payload = payload;
 
-    for (BitBucketPPRChange change : payload.getPush().getChanges()) {
+    for (BitBucketPPRChange change : changes) {
       if (change.getNewChange() != null) {
         this.targetBranchName = change.getNewChange().getName();
         this.type = change.getNewChange().getType();
-        this.repositoryUuid = payload.getRepository().getUuid();
+        this.repositoryUuid = repository.getUuid();
         break;
       }
     }
 
     Map<String, String> workspaceRepo;
     try {
-      workspaceRepo =
-          BitBucketPPRUtils.extractRepositoryNameFromHTTPSUrl(
-              payload.getRepository().getLinks().getHtml().getHref());
+      workspaceRepo = BitBucketPPRUtils.extractRepositoryNameFromHTTPSUrl(htmlHref);
     } catch (BitBucketPPRRepositoryNotParsedException e) {
       throw new RuntimeException(e);
     }
