@@ -36,8 +36,11 @@ import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.verb.POST;
 
 import com.cloudbees.plugins.credentials.CredentialsMatchers;
+import com.cloudbees.plugins.credentials.CredentialsProvider;
 import com.cloudbees.plugins.credentials.common.StandardCredentials;
 import com.cloudbees.plugins.credentials.common.StandardListBoxModel;
+
+import org.jenkinsci.plugins.plaincredentials.StringCredentials;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;
@@ -63,6 +66,8 @@ public class BitBucketPPRPluginConfig extends GlobalConfiguration {
   public boolean useJobNameAsBuildKey;
 
   public String credentialsId;
+
+  public String webhookSecretCredentialsId;
 
   public String singleJob;
 
@@ -180,6 +185,38 @@ public class BitBucketPPRPluginConfig extends GlobalConfiguration {
   }
 
   @DataBoundSetter
+  public void setWebhookSecretCredentialsId(@CheckForNull String webhookSecretCredentialsId) {
+    this.webhookSecretCredentialsId = webhookSecretCredentialsId;
+    save();
+  }
+
+  public String getWebhookSecretCredentialsId() {
+    return webhookSecretCredentialsId;
+  }
+
+  public boolean isWebhookSecretSet() {
+    return !isEmpty(webhookSecretCredentialsId);
+  }
+
+  /**
+   * Resolves the configured webhook secret credential to its plain text, or returns null when no
+   * credential is configured or the configured id cannot be resolved. The credential is looked up
+   * on every call so that rotating the secret takes effect without a restart.
+   */
+  @CheckForNull
+  public String getWebhookSecret() {
+    if (!isWebhookSecretSet()) {
+      return null;
+    }
+    StringCredentials credentials = CredentialsMatchers.firstOrNull(
+        CredentialsProvider.lookupCredentialsInItemGroup(StringCredentials.class, Jenkins.get(),
+            ACL.SYSTEM2, Collections.emptyList()),
+        CredentialsMatchers.withId(webhookSecretCredentialsId));
+
+    return credentials == null ? null : credentials.getSecret().getPlainText();
+  }
+
+  @DataBoundSetter
   public void setSingleJob(String singleJob) {
     if (isEmpty(singleJob)) {
       this.singleJob = "";
@@ -230,5 +267,24 @@ public class BitBucketPPRPluginConfig extends GlobalConfiguration {
             Collections.emptyList(),
             CredentialsMatchers.always())
         .includeCurrentValue(credentialsId);
+  }
+
+  @POST
+  public ListBoxModel doFillWebhookSecretCredentialsIdItems(
+      @QueryParameter String webhookSecretCredentialsId) {
+
+    if (!Jenkins.get().hasPermission(Jenkins.ADMINISTER)) {
+      return new StandardListBoxModel().includeCurrentValue(webhookSecretCredentialsId);
+    }
+
+    return new StandardListBoxModel()
+        .includeEmptyValue()
+        .includeMatchingAs(
+            ACL.SYSTEM2,
+            Jenkins.get(),
+            StringCredentials.class,
+            Collections.emptyList(),
+            CredentialsMatchers.always())
+        .includeCurrentValue(webhookSecretCredentialsId);
   }
 }
