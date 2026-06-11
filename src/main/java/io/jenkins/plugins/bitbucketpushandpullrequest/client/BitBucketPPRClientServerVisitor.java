@@ -21,9 +21,6 @@
 package io.jenkins.plugins.bitbucketpushandpullrequest.client;
 
 import java.io.IOException;
-import java.security.KeyManagementException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.commons.lang.NotImplementedException;
@@ -70,7 +67,7 @@ public class BitBucketPPRClientServerVisitor implements BitBucketPPRClientVisito
         logger.log(Level.FINEST, "Result of the state notification is: {0}, with status code: {1}",
             new Object[] {response.getEntity().getContent(),
                 response.getStatusLine().getStatusCode()});
-      } catch (IOException | KeyManagementException | NoSuchAlgorithmException | KeyStoreException e) {
+      } catch (IOException e) {
         logger.log(Level.WARNING, "Error du" + "ring state notification: {0} ", e.getMessage());
       }
     else
@@ -84,8 +81,7 @@ public class BitBucketPPRClientServerVisitor implements BitBucketPPRClientVisito
   }
 
   private HttpResponse send(StringCredentials credentials, Verb verb, String url, String payload)
-      throws IOException, KeyManagementException,
-      NoSuchAlgorithmException, KeyStoreException, NoSuchMethodException {
+      throws IOException, NoSuchMethodException {
     logger.finest("Set BB StringCredentials for BB Server state notification");
 
     BitBucketPPRBearerAuthorizationApiConsumer api =
