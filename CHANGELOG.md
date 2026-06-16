@@ -1,5 +1,12 @@
 # Change Log
 
+## 3.3.9 (2026-06-16)
+
+### Bug Fixes
+* **Use the JVM's TLS configuration for Bearer-token Bitbucket API calls** - The Bearer-token API client now follows the JVM's standard JSSE/trust-store configuration, consistent with the other API consumers. Instances using a private CA or a self-signed certificate must have it present in the JVM trust store (`javax.net.ssl.trustStore`).
+
+**Full Changelog**: https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/compare/bitbucket-push-and-pull-request-3.3.8...bitbucket-push-and-pull-request-3.3.9
+
 ## 3.3.8 (2026-06-11)
 
 ### Bug Fixes
