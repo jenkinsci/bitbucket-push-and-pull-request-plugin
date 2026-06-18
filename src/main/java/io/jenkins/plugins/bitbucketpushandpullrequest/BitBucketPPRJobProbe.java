@@ -1,7 +1,7 @@
 /*******************************************************************************
  * The MIT License
  *
- * Copyright (C) 2021, CloudBees, Inc.
+ * Copyright (C) 2018-2025, Christian Del Monte.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -21,49 +21,57 @@
 
 package io.jenkins.plugins.bitbucketpushandpullrequest;
 
-import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst.PULL_REQUEST_MERGED;
-import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst.PULL_REQUEST_SERVER_MERGED;
-import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst.REPOSITORY_CLOUD_PUSH;
-import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst.REPOSITORY_SERVER_PUSH;
-import java.net.URI;
+import hudson.model.Job;
+import hudson.model.Run;
+import hudson.plugins.git.GitSCM;
+import hudson.plugins.git.GitStatus;
+import hudson.scm.SCM;
+import hudson.security.ACL;
+import hudson.security.ACLContext;
+import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
+import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRPipelineLibrarySCMAction;
+import io.jenkins.plugins.bitbucketpushandpullrequest.config.BitBucketPPRPluginConfig;
+import io.jenkins.plugins.bitbucketpushandpullrequest.exception.TriggerNotSetException;
+import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRHookEvent;
+import io.jenkins.plugins.bitbucketpushandpullrequest.observer.BitBucketPPRObservable;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
-import org.apache.commons.lang.StringUtils;
-import org.eclipse.jgit.transport.URIish;
-import hudson.model.Job;
-import hudson.plugins.git.GitSCM;
-import hudson.plugins.git.GitStatus;
-import hudson.plugins.mercurial.MercurialSCM;
-import hudson.scm.SCM;
-import hudson.security.ACL;
-import hudson.security.ACLContext;
-import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
-import io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRUtils;
-import io.jenkins.plugins.bitbucketpushandpullrequest.exception.TriggerNotSetException;
-import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRHookEvent;
-import io.jenkins.plugins.bitbucketpushandpullrequest.observer.BitBucketPPRObservable;
 import jenkins.branch.MultiBranchProject;
 import jenkins.scm.api.SCMHead;
 import jenkins.model.Jenkins;
 import jenkins.model.ParameterizedJobMixIn;
 import jenkins.triggers.SCMTriggerItem;
+import org.eclipse.jgit.transport.RemoteConfig;
+import org.eclipse.jgit.transport.URIish;
+import org.jenkinsci.plugins.workflow.multibranch.WorkflowMultiBranchProject;
+import jenkins.branch.BranchSource;
+import jenkins.scm.api.SCMSource;
+
+import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst.*;
 
 /**
- * 
+ *
  * @author cdelmonte
  *
  */
 public class BitBucketPPRJobProbe {
   private static final Logger logger = Logger.getLogger(BitBucketPPRJobProbe.class.getName());
+
+  private static final BitBucketPPRPluginConfig globalConfig =
+          BitBucketPPRPluginConfig.getInstance();
+  private final List<SCM> scmTriggered;
+
+  public BitBucketPPRJobProbe() {
+    scmTriggered = new ArrayList<>();
+  }
 
   public void triggerMatchingJobs(BitBucketPPRHookEvent bitbucketEvent,
       BitBucketPPRAction bitbucketAction, BitBucketPPRObservable observable) {
@@ -74,7 +82,7 @@ public class BitBucketPPRJobProbe {
           String.format("Unsupported SCM type %s", bitbucketAction.getScm()));
     }
 
-    Function<String, URIish> f = (a) -> {
+    Function<String, URIish> makeUrl = a -> {
       try {
         return new URIish(a);
       } catch (URISyntaxException e) {
@@ -82,34 +90,85 @@ public class BitBucketPPRJobProbe {
         return null;
       }
     };
-    List<URIish> remotes = (List<URIish>) bitbucketAction.getScmUrls().stream().map(f)
+
+
+    List<URIish> remoteScmUrls = bitbucketAction.getScmUrls().stream().map(makeUrl)
         .filter(Objects::nonNull).collect(Collectors.toList());
 
-    try (ACLContext ctx = ACL.as(ACL.SYSTEM)) {
-      Jenkins.get().getAllItems(Job.class).stream().forEach(job -> {
+    try (ACLContext ctx = ACL.as2(ACL.SYSTEM2)) {
+      if (globalConfig.isSingleJobSet()) {
         try {
-          triggerScm(job, remotes, bitbucketEvent, bitbucketAction, observable);
+          Job job = (Job) Jenkins.get().getItemByFullName(globalConfig.getSingleJob());
+          if (job == null) {
+            logger.log(Level.WARNING, "Job could not be found!");
+            return;
+          }
+          triggerScmForSingleJob(job, remoteScmUrls, bitbucketEvent, bitbucketAction, observable);
         } catch (TriggerNotSetException e) {
           logger.log(Level.FINE, "Trigger not set");
         }
-      });
+      } else {
+        Jenkins.get().getAllItems(Job.class).forEach(job -> {
+          try {
+            triggerScm(job, remoteScmUrls, bitbucketEvent, bitbucketAction, observable);
+          } catch (TriggerNotSetException e) {
+            logger.log(Level.FINE, "Trigger not set");
+          }
+        });
+      }
     }
+  }
+
+  private void triggerScmForSingleJob(@Nonnull Job<?, ?> job, List<URIish> remotes,
+                          BitBucketPPRHookEvent bitbucketEvent, BitBucketPPRAction bitbucketAction,
+                          BitBucketPPRObservable observable) throws TriggerNotSetException {
+
+    Trigger jobTrigger = new Trigger(getBitBucketTrigger(job)
+            .orElseThrow(() -> new TriggerNotSetException(job.getFullDisplayName())), Optional.ofNullable(SCMTriggerItem.SCMTriggerItems.asSCMTriggerItem(job)));
+
+    jobTrigger.scmTriggerItem.ifPresent(it -> it.getSCMs().forEach(scm -> {
+
+      // Single-job mode does not match webhook URLs against the job's SCM (the job is
+      // pre-selected by the caller), but the Pipeline-shared-library exclusion still
+      // applies: a library SCM that happens to be in this job's getSCMs() must not
+      // become an onPost target (issue #380).
+      if (scm instanceof GitSCM && isExcludedAsPipelineLibrary(job, (GitSCM) scm)) {
+        if (logger.isLoggable(Level.FINE)) {
+          logger.log(Level.FINE,
+              "Skipping SCM for single-job {0}: classified as a Pipeline shared library.",
+              job.getName());
+        }
+        return;
+      }
+
+      if (!scmTriggered.contains(scm)) {
+        scmTriggered.add(scm);
+
+        try {
+          jobTrigger.bitbucketTrigger.onPost(bitbucketEvent, bitbucketAction, scm, observable);
+          return;
+
+        } catch (Exception e) {
+          logger.log(Level.WARNING, "Error: {0}", e.getMessage());
+        }
+      }
+
+      logger.log(Level.FINE, "{0} SCM doesn't match remote repo {1} or it was already triggered.",
+              new Object[] {job.getName(), remotes});
+
+    }));
   }
 
   private void triggerScm(@Nonnull Job<?, ?> job, List<URIish> remotes,
       BitBucketPPRHookEvent bitbucketEvent, BitBucketPPRAction bitbucketAction,
       BitBucketPPRObservable observable) throws TriggerNotSetException {
 
-    BitBucketPPRTrigger bitbucketTrigger = getBitBucketTrigger(job)
-        .orElseThrow(() -> new TriggerNotSetException(job.getFullDisplayName()));
+    Trigger jobTrigger = new Trigger(getBitBucketTrigger(job)
+            .orElseThrow(() -> new TriggerNotSetException(job.getFullDisplayName())), Optional.ofNullable(SCMTriggerItem.SCMTriggerItems.asSCMTriggerItem(job)));
 
-    // @todo shouldn't be an instance variable?
-    List<SCM> scmTriggered = new ArrayList<>();
+    jobTrigger.scmTriggerItem.ifPresent(it -> it.getSCMs().forEach(scm -> {
 
-    Optional<SCMTriggerItem> item =
-        Optional.ofNullable(SCMTriggerItem.SCMTriggerItems.asSCMTriggerItem(job));
-
-    item.ifPresent(it -> it.getSCMs().stream().forEach(scmTrigger -> {
+      triggerMultibranchScan(job, bitbucketAction);
 
       // @todo add comments to explain what is this check for
       if (job.getParent() instanceof MultiBranchProject
@@ -118,26 +177,58 @@ public class BitBucketPPRJobProbe {
         return;
       }
 
-      Predicate<URIish> p = (url) -> scmTrigger instanceof GitSCM ? matchGitScm(scmTrigger, url)
-          : scmTrigger instanceof MercurialSCM ? matchMercurialScm(scmTrigger, url) : false;
+      if (!(scm instanceof GitSCM)) {
+        return;
+      }
+      GitSCM gitScm = (GitSCM) scm;
 
-      if (remotes.stream().anyMatch(p) && !scmTriggered.contains(scmTrigger)) {
-        scmTriggered.add(scmTrigger);
+      // Filter ordering: match the webhook URL against the SCM FIRST. The library
+      // checks depend only on (job, scm) — running them inside the per-URI stream
+      // would re-evaluate them for every URI in `remotes`, and running them at all
+      // for jobs whose SCM URL does not even overlap the webhook payload wastes work
+      // on every unrelated job in a large Jenkins instance.
+      if (remotes.stream().noneMatch(url -> matchGitScm(gitScm, url))) {
+        if (logger.isLoggable(Level.FINE)) {
+          logger.log(Level.FINE, "{0} SCM doesn't match remote repo {1}.",
+              new Object[] {job.getName(),
+                  remotes.stream().map(URIish::toString).collect(Collectors.joining(", "))});
+        }
+        return;
+      }
+
+      if (isExcludedAsPipelineLibrary(job, gitScm)) {
+        return;
+      }
+
+      if (!scmTriggered.contains(gitScm)) {
+        scmTriggered.add(gitScm);
 
         try {
-          bitbucketTrigger.onPost(bitbucketEvent, bitbucketAction, scmTrigger, observable);
+          jobTrigger.bitbucketTrigger.onPost(bitbucketEvent, bitbucketAction, gitScm, observable);
           return;
 
-        } catch (Throwable e) {
+        } catch (Exception e) {
           logger.log(Level.WARNING, "Error: {0}", e.getMessage());
-          e.printStackTrace();
         }
       }
 
-      logger.log(Level.FINE, "{0} SCM doesn't match remote repo {1} or it was already triggered.",
-          new Object[] {job.getName(), remotes});
+      if (logger.isLoggable(Level.FINE)) {
+        logger.log(Level.FINE, "{0} SCM was already triggered for remote repo {1}.",
+            new Object[] {job.getName(),
+                remotes.stream().map(URIish::toString).collect(Collectors.joining(", "))});
+      }
 
     }));
+  }
+
+  private static class Trigger {
+    public final BitBucketPPRTrigger bitbucketTrigger;
+      final Optional<SCMTriggerItem> scmTriggerItem;
+
+    public Trigger(BitBucketPPRTrigger bitbucketTrigger, Optional<SCMTriggerItem> item) {
+      this.bitbucketTrigger = bitbucketTrigger;
+      this.scmTriggerItem = item;
+    }
   }
 
   private boolean mPJobShouldNotBeTriggered(Job<?, ?> job, BitBucketPPRHookEvent bitbucketEvent,
@@ -150,8 +241,9 @@ public class BitBucketPPRJobProbe {
 
       logger.log(Level.FINEST,
           "Bitbucket event is : {0}, Job Name : {1}, sourceBranchName: {2}, targetBranchName: {3}",
-          new String[] {bitbucketEvent.getAction(), displayName, sourceBranchName,
-              targetBranchName});
+          new String[] {
+              bitbucketEvent.getAction(), displayName, sourceBranchName,
+              targetBranchName });
 
       if (PULL_REQUEST_MERGED.equalsIgnoreCase(bitbucketEvent.getAction())) {
         return !displayName.equalsIgnoreCase(targetBranchName);
@@ -193,64 +285,190 @@ public class BitBucketPPRJobProbe {
   }
 
   private Optional<BitBucketPPRTrigger> getBitBucketTrigger(Job<?, ?> job) {
-    Optional<BitBucketPPRTrigger> trigger = null;
+    if (job instanceof ParameterizedJobMixIn.ParameterizedJob<?, ?> pJob) {
 
-    if (job instanceof ParameterizedJobMixIn.ParameterizedJob) {
-      ParameterizedJobMixIn.ParameterizedJob<?, ?> pJob =
-          (ParameterizedJobMixIn.ParameterizedJob<?, ?>) job;
-
-      trigger = pJob.getTriggers().values().stream().filter(BitBucketPPRTrigger.class::isInstance)
+        return pJob.getTriggers().values().stream().filter(BitBucketPPRTrigger.class::isInstance)
           .findFirst().map(BitBucketPPRTrigger.class::cast);
     }
-    return trigger;
+    return Optional.empty();
   }
 
-  // @todo: deprecated, will be removed in v3.0
-  private boolean matchMercurialScm(SCM scm, URIish remote) {
-    try {
-      URI hgUri = new URI(((MercurialSCM) scm).getSource());
 
-      logger.log(Level.INFO, "Trying to match {0} ", hgUri.toString() + "<-->" + remote.toString());
-      return hgLooselyMatches(hgUri, remote.toString());
+  // Two-counter scan budget:
+  //
+  // RECENT_BUILDS_WINDOW bounds the *semantic* lookback — how many builds with
+  // an informative-but-UNKNOWN verdict we are willing to look past before
+  // giving up. Pre-upgrade builds (action == null) and in-progress builds are
+  // skipped and do NOT consume this budget; otherwise their noise would mask
+  // the first informative verdict.
+  //
+  // MAX_BUILDS_TO_SCAN bounds the *operational* lookback — the absolute
+  // number of Run objects the scan will walk through, regardless of their
+  // state. Pre-upgrade and in-progress builds do not consume the semantic
+  // budget, but they still consume MAX_BUILDS_TO_SCAN. A job with thousands of
+  // pre-upgrade builds would otherwise let the semantic counter alone walk
+  // arbitrarily far; this cap keeps the per-webhook cost finite.
+  private static final int RECENT_BUILDS_WINDOW = 10;
+  private static final int MAX_BUILDS_TO_SCAN = 50;
 
-    } catch (URISyntaxException ex) {
-      logger.log(Level.SEVERE, "Could not parse jobSource uri: {0} ", ex);
+  // Together with isRecordedOnlyAsPipelineLibrary, this method participates in
+  // the Pipeline-shared-library exclusion: both gates are always evaluated and
+  // either returning true skips the SCM. isLibrarySCM is the older, narrower
+  // heuristic (single-remote with a non-origin remote name); it is retained
+  // because it still covers cases the listener cannot: builds executed before
+  // this plugin version (no recorded action) and jobs whose recent builds did
+  // not exercise the library code path (action absent from the entire window).
+  // Do NOT remove this method: deleting it would silently reintroduce #281 for
+  // those jobs. Do NOT extend it either — remote names are not a reliable
+  // signal for Pipeline shared libraries (see #378 and #380); for new shapes,
+  // extend BitBucketPPRSCMCheckoutListener / BitBucketPPRPipelineLibrarySCMAction.
+  private boolean isLibrarySCM(SCM scm) {
+    if (!(scm instanceof GitSCM)) {
       return false;
     }
+    GitSCM gitScm = (GitSCM) scm;
+    List<RemoteConfig> repositories = gitScm.getRepositories();
+
+    // A multi-remote GitSCM is a valid Jenkins configuration and must not be
+    // classified as a shared library solely from remote names. JGit may expose
+    // multiple remotes as origin, origin1, origin2, ... at runtime, which would
+    // make the non-origin heuristic skip the entire SCM before URL matching
+    // has a chance to run (issue #378).
+    if (repositories.size() != 1) {
+      return false;
+    }
+
+    String remoteName = repositories.get(0).getName();
+    if (remoteName != null && !remoteName.isEmpty() && !"origin".equals(remoteName)) {
+      if (logger.isLoggable(Level.FINE)) {
+        logger.log(Level.FINE,
+            "Skipping SCM with remote name ''{0}'' as it appears to be a shared library.",
+            remoteName);
+      }
+      return true;
+    }
+    return false;
+  }
+
+  // Returns true if `scm` is recognised as a Pipeline shared library for `job`,
+  // either by the legacy remote-name heuristic (isLibrarySCM) or by an entry
+  // recorded ONLY as a library (not also as an explicit checkout) by
+  // BitBucketPPRSCMCheckoutListener within the recent-builds window.
+  private boolean isExcludedAsPipelineLibrary(Job<?, ?> job, GitSCM scm) {
+    return isLibrarySCM(scm) || isRecordedOnlyAsPipelineLibrary(job, scm);
+  }
+
+  // Scans recent builds for an authoritative verdict from
+  // BitBucketPPRPipelineLibrarySCMAction.classify(scm). The scan stops on the
+  // FIRST build whose classify is informative:
+  //   ONLY_LIBRARY         -> return true  (skip the SCM)
+  //   NON_LIBRARY_OR_MIXED -> return false (do NOT skip — the most recent build
+  //                                         with an opinion says the SCM is
+  //                                         consumed as a real source too)
+  //   UNKNOWN              -> keep scanning earlier builds
+  //
+  // The tri-state is what prevents an older "library-only" snapshot from
+  // shadowing a newer "library+explicit" snapshot — collapsing to a boolean
+  // would return true on the older entry and silently filter a webhook the
+  // user expects to fire (issue #380 corollary).
+  //
+  // In-progress builds are skipped: their action reflects whatever checkouts
+  // have completed so far and can return ONLY_LIBRARY prematurely (e.g. the
+  // library was checked out at the top of the Jenkinsfile but the explicit
+  // checkout step has not run yet). Pre-upgrade builds (action == null)
+  // contribute nothing and also do not consume the semantic window.
+  //
+  // Two budgets bound the walk: see RECENT_BUILDS_WINDOW / MAX_BUILDS_TO_SCAN.
+  private boolean isRecordedOnlyAsPipelineLibrary(Job<?, ?> job, GitSCM scm) {
+    int informativeRemaining = RECENT_BUILDS_WINDOW;
+    int scannedRemaining = MAX_BUILDS_TO_SCAN;
+    for (Run<?, ?> run = job.getLastBuild();
+         run != null && informativeRemaining > 0 && scannedRemaining > 0;
+         run = run.getPreviousBuild(), scannedRemaining--) {
+      if (run.isBuilding()) {
+        continue;
+      }
+      BitBucketPPRPipelineLibrarySCMAction action =
+          run.getAction(BitBucketPPRPipelineLibrarySCMAction.class);
+      if (action == null) {
+        continue;
+      }
+      switch (action.classify(scm)) {
+        case ONLY_LIBRARY:
+          if (logger.isLoggable(Level.FINE)) {
+            logger.log(Level.FINE,
+                "Skipping SCM {0} as it was recorded exclusively as a Pipeline shared library on build {1}.",
+                new Object[] {scm.getKey(), run.getFullDisplayName()});
+          }
+          return true;
+        case NON_LIBRARY_OR_MIXED:
+          return false;
+        case UNKNOWN:
+        default:
+          informativeRemaining--;
+          break;
+      }
+    }
+    return false;
   }
 
   private boolean matchGitScm(SCM scm, URIish remote) {
     return ((GitSCM) scm).getRepositories().stream()
-        .anyMatch((a) -> a.getURIs().stream().anyMatch((b) -> GitStatus.looselyMatches(b, remote)));
+        .anyMatch((repo) -> repo.getURIs().stream().anyMatch((repoUrl) -> GitStatus.looselyMatches(repoUrl, remote)));
   }
 
+  private void triggerMultibranchScan(@Nonnull Job<?, ?> job,
+                                      BitBucketPPRAction bitbucketAction) {
 
-  // @todo: deprecated, will be removed in v3.0
-  private boolean hgLooselyMatches(URI notifyUri, String repository) {
-    boolean result = false;
-    try {
-      if (!hgIsUnexpandedEnvVar(repository)) {
-        URI repositoryUri = new URI(repository);
-        logger.log(Level.INFO, "Mercurial loose match between {0} ",
-            notifyUri.toString() + "<- and ->" + repositoryUri.toString());
-        result = Objects.equals(notifyUri.getHost(), repositoryUri.getHost())
-            && Objects.equals(StringUtils.stripEnd(notifyUri.getPath(), "/"),
-                StringUtils.stripEnd(repositoryUri.getPath(), "/"))
-            && Objects.equals(notifyUri.getQuery(), repositoryUri.getQuery());
+      String getLatestCommit = bitbucketAction.getLatestCommit();
+      String getLatestFromCommit = bitbucketAction.getLatestFromCommit();
+      String pipelineName = job.getParent().getFullName();
+      String getPayldChgType = bitbucketAction.getPayloadChangeType();
+
+      if ((getLatestCommit != null) && (getLatestFromCommit != null) && (pipelineName != null) && (getPayldChgType != null)) {
+        if ((getLatestFromCommit.equals(EMPTY_HASH) && PAYLOAD_CHANGE_TYPE_ADD.equals(getPayldChgType)) ||
+            (getLatestCommit.equals(EMPTY_HASH) && PAYLOAD_CHANGE_TYPE_DELETE.equals(getPayldChgType))) {
+
+            Jenkins jenkins = Jenkins.get();
+
+            WorkflowMultiBranchProject mbp = jenkins.getInstance().getItemByFullName(pipelineName, WorkflowMultiBranchProject.class);
+
+            if (mbp != null) {
+              for (BranchSource bs : mbp.getSourcesList()) {
+                SCMSource src = bs.getSource();
+
+                logger.log(Level.FINEST,
+                      "Source Type: {0}",
+                      new String[] { src.getDescriptor().getDisplayName() });
+
+                if (src instanceof jenkins.plugins.git.GitSCMSource) {
+                  jenkins.plugins.git.GitSCMSource git = (jenkins.plugins.git.GitSCMSource) src;
+                  String gitRemote = git.getRemote();
+
+                  logger.log(Level.FINEST,
+                      "Branch Source URL: {0}",
+                      new String[] { gitRemote });
+
+                  List<String> cloneUrls = bitbucketAction.getScmUrls();
+                  if (cloneUrls != null && cloneUrls.contains(gitRemote)) {
+                    logger.log(Level.FINEST,
+                          "Branch Source URL: {0}, clone URLs: {1}",
+                          new Object[] { gitRemote, cloneUrls });
+
+                    mbp.scheduleBuild2(0);
+
+                    logger.log(Level.INFO,
+                      "Triggered branch indexing for: {0}",
+                      new String[] { pipelineName });
+                  }
+                }
+              }
+            } else {
+                logger.log(Level.WARNING,
+                      "Multibranch job not found: {0}",
+                      new String[] { pipelineName });
+            }
+        }
       }
-    } catch (URISyntaxException ex) {
-      logger.log(Level.SEVERE, "could not parse repository uri " + repository, ex);
-    }
-    return result;
-  }
-
-  // @todo: deprecated, will be removed in v3.0
-  private boolean hgIsUnexpandedEnvVar(String str) {
-    return str.startsWith("$");
-  }
-
-  // @todo: deprecated, will be removed in v3.0
-  public boolean testMatchMercurialScm(SCM scm, URIish remote) {
-    return matchMercurialScm(scm, remote);
   }
 }
