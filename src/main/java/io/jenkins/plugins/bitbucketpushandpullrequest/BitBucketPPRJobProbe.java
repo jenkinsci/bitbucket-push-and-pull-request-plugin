@@ -52,6 +52,7 @@ import io.jenkins.plugins.bitbucketpushandpullrequest.exception.TriggerNotSetExc
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRHookEvent;
 import io.jenkins.plugins.bitbucketpushandpullrequest.observer.BitBucketPPRObservable;
 import jenkins.branch.MultiBranchProject;
+import jenkins.scm.api.SCMHead;
 import jenkins.model.Jenkins;
 import jenkins.model.ParameterizedJobMixIn;
 import jenkins.triggers.SCMTriggerItem;
@@ -161,6 +162,19 @@ public class BitBucketPPRJobProbe {
       }
 
       if (sourceBranchName != null) {
+        // For PR events, check if this job is associated with the PR's source branch
+        // via the SCMHead. This works regardless of the job's display name which may
+        // be set to the PR title by bitbucket-branch-source plugin.
+        SCMHead head = SCMHead.HeadByItem.findHead(job);
+        if (head != null) {
+          String headName = head.getName();
+          if (sourceBranchName.equalsIgnoreCase(headName)) {
+            return false; // trigger this job
+          }
+          return true; // different branch/PR, skip
+        }
+
+        // Fallback for jobs without an SCMHead: exact match on display name
         return !displayName.equalsIgnoreCase(sourceBranchName);
       }
 
