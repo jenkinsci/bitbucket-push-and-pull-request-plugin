@@ -30,8 +30,12 @@ import hudson.model.Job;
 import hudson.model.Run;
 import hudson.plugins.git.GitSCM;
 import hudson.scm.SCM;
+import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRPipelineLibrarySCMAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.config.BitBucketPPRPluginConfig;
+import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRHookEvent;
+import jenkins.scm.api.SCMHead;
+import jenkins.scm.api.mixin.ChangeRequestSCMHead2;
 import java.lang.reflect.Method;
 import java.net.URISyntaxException;
 import java.util.List;
@@ -428,6 +432,122 @@ class BitBucketPPRJobProbeTest {
 
       GitSCM scm = mockGitScmWithUrl("ssh://git@host.example.com/org/repo.git");
       assertFalse(invokeIsRecordedOnlyAsPipelineLibrary(probe, job, scm));
+    }
+  }
+
+  private boolean invokeMPJobShouldNotBeTriggered(BitBucketPPRJobProbe probe, Job<?, ?> job,
+      BitBucketPPRHookEvent event, BitBucketPPRAction action) throws Exception {
+    Method method = BitBucketPPRJobProbe.class.getDeclaredMethod("mPJobShouldNotBeTriggered",
+        Job.class, BitBucketPPRHookEvent.class, BitBucketPPRAction.class);
+    method.setAccessible(true);
+    return (boolean) method.invoke(probe, job, event, action);
+  }
+
+  private static BitBucketPPRHookEvent prEvent() {
+    BitBucketPPRHookEvent event = mock(BitBucketPPRHookEvent.class);
+    when(event.getAction()).thenReturn("pullrequest:comment_created");
+    return event;
+  }
+
+  private static BitBucketPPRAction prAction(String sourceBranch, String targetBranch) {
+    BitBucketPPRAction action = mock(BitBucketPPRAction.class);
+    when(action.getSourceBranch()).thenReturn(sourceBranch);
+    when(action.getTargetBranch()).thenReturn(targetBranch);
+    return action;
+  }
+
+  // Mirrors the real PullRequestSCMHead, which both extends SCMHead and
+  // implements ChangeRequestSCMHead2; getOriginName() carries the source branch.
+  private static SCMHead mockPrHead(String originBranch) {
+    SCMHead head = mock(SCMHead.class, Mockito.withSettings().extraInterfaces(ChangeRequestSCMHead2.class));
+    when(((ChangeRequestSCMHead2) head).getOriginName()).thenReturn(originBranch);
+    return head;
+  }
+
+  // Regression test for issue #388: bitbucket-branch-source sets a multibranch PR
+  // job's display name to the PR *title* (e.g. "release(demo-api): - release/next
+  // (#11)"), so the old displayName-vs-sourceBranch comparison always failed and
+  // the job was skipped. The match must instead use the PR head's origin branch.
+  //
+  // Note on the chosen API: for a PullRequestSCMHead, getName() is "PR-<id>" (e.g.
+  // "PR-11") — NOT the branch — so getName() would still mismatch "release/next".
+  // getOriginName() (from ChangeRequestSCMHead2) is the source branch, hence used.
+  @Test
+  void testMpJobTriggeredForPrJobWhenDisplayNameIsPrTitle() throws Exception {
+    BitBucketPPRJobProbe probe = new BitBucketPPRJobProbe();
+
+    Job<?, ?> job = mock(Job.class);
+    when(job.getDisplayName()).thenReturn("release(demo-api): - release/next (#11)");
+
+    SCMHead prHead = mockPrHead("release/next");
+
+    try (MockedStatic<SCMHead.HeadByItem> heads = Mockito.mockStatic(SCMHead.HeadByItem.class)) {
+      heads.when(() -> SCMHead.HeadByItem.findHead(job)).thenReturn(prHead);
+
+      assertFalse(
+          invokeMPJobShouldNotBeTriggered(probe, job, prEvent(), prAction("release/next", "main")),
+          "PR job must be triggered when the PR origin branch matches, despite a PR-title display name (#388)");
+    }
+  }
+
+  // The PR-head match must still discriminate: an event for a different source
+  // branch must not trigger this PR's job.
+  @Test
+  void testMpJobNotTriggeredForPrJobOnDifferentSourceBranch() throws Exception {
+    BitBucketPPRJobProbe probe = new BitBucketPPRJobProbe();
+
+    Job<?, ?> job = mock(Job.class);
+    when(job.getDisplayName()).thenReturn("release(demo-api): - release/next (#11)");
+
+    SCMHead prHead = mockPrHead("release/next");
+
+    try (MockedStatic<SCMHead.HeadByItem> heads = Mockito.mockStatic(SCMHead.HeadByItem.class)) {
+      heads.when(() -> SCMHead.HeadByItem.findHead(job)).thenReturn(prHead);
+
+      assertTrue(
+          invokeMPJobShouldNotBeTriggered(probe, job, prEvent(), prAction("feature/unrelated", "main")),
+          "PR job must be skipped when the event's source branch is not this PR's origin branch");
+    }
+  }
+
+  // A plain (non-PR) multibranch branch job is matched on the head name, which is
+  // the branch name. This must keep working independently of the display name.
+  @Test
+  void testMpJobTriggeredForBranchJobMatchingByHeadName() throws Exception {
+    BitBucketPPRJobProbe probe = new BitBucketPPRJobProbe();
+
+    Job<?, ?> job = mock(Job.class);
+    when(job.getDisplayName()).thenReturn("a custom display name");
+
+    SCMHead branchHead = new SCMHead("feature/foo");
+
+    try (MockedStatic<SCMHead.HeadByItem> heads = Mockito.mockStatic(SCMHead.HeadByItem.class)) {
+      heads.when(() -> SCMHead.HeadByItem.findHead(job)).thenReturn(branchHead);
+
+      assertFalse(
+          invokeMPJobShouldNotBeTriggered(probe, job, prEvent(), prAction("feature/foo", "main")),
+          "Branch job must be triggered when the head (branch) name matches the source branch");
+    }
+  }
+
+  // Freestyle / standalone jobs have no SCMHead: the probe must fall back to the
+  // original displayName comparison, preserving pre-#388 behavior for those jobs.
+  @Test
+  void testMpJobFallsBackToDisplayNameWhenNoScmHead() throws Exception {
+    BitBucketPPRJobProbe probe = new BitBucketPPRJobProbe();
+
+    Job<?, ?> job = mock(Job.class);
+    when(job.getDisplayName()).thenReturn("feature/foo");
+
+    try (MockedStatic<SCMHead.HeadByItem> heads = Mockito.mockStatic(SCMHead.HeadByItem.class)) {
+      heads.when(() -> SCMHead.HeadByItem.findHead(job)).thenReturn(null);
+
+      assertFalse(
+          invokeMPJobShouldNotBeTriggered(probe, job, prEvent(), prAction("feature/foo", "main")),
+          "Without an SCMHead the probe must fall back to the display-name comparison (trigger on match)");
+      assertTrue(
+          invokeMPJobShouldNotBeTriggered(probe, job, prEvent(), prAction("other-branch", "main")),
+          "Without an SCMHead a non-matching display name must still skip the job");
     }
   }
 

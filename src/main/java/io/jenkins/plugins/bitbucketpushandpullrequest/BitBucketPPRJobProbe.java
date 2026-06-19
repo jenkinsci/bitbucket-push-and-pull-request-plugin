@@ -48,6 +48,8 @@ import jenkins.branch.MultiBranchProject;
 import jenkins.scm.api.SCMHead;
 import jenkins.model.Jenkins;
 import jenkins.model.ParameterizedJobMixIn;
+import jenkins.scm.api.SCMHead;
+import jenkins.scm.api.mixin.ChangeRequestSCMHead2;
 import jenkins.triggers.SCMTriggerItem;
 import org.eclipse.jgit.transport.RemoteConfig;
 import org.eclipse.jgit.transport.URIish;
@@ -254,19 +256,21 @@ public class BitBucketPPRJobProbe {
       }
 
       if (sourceBranchName != null) {
-        // For PR events, check if this job is associated with the PR's source branch
-        // via the SCMHead. This works regardless of the job's display name which may
-        // be set to the PR title by bitbucket-branch-source plugin.
+        // The display name is unreliable for multibranch PR jobs: the
+        // bitbucket-branch-source plugin sets it to the PR title rather than the
+        // branch name, so comparing it to the source branch always fails (#388).
+        // Prefer the SCMHead, which carries the real branch/PR association
+        // regardless of the display name.
         SCMHead head = SCMHead.HeadByItem.findHead(job);
-        if (head != null) {
-          String headName = head.getName();
-          if (sourceBranchName.equalsIgnoreCase(headName)) {
-            return false; // trigger this job
-          }
-          return true; // different branch/PR, skip
+        if (head instanceof ChangeRequestSCMHead2 changeRequest) {
+          // PR head: getName() is "PR-<id>"; the source branch is getOriginName().
+          return !sourceBranchName.equalsIgnoreCase(changeRequest.getOriginName());
         }
-
-        // Fallback for jobs without an SCMHead: exact match on display name
+        if (head != null) {
+          // Plain branch head: getName() is the branch name.
+          return !sourceBranchName.equalsIgnoreCase(head.getName());
+        }
+        // Freestyle / standalone jobs have no SCMHead: keep the original behavior.
         return !displayName.equalsIgnoreCase(sourceBranchName);
       }
 
