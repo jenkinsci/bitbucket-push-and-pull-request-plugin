@@ -50,6 +50,7 @@ import hudson.model.UnprotectedRootAction;
 import hudson.security.csrf.CrumbExclusion;
 import io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst;
 import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst.HOOK_URL;
+import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst.X_HUB_SIGNATURE;
 import io.jenkins.plugins.bitbucketpushandpullrequest.config.BitBucketPPRPluginConfig;
 import io.jenkins.plugins.bitbucketpushandpullrequest.exception.BitBucketPPRPayloadPropertyNotFoundException;
 import io.jenkins.plugins.bitbucketpushandpullrequest.exception.InputStreamException;
@@ -70,8 +71,6 @@ import io.jenkins.plugins.bitbucketpushandpullrequest.processor.BitBucketPPRPayl
 @Extension
 public class BitBucketPPRHookReceiver extends CrumbExclusion implements UnprotectedRootAction {
   private static final Logger logger = Logger.getLogger(BitBucketPPRHookReceiver.class.getName());
-  private static final BitBucketPPRPluginConfig globalConfig =
-      BitBucketPPRPluginConfig.getInstance();
 
   @POST
   public void doIndex(@Nonnull StaplerRequest request, @Nonnull StaplerResponse response)
@@ -85,8 +84,22 @@ public class BitBucketPPRHookReceiver extends CrumbExclusion implements Unprotec
       System.out.println(">>> Received POST request over Bitbucket hook");
 
       try {
+        byte[] body = readBody(request);
+
+        // Authenticate the request before doing anything with its content: when a webhook
+        // secret is configured, every delivery must carry an X-Hub-Signature header with a
+        // valid HMAC-SHA256 of the request body (issue #360). Bitbucket signs the payload
+        // before any transport encoding, so the signature is checked on the decompressed,
+        // not-yet-URL-decoded body.
+        if (BitBucketPPRPluginConfig.getInstance().isWebhookSecretSet()
+            && !isSignatureValid(request, body)) {
+          writeForbiddenResponse(response);
+          return;
+        }
+
         BitBucketPPRHookEvent bitbucketEvent = getBitbucketEvent(request);
-        BitBucketPPRPayload payload = getPayload(getInputStream(request), bitbucketEvent);
+        BitBucketPPRPayload payload =
+            getPayload(bodyToString(body, request.getContentType()), bitbucketEvent);
 
         BitBucketPPRPayloadProcessor processor;
         try {
@@ -156,7 +169,7 @@ public class BitBucketPPRHookReceiver extends CrumbExclusion implements Unprotec
     response.setCharacterEncoding("UTF-8");
     response.setStatus(HttpServletResponse.SC_OK);
     PrintWriter out = response.getWriter();
-    out.write("Bitbuckt PPR Plugin: request received successfully.");
+    out.write("Bitbucket PPR Plugin: request received successfully.");
     out.flush();
     out.close();
   }
@@ -166,22 +179,63 @@ public class BitBucketPPRHookReceiver extends CrumbExclusion implements Unprotec
     response.setCharacterEncoding("UTF-8");
     response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
     PrintWriter out = response.getWriter();
-    out.write("Bitbuckt PPR Plugin: request failed.");
+    out.write("Bitbucket PPR Plugin: request failed.");
     out.flush();
     out.close();
   }
 
-  String getInputStream(@Nonnull StaplerRequest request) throws IOException, InputStreamException {
+  private void writeForbiddenResponse(@Nonnull StaplerResponse response) throws IOException {
+    response.setContentType("text/html");
+    response.setCharacterEncoding("UTF-8");
+    response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+    PrintWriter out = response.getWriter();
+    out.write("Bitbucket PPR Plugin: request rejected: missing or invalid signature.");
+    out.flush();
+    out.close();
+  }
+
+  /**
+   * Reads the raw request body, transparently gunzipping it when the request was delivered with
+   * {@code Content-Encoding: gzip}. The bytes are returned before any URL decoding because the
+   * webhook signature, when present, is computed over exactly these bytes.
+   */
+  byte[] readBody(@Nonnull StaplerRequest request) throws IOException {
     boolean gzipHeader = "gzip".equalsIgnoreCase(request.getHeader("Content-Encoding"));
     try (InputStream body = gzipHeader ? GzipUtils.maybeGunzip(request.getInputStream())
         : request.getInputStream()) {
-      String inputStream = IOUtils.toString(body, StandardCharsets.UTF_8);
-      if (StringUtils.isBlank(inputStream)) {
-        logger.severe("The Jenkins job cannot be triggered. The input stream is empty.");
-        throw new InputStreamException("The input stream is empty");
-      }
-      return decodeInputStream(inputStream, request.getContentType());
+      return IOUtils.toByteArray(body);
     }
+  }
+
+  String bodyToString(@Nonnull byte[] body, String contentType) throws InputStreamException {
+    String inputStream = new String(body, StandardCharsets.UTF_8);
+    if (StringUtils.isBlank(inputStream)) {
+      logger.severe("The Jenkins job cannot be triggered. The input stream is empty.");
+      throw new InputStreamException("The input stream is empty");
+    }
+    return decodeInputStream(inputStream, contentType);
+  }
+
+  /**
+   * Validates the {@code X-Hub-Signature} header against the configured webhook secret. Returns
+   * false -- rejecting the request -- when the configured secret credential cannot be resolved
+   * (fail closed) or when the signature is missing, malformed or does not match.
+   */
+  private boolean isSignatureValid(@Nonnull StaplerRequest request, @Nonnull byte[] body) {
+    String secret = BitBucketPPRPluginConfig.getInstance().getWebhookSecret();
+    if (StringUtils.isBlank(secret)) {
+      logger.severe(
+          "A webhook secret credential is configured but could not be resolved to a non-empty "
+              + "secret; the request is rejected.");
+      return false;
+    }
+    if (!SignatureUtils.isValid(body, request.getHeader(X_HUB_SIGNATURE), secret)) {
+      logger.warning(
+          "The webhook request signature is missing or does not match the configured secret; "
+              + "the request is rejected.");
+      return false;
+    }
+    return true;
   }
 
   BitBucketPPRPayload getPayload(
@@ -237,6 +291,10 @@ public class BitBucketPPRHookReceiver extends CrumbExclusion implements Unprotec
 
   @Override
   public String getUrlName() {
+    // Resolved per call rather than cached in a static field: a static would pin the
+    // GlobalConfiguration instance of whichever Jenkins was alive when this class loaded,
+    // going stale across Jenkins instances (e.g. JenkinsRule tests in the same JVM).
+    BitBucketPPRPluginConfig globalConfig = BitBucketPPRPluginConfig.getInstance();
     return (globalConfig.isHookUrlSet() ? globalConfig.getHookUrl() : HOOK_URL).toLowerCase();
   }
 

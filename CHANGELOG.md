@@ -1,5 +1,10 @@
 # Change Log
 
+## 3.4.0 (unreleased)
+
+### Features
+* **Support Bitbucket webhook secrets** - The plugin can now authenticate incoming webhook deliveries. A new *Webhook secret* option in the global configuration selects a *Secret text* credential holding the secret configured on the Bitbucket webhooks. When set, every request to the webhook endpoint must carry a valid `X-Hub-Signature` header: the hex-encoded HMAC-SHA256 of the request body, prefixed with `sha256=`, as sent by both Bitbucket Cloud and Bitbucket Server / Data Center when a secret is configured on the webhook. Requests with a missing or invalid signature are rejected with **HTTP 403** before any payload processing; an unresolvable secret credential fails closed. The signature is validated on the decompressed body, so gzip-compressed deliveries keep working. When no secret is configured the behaviour is unchanged and unsigned requests are accepted as before. Fixes #360.
+
 ## 3.3.9 (2026-06-16)
 
 ### Bug Fixes

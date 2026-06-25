@@ -147,6 +147,12 @@ in the __Jenkins Global Configurations__:
 8. you can disable the `BITBUCKET_PULL_REQUEST_DESCRIPTION` environment variable to avoid exceeding the Linux
    `MAX_ARG_STRLEN` limit when the pull request description is too large
 
+9. you can set a webhook secret (as a *Secret text* credential) to authenticate incoming webhook deliveries: when set,
+   every request to the webhook endpoint must carry a valid `X-Hub-Signature` header (the HMAC-SHA256 of the request
+   body, sent by Bitbucket Cloud and Bitbucket Server / Data Center when a secret is configured on the webhook), and
+   requests with a missing or invalid signature are rejected with HTTP 403. The same secret must be configured on every
+   webhook pointing to the Jenkins instance
+
 ![example global config jenkins bb ppr 1](docs/img/global-config.png)
 
 ## Configure your Jenkins job
