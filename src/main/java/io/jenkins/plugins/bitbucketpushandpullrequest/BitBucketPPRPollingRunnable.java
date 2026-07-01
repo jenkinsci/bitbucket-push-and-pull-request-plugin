@@ -33,7 +33,7 @@ import java.text.DateFormat;
 import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.annotation.Nonnull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import jenkins.triggers.SCMTriggerItem;
 
 public class BitBucketPPRPollingRunnable implements Runnable {
@@ -45,8 +45,8 @@ public class BitBucketPPRPollingRunnable implements Runnable {
   private BitBucketPPRPollResultListener bitbucketPollResultListener;
 
 
-  public BitBucketPPRPollingRunnable(@Nonnull Job<?, ?> job, @Nonnull File logFile,
-      @Nonnull BitBucketPPRPollResultListener bitbucketPollResultListener) {
+  public BitBucketPPRPollingRunnable(@NonNull Job<?, ?> job, @NonNull File logFile,
+      @NonNull BitBucketPPRPollResultListener bitbucketPollResultListener) {
     this.job = job;
     this.bitbucketPollResultListener = bitbucketPollResultListener;
     this.logFile = logFile;

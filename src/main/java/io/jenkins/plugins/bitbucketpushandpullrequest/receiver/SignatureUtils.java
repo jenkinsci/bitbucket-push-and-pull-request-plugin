@@ -30,8 +30,8 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Locale;
 
-import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
@@ -60,7 +60,7 @@ final class SignatureUtils {
    * header never validates. The hex comparison is case-insensitive and constant-time.
    */
   static boolean isValid(
-      @Nonnull byte[] body, @CheckForNull String signatureHeader, @Nonnull String secret) {
+      @NonNull byte[] body, @CheckForNull String signatureHeader, @NonNull String secret) {
     if (StringUtils.isBlank(signatureHeader)
         || !StringUtils.startsWithIgnoreCase(signatureHeader, SHA256_PREFIX)) {
       return false;
@@ -83,7 +83,7 @@ final class SignatureUtils {
         providedHex.getBytes(StandardCharsets.US_ASCII));
   }
 
-  private static String toHex(@Nonnull byte[] bytes) {
+  private static String toHex(@NonNull byte[] bytes) {
     StringBuilder sb = new StringBuilder(bytes.length * 2);
     for (byte b : bytes) {
       sb.append(Character.forDigit((b >> 4) & 0xF, 16)).append(Character.forDigit(b & 0xF, 16));

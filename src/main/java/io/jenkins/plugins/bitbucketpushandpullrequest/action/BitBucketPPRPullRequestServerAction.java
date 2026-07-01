@@ -28,7 +28,7 @@ import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRHookEven
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.server.BitBucketPPRServerClone;
 
-import javax.annotation.Nonnull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -45,7 +45,7 @@ public class BitBucketPPRPullRequestServerAction extends BitBucketPPRActionAbstr
   private static final Logger logger =
       Logger.getLogger(BitBucketPPRPullRequestServerAction.class.getName());
 
-  private final @Nonnull BitBucketPPRPayload payload;
+  private final @NonNull BitBucketPPRPayload payload;
   private URL baseUrl;
   private List<String> scmUrls = new ArrayList<>(2);
   private String repositoryUuid;
@@ -54,7 +54,7 @@ public class BitBucketPPRPullRequestServerAction extends BitBucketPPRActionAbstr
   private final BitBucketPPRHookEvent bitbucketEvent;
 
   public BitBucketPPRPullRequestServerAction(
-      @Nonnull BitBucketPPRPayload payload, BitBucketPPRHookEvent bitbucketEvent)
+      @NonNull BitBucketPPRPayload payload, BitBucketPPRHookEvent bitbucketEvent)
       throws BitBucketPPRPayloadPropertyNotFoundException {
     requirePayloadProperty(payload.getServerPullRequest(), "pullRequest");
     this.payload = payload;

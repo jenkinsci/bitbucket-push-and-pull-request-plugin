@@ -43,13 +43,11 @@ public class BitBucketPPRServerPayload implements BitBucketPPRPayload {
     return actor;
   }
 
-  @SuppressFBWarnings
   @Override
   public BitBucketPPRServerPullRequest getServerPullRequest() {
     return pullRequest;
   }
 
-  @SuppressFBWarnings
   @Override
   public BitBucketPPRServerRepository getServerRepository() {
     return repository;

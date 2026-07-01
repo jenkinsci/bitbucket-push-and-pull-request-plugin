@@ -32,7 +32,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.annotation.Nonnull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.EnvVars;
 import hudson.plugins.git.BranchSpec;
 
@@ -82,7 +82,7 @@ public class BitBucketPPRUtils {
     return true;
   }
 
-  public static boolean matchWithRegex(@Nonnull String haystack, @Nonnull String patternStr, EnvVars env) {
+  public static boolean matchWithRegex(@NonNull String haystack, @NonNull String patternStr, EnvVars env) {
     if (haystack == null || haystack.trim().isEmpty()) {
       logger.info("The comment from BB is null or it is empty");
       return false;

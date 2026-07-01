@@ -43,9 +43,8 @@ import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-import javax.annotation.Nonnull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import jenkins.branch.MultiBranchProject;
-import jenkins.scm.api.SCMHead;
 import jenkins.model.Jenkins;
 import jenkins.model.ParameterizedJobMixIn;
 import jenkins.scm.api.SCMHead;
@@ -121,7 +120,7 @@ public class BitBucketPPRJobProbe {
     }
   }
 
-  private void triggerScmForSingleJob(@Nonnull Job<?, ?> job, List<URIish> remotes,
+  private void triggerScmForSingleJob(@NonNull Job<?, ?> job, List<URIish> remotes,
                           BitBucketPPRHookEvent bitbucketEvent, BitBucketPPRAction bitbucketAction,
                           BitBucketPPRObservable observable) throws TriggerNotSetException {
 
@@ -161,7 +160,7 @@ public class BitBucketPPRJobProbe {
     }));
   }
 
-  private void triggerScm(@Nonnull Job<?, ?> job, List<URIish> remotes,
+  private void triggerScm(@NonNull Job<?, ?> job, List<URIish> remotes,
       BitBucketPPRHookEvent bitbucketEvent, BitBucketPPRAction bitbucketAction,
       BitBucketPPRObservable observable) throws TriggerNotSetException {
 
@@ -421,7 +420,7 @@ public class BitBucketPPRJobProbe {
         .anyMatch((repo) -> repo.getURIs().stream().anyMatch((repoUrl) -> GitStatus.looselyMatches(repoUrl, remote)));
   }
 
-  private void triggerMultibranchScan(@Nonnull Job<?, ?> job,
+  private void triggerMultibranchScan(@NonNull Job<?, ?> job,
                                       BitBucketPPRAction bitbucketAction) {
 
       String getLatestCommit = bitbucketAction.getLatestCommit();

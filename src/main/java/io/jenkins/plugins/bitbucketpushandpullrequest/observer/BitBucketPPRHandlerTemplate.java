@@ -24,7 +24,7 @@ import java.net.MalformedURLException;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.annotation.Nonnull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.scribejava.core.model.Verb;
@@ -82,7 +82,7 @@ public abstract class BitBucketPPRHandlerTemplate {
     }
   }
 
-  protected void callClient(@Nonnull String url, @Nonnull Map<String, String> payload) {
+  protected void callClient(@NonNull String url, @NonNull Map<String, String> payload) {
     ObjectMapper objectMapper = new ObjectMapper();
 
     try {
@@ -96,7 +96,7 @@ public abstract class BitBucketPPRHandlerTemplate {
   }
 
   protected void callClient(
-      @Nonnull Verb verb, @Nonnull String url, @Nonnull Map<String, String> payload) {
+      @NonNull Verb verb, @NonNull String url, @NonNull Map<String, String> payload) {
     ObjectMapper objectMapper = new ObjectMapper();
 
     try {

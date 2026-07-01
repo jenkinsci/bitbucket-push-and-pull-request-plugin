@@ -29,7 +29,7 @@ import java.io.InputStream;
 import java.io.PushbackInputStream;
 import java.util.zip.GZIPInputStream;
 
-import javax.annotation.Nonnull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 
 /**
  * Utility for transparent gzip decompression of webhook request bodies.
@@ -54,7 +54,7 @@ final class GzipUtils {
    *
    * <p>The caller is responsible for closing the returned stream.
    */
-  static InputStream maybeGunzip(@Nonnull InputStream in) throws IOException {
+  static InputStream maybeGunzip(@NonNull InputStream in) throws IOException {
     PushbackInputStream pb = new PushbackInputStream(in, 2);
     byte[] magic = new byte[2];
     int read = 0, n;

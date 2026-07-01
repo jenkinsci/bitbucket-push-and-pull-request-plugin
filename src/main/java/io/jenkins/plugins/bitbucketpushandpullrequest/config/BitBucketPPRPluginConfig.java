@@ -26,7 +26,7 @@ import java.net.URL;
 import java.util.Collections;
 import java.util.logging.Logger;
 
-import javax.annotation.CheckForNull;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
 
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import org.kohsuke.stapler.AncestorInPath;

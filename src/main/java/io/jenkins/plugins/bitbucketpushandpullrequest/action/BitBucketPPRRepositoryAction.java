@@ -31,7 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.annotation.Nonnull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.cloud.BitBucketPPRChange;
@@ -50,7 +50,7 @@ public class BitBucketPPRRepositoryAction extends BitBucketPPRActionAbstract
   private static final String BITBUCKET_API_BASE_URL = "https://api.bitbucket.org/2.0";
   private static final String BITBUCKET_REPOSITORIES = "repositories";
 
-  private final @Nonnull BitBucketPPRPayload payload;
+  private final @NonNull BitBucketPPRPayload payload;
   private final String repoSlug;
   private final String workspace;
 
@@ -60,7 +60,7 @@ public class BitBucketPPRRepositoryAction extends BitBucketPPRActionAbstract
 
   private String repositoryUuid;
 
-  public BitBucketPPRRepositoryAction(@Nonnull BitBucketPPRPayload payload)
+  public BitBucketPPRRepositoryAction(@NonNull BitBucketPPRPayload payload)
       throws BitBucketPPRPayloadPropertyNotFoundException {
     BitBucketPPRPush push = requirePayloadProperty(payload.getPush(), "push");
     List<BitBucketPPRChange> changes = requirePayloadProperty(push.getChanges(), "push.changes");

@@ -27,7 +27,7 @@ import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPR
 import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst.REPOSITORY_SERVER_PUSH;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.annotation.Nonnull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRHookEvent;
 
 
@@ -37,7 +37,7 @@ public class BitBucketPPRObserverFactory {
   private BitBucketPPRObserverFactory() {}
 
   public static BitBucketPPRObservable createObservable(
-      @Nonnull final BitBucketPPRHookEvent bitbucketEvent) {
+      @NonNull final BitBucketPPRHookEvent bitbucketEvent) {
 
     BitBucketPPRObservable observable = new BitBucketPPRObservable();
 

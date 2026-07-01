@@ -23,7 +23,7 @@ package io.jenkins.plugins.bitbucketpushandpullrequest.environment;
 
 import java.util.List;
 import java.util.logging.Logger;
-import javax.annotation.Nonnull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.EnvVars;
@@ -78,7 +78,7 @@ public class BitBucketPPREnvironmentContributor extends EnvironmentContributor {
   }
 
   @Override
-  public void buildEnvironmentFor(@Nonnull Run run, @NonNull EnvVars envVars, @NonNull TaskListener taskListener) {
+  public void buildEnvironmentFor(@NonNull Run run, @NonNull EnvVars envVars, @NonNull TaskListener taskListener) {
 
     List<Cause> causes = null;
 

@@ -31,7 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.annotation.Nonnull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRHookEvent;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
@@ -59,16 +59,16 @@ public class BitBucketPPRPullRequestAction extends BitBucketPPRActionAbstract
 
   private static final String PULL_REQUEST_HTTP = "pull-requests";
   private static final String BITBUCKET_REPOSITORIES = "repositories";
-  private final @Nonnull BitBucketPPRPayload payload;
-  private final @Nonnull String workspace;
+  private final @NonNull BitBucketPPRPayload payload;
+  private final @NonNull String workspace;
 
-  private final @Nonnull String repoSlug;
+  private final @NonNull String repoSlug;
 
-  private final @Nonnull String pullRequestId;
-  private final @Nonnull BitBucketPPRHookEvent bitbucketEvent;
+  private final @NonNull String pullRequestId;
+  private final @NonNull BitBucketPPRHookEvent bitbucketEvent;
 
   public BitBucketPPRPullRequestAction(
-      @Nonnull BitBucketPPRPayload payload, @Nonnull BitBucketPPRHookEvent event)
+      @NonNull BitBucketPPRPayload payload, @NonNull BitBucketPPRHookEvent event)
       throws BitBucketPPRPayloadPropertyNotFoundException {
     BitBucketPPRPullRequest pullRequest =
         requirePayloadProperty(payload.getPullRequest(), "pullrequest");
