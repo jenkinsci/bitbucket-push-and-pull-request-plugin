@@ -1,5 +1,10 @@
 # Change Log
 
+## 4.0.0 (unreleased)
+
+### Breaking Changes
+* **Java 21 and Jenkins 2.555.3 are now required** - The plugin now targets the Jenkins 2.555 baseline and is compiled to Java 21 bytecode, so it no longer loads on controllers running Java 17 or on Jenkins releases older than 2.555.3. Upgrade the controller to Jenkins 2.555.3 (or newer) on Java 21 before updating the plugin. Jenkins itself has required Java 21 since LTS 2.555.1.
+
 ## 3.4.0 (2026-07-02)
 
 ### Features

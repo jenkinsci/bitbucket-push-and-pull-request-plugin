@@ -28,7 +28,7 @@ import io.jenkins.plugins.bitbucketpushandpullrequest.exception.BitBucketPPRPayl
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRHookEvent;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
 import java.util.logging.Logger;
-import javax.annotation.Nonnull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 
 public class BitBucketPPRPullRequestServerPayloadProcessor extends BitBucketPPRPayloadProcessor {
 
@@ -36,13 +36,13 @@ public class BitBucketPPRPullRequestServerPayloadProcessor extends BitBucketPPRP
       Logger.getLogger(BitBucketPPRPullRequestServerPayloadProcessor.class.getName());
 
   public BitBucketPPRPullRequestServerPayloadProcessor(
-      @Nonnull BitBucketPPRJobProbe jobProbe, @Nonnull BitBucketPPRHookEvent bitbucketEvent) {
+      @NonNull BitBucketPPRJobProbe jobProbe, @NonNull BitBucketPPRHookEvent bitbucketEvent) {
     super(jobProbe, bitbucketEvent);
     logger.fine(() -> "Processing " + bitbucketEvent);
   }
 
   @Override
-  public BitBucketPPRAction buildActionForJobs(@Nonnull BitBucketPPRPayload payload)
+  public BitBucketPPRAction buildActionForJobs(@NonNull BitBucketPPRPayload payload)
       throws BitBucketPPRPayloadPropertyNotFoundException {
     return new BitBucketPPRPullRequestServerAction(payload, bitbucketEvent);
   }

@@ -29,7 +29,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.annotation.Nonnull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import javax.naming.OperationNotSupportedException;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -73,7 +73,7 @@ public class BitBucketPPRHookReceiver extends CrumbExclusion implements Unprotec
   private static final Logger logger = Logger.getLogger(BitBucketPPRHookReceiver.class.getName());
 
   @POST
-  public void doIndex(@Nonnull StaplerRequest request, @Nonnull StaplerResponse response)
+  public void doIndex(@NonNull StaplerRequest request, @NonNull StaplerResponse response)
       throws IOException {
     // log request URL
     logger.log(Level.INFO, "Request URL: {0}", request.getRequestURI());
@@ -164,7 +164,7 @@ public class BitBucketPPRHookReceiver extends CrumbExclusion implements Unprotec
     }
   }
 
-  private void writeSuccessResponse(@Nonnull StaplerResponse response) throws IOException {
+  private void writeSuccessResponse(@NonNull StaplerResponse response) throws IOException {
     response.setContentType("text/html");
     response.setCharacterEncoding("UTF-8");
     response.setStatus(HttpServletResponse.SC_OK);
@@ -174,7 +174,7 @@ public class BitBucketPPRHookReceiver extends CrumbExclusion implements Unprotec
     out.close();
   }
 
-  private void writeFailResponse(@Nonnull StaplerResponse response) throws IOException {
+  private void writeFailResponse(@NonNull StaplerResponse response) throws IOException {
     response.setContentType("text/html");
     response.setCharacterEncoding("UTF-8");
     response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -184,7 +184,7 @@ public class BitBucketPPRHookReceiver extends CrumbExclusion implements Unprotec
     out.close();
   }
 
-  private void writeForbiddenResponse(@Nonnull StaplerResponse response) throws IOException {
+  private void writeForbiddenResponse(@NonNull StaplerResponse response) throws IOException {
     response.setContentType("text/html");
     response.setCharacterEncoding("UTF-8");
     response.setStatus(HttpServletResponse.SC_FORBIDDEN);
@@ -199,7 +199,7 @@ public class BitBucketPPRHookReceiver extends CrumbExclusion implements Unprotec
    * {@code Content-Encoding: gzip}. The bytes are returned before any URL decoding because the
    * webhook signature, when present, is computed over exactly these bytes.
    */
-  byte[] readBody(@Nonnull StaplerRequest request) throws IOException {
+  byte[] readBody(@NonNull StaplerRequest request) throws IOException {
     boolean gzipHeader = "gzip".equalsIgnoreCase(request.getHeader("Content-Encoding"));
     try (InputStream body = gzipHeader ? GzipUtils.maybeGunzip(request.getInputStream())
         : request.getInputStream()) {
@@ -207,7 +207,7 @@ public class BitBucketPPRHookReceiver extends CrumbExclusion implements Unprotec
     }
   }
 
-  String bodyToString(@Nonnull byte[] body, String contentType) throws InputStreamException {
+  String bodyToString(@NonNull byte[] body, String contentType) throws InputStreamException {
     String inputStream = new String(body, StandardCharsets.UTF_8);
     if (StringUtils.isBlank(inputStream)) {
       logger.severe("The Jenkins job cannot be triggered. The input stream is empty.");
@@ -221,7 +221,7 @@ public class BitBucketPPRHookReceiver extends CrumbExclusion implements Unprotec
    * false -- rejecting the request -- when the configured secret credential cannot be resolved
    * (fail closed) or when the signature is missing, malformed or does not match.
    */
-  private boolean isSignatureValid(@Nonnull StaplerRequest request, @Nonnull byte[] body) {
+  private boolean isSignatureValid(@NonNull StaplerRequest request, @NonNull byte[] body) {
     String secret = BitBucketPPRPluginConfig.getInstance().getWebhookSecret();
     if (StringUtils.isBlank(secret)) {
       logger.severe(
@@ -239,7 +239,7 @@ public class BitBucketPPRHookReceiver extends CrumbExclusion implements Unprotec
   }
 
   BitBucketPPRPayload getPayload(
-      @Nonnull final String inputStream, @Nonnull BitBucketPPRHookEvent bitbucketEvent)
+      @NonNull final String inputStream, @NonNull BitBucketPPRHookEvent bitbucketEvent)
       throws JsonSyntaxException, OperationNotSupportedException {
     BitBucketPPRPayload pl =
         new Gson()
@@ -257,7 +257,7 @@ public class BitBucketPPRHookReceiver extends CrumbExclusion implements Unprotec
   }
 
   static String decodeInputStream(
-      @Nonnull final String inputStream, @Nonnull final String contentType) {
+      @NonNull final String inputStream, @NonNull final String contentType) {
     String input = inputStream;
     if (StringUtils.startsWithIgnoreCase(
         contentType, BitBucketPPRConst.APPLICATION_X_WWW_FORM_URLENCODED)) {
@@ -269,7 +269,7 @@ public class BitBucketPPRHookReceiver extends CrumbExclusion implements Unprotec
     return input;
   }
 
-  BitBucketPPRHookEvent getBitbucketEvent(@Nonnull StaplerRequest request)
+  BitBucketPPRHookEvent getBitbucketEvent(@NonNull StaplerRequest request)
       throws OperationNotSupportedException {
     String xEventHeader = request.getHeader(BitBucketPPRConst.X_EVENT_KEY);
 

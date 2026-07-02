@@ -27,7 +27,7 @@ import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPR
 import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst.REPOSITORY_POST;
 import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst.REPOSITORY_SERVER_PUSH;
 import java.util.logging.Logger;
-import javax.annotation.Nonnull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import javax.naming.OperationNotSupportedException;
 import io.jenkins.plugins.bitbucketpushandpullrequest.BitBucketPPRJobProbe;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRHookEvent;
@@ -42,13 +42,13 @@ public final class BitBucketPPRPayloadProcessorFactory {
     throw new AssertionError();
   }
 
-  public static BitBucketPPRPayloadProcessor createProcessor(@Nonnull final BitBucketPPRHookEvent bitbucketEvent)
+  public static BitBucketPPRPayloadProcessor createProcessor(@NonNull final BitBucketPPRHookEvent bitbucketEvent)
       throws OperationNotSupportedException {
     return createProcessor(new BitBucketPPRJobProbe(), bitbucketEvent);
   }
 
-  public static BitBucketPPRPayloadProcessor createProcessor(@Nonnull final BitBucketPPRJobProbe probe,
-      @Nonnull final BitBucketPPRHookEvent bitbucketEvent) throws OperationNotSupportedException {
+  public static BitBucketPPRPayloadProcessor createProcessor(@NonNull final BitBucketPPRJobProbe probe,
+      @NonNull final BitBucketPPRHookEvent bitbucketEvent) throws OperationNotSupportedException {
 
     if (REPOSITORY_EVENT.equalsIgnoreCase(bitbucketEvent.getEvent())
         && REPOSITORY_CLOUD_PUSH.equalsIgnoreCase(bitbucketEvent.getAction())) {

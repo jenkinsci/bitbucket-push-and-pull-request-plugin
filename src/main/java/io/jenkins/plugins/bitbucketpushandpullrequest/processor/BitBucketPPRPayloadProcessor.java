@@ -21,7 +21,7 @@
 package io.jenkins.plugins.bitbucketpushandpullrequest.processor;
 
 import io.jenkins.plugins.bitbucketpushandpullrequest.exception.BitBucketPPRPayloadPropertyNotFoundException;
-import javax.annotation.Nonnull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import io.jenkins.plugins.bitbucketpushandpullrequest.BitBucketPPRJobProbe;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRHookEvent;
@@ -33,8 +33,8 @@ public abstract class BitBucketPPRPayloadProcessor {
   protected final BitBucketPPRHookEvent bitbucketEvent;
 
   public BitBucketPPRPayloadProcessor(
-      @Nonnull final BitBucketPPRJobProbe jobProbe,
-      @Nonnull final BitBucketPPRHookEvent bitbucketEvent) {
+      @NonNull final BitBucketPPRJobProbe jobProbe,
+      @NonNull final BitBucketPPRHookEvent bitbucketEvent) {
     this.jobProbe = jobProbe;
     this.bitbucketEvent = bitbucketEvent;
   }
@@ -45,18 +45,18 @@ public abstract class BitBucketPPRPayloadProcessor {
    * is rejected (with {@link BitBucketPPRPayloadPropertyNotFoundException}). Callers can invoke it
    * before acknowledging the webhook, so a malformed request maps to a 4xx instead of a silent 200.
    */
-  public abstract BitBucketPPRAction buildActionForJobs(@Nonnull BitBucketPPRPayload payload)
+  public abstract BitBucketPPRAction buildActionForJobs(@NonNull BitBucketPPRPayload payload)
       throws BitBucketPPRPayloadPropertyNotFoundException;
 
   /** Triggers the jobs matching an already-built action. */
   public void triggerMatchingJobs(
-      @Nonnull BitBucketPPRAction action, BitBucketPPRObservable observable) {
+      @NonNull BitBucketPPRAction action, BitBucketPPRObservable observable) {
     jobProbe.triggerMatchingJobs(bitbucketEvent, action, observable);
   }
 
   /** Builds the action and triggers matching jobs in a single step. */
   public void processPayload(
-      @Nonnull BitBucketPPRPayload payload, BitBucketPPRObservable observable)
+      @NonNull BitBucketPPRPayload payload, BitBucketPPRObservable observable)
       throws BitBucketPPRPayloadPropertyNotFoundException {
     triggerMatchingJobs(buildActionForJobs(payload), observable);
   }
