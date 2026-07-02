@@ -1,9 +1,14 @@
 # Change Log
 
-## 3.4.0 (unreleased)
+## 3.4.0 (2026-07-02)
 
 ### Features
 * **Support Bitbucket webhook secrets** - The plugin can now authenticate incoming webhook deliveries. A new *Webhook secret* option in the global configuration selects a *Secret text* credential holding the secret configured on the Bitbucket webhooks. When set, every request to the webhook endpoint must carry a valid `X-Hub-Signature` header: the hex-encoded HMAC-SHA256 of the request body, prefixed with `sha256=`, as sent by both Bitbucket Cloud and Bitbucket Server / Data Center when a secret is configured on the webhook. Requests with a missing or invalid signature are rejected with **HTTP 403** before any payload processing; an unresolvable secret credential fails closed. The signature is validated on the decompressed body, so gzip-compressed deliveries keep working. When no secret is configured the behaviour is unchanged and unsigned requests are accepted as before. Fixes #360.
+
+### Bug Fixes
+* **Trigger multibranch Pull Request jobs on pull request events** - Pull request comment and approval events were not triggering the corresponding multibranch Pull Request job when `cloudbees-bitbucket-branch-source` was in use. The branch-source plugin sets the job's display name to the pull request title rather than the branch name, so the display-name comparison in the job probe never matched and the job was skipped. The plugin now resolves the job's `SCMHead`: for a pull request head it matches on the source branch (`ChangeRequestSCMHead2.getOriginName()`), for a plain branch head on the branch name (`getName()`), and falls back to the previous display-name comparison for jobs without an `SCMHead`. Note that a `PullRequestSCMHead`'s `getName()` is `PR-<id>`, not the branch, so matching on it alone would not fix the pull request case. Fixes #388.
+
+**Full Changelog**: https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/compare/bitbucket-push-and-pull-request-3.3.9...bitbucket-push-and-pull-request-3.4.0
 
 ## 3.3.9 (2026-06-16)
 
