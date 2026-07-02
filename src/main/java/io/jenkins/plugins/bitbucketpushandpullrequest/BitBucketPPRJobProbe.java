@@ -45,8 +45,11 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import jenkins.branch.MultiBranchProject;
+import jenkins.scm.api.SCMHead;
 import jenkins.model.Jenkins;
 import jenkins.model.ParameterizedJobMixIn;
+import jenkins.scm.api.SCMHead;
+import jenkins.scm.api.mixin.ChangeRequestSCMHead2;
 import jenkins.triggers.SCMTriggerItem;
 import org.eclipse.jgit.transport.RemoteConfig;
 import org.eclipse.jgit.transport.URIish;
@@ -253,6 +256,21 @@ public class BitBucketPPRJobProbe {
       }
 
       if (sourceBranchName != null) {
+        // The display name is unreliable for multibranch PR jobs: the
+        // bitbucket-branch-source plugin sets it to the PR title rather than the
+        // branch name, so comparing it to the source branch always fails (#388).
+        // Prefer the SCMHead, which carries the real branch/PR association
+        // regardless of the display name.
+        SCMHead head = SCMHead.HeadByItem.findHead(job);
+        if (head instanceof ChangeRequestSCMHead2 changeRequest) {
+          // PR head: getName() is "PR-<id>"; the source branch is getOriginName().
+          return !sourceBranchName.equalsIgnoreCase(changeRequest.getOriginName());
+        }
+        if (head != null) {
+          // Plain branch head: getName() is the branch name.
+          return !sourceBranchName.equalsIgnoreCase(head.getName());
+        }
+        // Freestyle / standalone jobs have no SCMHead: keep the original behavior.
         return !displayName.equalsIgnoreCase(sourceBranchName);
       }
 
