@@ -31,7 +31,6 @@ import com.sun.net.httpserver.HttpsServer;
 import java.nio.file.Path;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLException;
-import org.apache.http.HttpResponse;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -84,9 +83,10 @@ class BitBucketPPRBasicAuthApiConsumerTest {
     SSLContext original = SSLContext.getDefault();
     SSLContext.setDefault(TlsTestSupport.contextTrusting(keystore));
     try {
-      HttpResponse response =
+      BitBucketPPRApiResponse response =
           new BitBucketPPRBasicAuthApiConsumer().send(credentials, Verb.POST, url, "{}");
-      assertEquals(200, response.getStatusLine().getStatusCode());
+      assertEquals(200, response.statusCode());
+      assertEquals("{}", response.body());
     } finally {
       SSLContext.setDefault(original);
     }

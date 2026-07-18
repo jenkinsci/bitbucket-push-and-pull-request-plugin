@@ -24,13 +24,11 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.commons.lang.NotImplementedException;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.util.EntityUtils;
 import org.jenkinsci.plugins.plaincredentials.StringCredentials;
 import com.cloudbees.plugins.credentials.common.StandardCredentials;
 import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials;
 import com.github.scribejava.core.model.Verb;
+import io.jenkins.plugins.bitbucketpushandpullrequest.client.api.BitBucketPPRApiResponse;
 import io.jenkins.plugins.bitbucketpushandpullrequest.client.api.BitBucketPPRBasicAuthApiConsumer;
 import io.jenkins.plugins.bitbucketpushandpullrequest.client.api.BitBucketPPRBearerAuthorizationApiConsumer;
 import io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRUtils;
@@ -52,38 +50,33 @@ public class BitBucketPPRClientServerVisitor implements BitBucketPPRClientVisito
 
     if (credentials instanceof StandardUsernamePasswordCredentials usernamePasswordCredentials)
       try {
-        final HttpResponse response =
+        BitBucketPPRApiResponse response =
             this.send(usernamePasswordCredentials, verb, url, payload);
-        HttpEntity responseEntity = response.getEntity();
-        final String responseBody =
-            responseEntity == null ? "empty" : EntityUtils.toString(responseEntity);
-
         logger.log(Level.FINEST, "Result of the status notification is: {0}, with status code: {1}",
-            new Object[] {responseBody, response.getStatusLine().getStatusCode()});
+            new Object[] {response.body(), response.statusCode()});
       } catch (IOException e) {
         logger.log(Level.WARNING, "Error during state notification: {0} ", e.getMessage());
       }
     else if (credentials instanceof StringCredentials stringCredentials)
       try {
-        HttpResponse response = this.send(stringCredentials, verb, url, payload);
+        BitBucketPPRApiResponse response = this.send(stringCredentials, verb, url, payload);
         logger.log(Level.FINEST, "Result of the state notification is: {0}, with status code: {1}",
-            new Object[] {response.getEntity().getContent(),
-                response.getStatusLine().getStatusCode()});
+            new Object[] {response.body(), response.statusCode()});
       } catch (IOException e) {
-        logger.log(Level.WARNING, "Error du" + "ring state notification: {0} ", e.getMessage());
+        logger.log(Level.WARNING, "Error during state notification: {0} ", e.getMessage());
       }
     else
       throw new NotImplementedException("Credentials provider for state notification not found");
   }
 
-  private HttpResponse send(StandardUsernamePasswordCredentials credentials, Verb verb, String url,
-      String payload) throws IOException, NoSuchMethodException {
+  private BitBucketPPRApiResponse send(StandardUsernamePasswordCredentials credentials, Verb verb,
+      String url, String payload) throws IOException, NoSuchMethodException {
     BitBucketPPRBasicAuthApiConsumer api = new BitBucketPPRBasicAuthApiConsumer();
     return api.send(credentials, verb, url, payload);
   }
 
-  private HttpResponse send(StringCredentials credentials, Verb verb, String url, String payload)
-      throws IOException, NoSuchMethodException {
+  private BitBucketPPRApiResponse send(StringCredentials credentials, Verb verb, String url,
+      String payload) throws IOException, NoSuchMethodException {
     logger.finest("Set BB StringCredentials for BB Server state notification");
 
     BitBucketPPRBearerAuthorizationApiConsumer api =

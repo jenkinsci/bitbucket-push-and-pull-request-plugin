@@ -25,7 +25,6 @@ import java.io.IOException;
 import java.util.logging.Logger;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpHeaders;
-import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ContentType;
@@ -40,9 +39,11 @@ public class BitBucketPPRBearerAuthorizationApiConsumer {
   private static final Logger logger =
       Logger.getLogger(BitBucketPPRBearerAuthorizationApiConsumer.class.getName());
 
-  public HttpResponse send(StringCredentials credentials, Verb verb, String url, String payload)
-      throws IOException, NoSuchMethodException {
+  public BitBucketPPRApiResponse send(StringCredentials credentials, Verb verb, String url,
+      String payload) throws IOException, NoSuchMethodException {
     logger.finest("Use BB Bearer Authorization for state notification");
+
+    String authHeader = "Bearer ".concat(credentials.getSecret().getPlainText());
 
     // Build the client from the JSSE configuration of the Jenkins JVM: createSystem() honours
     // the system properties (javax.net.ssl.trustStore and friends, proxy settings), so
@@ -51,28 +52,26 @@ public class BitBucketPPRBearerAuthorizationApiConsumer {
     // that certificate present in the trust store configured for the Jenkins JVM. The Bearer
     // token travels in the Authorization header, so the connection it travels over must be
     // authenticated -- it must never accept arbitrary certificates.
-    CloseableHttpClient httpClient = HttpClients.createSystem();
+    try (CloseableHttpClient httpClient = HttpClients.createSystem()) {
+      if (verb == Verb.POST) {
+        final HttpPost request = new HttpPost(url);
+        request.setHeader(HttpHeaders.AUTHORIZATION, authHeader);
+        request.setHeader("X-Atlassian-Token", "nocheck");
 
-    String authHeader = "Bearer ".concat(credentials.getSecret().getPlainText());
-
-    if (verb == Verb.POST) {
-      final HttpPost request = new HttpPost(url);
-      request.setHeader(HttpHeaders.AUTHORIZATION, authHeader);
-      request.setHeader("X-Atlassian-Token", "nocheck");
-
-      if (StringUtils.isNotBlank(payload)) {
-        request.setEntity(new StringEntity(payload, ContentType.APPLICATION_JSON));
+        if (StringUtils.isNotBlank(payload)) {
+          request.setEntity(new StringEntity(payload, ContentType.APPLICATION_JSON));
+        }
+        return httpClient.execute(request, BitBucketPPRApiResponse::from);
       }
-      return httpClient.execute(request);
-    }
 
-    if (verb == Verb.DELETE) {
-      final HttpDelete request = new HttpDelete(url);
-      request.setHeader(HttpHeaders.AUTHORIZATION, authHeader);
-      request.setHeader("X-Atlassian-Token", "nocheck");
-      return httpClient.execute(request);
-    }
+      if (verb == Verb.DELETE) {
+        final HttpDelete request = new HttpDelete(url);
+        request.setHeader(HttpHeaders.AUTHORIZATION, authHeader);
+        request.setHeader("X-Atlassian-Token", "nocheck");
+        return httpClient.execute(request, BitBucketPPRApiResponse::from);
+      }
 
-    throw new NoSuchMethodException();
+      throw new NoSuchMethodException();
+    }
   }
 }

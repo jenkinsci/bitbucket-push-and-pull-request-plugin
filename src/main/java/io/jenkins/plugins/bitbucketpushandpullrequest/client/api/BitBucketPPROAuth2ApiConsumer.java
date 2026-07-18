@@ -37,24 +37,30 @@ public class BitBucketPPROAuth2ApiConsumer {
   private static final Logger logger =
       Logger.getLogger(BitBucketPPROAuth2ApiConsumer.class.getName());
 
-  public Response send(StringCredentials credentials, Verb verb, String url, String payload)
-      throws InterruptedException, ExecutionException, IOException {
+  public BitBucketPPRApiResponse send(StringCredentials credentials, Verb verb, String url,
+      String payload) throws InterruptedException, ExecutionException, IOException {
     logger.finest("Set BB StringCredentials for BB Cloud state notification");
 
-    OAuth20Service service = new ServiceBuilder(credentials.getId())
-        .apiSecret(credentials.getSecret().getPlainText()).build(BitbucketPPROAuth2Api.instance());
+    // Service and response are both Closeable (the service wraps its own HTTP client); reading
+    // code and body inside the try-with-resources detaches the returned value from the
+    // transport, which is fully released on exit.
+    try (OAuth20Service service = new ServiceBuilder(credentials.getId())
+        .apiSecret(credentials.getSecret().getPlainText())
+        .build(BitbucketPPROAuth2Api.instance())) {
 
-    OAuth2AccessToken token = service.getAccessTokenClientCredentialsGrant();
-    OAuthRequest request = new OAuthRequest(verb, url);
-    request.addHeader("Content-Type", "application/json;charset=UTF-8");
+      OAuth2AccessToken token = service.getAccessTokenClientCredentialsGrant();
+      OAuthRequest request = new OAuthRequest(verb, url);
+      request.addHeader("Content-Type", "application/json;charset=UTF-8");
 
+      if (verb == Verb.POST && StringUtils.isNotBlank(payload)) {
+        request.setPayload(payload);
+      }
 
-    if (verb == Verb.POST && StringUtils.isNotBlank(payload)) {
-      request.setPayload(payload);
+      service.signRequest(token, request);
+
+      try (Response response = service.execute(request)) {
+        return new BitBucketPPRApiResponse(response.getCode(), response.getBody());
+      }
     }
-
-    service.signRequest(token, request);
-
-    return service.execute(request);
   }
 }
