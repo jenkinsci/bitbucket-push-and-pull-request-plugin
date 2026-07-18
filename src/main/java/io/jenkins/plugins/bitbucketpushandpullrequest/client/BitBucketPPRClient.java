@@ -21,6 +21,7 @@
 package io.jenkins.plugins.bitbucketpushandpullrequest.client;
 
 import java.io.IOException;
+import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -50,7 +51,9 @@ public class BitBucketPPRClient {
   private final BitBucketPPREventContext context;
 
   public BitBucketPPRClient(BitBucketPPRClientType type, BitBucketPPREventContext context) {
-    this.type = type;
+    // Fail fast: a null flavor would otherwise silently route Secret-text credentials to the
+    // Server/Bearer consumer through the type == CLOUD comparison below.
+    this.type = Objects.requireNonNull(type, "client type");
     this.context = context;
   }
 
@@ -75,10 +78,12 @@ public class BitBucketPPRClient {
             "Credentials provider for state notification not found");
       };
 
+      BitBucketPPRUtils.warnOnHttpError(url, response.statusCode(), response.body());
+
       logger.log(Level.FINEST, "Result of the status notification is: {0}, with status code: {1}",
           new Object[] {response.body(), response.statusCode()});
     } catch (ExecutionException | IOException e) {
-      logger.log(Level.WARNING, "Error during state notification: {0} ", e.getMessage());
+      logger.log(Level.WARNING, "Error during state notification", e);
     }
   }
 }

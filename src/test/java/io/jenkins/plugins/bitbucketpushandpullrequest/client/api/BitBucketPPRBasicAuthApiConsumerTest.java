@@ -23,12 +23,15 @@ package io.jenkins.plugins.bitbucketpushandpullrequest.client.api;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 
 import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials;
 import com.github.scribejava.core.model.Verb;
+import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpsServer;
 import java.nio.file.Path;
+import java.util.concurrent.atomic.AtomicReference;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLException;
 import org.junit.jupiter.api.AfterEach;
@@ -103,5 +106,41 @@ class BitBucketPPRBasicAuthApiConsumerTest {
 
     assertThrows(SSLException.class,
         () -> new BitBucketPPRBasicAuthApiConsumer().send(credentials, Verb.POST, url, "{}"));
+  }
+
+  @Test
+  void sendDeleteCarriesTheAuthHeaders(@TempDir Path tmp) throws Exception {
+    // DELETE is production-reachable (approve revocation on failed builds) and shares the
+    // request building with POST: this pins that the Authorization and X-Atlassian-Token
+    // headers do not drift off the less-exercised verb.
+    Path keystore = tmp.resolve("keystore.p12");
+    TlsTestSupport.generateSelfSignedKeystore(keystore, "CN=localhost",
+        "dns:localhost,ip:127.0.0.1");
+    AtomicReference<Headers> requestHeaders = new AtomicReference<>();
+    server = TlsTestSupport.startHttpsServer(keystore, requestHeaders);
+
+    String url = "https://localhost:" + server.getAddress().getPort() + "/rest/build-status";
+
+    SSLContext original = SSLContext.getDefault();
+    SSLContext.setDefault(TlsTestSupport.contextTrusting(keystore));
+    try {
+      BitBucketPPRApiResponse response =
+          new BitBucketPPRBasicAuthApiConsumer().send(credentials, Verb.DELETE, url, "");
+      assertEquals(200, response.statusCode());
+    } finally {
+      SSLContext.setDefault(original);
+    }
+
+    Headers headers = requestHeaders.get();
+    assertTrue(headers.getFirst("Authorization").startsWith("Basic "),
+        () -> "expected a preemptive Basic Authorization header, got: "
+            + headers.getFirst("Authorization"));
+    assertEquals("nocheck", headers.getFirst("X-Atlassian-Token"));
+  }
+
+  @Test
+  void sendRejectsUnsupportedVerbs() {
+    assertThrows(NoSuchMethodException.class, () -> new BitBucketPPRBasicAuthApiConsumer()
+        .send(credentials, Verb.GET, "https://bitbucket-unused.test", ""));
   }
 }

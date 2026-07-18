@@ -97,7 +97,7 @@ class BitBucketPPRUtilsTest {
       BitBucketPPRUtils
           .warnIfNotHttps("http://bitbucket-again.test/rest/build-status/1.0/commits/aaa");
 
-      List<String> warned = nonHttpsWarnings(records);
+      List<String> warned = warningsContaining(records, "not https");
       assertEquals(2, warned.size(),
           () -> "expected one warning per distinct non-https origin, got: " + warned);
       assertTrue(warned.get(0).contains("bitbucket-once.test"));
@@ -129,7 +129,7 @@ class BitBucketPPRUtilsTest {
       BitBucketPPRUtils
           .warnIfNotHttps("http://bitbucket_ci.internal/rest/build-status/1.0/commits/bbb");
 
-      List<String> warned = nonHttpsWarnings(records);
+      List<String> warned = warningsContaining(records, "not https");
       assertEquals(2, warned.size(),
           () -> "expected one warning per authority even for unparseable URLs, got: " + warned);
       assertFalse(warned.get(0).contains("commits"),
@@ -153,7 +153,7 @@ class BitBucketPPRUtilsTest {
       BitBucketPPRUtils
           .warnIfNotHttps("http://bitbucket-private.test/rest/build-status/1.0/commits/bbb");
 
-      List<String> warned = nonHttpsWarnings(records);
+      List<String> warned = warningsContaining(records, "not https");
       assertEquals(1, warned.size(),
           () -> "case-variant hosts and user-info must collapse to one origin, got: " + warned);
       assertFalse(warned.get(0).contains("s3cret"),
@@ -175,7 +175,7 @@ class BitBucketPPRUtilsTest {
       BitBucketPPRUtils.warnIfNotHttps("HTTPS://bitbucket-secure-upper.test/rest/build-status");
       BitBucketPPRUtils.warnIfNotHttps(null);
 
-      assertEquals(List.of(), nonHttpsWarnings(records));
+      assertEquals(List.of(), warningsContaining(records, "not https"));
     } finally {
       utilsLogger.removeHandler(capture);
     }
@@ -196,8 +196,40 @@ class BitBucketPPRUtilsTest {
     };
   }
 
-  private static List<String> nonHttpsWarnings(List<LogRecord> records) {
+  private static List<String> warningsContaining(List<LogRecord> records, String needle) {
     return records.stream().filter(r -> Level.WARNING.equals(r.getLevel()))
-        .map(LogRecord::getMessage).filter(m -> m != null && m.contains("not https")).toList();
+        .map(LogRecord::getMessage).filter(m -> m != null && m.contains(needle)).toList();
+  }
+
+  @Test
+  void warnOnHttpErrorWarnsOncePerOriginAndStatus() {
+    List<LogRecord> records = new ArrayList<>();
+    Handler capture = newCapturingHandler(records);
+    Logger utilsLogger = Logger.getLogger(BitBucketPPRUtils.class.getName());
+    utilsLogger.addHandler(capture);
+    try {
+      // A persistent misconfiguration answers every notification with the same status: one
+      // warning per origin and status, keyed on the authority (never the commit-bearing URL),
+      // while a different status on the same origin is new information and warns again.
+      BitBucketPPRUtils.warnOnHttpError(
+          "http://bitbucket-rejected.test/rest/build-status/1.0/commits/aaa", 401, "{\"e\":1}");
+      BitBucketPPRUtils.warnOnHttpError(
+          "http://bitbucket-rejected.test/rest/build-status/1.0/commits/bbb", 401, "{\"e\":1}");
+      BitBucketPPRUtils.warnOnHttpError(
+          "http://bitbucket-rejected.test/rest/build-status/1.0/commits/ccc", 403, "{\"e\":2}");
+      BitBucketPPRUtils.warnOnHttpError(
+          "http://bitbucket-rejected.test/rest/build-status/1.0/commits/ddd", 200, "ok");
+
+      List<String> warned = warningsContaining(records, "rejected with HTTP");
+      assertEquals(2, warned.size(),
+          () -> "expected one warning per origin and status, got: " + warned);
+      assertTrue(warned.get(0).contains("401"));
+      assertTrue(warned.get(0).contains("bitbucket-rejected.test"));
+      assertFalse(warned.get(0).contains("commits"),
+          () -> "the warning must name the origin, not the full URL, got: " + warned.get(0));
+      assertTrue(warned.get(1).contains("403"));
+    } finally {
+      utilsLogger.removeHandler(capture);
+    }
   }
 }

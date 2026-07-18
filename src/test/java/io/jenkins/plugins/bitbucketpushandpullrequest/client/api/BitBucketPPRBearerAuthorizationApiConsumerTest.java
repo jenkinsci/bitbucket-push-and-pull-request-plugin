@@ -21,13 +21,16 @@
 
 package io.jenkins.plugins.bitbucketpushandpullrequest.client.api;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 
 import com.github.scribejava.core.model.Verb;
+import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpsServer;
 import java.nio.file.Path;
+import java.util.concurrent.atomic.AtomicReference;
 import java.security.cert.CertPathBuilderException;
 import java.security.cert.CertPathValidatorException;
 import javax.net.ssl.SSLContext;
@@ -119,6 +122,35 @@ class BitBucketPPRBearerAuthorizationApiConsumerTest {
     } finally {
       SSLContext.setDefault(original);
     }
+  }
+
+  @Test
+  void sendDeleteCarriesTheAuthHeaders(@TempDir Path tmp) throws Exception {
+    // Mirrors the Basic consumer's DELETE test: the verb used for approve revocation must carry
+    // the same headers as POST, off the shared request building.
+    Path keystore = tmp.resolve("keystore.p12");
+    TlsTestSupport.generateSelfSignedKeystore(keystore, "CN=localhost",
+        "dns:localhost,ip:127.0.0.1");
+    AtomicReference<Headers> requestHeaders = new AtomicReference<>();
+    server = TlsTestSupport.startHttpsServer(keystore, requestHeaders);
+
+    String url = "https://localhost:" + server.getAddress().getPort() + "/rest/build-status";
+
+    SSLContext original = SSLContext.getDefault();
+    SSLContext.setDefault(TlsTestSupport.contextTrusting(keystore));
+    try {
+      BitBucketPPRApiResponse response = new BitBucketPPRBearerAuthorizationApiConsumer()
+          .send(credentials, Verb.DELETE, url, "");
+      assertEquals(200, response.statusCode());
+    } finally {
+      SSLContext.setDefault(original);
+    }
+
+    Headers headers = requestHeaders.get();
+    assertTrue(headers.getFirst("Authorization").startsWith("Bearer "),
+        () -> "expected a Bearer Authorization header, got: "
+            + headers.getFirst("Authorization"));
+    assertEquals("nocheck", headers.getFirst("X-Atlassian-Token"));
   }
 
   private static boolean indicatesCertPathFailure(Throwable throwable) {

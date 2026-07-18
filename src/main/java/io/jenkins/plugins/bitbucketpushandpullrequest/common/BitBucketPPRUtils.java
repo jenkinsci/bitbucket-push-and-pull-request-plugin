@@ -73,6 +73,26 @@ public class BitBucketPPRUtils {
   // ":-1" a portless base URL used to produce), and any fallback to the full URL would bring
   // back the per-commit key. Cutting at the end of the authority keeps the key bounded and
   // commit-free for every input; user-info is stripped so it can never reach the log.
+  private static final Set<String> httpErrorWarnedOriginsAndStatuses =
+      ConcurrentHashMap.newKeySet();
+
+  // A rejected notification (rotated token, revoked credential, wrong repository) throws no
+  // exception: the transport call succeeded, so without this warning the failure is visible only
+  // at FINEST. Warned once per origin and status code, mirroring warnIfNotHttps, so a persistent
+  // misconfiguration surfaces at default log level without flooding the log on every build.
+  public static void warnOnHttpError(String url, int statusCode, String body) {
+    if (statusCode < 400) {
+      return;
+    }
+    String origin = originOf(url);
+    if (httpErrorWarnedOriginsAndStatuses.add(origin + "#" + statusCode)) {
+      String detail = body == null || body.isBlank() ? ""
+          : ": " + (body.length() > 500 ? body.substring(0, 500) + "..." : body);
+      logger.warning(() -> "Build status notification to " + origin
+          + " was rejected with HTTP " + statusCode + detail);
+    }
+  }
+
   private static String originOf(String url) {
     int schemeEnd = url.indexOf("://");
     int authorityStart = schemeEnd < 0 ? 0 : schemeEnd + 3;
