@@ -1,7 +1,7 @@
 /*******************************************************************************
  * The MIT License
  *
- * Copyright (C) 2018-2025, Christian Del Monte.
+ * Copyright (C) 2018-2026, Christian Del Monte.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -20,10 +20,65 @@
  ******************************************************************************/
 package io.jenkins.plugins.bitbucketpushandpullrequest.client;
 
+import java.io.IOException;
+import java.util.concurrent.ExecutionException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.apache.commons.lang.NotImplementedException;
+import org.jenkinsci.plugins.plaincredentials.StringCredentials;
+import com.cloudbees.plugins.credentials.common.StandardCredentials;
+import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials;
 import com.github.scribejava.core.model.Verb;
+import io.jenkins.plugins.bitbucketpushandpullrequest.client.api.BitBucketPPRApiResponse;
+import io.jenkins.plugins.bitbucketpushandpullrequest.client.api.BitBucketPPRBasicAuthApiConsumer;
+import io.jenkins.plugins.bitbucketpushandpullrequest.client.api.BitBucketPPRBearerAuthorizationApiConsumer;
+import io.jenkins.plugins.bitbucketpushandpullrequest.client.api.BitBucketPPROAuth2ApiConsumer;
+import io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRUtils;
+import io.jenkins.plugins.bitbucketpushandpullrequest.event.BitBucketPPREventContext;
 
-public interface BitBucketPPRClient {
-  void send(String url, String payload) throws Exception;
-  void send(Verb verb, String url, String payload) throws Exception;
-  void accept(BitBucketPPRClientVisitor visitor);
+/**
+ * Sends build-status notifications to Bitbucket. The API consumer is chosen from the Bitbucket
+ * flavor and the configured credential type: username/password credentials use Basic auth on both
+ * flavors; a Secret-text credential is an OAuth2 client on Cloud and a Bearer token on Server.
+ * This is the single dispatch point for every notification, so cross-cutting policies (like the
+ * non-https warning) live here once.
+ */
+public class BitBucketPPRClient {
+  private static final Logger logger = Logger.getLogger(BitBucketPPRClient.class.getName());
+
+  private final BitBucketPPRClientType type;
+  private final BitBucketPPREventContext context;
+
+  public BitBucketPPRClient(BitBucketPPRClientType type, BitBucketPPREventContext context) {
+    this.type = type;
+    this.context = context;
+  }
+
+  public void send(String url, String payload) throws Exception {
+    send(Verb.POST, url, payload);
+  }
+
+  public void send(Verb verb, String url, String payload) throws Exception {
+    BitBucketPPRUtils.warnIfNotHttps(url);
+    StandardCredentials credentials = context.getStandardCredentials();
+
+    try {
+      BitBucketPPRApiResponse response = switch (credentials) {
+        case StandardUsernamePasswordCredentials usernamePasswordCredentials ->
+            new BitBucketPPRBasicAuthApiConsumer().send(usernamePasswordCredentials, verb, url,
+                payload);
+        case StringCredentials stringCredentials -> type == BitBucketPPRClientType.CLOUD
+            ? new BitBucketPPROAuth2ApiConsumer().send(stringCredentials, verb, url, payload)
+            : new BitBucketPPRBearerAuthorizationApiConsumer().send(stringCredentials, verb, url,
+                payload);
+        case null, default -> throw new NotImplementedException(
+            "Credentials provider for state notification not found");
+      };
+
+      logger.log(Level.FINEST, "Result of the status notification is: {0}, with status code: {1}",
+          new Object[] {response.body(), response.statusCode()});
+    } catch (ExecutionException | IOException e) {
+      logger.log(Level.WARNING, "Error during state notification: {0} ", e.getMessage());
+    }
+  }
 }
