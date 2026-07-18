@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.0.1 (unreleased)
+
+### Improvements
+* **Use the JVM's TLS configuration for Basic-auth Bitbucket API calls** - The Basic-auth API client now follows the JVM's standard JSSE/trust-store configuration (`javax.net.ssl.trustStore` and friends, proxy settings), as the Bearer-token client does since 3.3.9. A Bitbucket instance using a private CA or a self-signed certificate present in the JVM trust store now works on both authentication paths.
+* **Warn when build-status notifications are sent over plain HTTP** - The Basic-auth and Bearer-token API clients now log a warning when the configured Bitbucket URL is not `https://`, since the `Authorization` header (credentials or Bearer token) travels unencrypted. The request is still sent, so setups terminating TLS on a trusted reverse proxy keep working.
+
 ## 4.0.0 (2026-07-09)
 
 ### Breaking Changes

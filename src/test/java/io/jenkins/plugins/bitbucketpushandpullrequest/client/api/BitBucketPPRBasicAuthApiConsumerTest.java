@@ -26,6 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 
+import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials;
 import com.github.scribejava.core.model.Verb;
 import com.sun.net.httpserver.HttpServer;
 import com.sun.net.httpserver.HttpsServer;
@@ -33,8 +34,6 @@ import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
-import java.security.cert.CertPathBuilderException;
-import java.security.cert.CertPathValidatorException;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Handler;
@@ -43,9 +42,7 @@ import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLException;
-import javax.net.ssl.SSLPeerUnverifiedException;
 import org.apache.http.HttpResponse;
-import org.jenkinsci.plugins.plaincredentials.StringCredentials;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -55,37 +52,52 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 /**
- * Verifies the TLS behaviour of the Bearer-token API consumer. The Bearer token travels in the
- * Authorization header, so the connection it travels over must be authenticated. Before this was
- * enforced, the consumer disabled certificate and hostname validation unconditionally and would
- * have completed the request against any certificate.
- *
- * <ul>
- * <li>Certificate-chain validation: a server presenting a certificate that does not chain to the
- * trust store configured for the JVM (a freshly generated self-signed certificate) must fail the
- * handshake with a certificate path failure, so the token is never transmitted.</li>
- * <li>Hostname verification: a certificate that is trusted but does not carry the contacted host
- * in its subject alternative names must be rejected as well.</li>
- * <li>Plain-HTTP warning: a non-https URL is accepted (TLS may legitimately be terminated by a
- * proxy in front of Bitbucket) but must be flagged with a warning in the log.</li>
- * </ul>
+ * Verifies the TLS behaviour of the Basic-auth API consumer, mirroring
+ * {@link BitBucketPPRBearerAuthorizationApiConsumerTest}: the client must follow the JSSE
+ * configuration of the Jenkins JVM (so a Bitbucket instance using a private CA works on both
+ * authentication paths), must keep validating certificate chains, and must warn when the
+ * credentials are sent over a non-https URL.
  */
 @ExtendWith(MockitoExtension.class)
-class BitBucketPPRBearerAuthorizationApiConsumerTest {
+class BitBucketPPRBasicAuthApiConsumerTest {
 
   private HttpsServer server;
-  private StringCredentials credentials;
+  private StandardUsernamePasswordCredentials credentials;
 
   @BeforeEach
   void mockCredentials() {
-    credentials = Mockito.mock(StringCredentials.class, RETURNS_DEEP_STUBS);
-    Mockito.when(credentials.getSecret().getPlainText()).thenReturn("a-secret-bearer-token");
+    credentials = Mockito.mock(StandardUsernamePasswordCredentials.class, RETURNS_DEEP_STUBS);
+    Mockito.when(credentials.getUsername()).thenReturn("a-user");
+    Mockito.when(credentials.getPassword().getPlainText()).thenReturn("a-password");
   }
 
   @AfterEach
   void stopServer() {
     if (server != null) {
       server.stop(0);
+    }
+  }
+
+  @Test
+  void sendHonoursJvmDefaultTlsConfiguration(@TempDir Path tmp) throws Exception {
+    Path keystore = tmp.resolve("keystore.p12");
+    TlsTestSupport.generateSelfSignedKeystore(keystore, "CN=localhost",
+        "dns:localhost,ip:127.0.0.1");
+    server = TlsTestSupport.startHttpsServer(keystore);
+
+    String url = "https://localhost:" + server.getAddress().getPort() + "/rest/build-status";
+
+    // With the certificate trusted at the JVM default level the request must succeed: this is
+    // what useSystemProperties() restores, a plain HttpClientBuilder.create() client ignores the
+    // JVM default context and would fail the handshake here.
+    SSLContext original = SSLContext.getDefault();
+    SSLContext.setDefault(TlsTestSupport.contextTrusting(keystore));
+    try {
+      HttpResponse response =
+          new BitBucketPPRBasicAuthApiConsumer().send(credentials, Verb.POST, url, "{}");
+      assertEquals(200, response.getStatusLine().getStatusCode());
+    } finally {
+      SSLContext.setDefault(original);
     }
   }
 
@@ -98,38 +110,8 @@ class BitBucketPPRBearerAuthorizationApiConsumerTest {
 
     String url = "https://localhost:" + server.getAddress().getPort() + "/rest/build-status";
 
-    BitBucketPPRBearerAuthorizationApiConsumer testSubject =
-        new BitBucketPPRBearerAuthorizationApiConsumer();
-
-    SSLException exception = assertThrows(SSLException.class,
-        () -> testSubject.send(credentials, Verb.POST, url, "{}"));
-    // The certificate carries localhost in its SAN, so the failure must come from the untrusted
-    // chain, not from a hostname mismatch or an unrelated TLS problem.
-    assertTrue(indicatesCertPathFailure(exception),
-        () -> "expected a certificate path validation failure, got: " + exception);
-  }
-
-  @Test
-  void sendRejectsTrustedCertificateWithMismatchedHostname(@TempDir Path tmp) throws Exception {
-    Path keystore = tmp.resolve("keystore.p12");
-    TlsTestSupport.generateSelfSignedKeystore(keystore, "CN=bitbucket.test", "dns:bitbucket.test");
-    server = TlsTestSupport.startHttpsServer(keystore);
-
-    String url = "https://localhost:" + server.getAddress().getPort() + "/rest/build-status";
-
-    BitBucketPPRBearerAuthorizationApiConsumer testSubject =
-        new BitBucketPPRBearerAuthorizationApiConsumer();
-
-    // Trust the certificate at the JVM default level, where createSystem() picks it up: the
-    // chain then validates and the failure left to observe is the hostname mismatch.
-    SSLContext original = SSLContext.getDefault();
-    SSLContext.setDefault(TlsTestSupport.contextTrusting(keystore));
-    try {
-      assertThrows(SSLPeerUnverifiedException.class,
-          () -> testSubject.send(credentials, Verb.POST, url, "{}"));
-    } finally {
-      SSLContext.setDefault(original);
-    }
+    assertThrows(SSLException.class,
+        () -> new BitBucketPPRBasicAuthApiConsumer().send(credentials, Verb.POST, url, "{}"));
   }
 
   @Test
@@ -159,12 +141,11 @@ class BitBucketPPRBearerAuthorizationApiConsumerTest {
       @Override
       public void close() {}
     };
-    Logger consumerLogger =
-        Logger.getLogger(BitBucketPPRBearerAuthorizationApiConsumer.class.getName());
+    Logger consumerLogger = Logger.getLogger(BitBucketPPRBasicAuthApiConsumer.class.getName());
     consumerLogger.addHandler(capture);
     try {
-      HttpResponse response = new BitBucketPPRBearerAuthorizationApiConsumer()
-          .send(credentials, Verb.POST, url, "{}");
+      HttpResponse response =
+          new BitBucketPPRBasicAuthApiConsumer().send(credentials, Verb.POST, url, "{}");
       assertEquals(200, response.getStatusLine().getStatusCode());
       assertTrue(records.stream().anyMatch(
           r -> Level.WARNING.equals(r.getLevel()) && r.getMessage().contains("not https")),
@@ -173,19 +154,5 @@ class BitBucketPPRBearerAuthorizationApiConsumerTest {
       consumerLogger.removeHandler(capture);
       plainServer.stop(0);
     }
-  }
-
-  private static boolean indicatesCertPathFailure(Throwable throwable) {
-    for (Throwable cause = throwable; cause != null; cause = cause.getCause()) {
-      if (cause instanceof CertPathValidatorException
-          || cause instanceof CertPathBuilderException) {
-        return true;
-      }
-      String message = cause.getMessage();
-      if (message != null && message.contains("PKIX")) {
-        return true;
-      }
-    }
-    return false;
   }
 }

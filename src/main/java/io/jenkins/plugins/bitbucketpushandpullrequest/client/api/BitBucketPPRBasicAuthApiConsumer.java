@@ -58,8 +58,13 @@ public class BitBucketPPRBasicAuthApiConsumer {
     final org.apache.http.client.CredentialsProvider provider = new BasicCredentialsProvider();
     provider.setCredentials(AuthScope.ANY, httpAuthCredentials);
 
-    final HttpClient client =
-        HttpClientBuilder.create().setDefaultCredentialsProvider(provider).build();
+    // useSystemProperties() builds the client from the JSSE configuration of the Jenkins JVM
+    // (javax.net.ssl.trustStore and friends, proxy settings), consistent with the Bearer
+    // consumer: a Bitbucket instance using a private CA must work on both authentication paths.
+    final HttpClient client = HttpClientBuilder.create().useSystemProperties()
+        .setDefaultCredentialsProvider(provider).build();
+
+    warnIfNotHttps(url);
 
     if (verb == Verb.POST) {
       final HttpPost request = new HttpPost(url);
@@ -79,6 +84,16 @@ public class BitBucketPPRBasicAuthApiConsumer {
       return client.execute(request);
     }
     throw new NoSuchMethodException();
+  }
+
+  // The request is still sent: setups terminating TLS on a trusted reverse proxy in front of
+  // Bitbucket are legitimate, so a non-https URL is the operator's call, not an error.
+  private static void warnIfNotHttps(String url) {
+    if (!url.regionMatches(true, 0, "https:", 0, 6)) {
+      logger.warning(() -> "The Bitbucket URL " + url
+          + " is not https: the credentials in the Authorization header travel unencrypted."
+          + " Use an https URL unless TLS is terminated by a trusted proxy.");
+    }
   }
 
   private String getAuthHeader(String username, String password) {

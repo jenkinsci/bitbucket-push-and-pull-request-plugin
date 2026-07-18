@@ -53,6 +53,8 @@ public class BitBucketPPRBearerAuthorizationApiConsumer {
     // authenticated -- it must never accept arbitrary certificates.
     CloseableHttpClient httpClient = HttpClients.createSystem();
 
+    warnIfNotHttps(url);
+
     String authHeader = "Bearer ".concat(credentials.getSecret().getPlainText());
 
     if (verb == Verb.POST) {
@@ -74,5 +76,15 @@ public class BitBucketPPRBearerAuthorizationApiConsumer {
     }
 
     throw new NoSuchMethodException();
+  }
+
+  // The request is still sent: setups terminating TLS on a trusted reverse proxy in front of
+  // Bitbucket are legitimate, so a non-https URL is the operator's call, not an error.
+  private static void warnIfNotHttps(String url) {
+    if (!url.regionMatches(true, 0, "https:", 0, 6)) {
+      logger.warning(() -> "The Bitbucket URL " + url
+          + " is not https: the Bearer token in the Authorization header travels unencrypted."
+          + " Use an https URL unless TLS is terminated by a trusted proxy.");
+    }
   }
 }
