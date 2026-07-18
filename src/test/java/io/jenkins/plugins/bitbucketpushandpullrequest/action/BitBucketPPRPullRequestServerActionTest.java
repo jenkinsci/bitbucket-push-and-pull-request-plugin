@@ -106,6 +106,39 @@ class BitBucketPPRPullRequestServerActionTest {
   }
 
   @Test
+  void getCommitLinkOmitsThePortWhenTheBaseUrlHasNone() throws Exception {
+    // A portless base URL used to produce "host:-1" (URL.getPort() appended verbatim), an
+    // unroutable authority that also defeated the per-origin dedup of the non-https warning.
+    assertEquals("http://bitbucket.example.org/rest/build-status/1.0/commits/123456",
+        commitLinkFor("http://bitbucket.example.org/scm/some-namespace/some-repo.git"));
+  }
+
+  @Test
+  void getCommitLinkKeepsAnExplicitPort() throws Exception {
+    assertEquals("http://bitbucket.example.org:7990/rest/build-status/1.0/commits/123456",
+        commitLinkFor("http://bitbucket.example.org:7990/scm/some-namespace/some-repo.git"));
+  }
+
+  // Stub the global configuration required while constructing the action; the propagation URL
+  // exercised by these tests is then set directly on the action instance.
+  private static String commitLinkFor(String propagationUrl) throws Exception {
+    try (MockedStatic<BitBucketPPRPluginConfig> config =
+        Mockito.mockStatic(BitBucketPPRPluginConfig.class)) {
+      BitBucketPPRPluginConfig c = mock(BitBucketPPRPluginConfig.class);
+      config.when(BitBucketPPRPluginConfig::getInstance).thenReturn(c);
+      BitBucketPPRPayload payloadMock = mock(BitBucketPPRPayload.class, RETURNS_DEEP_STUBS);
+      when(payloadMock.getServerPullRequest().getProperties().getMergeCommit()
+          .getId()).thenReturn("123456");
+      BitBucketPPRHookEvent event = mock(BitBucketPPRHookEvent.class);
+      when(event.getAction()).thenReturn("merged");
+      BitBucketPPRPullRequestServerAction action =
+          new BitBucketPPRPullRequestServerAction(payloadMock, event);
+      action.setPropagationUrl(propagationUrl);
+      return action.getCommitLink();
+    }
+  }
+
+  @Test
   void testScmUrlsIncludeFromRefForForkedPR() throws Exception {
     try (MockedStatic<BitBucketPPRPluginConfig> config =
         Mockito.mockStatic(BitBucketPPRPluginConfig.class)) {

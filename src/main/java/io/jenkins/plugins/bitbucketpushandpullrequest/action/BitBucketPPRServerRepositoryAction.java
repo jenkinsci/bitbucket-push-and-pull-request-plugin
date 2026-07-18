@@ -22,7 +22,6 @@
 package io.jenkins.plugins.bitbucketpushandpullrequest.action;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
-import io.jenkins.plugins.bitbucketpushandpullrequest.config.BitBucketPPRPluginConfig;
 import io.jenkins.plugins.bitbucketpushandpullrequest.exception.BitBucketPPRPayloadPropertyNotFoundException;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.server.BitBucketPPRServerChange;
@@ -44,8 +43,6 @@ import static org.apache.commons.lang3.ObjectUtils.isEmpty;
 public class BitBucketPPRServerRepositoryAction extends BitBucketPPRActionAbstract
     implements BitBucketPPRAction {
   private static final Logger logger = Logger.getLogger(BitBucketPPRAction.class.getName());
-  private static final BitBucketPPRPluginConfig globalConfig =
-      BitBucketPPRPluginConfig.getInstance();
 
   private final @NonNull BitBucketPPRPayload payload;
   private URL baseUrl;
@@ -206,13 +203,6 @@ public class BitBucketPPRServerRepositoryAction extends BitBucketPPRActionAbstra
     }
 
     return links;
-  }
-
-  private String getBaseUrl() {
-    if (baseUrl == null) {
-      return null;
-    }
-    return baseUrl.getProtocol() + "://" + baseUrl.getHost() + ":" + baseUrl.getPort();
   }
 
   @Override

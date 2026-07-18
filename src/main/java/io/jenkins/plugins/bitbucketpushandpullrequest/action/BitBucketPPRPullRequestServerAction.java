@@ -49,8 +49,6 @@ public class BitBucketPPRPullRequestServerAction extends BitBucketPPRActionAbstr
   private URL baseUrl;
   private List<String> scmUrls = new ArrayList<>(2);
   private String repositoryUuid;
-  private static final BitBucketPPRPluginConfig globalConfig =
-      BitBucketPPRPluginConfig.getInstance();
   private final BitBucketPPRHookEvent bitbucketEvent;
 
   public BitBucketPPRPullRequestServerAction(
@@ -117,9 +115,9 @@ public class BitBucketPPRPullRequestServerAction extends BitBucketPPRActionAbstr
       }
     }
 
-    if (globalConfig.isPropagationUrlSet()) {
+    if (getGlobalConfig().isPropagationUrlSet()) {
       try {
-        this.baseUrl = new URL(globalConfig.getPropagationUrl());
+        this.baseUrl = new URL(getGlobalConfig().getPropagationUrl());
       } catch (MalformedURLException e) {
         throw new RuntimeException(e);
       }
@@ -264,11 +262,11 @@ public class BitBucketPPRPullRequestServerAction extends BitBucketPPRActionAbstr
   private String getBaseUrl() throws MalformedURLException {
     URL baseCommitLink =
         isEmpty(this.getPropagationUrl()) ? baseUrl : new URL(this.getPropagationUrl());
-    return baseCommitLink.getProtocol()
-        + "://"
-        + baseCommitLink.getHost()
-        + ":"
-        + baseCommitLink.getPort();
+    int port = baseCommitLink.getPort();
+    // URL.getPort() is -1 when the URL carries no explicit port: appending it verbatim would
+    // produce an unroutable "host:-1" authority.
+    return baseCommitLink.getProtocol() + "://" + baseCommitLink.getHost()
+        + (port == -1 ? "" : ":" + port);
   }
 
   @Override

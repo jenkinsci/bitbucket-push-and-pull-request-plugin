@@ -2,9 +2,12 @@
 
 ## 4.0.1 (unreleased)
 
+### Bug Fixes
+* **Build Server build-status links correctly for base URLs without an explicit port** - The pull request Server action appended `URL.getPort()` verbatim when building commit, approve and decline links, producing an unroutable `host:-1` address whenever the configured propagation URL (or the payload clone URL) carried no explicit port, so those status notifications failed silently. The port is now omitted when absent.
+
 ### Improvements
 * **Use the JVM's TLS configuration for Basic-auth Bitbucket API calls** - The Basic-auth API client now follows the JVM's standard JSSE/trust-store configuration (`javax.net.ssl.trustStore` and friends, proxy settings), as the Bearer-token client does since 3.3.9. A Bitbucket instance using a private CA or a self-signed certificate present in the JVM trust store now works on both authentication paths.
-* **Warn when build-status notifications are sent over plain HTTP** - The plugin now logs a warning when the Bitbucket URL used for a status notification is not `https://`, since the `Authorization` header (credentials or token) travels unencrypted. The check runs at the dispatch layer, so it covers all three authentication paths (Basic, Bearer and OAuth2), and warns once per origin (`scheme://host:port`) rather than per URL, so notification URLs embedding the commit hash do not flood the log. The request is still sent, so setups terminating TLS on a trusted reverse proxy keep working.
+* **Warn when build-status notifications are sent over plain HTTP** - The plugin now logs a warning when the Bitbucket URL used for a status notification is not `https://`, since the `Authorization` header (credentials or token) travels unencrypted. The check runs at the dispatch layer, so it covers all three authentication paths (Basic, Bearer and OAuth2), and warns once per origin (`scheme://host[:port]`) rather than per URL, so notification URLs embedding the commit hash do not flood the log. The request is still sent, so setups terminating TLS on a trusted reverse proxy keep working.
 * **Keep the Bitbucket credentials out of the HTTP client's credentials provider** - Basic auth is sent preemptively via the `Authorization` header only; the credentials are no longer registered in the client (formerly with `AuthScope.ANY`), so they can never be offered to a proxy answering a 407 challenge. Leaving the provider unset also lets the client fall back to the system default credentials provider, so JVM-configured proxy credentials (`java.net.Authenticator`) now work as the system-properties support intends.
 
 ## 4.0.0 (2026-07-09)

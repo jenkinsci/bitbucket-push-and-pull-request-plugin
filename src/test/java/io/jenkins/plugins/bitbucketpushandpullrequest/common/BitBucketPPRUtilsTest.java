@@ -89,11 +89,11 @@ class BitBucketPPRUtilsTest {
     utilsLogger.addHandler(capture);
     try {
       // Notification URLs embed the commit hash: distinct URLs on the same origin must warn
-      // only once, and an explicit default port is the same origin as no port at all.
+      // only once.
       BitBucketPPRUtils
           .warnIfNotHttps("http://bitbucket-once.test/rest/build-status/1.0/commits/aaa");
       BitBucketPPRUtils
-          .warnIfNotHttps("http://bitbucket-once.test:80/rest/build-status/1.0/commits/bbb");
+          .warnIfNotHttps("http://bitbucket-once.test/rest/build-status/1.0/commits/bbb");
       BitBucketPPRUtils
           .warnIfNotHttps("http://bitbucket-again.test/rest/build-status/1.0/commits/aaa");
 
@@ -104,6 +104,61 @@ class BitBucketPPRUtilsTest {
       assertFalse(warned.get(0).contains("commits"),
           () -> "the warning must name the origin, not the full URL, got: " + warned.get(0));
       assertTrue(warned.get(1).contains("bitbucket-again.test"));
+    } finally {
+      utilsLogger.removeHandler(capture);
+    }
+  }
+
+  @Test
+  void warnIfNotHttpsDedupsUrlsJavaNetUriCannotParse() {
+    List<LogRecord> records = new ArrayList<>();
+    Handler capture = newCapturingHandler(records);
+    Logger utilsLogger = Logger.getLogger(BitBucketPPRUtils.class.getName());
+    utilsLogger.addHandler(capture);
+    try {
+      // URLs java.net.URI cannot model as host+port (URI.getHost() is null for both, without
+      // throwing): hostnames with underscores, and the legacy malformed ":-1" a portless base
+      // URL produced before getBaseUrl learned to omit the missing port. Both must still dedup
+      // on the authority, never on the commit-bearing full URL.
+      BitBucketPPRUtils
+          .warnIfNotHttps("http://bitbucket-legacy.test:-1/rest/build-status/1.0/commits/aaa");
+      BitBucketPPRUtils
+          .warnIfNotHttps("http://bitbucket-legacy.test:-1/rest/build-status/1.0/commits/bbb");
+      BitBucketPPRUtils
+          .warnIfNotHttps("http://bitbucket_ci.internal/rest/build-status/1.0/commits/aaa");
+      BitBucketPPRUtils
+          .warnIfNotHttps("http://bitbucket_ci.internal/rest/build-status/1.0/commits/bbb");
+
+      List<String> warned = nonHttpsWarnings(records);
+      assertEquals(2, warned.size(),
+          () -> "expected one warning per authority even for unparseable URLs, got: " + warned);
+      assertFalse(warned.get(0).contains("commits"),
+          () -> "the warning must never contain the URL path, got: " + warned.get(0));
+      assertFalse(warned.get(1).contains("commits"),
+          () -> "the warning must never contain the URL path, got: " + warned.get(1));
+    } finally {
+      utilsLogger.removeHandler(capture);
+    }
+  }
+
+  @Test
+  void warnIfNotHttpsStripsUserInfoAndNormalizesHostCase() {
+    List<LogRecord> records = new ArrayList<>();
+    Handler capture = newCapturingHandler(records);
+    Logger utilsLogger = Logger.getLogger(BitBucketPPRUtils.class.getName());
+    utilsLogger.addHandler(capture);
+    try {
+      BitBucketPPRUtils.warnIfNotHttps(
+          "http://user:s3cret@Bitbucket-Private.test/rest/build-status/1.0/commits/aaa");
+      BitBucketPPRUtils
+          .warnIfNotHttps("http://bitbucket-private.test/rest/build-status/1.0/commits/bbb");
+
+      List<String> warned = nonHttpsWarnings(records);
+      assertEquals(1, warned.size(),
+          () -> "case-variant hosts and user-info must collapse to one origin, got: " + warned);
+      assertFalse(warned.get(0).contains("s3cret"),
+          () -> "credentials in the URL must never reach the log, got: " + warned.get(0));
+      assertTrue(warned.get(0).contains("bitbucket-private.test"));
     } finally {
       utilsLogger.removeHandler(capture);
     }

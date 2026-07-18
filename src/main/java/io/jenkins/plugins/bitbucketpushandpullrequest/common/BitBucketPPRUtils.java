@@ -21,8 +21,6 @@
 package io.jenkins.plugins.bitbucketpushandpullrequest.common;
 
 import java.io.PrintStream;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -54,7 +52,7 @@ public class BitBucketPPRUtils {
 
   // The request is still sent: setups terminating TLS on a trusted reverse proxy in front of
   // Bitbucket are legitimate, so a non-https URL is the operator's call, not an error. Warned
-  // once per origin (scheme://host:port) until Jenkins is restarted or the plugin is reloaded:
+  // once per origin (scheme://host[:port]) until Jenkins is restarted or the plugin is reloaded:
   // notification URLs embed the commit hash, so keying on the full URL would warn on every
   // commit and grow the set without bound. Logging the origin instead of the full URL also
   // keeps paths, query strings and user-info out of the log.
@@ -70,21 +68,29 @@ public class BitBucketPPRUtils {
     }
   }
 
+  // Extracts scheme://host[:port] by hand instead of via java.net.URI: URI.getHost() is null
+  // for authorities URI cannot model (hostnames with underscores, an invalid port such as the
+  // ":-1" a portless base URL used to produce), and any fallback to the full URL would bring
+  // back the per-commit key. Cutting at the end of the authority keeps the key bounded and
+  // commit-free for every input; user-info is stripped so it can never reach the log.
   private static String originOf(String url) {
-    try {
-      URI uri = new URI(url);
-      if (uri.getScheme() != null && uri.getHost() != null) {
-        int port = uri.getPort();
-        if (port == -1 && "http".equalsIgnoreCase(uri.getScheme())) {
-          port = 80;
-        }
-        return uri.getScheme().toLowerCase(Locale.ROOT) + "://" + uri.getHost()
-            + (port == -1 ? "" : ":" + port);
+    int schemeEnd = url.indexOf("://");
+    int authorityStart = schemeEnd < 0 ? 0 : schemeEnd + 3;
+    int authorityEnd = url.length();
+    for (int i = authorityStart; i < authorityEnd; i++) {
+      char c = url.charAt(i);
+      if (c == '/' || c == '?' || c == '#') {
+        authorityEnd = i;
+        break;
       }
-    } catch (URISyntaxException e) {
-      // not parseable as a URI: fall back to the raw string as the dedup key
     }
-    return url;
+    String authority = url.substring(authorityStart, authorityEnd);
+    int userInfoEnd = authority.lastIndexOf('@');
+    if (userInfoEnd >= 0) {
+      authority = authority.substring(userInfoEnd + 1);
+    }
+    String scheme = schemeEnd < 0 ? "" : url.substring(0, schemeEnd) + "://";
+    return (scheme + authority).toLowerCase(Locale.ROOT);
   }
 
   public static boolean matches(String allBranches, String branchName, EnvVars env) {

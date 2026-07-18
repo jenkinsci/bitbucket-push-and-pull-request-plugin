@@ -51,11 +51,12 @@ public class BitBucketPPRActionAbstract extends InvisibleAction {
     }
   }
 
-  private static final BitBucketPPRPluginConfig globalConfig =
-      BitBucketPPRPluginConfig.getInstance();
-
+  // Resolved per call, not pinned in a static field: a static would capture whichever config
+  // instance exists when this class is first loaded and go stale for every later caller in the
+  // same JVM, an order dependency that bites tests mocking getInstance() (same reasoning as the
+  // receiver, PR #386).
   public BitBucketPPRPluginConfig getGlobalConfig() {
-    return globalConfig;
+    return BitBucketPPRPluginConfig.getInstance();
   }
 
   public void setPropagationUrl(String propagationUrl) {

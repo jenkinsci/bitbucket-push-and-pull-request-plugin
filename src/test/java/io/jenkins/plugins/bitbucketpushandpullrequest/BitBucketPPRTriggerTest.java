@@ -82,7 +82,7 @@ class BitBucketPPRTriggerTest {
       bitBucketPPRTrigger.onPost(
           bitBucketHookEvent, bitBucketPPRServerRepositoryAction, scmTrigger, observable);
       assertEquals(
-          "https://example2.org:-1",
+          "https://example2.org",
           bitBucketPPRServerRepositoryAction.getCommitLink()
               .split("/rest/build-status/1.0/commits/")[0]);
     }
