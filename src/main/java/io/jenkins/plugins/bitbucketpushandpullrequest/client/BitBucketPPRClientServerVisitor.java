@@ -35,6 +35,12 @@ import io.jenkins.plugins.bitbucketpushandpullrequest.client.api.BitBucketPPRBas
 import io.jenkins.plugins.bitbucketpushandpullrequest.client.api.BitBucketPPRBearerAuthorizationApiConsumer;
 import io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRUtils;
 
+/**
+ * @deprecated kept for binary and behavioral compatibility with releases up to 4.0.0; the
+ *             plugin itself now dispatches through {@link DefaultBitBucketPPRClient}.
+ *             Scheduled for removal in the next major release.
+ */
+@Deprecated
 public class BitBucketPPRClientServerVisitor implements BitBucketPPRClientVisitor {
   private static final Logger logger =
       Logger.getLogger(BitBucketPPRClientServerVisitor.class.getName());

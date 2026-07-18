@@ -24,6 +24,12 @@ import com.github.scribejava.core.model.Verb;
 import io.jenkins.plugins.bitbucketpushandpullrequest.event.BitBucketPPREventContext;
 
 
+/**
+ * @deprecated kept for binary and behavioral compatibility with releases up to 4.0.0; the
+ *             plugin itself now dispatches through {@link DefaultBitBucketPPRClient}.
+ *             Scheduled for removal in the next major release.
+ */
+@Deprecated
 public class BitBucketPPRCloudClient implements BitBucketPPRClient {
   private BitBucketPPREventContext context;
   private BitBucketPPRClientVisitor visitor;

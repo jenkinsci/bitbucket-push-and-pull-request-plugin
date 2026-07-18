@@ -97,7 +97,7 @@ class BitBucketPPRUtilsTest {
       BitBucketPPRUtils
           .warnIfNotHttps("http://bitbucket-again.test/rest/build-status/1.0/commits/aaa");
 
-      List<String> warned = nonHttpsWarnings(records);
+      List<String> warned = warningsContaining(records, "not https");
       assertEquals(2, warned.size(),
           () -> "expected one warning per distinct non-https origin, got: " + warned);
       assertTrue(warned.get(0).contains("bitbucket-once.test"));
@@ -129,7 +129,7 @@ class BitBucketPPRUtilsTest {
       BitBucketPPRUtils
           .warnIfNotHttps("http://bitbucket_ci.internal/rest/build-status/1.0/commits/bbb");
 
-      List<String> warned = nonHttpsWarnings(records);
+      List<String> warned = warningsContaining(records, "not https");
       assertEquals(2, warned.size(),
           () -> "expected one warning per authority even for unparseable URLs, got: " + warned);
       assertFalse(warned.get(0).contains("commits"),
@@ -153,7 +153,7 @@ class BitBucketPPRUtilsTest {
       BitBucketPPRUtils
           .warnIfNotHttps("http://bitbucket-private.test/rest/build-status/1.0/commits/bbb");
 
-      List<String> warned = nonHttpsWarnings(records);
+      List<String> warned = warningsContaining(records, "not https");
       assertEquals(1, warned.size(),
           () -> "case-variant hosts and user-info must collapse to one origin, got: " + warned);
       assertFalse(warned.get(0).contains("s3cret"),
@@ -175,7 +175,7 @@ class BitBucketPPRUtilsTest {
       BitBucketPPRUtils.warnIfNotHttps("HTTPS://bitbucket-secure-upper.test/rest/build-status");
       BitBucketPPRUtils.warnIfNotHttps(null);
 
-      assertEquals(List.of(), nonHttpsWarnings(records));
+      assertEquals(List.of(), warningsContaining(records, "not https"));
     } finally {
       utilsLogger.removeHandler(capture);
     }
@@ -196,8 +196,94 @@ class BitBucketPPRUtilsTest {
     };
   }
 
-  private static List<String> nonHttpsWarnings(List<LogRecord> records) {
+  private static List<String> warningsContaining(List<LogRecord> records, String needle) {
     return records.stream().filter(r -> Level.WARNING.equals(r.getLevel()))
-        .map(LogRecord::getMessage).filter(m -> m != null && m.contains("not https")).toList();
+        .map(LogRecord::getMessage).filter(m -> m != null && m.contains(needle)).toList();
+  }
+
+  @Test
+  void warnOnHttpErrorWarnsPerEpisodeAndRearmsAfterSuccess() {
+    List<LogRecord> records = new ArrayList<>();
+    Handler capture = newCapturingHandler(records);
+    Logger utilsLogger = Logger.getLogger(BitBucketPPRUtils.class.getName());
+    utilsLogger.addHandler(capture);
+    try {
+      // A repeat of the same failing status is the same episode and stays silent, a status
+      // change is new information, and a success clears the state: the next incident, even with
+      // the same status as the first, must warn again instead of being suppressed forever.
+      BitBucketPPRUtils.warnOnHttpError(
+          "http://bitbucket-rejected.test/rest/build-status/1.0/commits/aaa", 401, "{\"e\":1}");
+      BitBucketPPRUtils.warnOnHttpError(
+          "http://bitbucket-rejected.test/rest/build-status/1.0/commits/bbb", 401, "{\"e\":1}");
+      BitBucketPPRUtils.warnOnHttpError(
+          "http://bitbucket-rejected.test/rest/build-status/1.0/commits/ccc", 403, "{\"e\":2}");
+      BitBucketPPRUtils.warnOnHttpError(
+          "http://bitbucket-rejected.test/rest/build-status/1.0/commits/ddd", 200, "ok");
+      BitBucketPPRUtils.warnOnHttpError(
+          "http://bitbucket-rejected.test/rest/build-status/1.0/commits/eee", 401, "{\"e\":1}");
+
+      List<String> warned = warningsContaining(records, "instead of success");
+      assertEquals(3, warned.size(),
+          () -> "expected 401, 403 and the post-success 401 to warn, got: " + warned);
+      assertTrue(warned.get(0).contains("401"));
+      assertTrue(warned.get(0).contains("bitbucket-rejected.test"));
+      assertFalse(warned.get(0).contains("commits"),
+          () -> "the warning must name the origin, not the full URL, got: " + warned.get(0));
+      assertFalse(warned.get(0).contains("{\"e\""),
+          () -> "the body must not be part of the warning, got: " + warned.get(0));
+      assertTrue(warned.get(1).contains("403"));
+      assertTrue(warned.get(2).contains("401"));
+    } finally {
+      utilsLogger.removeHandler(capture);
+    }
+  }
+
+  @Test
+  void warnOnHttpErrorTreatsRedirectsAsNotSuccessful() {
+    List<LogRecord> records = new ArrayList<>();
+    Handler capture = newCapturingHandler(records);
+    Logger utilsLogger = Logger.getLogger(BitBucketPPRUtils.class.getName());
+    utilsLogger.addHandler(capture);
+    try {
+      // A 3xx means the notification was not accepted where it was sent (wrong base URL, a
+      // redirecting proxy): only 2xx counts as success.
+      BitBucketPPRUtils.warnOnHttpError(
+          "http://bitbucket-redirect.test/rest/build-status/1.0/commits/aaa", 302, "");
+
+      List<String> warned = warningsContaining(records, "instead of success");
+      assertEquals(1, warned.size());
+      assertTrue(warned.get(0).contains("302"));
+    } finally {
+      utilsLogger.removeHandler(capture);
+    }
+  }
+
+  @Test
+  void warnOnHttpErrorLogsTheSanitizedBodyAtFine() {
+    List<LogRecord> records = new ArrayList<>();
+    Handler capture = newCapturingHandler(records);
+    Logger utilsLogger = Logger.getLogger(BitBucketPPRUtils.class.getName());
+    Level originalLevel = utilsLogger.getLevel();
+    utilsLogger.setLevel(Level.FINE);
+    utilsLogger.addHandler(capture);
+    try {
+      BitBucketPPRUtils.warnOnHttpError("http://bitbucket-body.test/rest/build-status/1.0/x",
+          500, "line1\r\nline2\u0007end\u2028tail");
+
+      List<String> bodies = records.stream().filter(r -> Level.FINE.equals(r.getLevel()))
+          .map(LogRecord::getMessage)
+          .filter(m -> m != null && m.contains("Response body")).toList();
+      assertEquals(1, bodies.size(), () -> "expected the body at FINE, got: " + records);
+      assertFalse(bodies.get(0).contains("\n"),
+          () -> "control characters must be sanitized, got: " + bodies.get(0));
+      assertFalse(bodies.get(0).contains("\u2028"),
+          () -> "unicode line separators must be sanitized too, got: " + bodies.get(0));
+      assertTrue(bodies.get(0).contains("line1  line2 end tail"),
+          () -> "expected each control or separator character replaced by a space, got: "
+              + bodies.get(0));
+    } finally {
+      utilsLogger.removeHandler(capture);
+      utilsLogger.setLevel(originalLevel);
+    }
   }
 }

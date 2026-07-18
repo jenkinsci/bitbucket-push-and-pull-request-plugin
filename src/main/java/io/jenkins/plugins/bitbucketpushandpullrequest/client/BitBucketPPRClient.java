@@ -24,6 +24,14 @@ import com.github.scribejava.core.model.Verb;
 
 public interface BitBucketPPRClient {
   void send(String url, String payload) throws Exception;
+
   void send(Verb verb, String url, String payload) throws Exception;
+
+  /**
+   * @deprecated the visitor wiring only applies to the legacy client implementations kept for
+   *             compatibility; {@link DefaultBitBucketPPRClient} dispatches internally and
+   *             ignores it. Scheduled for removal in the next major release.
+   */
+  @Deprecated
   void accept(BitBucketPPRClientVisitor visitor);
 }

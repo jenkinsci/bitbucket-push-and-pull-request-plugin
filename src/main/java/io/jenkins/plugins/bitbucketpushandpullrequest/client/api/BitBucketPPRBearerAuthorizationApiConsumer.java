@@ -35,6 +35,13 @@ import org.apache.http.impl.client.HttpClients;
 import org.jenkinsci.plugins.plaincredentials.StringCredentials;
 import com.github.scribejava.core.model.Verb;
 
+/**
+ * @deprecated kept with its original signature and behavior for binary compatibility with
+ *             releases up to 4.0.0; the plugin itself now sends notifications through
+ *             {@link BitBucketPPRNotificationSender}, which owns the transport lifecycle.
+ *             Scheduled for removal in the next major release.
+ */
+@Deprecated
 public class BitBucketPPRBearerAuthorizationApiConsumer {
 
   private static final Logger logger =

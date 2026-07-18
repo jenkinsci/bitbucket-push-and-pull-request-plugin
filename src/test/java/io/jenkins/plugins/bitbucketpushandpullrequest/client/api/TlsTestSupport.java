@@ -21,6 +21,7 @@
 
 package io.jenkins.plugins.bitbucketpushandpullrequest.client.api;
 
+import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpsConfigurator;
 import com.sun.net.httpserver.HttpsServer;
 import java.io.InputStream;
@@ -32,6 +33,7 @@ import java.nio.file.Path;
 import java.security.KeyStore;
 import java.security.cert.Certificate;
 import java.util.Locale;
+import java.util.concurrent.atomic.AtomicReference;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManagerFactory;
@@ -46,7 +48,42 @@ final class TlsTestSupport {
 
   static final String STORE_PASS = "changeit";
 
+  private static Path cachedLocalhostKeystore;
+  private static Path cachedMismatchedHostKeystore;
+
   private TlsTestSupport() {}
+
+  /**
+   * A keystore with a localhost SAN, generated once per JVM and shared across test classes:
+   * keytool spawns a whole subprocess per generation, and every consumer of this certificate
+   * needs the identical one.
+   */
+  static synchronized Path localhostKeystore() throws Exception {
+    if (cachedLocalhostKeystore == null) {
+      cachedLocalhostKeystore = newKeystorePath();
+      generateSelfSignedKeystore(cachedLocalhostKeystore, "CN=localhost",
+          "dns:localhost,ip:127.0.0.1");
+    }
+    return cachedLocalhostKeystore;
+  }
+
+  /** A keystore whose certificate does not carry localhost: for hostname-mismatch tests. */
+  static synchronized Path mismatchedHostKeystore() throws Exception {
+    if (cachedMismatchedHostKeystore == null) {
+      cachedMismatchedHostKeystore = newKeystorePath();
+      generateSelfSignedKeystore(cachedMismatchedHostKeystore, "CN=bitbucket.test",
+          "dns:bitbucket.test");
+    }
+    return cachedMismatchedHostKeystore;
+  }
+
+  private static Path newKeystorePath() throws Exception {
+    Path dir = Files.createTempDirectory("bbppr-tls");
+    dir.toFile().deleteOnExit();
+    Path keystore = dir.resolve("keystore.p12");
+    keystore.toFile().deleteOnExit();
+    return keystore;
+  }
 
   static void generateSelfSignedKeystore(Path keystore, String dname, String san)
       throws Exception {
@@ -81,6 +118,12 @@ final class TlsTestSupport {
   }
 
   static HttpsServer startHttpsServer(Path keystore) throws Exception {
+    return startHttpsServer(keystore, new AtomicReference<>());
+  }
+
+  /** The headers of the last received request are published to {@code lastRequestHeaders}. */
+  static HttpsServer startHttpsServer(Path keystore, AtomicReference<Headers> lastRequestHeaders)
+      throws Exception {
     KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
     kmf.init(loadKeystore(keystore), STORE_PASS.toCharArray());
     SSLContext sslContext = SSLContext.getInstance("TLS");
@@ -89,6 +132,7 @@ final class TlsTestSupport {
     HttpsServer server = HttpsServer.create(new InetSocketAddress("localhost", 0), 0);
     server.setHttpsConfigurator(new HttpsConfigurator(sslContext));
     server.createContext("/", exchange -> {
+      lastRequestHeaders.set(exchange.getRequestHeaders());
       byte[] body = "{}".getBytes(StandardCharsets.UTF_8);
       exchange.sendResponseHeaders(200, body.length);
       try (OutputStream os = exchange.getResponseBody()) {

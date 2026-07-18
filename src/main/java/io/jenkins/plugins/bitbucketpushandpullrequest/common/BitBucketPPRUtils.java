@@ -27,8 +27,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 import java.util.logging.Level;
@@ -73,6 +75,48 @@ public class BitBucketPPRUtils {
   // ":-1" a portless base URL used to produce), and any fallback to the full URL would bring
   // back the per-commit key. Cutting at the end of the authority keeps the key bounded and
   // commit-free for every input; user-info is stripped so it can never reach the log.
+  private static final ConcurrentMap<String, Integer> lastHttpErrorByOrigin =
+      new ConcurrentHashMap<>();
+
+  // A notification that does not succeed (rotated token, revoked credential, wrong repository, a
+  // misconfigured proxy answering with a redirect) throws no exception: the transport call
+  // succeeded, so without this warning the failure is visible only at FINEST. Unlike the static
+  // non-https configuration, this is a dynamic error, so it is warned once per continuous
+  // episode: the first non-successful status per origin warns, a repeat of the same status stays
+  // silent, a status change warns again, and a successful response clears the state so the next
+  // incident is a new episode. The response body is logged separately at FINE, sanitized and
+  // truncated, so control characters cannot forge multi-line log entries and an oversized reply
+  // cannot flood the log.
+  //
+  // Known limitation: the state is keyed on the origin alone, because the URL carries no job or
+  // credential identity. On a Bitbucket host shared by many jobs, a healthy job's success
+  // re-arms the episode of a broken one, which then warns roughly once per build (tolerated: a
+  // job that fails every build produces a per-build signal), and concurrent incidents with the
+  // same status collapse into one episode for the origin.
+  public static void warnOnHttpError(String url, int statusCode, String body) {
+    String origin = originOf(url);
+    if (statusCode >= 200 && statusCode < 300) {
+      lastHttpErrorByOrigin.remove(origin);
+      return;
+    }
+    Integer previous = lastHttpErrorByOrigin.put(origin, statusCode);
+    if (!Objects.equals(previous, statusCode)) {
+      logger.warning(() -> "Build status notification to " + origin + " was answered with HTTP "
+          + statusCode + " instead of success");
+      if (body != null && !body.isBlank()) {
+        logger.fine(() -> "Response body of the HTTP " + statusCode + " from " + origin + ": "
+            + sanitizeForLog(body));
+      }
+    }
+  }
+
+  // Control characters plus the Unicode line and paragraph separators: everything that could
+  // forge a multi-line log entry, not just ASCII controls.
+  private static String sanitizeForLog(String body) {
+    String flat = body.replaceAll("[\\p{Cc}\\p{Zl}\\p{Zp}]", " ").trim();
+    return flat.length() > 500 ? flat.substring(0, 500) + "..." : flat;
+  }
+
   private static String originOf(String url) {
     int schemeEnd = url.indexOf("://");
     int authorityStart = schemeEnd < 0 ? 0 : schemeEnd + 3;

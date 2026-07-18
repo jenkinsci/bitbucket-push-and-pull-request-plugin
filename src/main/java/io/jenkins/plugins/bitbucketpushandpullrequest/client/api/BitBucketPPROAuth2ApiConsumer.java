@@ -33,6 +33,13 @@ import com.github.scribejava.core.model.Response;
 import com.github.scribejava.core.model.Verb;
 import com.github.scribejava.core.oauth.OAuth20Service;
 
+/**
+ * @deprecated kept with its original signature and behavior for binary compatibility with
+ *             releases up to 4.0.0; the plugin itself now sends notifications through
+ *             {@link BitBucketPPRNotificationSender}, which owns the transport lifecycle.
+ *             Scheduled for removal in the next major release.
+ */
+@Deprecated
 public class BitBucketPPROAuth2ApiConsumer {
   private static final Logger logger =
       Logger.getLogger(BitBucketPPROAuth2ApiConsumer.class.getName());
