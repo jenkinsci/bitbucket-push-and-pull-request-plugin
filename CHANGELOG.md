@@ -1,6 +1,6 @@
 # Change Log
 
-## 4.0.1 (unreleased)
+## 4.0.1 (2026-07-18)
 
 ### Bug Fixes
 * **Build Server build-status links correctly for base URLs without an explicit port** - The pull request Server action appended `URL.getPort()` verbatim when building commit, approve and decline links, producing an unroutable `host:-1` address whenever the configured propagation URL (or the payload clone URL) carried no explicit port, so those status notifications failed silently. The port is now omitted when absent.
@@ -12,6 +12,8 @@
 * **Warn when a build-status notification does not succeed** - A notification answered with a non-successful HTTP status (rotated token, revoked credential, wrong repository, a misconfigured proxy answering with a redirect) previously left no trace at default log level, since the HTTP call itself succeeded. The plugin now logs a warning with the origin and status code, once per continuous episode: a repeat of the same status stays silent, and a successful response resets the state so the next incident warns again. The episode state is tracked per origin, without job or credential identity: on a Bitbucket host shared by many jobs, any job's success re-arms the warning and simultaneous same-status incidents collapse into one episode. The response body, truncated and stripped of control characters, is available at FINE. Transport failures are also logged with the full exception instead of only its message.
 * **Release HTTP resources in the plugin's build-status notification path** - The plugin's notification path now fully owns the lifecycle of its transport: the Apache HTTP clients are closed after each call, responses are consumed through a `ResponseHandler` (which releases the connection), and the OAuth2 service and its response are closed as well. Previously every notification leaked an unclosed client with its connection manager and sockets. Callers receive a plain value (status code and body, capped at 16 KiB on all three authentication paths) instead of a live response object. The new transport lives in an internal sender used by `DefaultBitBucketPPRClient`; the previous public surface (client interface and factory, visitors, client wrappers and the per-credential consumers) remains available with its original method signatures and dispatch semantics, deprecated and scheduled for removal in the next major release.
 * **Keep the Bitbucket credentials out of the HTTP client's credentials provider** - Basic auth is sent preemptively via the `Authorization` header only; the credentials are no longer registered in the client (formerly with `AuthScope.ANY`), so they can never be offered to a proxy answering a 407 challenge. Leaving the provider unset also lets the client fall back to the system default credentials provider, so JVM-configured proxy credentials (`java.net.Authenticator`) now work as the system-properties support intends.
+
+**Full Changelog**: https://github.com/jenkinsci/bitbucket-push-and-pull-request-plugin/compare/bitbucket-push-and-pull-request-4.0.0...bitbucket-push-and-pull-request-4.0.1
 
 ## 4.0.0 (2026-07-09)
 
