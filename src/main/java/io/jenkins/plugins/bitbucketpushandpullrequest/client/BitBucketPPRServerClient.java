@@ -21,18 +21,35 @@
 package io.jenkins.plugins.bitbucketpushandpullrequest.client;
 
 import com.github.scribejava.core.model.Verb;
+import io.jenkins.plugins.bitbucketpushandpullrequest.event.BitBucketPPREventContext;
 
-public interface BitBucketPPRClient {
-  void send(String url, String payload) throws Exception;
+/**
+ * @deprecated kept for binary compatibility with releases up to 4.0.0: the dispatch on the
+ *             credential type now lives in {@link DefaultBitBucketPPRClient}. Scheduled for
+ *             removal in the next major release.
+ */
+@Deprecated
+public class BitBucketPPRServerClient implements BitBucketPPRClient {
 
-  void send(Verb verb, String url, String payload) throws Exception;
+  private BitBucketPPREventContext context;
+  private BitBucketPPRClientVisitor visitor;
 
-  /**
-   * @deprecated the dispatch on the credential type is internal to the implementation now; this
-   *             method is kept for binary compatibility with releases up to 4.0.0 and does
-   *             nothing on the default implementation. Scheduled for removal in the next major
-   *             release.
-   */
-  @Deprecated
-  default void accept(BitBucketPPRClientVisitor visitor) {}
+  public BitBucketPPRServerClient(BitBucketPPREventContext context) {
+    this.context = context;
+  }
+
+  @Override
+  public void send(final String url, String payload) throws Exception {
+    visitor.send(context.getStandardCredentials(), url, payload);
+  }
+
+  @Override
+  public void accept(BitBucketPPRClientVisitor visitor) {
+    this.visitor = visitor;
+  }
+
+  @Override
+  public void send(Verb verb, String url, String payload) throws Exception {
+    visitor.send(context.getStandardCredentials(), verb, url, payload);
+  }
 }

@@ -20,19 +20,21 @@
  ******************************************************************************/
 package io.jenkins.plugins.bitbucketpushandpullrequest.client;
 
+import java.io.IOException;
+import com.cloudbees.plugins.credentials.common.StandardCredentials;
 import com.github.scribejava.core.model.Verb;
 
-public interface BitBucketPPRClient {
-  void send(String url, String payload) throws Exception;
+/**
+ * @deprecated kept for binary compatibility with releases up to 4.0.0: the dispatch on the
+ *             credential type now lives in {@link DefaultBitBucketPPRClient}. Scheduled for
+ *             removal in the next major release.
+ */
+@Deprecated
+public interface BitBucketPPRClientVisitor {
+  void send(StandardCredentials credentials, String url, String payload)
+      throws InterruptedException, IOException, NoSuchMethodException;
 
-  void send(Verb verb, String url, String payload) throws Exception;
+  void send(StandardCredentials credentials, Verb verb, String url, String payload)
+      throws InterruptedException, NoSuchMethodException;
 
-  /**
-   * @deprecated the dispatch on the credential type is internal to the implementation now; this
-   *             method is kept for binary compatibility with releases up to 4.0.0 and does
-   *             nothing on the default implementation. Scheduled for removal in the next major
-   *             release.
-   */
-  @Deprecated
-  default void accept(BitBucketPPRClientVisitor visitor) {}
 }

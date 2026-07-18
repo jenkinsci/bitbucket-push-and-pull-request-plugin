@@ -27,8 +27,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 import java.util.logging.Level;
@@ -73,24 +75,38 @@ public class BitBucketPPRUtils {
   // ":-1" a portless base URL used to produce), and any fallback to the full URL would bring
   // back the per-commit key. Cutting at the end of the authority keeps the key bounded and
   // commit-free for every input; user-info is stripped so it can never reach the log.
-  private static final Set<String> httpErrorWarnedOriginsAndStatuses =
-      ConcurrentHashMap.newKeySet();
+  private static final ConcurrentMap<String, Integer> lastHttpErrorByOrigin =
+      new ConcurrentHashMap<>();
 
-  // A rejected notification (rotated token, revoked credential, wrong repository) throws no
-  // exception: the transport call succeeded, so without this warning the failure is visible only
-  // at FINEST. Warned once per origin and status code, mirroring warnIfNotHttps, so a persistent
-  // misconfiguration surfaces at default log level without flooding the log on every build.
+  // A notification that does not succeed (rotated token, revoked credential, wrong repository, a
+  // misconfigured proxy answering with a redirect) throws no exception: the transport call
+  // succeeded, so without this warning the failure is visible only at FINEST. Unlike the static
+  // non-https configuration, this is a dynamic error, so it is warned once per continuous
+  // episode: the first non-successful status per origin warns, a repeat of the same status stays
+  // silent, a status change warns again, and a successful response clears the state so the next
+  // incident is a new episode. The response body is logged separately at FINE, sanitized and
+  // truncated, so control characters cannot forge multi-line log entries and an oversized reply
+  // cannot flood the log.
   public static void warnOnHttpError(String url, int statusCode, String body) {
-    if (statusCode < 400) {
+    String origin = originOf(url);
+    if (statusCode >= 200 && statusCode < 300) {
+      lastHttpErrorByOrigin.remove(origin);
       return;
     }
-    String origin = originOf(url);
-    if (httpErrorWarnedOriginsAndStatuses.add(origin + "#" + statusCode)) {
-      String detail = body == null || body.isBlank() ? ""
-          : ": " + (body.length() > 500 ? body.substring(0, 500) + "..." : body);
-      logger.warning(() -> "Build status notification to " + origin
-          + " was rejected with HTTP " + statusCode + detail);
+    Integer previous = lastHttpErrorByOrigin.put(origin, statusCode);
+    if (!Objects.equals(previous, statusCode)) {
+      logger.warning(() -> "Build status notification to " + origin + " was answered with HTTP "
+          + statusCode + " instead of success");
+      if (body != null && !body.isBlank()) {
+        logger.fine(() -> "Response body of the HTTP " + statusCode + " from " + origin + ": "
+            + sanitizeForLog(body));
+      }
     }
+  }
+
+  private static String sanitizeForLog(String body) {
+    String flat = body.replaceAll("\\p{Cntrl}", " ").trim();
+    return flat.length() > 500 ? flat.substring(0, 500) + "..." : flat;
   }
 
   private static String originOf(String url) {

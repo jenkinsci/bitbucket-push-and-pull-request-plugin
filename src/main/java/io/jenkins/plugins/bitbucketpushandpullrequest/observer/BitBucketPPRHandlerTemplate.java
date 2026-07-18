@@ -29,7 +29,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.scribejava.core.model.Verb;
 import hudson.model.Job;
-import io.jenkins.plugins.bitbucketpushandpullrequest.client.BitBucketPPRClient;
+import io.jenkins.plugins.bitbucketpushandpullrequest.client.BitBucketPPRClientFactory;
 import io.jenkins.plugins.bitbucketpushandpullrequest.client.BitBucketPPRClientType;
 import io.jenkins.plugins.bitbucketpushandpullrequest.config.BitBucketPPRPluginConfig;
 import io.jenkins.plugins.bitbucketpushandpullrequest.event.BitBucketPPREventContext;
@@ -87,7 +87,7 @@ public abstract class BitBucketPPRHandlerTemplate {
 
     try {
       String jsonPayload = objectMapper.writeValueAsString(payload);
-      new BitBucketPPRClient(clientType, context).send(url, jsonPayload);
+      BitBucketPPRClientFactory.createClient(clientType, context).send(url, jsonPayload);
     } catch (JsonProcessingException e) {
       logger.log(Level.WARNING, "Cannot create payload: {0}", e.getMessage());
     } catch (Exception e) {
@@ -101,7 +101,7 @@ public abstract class BitBucketPPRHandlerTemplate {
 
     try {
       String jsonPayload = payload.isEmpty() ? "" : objectMapper.writeValueAsString(payload);
-      new BitBucketPPRClient(clientType, context).send(verb, url, jsonPayload);
+      BitBucketPPRClientFactory.createClient(clientType, context).send(verb, url, jsonPayload);
     } catch (JsonProcessingException e) {
       logger.log(Level.WARNING, "Cannot create payload: {0}", e.getMessage());
     } catch (Exception e) {

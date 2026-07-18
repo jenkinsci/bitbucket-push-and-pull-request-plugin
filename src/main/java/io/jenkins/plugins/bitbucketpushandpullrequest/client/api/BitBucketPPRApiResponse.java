@@ -22,8 +22,14 @@
 package io.jenkins.plugins.bitbucketpushandpullrequest.client.api;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.nio.charset.UnsupportedCharsetException;
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
-import org.apache.http.util.EntityUtils;
+import org.apache.http.ParseException;
+import org.apache.http.entity.ContentType;
 
 /**
  * Outcome of a Bitbucket API call, detached from the transport that produced it. The consumers
@@ -32,13 +38,38 @@ import org.apache.http.util.EntityUtils;
  */
 public record BitBucketPPRApiResponse(int statusCode, String body) {
 
+  private static final int MAX_BODY_BYTES = 16 * 1024;
+
   /**
    * Materializes an Apache HttpClient response. Used as the {@code ResponseHandler} of
    * {@code CloseableHttpClient#execute(HttpUriRequest, ResponseHandler)}, the execution form that
-   * consumes the entity and releases the connection before returning.
+   * releases the connection before returning.
    */
   public static BitBucketPPRApiResponse from(HttpResponse response) throws IOException {
-    return new BitBucketPPRApiResponse(response.getStatusLine().getStatusCode(),
-        response.getEntity() == null ? "" : EntityUtils.toString(response.getEntity()));
+    int statusCode = response.getStatusLine().getStatusCode();
+    HttpEntity entity = response.getEntity();
+    if (entity == null) {
+      return new BitBucketPPRApiResponse(statusCode, "");
+    }
+    // The body only feeds logs, so it is read up to a fixed cap: an oversized reply (a proxy
+    // error page, a misrouted endpoint) must not be buffered whole. The client is closed after
+    // every call, so the unread remainder cannot poison a pooled connection.
+    byte[] head;
+    try (InputStream content = entity.getContent()) {
+      head = content.readNBytes(MAX_BODY_BYTES);
+    }
+    return new BitBucketPPRApiResponse(statusCode, new String(head, charsetOf(entity)));
+  }
+
+  private static Charset charsetOf(HttpEntity entity) {
+    try {
+      ContentType contentType = ContentType.get(entity);
+      if (contentType != null && contentType.getCharset() != null) {
+        return contentType.getCharset();
+      }
+    } catch (ParseException | UnsupportedCharsetException e) {
+      // a malformed or unknown Content-Type header must not fail the notification
+    }
+    return StandardCharsets.UTF_8;
   }
 }
