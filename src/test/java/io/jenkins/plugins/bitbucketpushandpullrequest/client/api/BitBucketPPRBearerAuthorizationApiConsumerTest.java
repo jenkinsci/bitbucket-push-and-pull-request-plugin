@@ -21,30 +21,18 @@
 
 package io.jenkins.plugins.bitbucketpushandpullrequest.client.api;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 
 import com.github.scribejava.core.model.Verb;
-import com.sun.net.httpserver.HttpServer;
 import com.sun.net.httpserver.HttpsServer;
-import java.io.OutputStream;
-import java.net.InetSocketAddress;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.security.cert.CertPathBuilderException;
 import java.security.cert.CertPathValidatorException;
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.logging.Handler;
-import java.util.logging.Level;
-import java.util.logging.LogRecord;
-import java.util.logging.Logger;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLPeerUnverifiedException;
-import org.apache.http.HttpResponse;
 import org.jenkinsci.plugins.plaincredentials.StringCredentials;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -66,9 +54,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
  * handshake with a certificate path failure, so the token is never transmitted.</li>
  * <li>Hostname verification: a certificate that is trusted but does not carry the contacted host
  * in its subject alternative names must be rejected as well.</li>
- * <li>Plain-HTTP warning: a non-https URL is accepted (TLS may legitimately be terminated by a
- * proxy in front of Bitbucket) but must be flagged with a warning in the log.</li>
  * </ul>
+ *
+ * <p>The warning for non-https URLs is emitted at the visitor layer, see
+ * {@code BitBucketPPRUtilsTest}.
  */
 @ExtendWith(MockitoExtension.class)
 class BitBucketPPRBearerAuthorizationApiConsumerTest {
@@ -129,49 +118,6 @@ class BitBucketPPRBearerAuthorizationApiConsumerTest {
           () -> testSubject.send(credentials, Verb.POST, url, "{}"));
     } finally {
       SSLContext.setDefault(original);
-    }
-  }
-
-  @Test
-  void sendWarnsWhenUrlIsNotHttps() throws Exception {
-    HttpServer plainServer = HttpServer.create(new InetSocketAddress("localhost", 0), 0);
-    plainServer.createContext("/", exchange -> {
-      byte[] body = "{}".getBytes(StandardCharsets.UTF_8);
-      exchange.sendResponseHeaders(200, body.length);
-      try (OutputStream os = exchange.getResponseBody()) {
-        os.write(body);
-      }
-    });
-    plainServer.start();
-
-    String url = "http://localhost:" + plainServer.getAddress().getPort() + "/rest/build-status";
-
-    List<LogRecord> records = new CopyOnWriteArrayList<>();
-    Handler capture = new Handler() {
-      @Override
-      public void publish(LogRecord record) {
-        records.add(record);
-      }
-
-      @Override
-      public void flush() {}
-
-      @Override
-      public void close() {}
-    };
-    Logger consumerLogger =
-        Logger.getLogger(BitBucketPPRBearerAuthorizationApiConsumer.class.getName());
-    consumerLogger.addHandler(capture);
-    try {
-      HttpResponse response = new BitBucketPPRBearerAuthorizationApiConsumer()
-          .send(credentials, Verb.POST, url, "{}");
-      assertEquals(200, response.getStatusLine().getStatusCode());
-      assertTrue(records.stream().anyMatch(
-          r -> Level.WARNING.equals(r.getLevel()) && r.getMessage().contains("not https")),
-          () -> "expected a WARNING about the non-https URL, got: " + records);
-    } finally {
-      consumerLogger.removeHandler(capture);
-      plainServer.stop(0);
     }
   }
 

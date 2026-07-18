@@ -26,6 +26,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 import java.util.logging.Level;
@@ -44,6 +46,21 @@ public class BitBucketPPRUtils {
 
   public static final String BB_WORKSPACE = "workspace";
   public static final String BB_REPOSITORY = "repository";
+
+  private static final Set<String> nonHttpsWarnedUrls = ConcurrentHashMap.newKeySet();
+
+  // The request is still sent: setups terminating TLS on a trusted reverse proxy in front of
+  // Bitbucket are legitimate, so a non-https URL is the operator's call, not an error. Each URL
+  // is warned about once per Jenkins run, so a deliberate choice does not flood the log with
+  // every build-status notification.
+  public static void warnIfNotHttps(String url) {
+    if (url != null && !url.regionMatches(true, 0, "https:", 0, 6)
+        && nonHttpsWarnedUrls.add(url)) {
+      logger.warning(() -> "The Bitbucket URL " + url
+          + " is not https: the Authorization header travels unencrypted."
+          + " Use an https URL unless TLS is terminated by a trusted proxy.");
+    }
+  }
 
   public static boolean matches(String allBranches, String branchName, EnvVars env) {
     String allowedBranchesPattern = allBranches != null ? allBranches : "";

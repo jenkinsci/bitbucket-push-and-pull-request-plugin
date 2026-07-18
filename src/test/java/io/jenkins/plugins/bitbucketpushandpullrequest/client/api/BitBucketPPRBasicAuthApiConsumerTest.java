@@ -23,23 +23,12 @@ package io.jenkins.plugins.bitbucketpushandpullrequest.client.api;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 
 import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials;
 import com.github.scribejava.core.model.Verb;
-import com.sun.net.httpserver.HttpServer;
 import com.sun.net.httpserver.HttpsServer;
-import java.io.OutputStream;
-import java.net.InetSocketAddress;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.logging.Handler;
-import java.util.logging.Level;
-import java.util.logging.LogRecord;
-import java.util.logging.Logger;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLException;
 import org.apache.http.HttpResponse;
@@ -55,8 +44,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
  * Verifies the TLS behaviour of the Basic-auth API consumer, mirroring
  * {@link BitBucketPPRBearerAuthorizationApiConsumerTest}: the client must follow the JSSE
  * configuration of the Jenkins JVM (so a Bitbucket instance using a private CA works on both
- * authentication paths), must keep validating certificate chains, and must warn when the
- * credentials are sent over a non-https URL.
+ * authentication paths) and must keep validating certificate chains.
+ *
+ * <p>The warning for non-https URLs is emitted at the visitor layer, see
+ * {@code BitBucketPPRUtilsTest}.
  */
 @ExtendWith(MockitoExtension.class)
 class BitBucketPPRBasicAuthApiConsumerTest {
@@ -112,47 +103,5 @@ class BitBucketPPRBasicAuthApiConsumerTest {
 
     assertThrows(SSLException.class,
         () -> new BitBucketPPRBasicAuthApiConsumer().send(credentials, Verb.POST, url, "{}"));
-  }
-
-  @Test
-  void sendWarnsWhenUrlIsNotHttps() throws Exception {
-    HttpServer plainServer = HttpServer.create(new InetSocketAddress("localhost", 0), 0);
-    plainServer.createContext("/", exchange -> {
-      byte[] body = "{}".getBytes(StandardCharsets.UTF_8);
-      exchange.sendResponseHeaders(200, body.length);
-      try (OutputStream os = exchange.getResponseBody()) {
-        os.write(body);
-      }
-    });
-    plainServer.start();
-
-    String url = "http://localhost:" + plainServer.getAddress().getPort() + "/rest/build-status";
-
-    List<LogRecord> records = new CopyOnWriteArrayList<>();
-    Handler capture = new Handler() {
-      @Override
-      public void publish(LogRecord record) {
-        records.add(record);
-      }
-
-      @Override
-      public void flush() {}
-
-      @Override
-      public void close() {}
-    };
-    Logger consumerLogger = Logger.getLogger(BitBucketPPRBasicAuthApiConsumer.class.getName());
-    consumerLogger.addHandler(capture);
-    try {
-      HttpResponse response =
-          new BitBucketPPRBasicAuthApiConsumer().send(credentials, Verb.POST, url, "{}");
-      assertEquals(200, response.getStatusLine().getStatusCode());
-      assertTrue(records.stream().anyMatch(
-          r -> Level.WARNING.equals(r.getLevel()) && r.getMessage().contains("not https")),
-          () -> "expected a WARNING about the non-https URL, got: " + records);
-    } finally {
-      consumerLogger.removeHandler(capture);
-      plainServer.stop(0);
-    }
   }
 }

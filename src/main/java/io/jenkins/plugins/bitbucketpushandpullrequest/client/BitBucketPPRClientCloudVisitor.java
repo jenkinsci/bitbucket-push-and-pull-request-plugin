@@ -35,6 +35,7 @@ import com.github.scribejava.core.model.Response;
 import com.github.scribejava.core.model.Verb;
 import io.jenkins.plugins.bitbucketpushandpullrequest.client.api.BitBucketPPRBasicAuthApiConsumer;
 import io.jenkins.plugins.bitbucketpushandpullrequest.client.api.BitBucketPPROAuth2ApiConsumer;
+import io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRUtils;
 
 public class BitBucketPPRClientCloudVisitor implements BitBucketPPRClientVisitor {
   private static final Logger logger =
@@ -49,6 +50,8 @@ public class BitBucketPPRClientCloudVisitor implements BitBucketPPRClientVisitor
   @Override
   public void send(StandardCredentials credentials, Verb verb, String url, String payload)
       throws InterruptedException, NoSuchMethodException {
+    BitBucketPPRUtils.warnIfNotHttps(url);
+
     if (credentials instanceof StandardUsernamePasswordCredentials usernamePasswordCredentials)
       try {
         final HttpResponse response =

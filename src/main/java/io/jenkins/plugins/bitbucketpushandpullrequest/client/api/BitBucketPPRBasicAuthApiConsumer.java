@@ -22,6 +22,7 @@
 package io.jenkins.plugins.bitbucketpushandpullrequest.client.api;
 
 import java.io.IOException;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.logging.Logger;
 import org.apache.commons.codec.binary.Base64;
@@ -55,16 +56,19 @@ public class BitBucketPPRBasicAuthApiConsumer {
     final String authHeader =
         getAuthHeader(credentials.getUsername(), credentials.getPassword().getPlainText());
 
+    // Scope the credentials to the Bitbucket host: with AuthScope.ANY they would also answer a
+    // 407 challenge from a JVM-configured proxy (reachable since useSystemProperties), handing
+    // the Bitbucket credentials to the proxy.
+    final URI target = URI.create(url);
     final org.apache.http.client.CredentialsProvider provider = new BasicCredentialsProvider();
-    provider.setCredentials(AuthScope.ANY, httpAuthCredentials);
+    provider.setCredentials(new AuthScope(target.getHost(), target.getPort()),
+        httpAuthCredentials);
 
     // useSystemProperties() builds the client from the JSSE configuration of the Jenkins JVM
     // (javax.net.ssl.trustStore and friends, proxy settings), consistent with the Bearer
     // consumer: a Bitbucket instance using a private CA must work on both authentication paths.
     final HttpClient client = HttpClientBuilder.create().useSystemProperties()
         .setDefaultCredentialsProvider(provider).build();
-
-    warnIfNotHttps(url);
 
     if (verb == Verb.POST) {
       final HttpPost request = new HttpPost(url);
@@ -84,16 +88,6 @@ public class BitBucketPPRBasicAuthApiConsumer {
       return client.execute(request);
     }
     throw new NoSuchMethodException();
-  }
-
-  // The request is still sent: setups terminating TLS on a trusted reverse proxy in front of
-  // Bitbucket are legitimate, so a non-https URL is the operator's call, not an error.
-  private static void warnIfNotHttps(String url) {
-    if (!url.regionMatches(true, 0, "https:", 0, 6)) {
-      logger.warning(() -> "The Bitbucket URL " + url
-          + " is not https: the credentials in the Authorization header travel unencrypted."
-          + " Use an https URL unless TLS is terminated by a trusted proxy.");
-    }
   }
 
   private String getAuthHeader(String username, String password) {

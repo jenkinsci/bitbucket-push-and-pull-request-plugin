@@ -4,7 +4,8 @@
 
 ### Improvements
 * **Use the JVM's TLS configuration for Basic-auth Bitbucket API calls** - The Basic-auth API client now follows the JVM's standard JSSE/trust-store configuration (`javax.net.ssl.trustStore` and friends, proxy settings), as the Bearer-token client does since 3.3.9. A Bitbucket instance using a private CA or a self-signed certificate present in the JVM trust store now works on both authentication paths.
-* **Warn when build-status notifications are sent over plain HTTP** - The Basic-auth and Bearer-token API clients now log a warning when the configured Bitbucket URL is not `https://`, since the `Authorization` header (credentials or Bearer token) travels unencrypted. The request is still sent, so setups terminating TLS on a trusted reverse proxy keep working.
+* **Warn when build-status notifications are sent over plain HTTP** - The plugin now logs a warning when the Bitbucket URL used for a status notification is not `https://`, since the `Authorization` header (credentials or token) travels unencrypted. The check runs once per URL at the dispatch layer, so it covers all three authentication paths (Basic, Bearer and OAuth2) without flooding the log on every notification. The request is still sent, so setups terminating TLS on a trusted reverse proxy keep working.
+* **Scope Basic-auth credentials to the Bitbucket host** - The Basic-auth client no longer registers its credentials for any host (`AuthScope.ANY`): they are now bound to the host of the target URL, so a JVM-configured proxy answering with a 407 challenge can no longer receive the Bitbucket credentials as proxy credentials.
 
 ## 4.0.0 (2026-07-09)
 

@@ -33,6 +33,7 @@ import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredenti
 import com.github.scribejava.core.model.Verb;
 import io.jenkins.plugins.bitbucketpushandpullrequest.client.api.BitBucketPPRBasicAuthApiConsumer;
 import io.jenkins.plugins.bitbucketpushandpullrequest.client.api.BitBucketPPRBearerAuthorizationApiConsumer;
+import io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRUtils;
 
 public class BitBucketPPRClientServerVisitor implements BitBucketPPRClientVisitor {
   private static final Logger logger =
@@ -47,6 +48,7 @@ public class BitBucketPPRClientServerVisitor implements BitBucketPPRClientVisito
   @Override
   public void send(StandardCredentials credentials, Verb verb, String url, String payload)
       throws NoSuchMethodException {
+    BitBucketPPRUtils.warnIfNotHttps(url);
 
     if (credentials instanceof StandardUsernamePasswordCredentials usernamePasswordCredentials)
       try {

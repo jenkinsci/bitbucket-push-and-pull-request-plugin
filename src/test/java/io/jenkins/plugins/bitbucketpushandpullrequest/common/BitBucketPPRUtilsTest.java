@@ -22,10 +22,18 @@
 package io.jenkins.plugins.bitbucketpushandpullrequest.common;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.logging.Handler;
+import java.util.logging.Level;
+import java.util.logging.LogRecord;
+import java.util.logging.Logger;
 import java.util.stream.Stream;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -68,5 +76,65 @@ class BitBucketPPRUtilsTest {
         arguments("https://username@bitbucket.org/workspace/reponame", "workspace", "reponame"),
         arguments("https://username@bitbucket.org/work&&space/reponame/", "work&&space",
             "reponame"));
+  }
+
+  // Each test uses URLs of its own so the once-per-URL state, which is static and shared across
+  // the JVM, cannot leak between tests.
+  @Test
+  void warnIfNotHttpsWarnsOncePerUrl() {
+    List<LogRecord> records = new ArrayList<>();
+    Handler capture = newCapturingHandler(records);
+    Logger utilsLogger = Logger.getLogger(BitBucketPPRUtils.class.getName());
+    utilsLogger.addHandler(capture);
+    try {
+      BitBucketPPRUtils.warnIfNotHttps("http://bitbucket-once.test/rest/build-status");
+      BitBucketPPRUtils.warnIfNotHttps("http://bitbucket-once.test/rest/build-status");
+      BitBucketPPRUtils.warnIfNotHttps("http://bitbucket-again.test/rest/build-status");
+
+      List<String> warned = nonHttpsWarnings(records);
+      assertEquals(2, warned.size(),
+          () -> "expected one warning per distinct non-https URL, got: " + warned);
+      assertTrue(warned.get(0).contains("bitbucket-once.test"));
+      assertTrue(warned.get(1).contains("bitbucket-again.test"));
+    } finally {
+      utilsLogger.removeHandler(capture);
+    }
+  }
+
+  @Test
+  void warnIfNotHttpsIsSilentForHttpsAndNull() {
+    List<LogRecord> records = new ArrayList<>();
+    Handler capture = newCapturingHandler(records);
+    Logger utilsLogger = Logger.getLogger(BitBucketPPRUtils.class.getName());
+    utilsLogger.addHandler(capture);
+    try {
+      BitBucketPPRUtils.warnIfNotHttps("https://bitbucket-secure.test/rest/build-status");
+      BitBucketPPRUtils.warnIfNotHttps("HTTPS://bitbucket-secure-upper.test/rest/build-status");
+      BitBucketPPRUtils.warnIfNotHttps(null);
+
+      assertEquals(List.of(), nonHttpsWarnings(records));
+    } finally {
+      utilsLogger.removeHandler(capture);
+    }
+  }
+
+  private static Handler newCapturingHandler(List<LogRecord> records) {
+    return new Handler() {
+      @Override
+      public void publish(LogRecord record) {
+        records.add(record);
+      }
+
+      @Override
+      public void flush() {}
+
+      @Override
+      public void close() {}
+    };
+  }
+
+  private static List<String> nonHttpsWarnings(List<LogRecord> records) {
+    return records.stream().filter(r -> Level.WARNING.equals(r.getLevel()))
+        .map(LogRecord::getMessage).filter(m -> m != null && m.contains("not https")).toList();
   }
 }
