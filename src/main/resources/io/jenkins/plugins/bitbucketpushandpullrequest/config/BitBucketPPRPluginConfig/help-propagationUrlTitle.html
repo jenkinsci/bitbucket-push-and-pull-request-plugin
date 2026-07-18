@@ -1,4 +1,7 @@
 <div>
     <p>Optional endpoint used to propagate statuses.</p>
     <p>It is mandatory in the case that your bitbucket repository supports only ssh cloning</p>
+    <p>Use an https URL: over plain http the credentials of the build status notifications
+       travel unencrypted. An http URL is still accepted, for setups where TLS is terminated
+       by a trusted proxy in front of Bitbucket, but the form shows a warning.</p>
 </div>

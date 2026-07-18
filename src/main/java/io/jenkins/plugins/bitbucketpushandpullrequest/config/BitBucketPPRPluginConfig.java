@@ -115,7 +115,16 @@ public class BitBucketPPRPluginConfig extends GlobalConfiguration {
     }
 
     try {
-      new URL(value); // This will throw MalformedURLException if the URL is not valid
+      URL parsed = new URL(value); // throws MalformedURLException if the URL is not valid
+      // Warn, do not reject: TLS terminated on a trusted reverse proxy in front of Bitbucket is
+      // a legitimate setup. This reaches the operator while typing; the runtime warning still
+      // covers payload-derived URLs that no form validates.
+      if (!"https".equalsIgnoreCase(parsed.getProtocol())) {
+        return FormValidation.warning(
+            "This URL is not https: the credentials used for build status notifications will"
+                + " travel unencrypted. Use an https URL unless TLS is terminated by a trusted"
+                + " proxy in front of Bitbucket.");
+      }
       return FormValidation.ok();
     } catch (MalformedURLException e) {
       return FormValidation.error("This is not a valid URL. Please enter a correct URL.");
