@@ -21,10 +21,13 @@
 package io.jenkins.plugins.bitbucketpushandpullrequest.common;
 
 import java.io.PrintStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -47,19 +50,41 @@ public class BitBucketPPRUtils {
   public static final String BB_WORKSPACE = "workspace";
   public static final String BB_REPOSITORY = "repository";
 
-  private static final Set<String> nonHttpsWarnedUrls = ConcurrentHashMap.newKeySet();
+  private static final Set<String> nonHttpsWarnedOrigins = ConcurrentHashMap.newKeySet();
 
   // The request is still sent: setups terminating TLS on a trusted reverse proxy in front of
-  // Bitbucket are legitimate, so a non-https URL is the operator's call, not an error. Each URL
-  // is warned about once per Jenkins run, so a deliberate choice does not flood the log with
-  // every build-status notification.
+  // Bitbucket are legitimate, so a non-https URL is the operator's call, not an error. Warned
+  // once per origin (scheme://host:port) until Jenkins is restarted or the plugin is reloaded:
+  // notification URLs embed the commit hash, so keying on the full URL would warn on every
+  // commit and grow the set without bound. Logging the origin instead of the full URL also
+  // keeps paths, query strings and user-info out of the log.
   public static void warnIfNotHttps(String url) {
-    if (url != null && !url.regionMatches(true, 0, "https:", 0, 6)
-        && nonHttpsWarnedUrls.add(url)) {
-      logger.warning(() -> "The Bitbucket URL " + url
+    if (url == null || url.regionMatches(true, 0, "https:", 0, 6)) {
+      return;
+    }
+    String origin = originOf(url);
+    if (nonHttpsWarnedOrigins.add(origin)) {
+      logger.warning(() -> "The Bitbucket URL at " + origin
           + " is not https: the Authorization header travels unencrypted."
           + " Use an https URL unless TLS is terminated by a trusted proxy.");
     }
+  }
+
+  private static String originOf(String url) {
+    try {
+      URI uri = new URI(url);
+      if (uri.getScheme() != null && uri.getHost() != null) {
+        int port = uri.getPort();
+        if (port == -1 && "http".equalsIgnoreCase(uri.getScheme())) {
+          port = 80;
+        }
+        return uri.getScheme().toLowerCase(Locale.ROOT) + "://" + uri.getHost()
+            + (port == -1 ? "" : ":" + port);
+      }
+    } catch (URISyntaxException e) {
+      // not parseable as a URI: fall back to the raw string as the dedup key
+    }
+    return url;
   }
 
   public static boolean matches(String allBranches, String branchName, EnvVars env) {

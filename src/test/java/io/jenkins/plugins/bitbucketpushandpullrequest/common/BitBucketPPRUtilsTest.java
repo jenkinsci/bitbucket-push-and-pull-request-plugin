@@ -22,6 +22,7 @@
 package io.jenkins.plugins.bitbucketpushandpullrequest.common;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
@@ -78,23 +79,30 @@ class BitBucketPPRUtilsTest {
             "reponame"));
   }
 
-  // Each test uses URLs of its own so the once-per-URL state, which is static and shared across
-  // the JVM, cannot leak between tests.
+  // Each test uses hosts of its own so the once-per-origin state, which is static and shared
+  // across the JVM, cannot leak between tests.
   @Test
-  void warnIfNotHttpsWarnsOncePerUrl() {
+  void warnIfNotHttpsWarnsOncePerOrigin() {
     List<LogRecord> records = new ArrayList<>();
     Handler capture = newCapturingHandler(records);
     Logger utilsLogger = Logger.getLogger(BitBucketPPRUtils.class.getName());
     utilsLogger.addHandler(capture);
     try {
-      BitBucketPPRUtils.warnIfNotHttps("http://bitbucket-once.test/rest/build-status");
-      BitBucketPPRUtils.warnIfNotHttps("http://bitbucket-once.test/rest/build-status");
-      BitBucketPPRUtils.warnIfNotHttps("http://bitbucket-again.test/rest/build-status");
+      // Notification URLs embed the commit hash: distinct URLs on the same origin must warn
+      // only once, and an explicit default port is the same origin as no port at all.
+      BitBucketPPRUtils
+          .warnIfNotHttps("http://bitbucket-once.test/rest/build-status/1.0/commits/aaa");
+      BitBucketPPRUtils
+          .warnIfNotHttps("http://bitbucket-once.test:80/rest/build-status/1.0/commits/bbb");
+      BitBucketPPRUtils
+          .warnIfNotHttps("http://bitbucket-again.test/rest/build-status/1.0/commits/aaa");
 
       List<String> warned = nonHttpsWarnings(records);
       assertEquals(2, warned.size(),
-          () -> "expected one warning per distinct non-https URL, got: " + warned);
+          () -> "expected one warning per distinct non-https origin, got: " + warned);
       assertTrue(warned.get(0).contains("bitbucket-once.test"));
+      assertFalse(warned.get(0).contains("commits"),
+          () -> "the warning must name the origin, not the full URL, got: " + warned.get(0));
       assertTrue(warned.get(1).contains("bitbucket-again.test"));
     } finally {
       utilsLogger.removeHandler(capture);

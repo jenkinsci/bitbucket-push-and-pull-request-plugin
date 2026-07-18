@@ -22,21 +22,17 @@
 package io.jenkins.plugins.bitbucketpushandpullrequest.client.api;
 
 import java.io.IOException;
-import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.logging.Logger;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpResponse;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.HttpClientBuilder;
 import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials;
 import com.github.scribejava.core.model.Verb;
@@ -50,25 +46,18 @@ public class BitBucketPPRBasicAuthApiConsumer {
       String payload) throws IOException, NoSuchMethodException {
     logger.finest("Send state notification with StandardUsernamePasswordCredentials");
 
-    final UsernamePasswordCredentials httpAuthCredentials = new UsernamePasswordCredentials(
-        credentials.getUsername(), credentials.getPassword().getPlainText());
-
     final String authHeader =
         getAuthHeader(credentials.getUsername(), credentials.getPassword().getPlainText());
 
-    // Scope the credentials to the Bitbucket host: with AuthScope.ANY they would also answer a
-    // 407 challenge from a JVM-configured proxy (reachable since useSystemProperties), handing
-    // the Bitbucket credentials to the proxy.
-    final URI target = URI.create(url);
-    final org.apache.http.client.CredentialsProvider provider = new BasicCredentialsProvider();
-    provider.setCredentials(new AuthScope(target.getHost(), target.getPort()),
-        httpAuthCredentials);
-
+    // Basic auth travels only in the preemptive Authorization header set below. The credentials
+    // are deliberately NOT registered in the client's credentials provider: they must never be
+    // offered to anyone but Bitbucket (a proxy answering 407 would otherwise receive them), and
+    // leaving the provider unset lets useSystemProperties() install the system default one, so
+    // JVM-configured proxy credentials (java.net.Authenticator) keep working.
     // useSystemProperties() builds the client from the JSSE configuration of the Jenkins JVM
     // (javax.net.ssl.trustStore and friends, proxy settings), consistent with the Bearer
     // consumer: a Bitbucket instance using a private CA must work on both authentication paths.
-    final HttpClient client = HttpClientBuilder.create().useSystemProperties()
-        .setDefaultCredentialsProvider(provider).build();
+    final HttpClient client = HttpClientBuilder.create().useSystemProperties().build();
 
     if (verb == Verb.POST) {
       final HttpPost request = new HttpPost(url);
