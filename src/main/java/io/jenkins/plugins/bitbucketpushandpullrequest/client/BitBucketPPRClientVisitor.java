@@ -25,9 +25,9 @@ import com.cloudbees.plugins.credentials.common.StandardCredentials;
 import com.github.scribejava.core.model.Verb;
 
 /**
- * @deprecated kept for binary compatibility with releases up to 4.0.0: the dispatch on the
- *             credential type now lives in {@link DefaultBitBucketPPRClient}. Scheduled for
- *             removal in the next major release.
+ * @deprecated kept for binary and behavioral compatibility with releases up to 4.0.0; the
+ *             plugin itself now dispatches through {@link DefaultBitBucketPPRClient}.
+ *             Scheduled for removal in the next major release.
  */
 @Deprecated
 public interface BitBucketPPRClientVisitor {

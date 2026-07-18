@@ -22,9 +22,29 @@ package io.jenkins.plugins.bitbucketpushandpullrequest.client;
 
 import io.jenkins.plugins.bitbucketpushandpullrequest.event.BitBucketPPREventContext;
 
+/**
+ * @deprecated kept for binary and behavioral compatibility with releases up to 4.0.0; the
+ *             plugin itself now dispatches through {@link DefaultBitBucketPPRClient}.
+ *             Scheduled for removal in the next major release.
+ */
+@Deprecated
 public class BitBucketPPRClientFactory {
   public static BitBucketPPRClient createClient(BitBucketPPRClientType type,
       BitBucketPPREventContext context) throws Exception {
-    return new DefaultBitBucketPPRClient(type, context);
+
+    BitBucketPPRClient client = null;
+
+    switch (type) {
+      case CLOUD:
+        client = new BitBucketPPRCloudClient(context);
+        client.accept(new BitBucketPPRClientCloudVisitor());
+        return client;
+      case SERVER:
+        client = new BitBucketPPRServerClient(context);
+        client.accept(new BitBucketPPRClientServerVisitor());
+        return client;
+      default:
+        throw new Exception();
+    }
   }
 }

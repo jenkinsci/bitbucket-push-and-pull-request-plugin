@@ -31,9 +31,7 @@ import com.cloudbees.plugins.credentials.common.StandardCredentials;
 import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials;
 import com.github.scribejava.core.model.Verb;
 import io.jenkins.plugins.bitbucketpushandpullrequest.client.api.BitBucketPPRApiResponse;
-import io.jenkins.plugins.bitbucketpushandpullrequest.client.api.BitBucketPPRBasicAuthApiConsumer;
-import io.jenkins.plugins.bitbucketpushandpullrequest.client.api.BitBucketPPRBearerAuthorizationApiConsumer;
-import io.jenkins.plugins.bitbucketpushandpullrequest.client.api.BitBucketPPROAuth2ApiConsumer;
+import io.jenkins.plugins.bitbucketpushandpullrequest.client.api.BitBucketPPRNotificationSender;
 import io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRUtils;
 import io.jenkins.plugins.bitbucketpushandpullrequest.event.BitBucketPPREventContext;
 
@@ -63,6 +61,13 @@ public class DefaultBitBucketPPRClient implements BitBucketPPRClient {
   }
 
   @Override
+  @Deprecated
+  public void accept(BitBucketPPRClientVisitor visitor) {
+    // The dispatch on the credential type is internal; the visitor wiring only ever applied to
+    // the legacy client implementations kept for compatibility.
+  }
+
+  @Override
   public void send(Verb verb, String url, String payload) throws Exception {
     BitBucketPPRUtils.warnIfNotHttps(url);
     StandardCredentials credentials = context.getStandardCredentials();
@@ -70,12 +75,11 @@ public class DefaultBitBucketPPRClient implements BitBucketPPRClient {
     try {
       BitBucketPPRApiResponse response = switch (credentials) {
         case StandardUsernamePasswordCredentials usernamePasswordCredentials ->
-            new BitBucketPPRBasicAuthApiConsumer().send(usernamePasswordCredentials, verb, url,
+            BitBucketPPRNotificationSender.sendBasicAuth(usernamePasswordCredentials, verb, url,
                 payload);
         case StringCredentials stringCredentials -> type == BitBucketPPRClientType.CLOUD
-            ? new BitBucketPPROAuth2ApiConsumer().send(stringCredentials, verb, url, payload)
-            : new BitBucketPPRBearerAuthorizationApiConsumer().send(stringCredentials, verb, url,
-                payload);
+            ? BitBucketPPRNotificationSender.sendOAuth2(stringCredentials, verb, url, payload)
+            : BitBucketPPRNotificationSender.sendBearer(stringCredentials, verb, url, payload);
         case null, default -> throw new NotImplementedException(
             "Credentials provider for state notification not found");
       };

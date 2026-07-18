@@ -268,7 +268,7 @@ class BitBucketPPRUtilsTest {
     utilsLogger.addHandler(capture);
     try {
       BitBucketPPRUtils.warnOnHttpError("http://bitbucket-body.test/rest/build-status/1.0/x",
-          500, "line1\r\nline2end");
+          500, "line1\r\nline2\u0007end");
 
       List<String> bodies = records.stream().filter(r -> Level.FINE.equals(r.getLevel()))
           .map(LogRecord::getMessage)

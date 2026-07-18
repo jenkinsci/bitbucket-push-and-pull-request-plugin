@@ -28,11 +28,10 @@ public interface BitBucketPPRClient {
   void send(Verb verb, String url, String payload) throws Exception;
 
   /**
-   * @deprecated the dispatch on the credential type is internal to the implementation now; this
-   *             method is kept for binary compatibility with releases up to 4.0.0 and does
-   *             nothing on the default implementation. Scheduled for removal in the next major
-   *             release.
+   * @deprecated the visitor wiring only applies to the legacy client implementations kept for
+   *             compatibility; {@link DefaultBitBucketPPRClient} dispatches internally and
+   *             ignores it. Scheduled for removal in the next major release.
    */
   @Deprecated
-  default void accept(BitBucketPPRClientVisitor visitor) {}
+  void accept(BitBucketPPRClientVisitor visitor);
 }

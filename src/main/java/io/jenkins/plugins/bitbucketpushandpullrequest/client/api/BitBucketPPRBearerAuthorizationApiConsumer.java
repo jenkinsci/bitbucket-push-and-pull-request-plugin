@@ -23,21 +23,63 @@ package io.jenkins.plugins.bitbucketpushandpullrequest.client.api;
 
 import java.io.IOException;
 import java.util.logging.Logger;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.http.HttpHeaders;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpDelete;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.jenkinsci.plugins.plaincredentials.StringCredentials;
 import com.github.scribejava.core.model.Verb;
 
+/**
+ * @deprecated kept with its original signature and behavior for binary compatibility with
+ *             releases up to 4.0.0; the plugin itself now sends notifications through
+ *             {@link BitBucketPPRNotificationSender}, which owns the transport lifecycle.
+ *             Scheduled for removal in the next major release.
+ */
+@Deprecated
 public class BitBucketPPRBearerAuthorizationApiConsumer {
 
   private static final Logger logger =
       Logger.getLogger(BitBucketPPRBearerAuthorizationApiConsumer.class.getName());
 
-  public BitBucketPPRApiResponse send(StringCredentials credentials, Verb verb, String url,
-      String payload) throws IOException, NoSuchMethodException {
+  public HttpResponse send(StringCredentials credentials, Verb verb, String url, String payload)
+      throws IOException, NoSuchMethodException {
     logger.finest("Use BB Bearer Authorization for state notification");
 
-    // The token travels only in the Authorization header, over a connection validated against
-    // the JVM trust store (see BitBucketPPRApiRequest for the shared transport policy).
-    return BitBucketPPRApiRequest.send("Bearer ".concat(credentials.getSecret().getPlainText()),
-        verb, url, payload);
+    // Build the client from the JSSE configuration of the Jenkins JVM: createSystem() honours
+    // the system properties (javax.net.ssl.trustStore and friends, proxy settings), so
+    // certificates are validated against the JVM-configured JSSE trust store and hostnames are
+    // verified. A Bitbucket instance using a private CA or a self-signed certificate must have
+    // that certificate present in the trust store configured for the Jenkins JVM. The Bearer
+    // token travels in the Authorization header, so the connection it travels over must be
+    // authenticated -- it must never accept arbitrary certificates.
+    CloseableHttpClient httpClient = HttpClients.createSystem();
+
+    String authHeader = "Bearer ".concat(credentials.getSecret().getPlainText());
+
+    if (verb == Verb.POST) {
+      final HttpPost request = new HttpPost(url);
+      request.setHeader(HttpHeaders.AUTHORIZATION, authHeader);
+      request.setHeader("X-Atlassian-Token", "nocheck");
+
+      if (StringUtils.isNotBlank(payload)) {
+        request.setEntity(new StringEntity(payload, ContentType.APPLICATION_JSON));
+      }
+      return httpClient.execute(request);
+    }
+
+    if (verb == Verb.DELETE) {
+      final HttpDelete request = new HttpDelete(url);
+      request.setHeader(HttpHeaders.AUTHORIZATION, authHeader);
+      request.setHeader("X-Atlassian-Token", "nocheck");
+      return httpClient.execute(request);
+    }
+
+    throw new NoSuchMethodException();
   }
 }

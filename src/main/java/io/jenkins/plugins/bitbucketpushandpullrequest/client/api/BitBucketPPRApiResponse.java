@@ -26,16 +26,20 @@ import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.charset.UnsupportedCharsetException;
+import java.util.zip.GZIPInputStream;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.ParseException;
 import org.apache.http.entity.ContentType;
+import org.kohsuke.accmod.Restricted;
+import org.kohsuke.accmod.restrictions.NoExternalUse;
 
 /**
- * Outcome of a Bitbucket API call, detached from the transport that produced it. The consumers
- * fully own the lifecycle of their HTTP client and response: by the time this value is returned,
- * every underlying resource has been consumed and released, so callers can hold it freely.
+ * Outcome of a Bitbucket API call, detached from the transport that produced it. The sender fully
+ * owns the lifecycle of its HTTP client and response: by the time this value is returned, every
+ * underlying resource has been consumed and released, so callers can hold it freely.
  */
+@Restricted(NoExternalUse.class)
 public record BitBucketPPRApiResponse(int statusCode, String body) {
 
   private static final int MAX_BODY_BYTES = 16 * 1024;
@@ -59,6 +63,27 @@ public record BitBucketPPRApiResponse(int statusCode, String body) {
       head = content.readNBytes(MAX_BODY_BYTES);
     }
     return new BitBucketPPRApiResponse(statusCode, new String(head, charsetOf(entity)));
+  }
+
+  /**
+   * Materializes a scribejava response with the same body cap as the Apache path. The stream is
+   * decompressed when the reply declares {@code Content-Encoding: gzip}, mirroring what
+   * {@code Response#getBody()} would do, but reading at most the cap.
+   */
+  public static BitBucketPPRApiResponse from(com.github.scribejava.core.model.Response response)
+      throws IOException {
+    InputStream stream = response.getStream();
+    if (stream == null) {
+      return new BitBucketPPRApiResponse(response.getCode(), "");
+    }
+    byte[] head;
+    try (InputStream content = "gzip".equalsIgnoreCase(response.getHeader("Content-Encoding"))
+        ? new GZIPInputStream(stream)
+        : stream) {
+      head = content.readNBytes(MAX_BODY_BYTES);
+    }
+    return new BitBucketPPRApiResponse(response.getCode(),
+        new String(head, StandardCharsets.UTF_8));
   }
 
   private static Charset charsetOf(HttpEntity entity) {

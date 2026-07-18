@@ -25,19 +25,22 @@ import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.commons.lang.NotImplementedException;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.util.EntityUtils;
 import org.jenkinsci.plugins.plaincredentials.StringCredentials;
 import com.cloudbees.plugins.credentials.common.StandardCredentials;
 import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials;
+import com.github.scribejava.core.model.Response;
 import com.github.scribejava.core.model.Verb;
-import io.jenkins.plugins.bitbucketpushandpullrequest.client.api.BitBucketPPRApiResponse;
 import io.jenkins.plugins.bitbucketpushandpullrequest.client.api.BitBucketPPRBasicAuthApiConsumer;
 import io.jenkins.plugins.bitbucketpushandpullrequest.client.api.BitBucketPPROAuth2ApiConsumer;
 import io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRUtils;
 
 /**
- * @deprecated kept for binary compatibility with releases up to 4.0.0: the dispatch on the
- *             credential type now lives in {@link DefaultBitBucketPPRClient}. Scheduled for
- *             removal in the next major release.
+ * @deprecated kept for binary and behavioral compatibility with releases up to 4.0.0; the
+ *             plugin itself now dispatches through {@link DefaultBitBucketPPRClient}.
+ *             Scheduled for removal in the next major release.
  */
 @Deprecated
 public class BitBucketPPRClientCloudVisitor implements BitBucketPPRClientVisitor {
@@ -57,19 +60,23 @@ public class BitBucketPPRClientCloudVisitor implements BitBucketPPRClientVisitor
 
     if (credentials instanceof StandardUsernamePasswordCredentials usernamePasswordCredentials)
       try {
-        BitBucketPPRApiResponse response =
+        final HttpResponse response =
             this.send(usernamePasswordCredentials, verb, url, payload);
+        HttpEntity responseEntity = response.getEntity();
+        final String responseBody =
+            responseEntity == null ? "empty" : EntityUtils.toString(responseEntity);
+
         logger.log(Level.FINEST, "Result of the status notification is: {0}, with status code: {1}",
-            new Object[] {response.body(), response.statusCode()});
+            new Object[] {responseBody, response.getStatusLine().getStatusCode()});
       } catch (IOException e) {
         logger.log(Level.WARNING, "Error during state notification: {0} ", e.getMessage());
       }
     else if (credentials instanceof StringCredentials stringCredentials) {
       try {
-        BitBucketPPRApiResponse response = this.send(stringCredentials, verb, url, payload);
+        Response response = this.send(stringCredentials, verb, url, payload);
 
         logger.log(Level.FINEST, "Result of the state notification is: {0}, with status code: {1}",
-            new Object[] {response.body(), response.statusCode()});
+            new Object[] {response.getBody(), response.getCode()});
       } catch (ExecutionException | IOException e) {
         logger.log(Level.WARNING, "Error during state notification: {0} ", e.getMessage());
       }
@@ -77,15 +84,15 @@ public class BitBucketPPRClientCloudVisitor implements BitBucketPPRClientVisitor
       throw new NotImplementedException("Credentials provider for state notification not found");
   }
 
-  private BitBucketPPRApiResponse send(StandardUsernamePasswordCredentials credentials, Verb verb,
-      String url, String payload) throws IOException, NoSuchMethodException {
+  private HttpResponse send(StandardUsernamePasswordCredentials credentials, Verb verb, String url,
+      String payload) throws IOException, NoSuchMethodException {
 
     BitBucketPPRBasicAuthApiConsumer api = new BitBucketPPRBasicAuthApiConsumer();
     return api.send(credentials, verb, url, payload);
   }
 
-  private BitBucketPPRApiResponse send(StringCredentials credentials, Verb verb, String url,
-      String payload) throws InterruptedException, ExecutionException, IOException {
+  private Response send(StringCredentials credentials, Verb verb, String url, String payload)
+      throws InterruptedException, ExecutionException, IOException {
     logger.finest("Set BB StringCredentials for BB Cloud state notification");
 
     BitBucketPPROAuth2ApiConsumer api = new BitBucketPPROAuth2ApiConsumer();
