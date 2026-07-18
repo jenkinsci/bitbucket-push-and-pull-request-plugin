@@ -79,10 +79,14 @@ public record BitBucketPPRApiResponse(int statusCode, String body) {
       String body = response.getBody();
       return new BitBucketPPRApiResponse(response.getCode(), capUtf8(body == null ? "" : body));
     }
+    boolean gzip = "gzip".equalsIgnoreCase(response.getHeader("Content-Encoding"));
     byte[] head;
-    try (InputStream content = "gzip".equalsIgnoreCase(response.getHeader("Content-Encoding"))
-        ? new GZIPInputStream(stream)
-        : stream) {
+    // Two resources on purpose: the GZIPInputStream constructor reads the gzip header eagerly
+    // and throws on a malformed body, and in that case the wrapper resource is never
+    // initialized. Declaring the raw stream as its own resource first guarantees it is closed
+    // even when building the wrapper fails; scribejava's Response.close() would not close it.
+    try (InputStream raw = stream;
+        InputStream content = gzip ? new GZIPInputStream(raw) : raw) {
       head = content.readNBytes(MAX_BODY_BYTES);
     }
     return new BitBucketPPRApiResponse(response.getCode(),

@@ -22,13 +22,17 @@
 package io.jenkins.plugins.bitbucketpushandpullrequest.client.api;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.github.scribejava.core.model.Response;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.zip.GZIPOutputStream;
 import org.apache.http.HttpVersion;
 import org.apache.http.entity.ByteArrayEntity;
@@ -81,6 +85,28 @@ class BitBucketPPRApiResponseTest {
 
     assertEquals(502, materialized.statusCode());
     assertEquals(CAP, materialized.body().getBytes(StandardCharsets.UTF_8).length);
+  }
+
+  @Test
+  void fromScribejavaResponseClosesTheStreamWhenGzipConstructionFails() {
+    // The GZIPInputStream constructor reads the gzip header eagerly and throws on a malformed
+    // body: the raw stream must be closed anyway, since scribejava's Response.close() would not
+    // close it.
+    AtomicBoolean closed = new AtomicBoolean();
+    InputStream broken =
+        new ByteArrayInputStream("not gzip at all".getBytes(StandardCharsets.UTF_8)) {
+          @Override
+          public void close() throws IOException {
+            closed.set(true);
+            super.close();
+          }
+        };
+    Response response =
+        new Response(500, "Internal Server Error", Map.of("Content-Encoding", "gzip"), broken);
+
+    assertThrows(IOException.class, () -> BitBucketPPRApiResponse.from(response));
+    assertTrue(closed.get(),
+        "the raw stream must be closed when the gzip wrapper fails to build");
   }
 
   @Test
