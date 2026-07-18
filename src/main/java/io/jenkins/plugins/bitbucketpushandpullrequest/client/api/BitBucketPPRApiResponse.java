@@ -74,7 +74,10 @@ public record BitBucketPPRApiResponse(int statusCode, String body) {
       throws IOException {
     InputStream stream = response.getStream();
     if (stream == null) {
-      return new BitBucketPPRApiResponse(response.getCode(), "");
+      // A scribejava Response can also be built directly from a materialized String body, in
+      // which case there is no stream to read: the same budget applies to the string.
+      String body = response.getBody();
+      return new BitBucketPPRApiResponse(response.getCode(), capUtf8(body == null ? "" : body));
     }
     byte[] head;
     try (InputStream content = "gzip".equalsIgnoreCase(response.getHeader("Content-Encoding"))
@@ -84,6 +87,14 @@ public record BitBucketPPRApiResponse(int statusCode, String body) {
     }
     return new BitBucketPPRApiResponse(response.getCode(),
         new String(head, StandardCharsets.UTF_8));
+  }
+
+  private static String capUtf8(String body) {
+    byte[] bytes = body.getBytes(StandardCharsets.UTF_8);
+    if (bytes.length <= MAX_BODY_BYTES) {
+      return body;
+    }
+    return new String(bytes, 0, MAX_BODY_BYTES, StandardCharsets.UTF_8);
   }
 
   private static Charset charsetOf(HttpEntity entity) {

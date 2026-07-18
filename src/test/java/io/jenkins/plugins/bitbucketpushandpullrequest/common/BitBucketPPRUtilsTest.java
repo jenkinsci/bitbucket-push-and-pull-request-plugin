@@ -268,7 +268,7 @@ class BitBucketPPRUtilsTest {
     utilsLogger.addHandler(capture);
     try {
       BitBucketPPRUtils.warnOnHttpError("http://bitbucket-body.test/rest/build-status/1.0/x",
-          500, "line1\r\nline2\u0007end");
+          500, "line1\r\nline2\u0007end\u2028tail");
 
       List<String> bodies = records.stream().filter(r -> Level.FINE.equals(r.getLevel()))
           .map(LogRecord::getMessage)
@@ -276,8 +276,11 @@ class BitBucketPPRUtilsTest {
       assertEquals(1, bodies.size(), () -> "expected the body at FINE, got: " + records);
       assertFalse(bodies.get(0).contains("\n"),
           () -> "control characters must be sanitized, got: " + bodies.get(0));
-      assertTrue(bodies.get(0).contains("line1  line2 end"),
-          () -> "expected each control character replaced by a space, got: " + bodies.get(0));
+      assertFalse(bodies.get(0).contains("\u2028"),
+          () -> "unicode line separators must be sanitized too, got: " + bodies.get(0));
+      assertTrue(bodies.get(0).contains("line1  line2 end tail"),
+          () -> "expected each control or separator character replaced by a space, got: "
+              + bodies.get(0));
     } finally {
       utilsLogger.removeHandler(capture);
       utilsLogger.setLevel(originalLevel);

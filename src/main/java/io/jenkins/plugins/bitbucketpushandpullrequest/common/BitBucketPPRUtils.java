@@ -104,8 +104,10 @@ public class BitBucketPPRUtils {
     }
   }
 
+  // Control characters plus the Unicode line and paragraph separators: everything that could
+  // forge a multi-line log entry, not just ASCII controls.
   private static String sanitizeForLog(String body) {
-    String flat = body.replaceAll("\\p{Cntrl}", " ").trim();
+    String flat = body.replaceAll("[\\p{Cc}\\p{Zl}\\p{Zp}]", " ").trim();
     return flat.length() > 500 ? flat.substring(0, 500) + "..." : flat;
   }
 

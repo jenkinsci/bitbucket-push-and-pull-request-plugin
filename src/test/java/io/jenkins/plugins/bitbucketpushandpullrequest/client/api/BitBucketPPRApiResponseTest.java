@@ -72,6 +72,18 @@ class BitBucketPPRApiResponseTest {
   }
 
   @Test
+  void fromScribejavaResponseCapsAMaterializedStringBody() throws Exception {
+    // A scribejava Response can also be built directly from a String body (getStream() is null):
+    // the cap must hold there too.
+    Response response = new Response(502, "Bad Gateway", Map.of(), "c".repeat(CAP + 4096));
+
+    BitBucketPPRApiResponse materialized = BitBucketPPRApiResponse.from(response);
+
+    assertEquals(502, materialized.statusCode());
+    assertEquals(CAP, materialized.body().getBytes(StandardCharsets.UTF_8).length);
+  }
+
+  @Test
   void fromScribejavaResponseDecompressesGzip() throws Exception {
     ByteArrayOutputStream compressed = new ByteArrayOutputStream();
     try (GZIPOutputStream gzip = new GZIPOutputStream(compressed)) {

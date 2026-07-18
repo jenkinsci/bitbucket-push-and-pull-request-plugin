@@ -88,6 +88,11 @@ public class DefaultBitBucketPPRClient implements BitBucketPPRClient {
 
       logger.log(Level.FINEST, "Result of the status notification is: {0}, with status code: {1}",
           new Object[] {response.body(), response.statusCode()});
+    } catch (InterruptedException e) {
+      // The broad handler upstream logs and swallows: the thread must keep its interrupted
+      // status.
+      Thread.currentThread().interrupt();
+      throw e;
     } catch (ExecutionException | IOException e) {
       logger.log(Level.WARNING, "Error during state notification", e);
     }
