@@ -48,7 +48,42 @@ final class TlsTestSupport {
 
   static final String STORE_PASS = "changeit";
 
+  private static Path cachedLocalhostKeystore;
+  private static Path cachedMismatchedHostKeystore;
+
   private TlsTestSupport() {}
+
+  /**
+   * A keystore with a localhost SAN, generated once per JVM and shared across test classes:
+   * keytool spawns a whole subprocess per generation, and every consumer of this certificate
+   * needs the identical one.
+   */
+  static synchronized Path localhostKeystore() throws Exception {
+    if (cachedLocalhostKeystore == null) {
+      cachedLocalhostKeystore = newKeystorePath();
+      generateSelfSignedKeystore(cachedLocalhostKeystore, "CN=localhost",
+          "dns:localhost,ip:127.0.0.1");
+    }
+    return cachedLocalhostKeystore;
+  }
+
+  /** A keystore whose certificate does not carry localhost: for hostname-mismatch tests. */
+  static synchronized Path mismatchedHostKeystore() throws Exception {
+    if (cachedMismatchedHostKeystore == null) {
+      cachedMismatchedHostKeystore = newKeystorePath();
+      generateSelfSignedKeystore(cachedMismatchedHostKeystore, "CN=bitbucket.test",
+          "dns:bitbucket.test");
+    }
+    return cachedMismatchedHostKeystore;
+  }
+
+  private static Path newKeystorePath() throws Exception {
+    Path dir = Files.createTempDirectory("bbppr-tls");
+    dir.toFile().deleteOnExit();
+    Path keystore = dir.resolve("keystore.p12");
+    keystore.toFile().deleteOnExit();
+    return keystore;
+  }
 
   static void generateSelfSignedKeystore(Path keystore, String dname, String san)
       throws Exception {

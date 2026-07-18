@@ -87,6 +87,12 @@ public class BitBucketPPRUtils {
   // incident is a new episode. The response body is logged separately at FINE, sanitized and
   // truncated, so control characters cannot forge multi-line log entries and an oversized reply
   // cannot flood the log.
+  //
+  // Known limitation: the state is keyed on the origin alone, because the URL carries no job or
+  // credential identity. On a Bitbucket host shared by many jobs, a healthy job's success
+  // re-arms the episode of a broken one, which then warns roughly once per build (tolerated: a
+  // job that fails every build produces a per-build signal), and concurrent incidents with the
+  // same status collapse into one episode for the origin.
   public static void warnOnHttpError(String url, int statusCode, String body) {
     String origin = originOf(url);
     if (statusCode >= 200 && statusCode < 300) {

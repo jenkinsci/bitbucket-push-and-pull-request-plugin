@@ -41,7 +41,6 @@ import org.jenkinsci.plugins.plaincredentials.StringCredentials;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -79,10 +78,8 @@ class BitBucketPPRNotificationSenderTest {
   }
 
   @Test
-  void sendBearerRejectsUntrustedCertificate(@TempDir Path tmp) throws Exception {
-    Path keystore = tmp.resolve("keystore.p12");
-    TlsTestSupport.generateSelfSignedKeystore(keystore, "CN=localhost",
-        "dns:localhost,ip:127.0.0.1");
+  void sendBearerRejectsUntrustedCertificate() throws Exception {
+    Path keystore = TlsTestSupport.localhostKeystore();
     server = TlsTestSupport.startHttpsServer(keystore);
 
     String url = "https://localhost:" + server.getAddress().getPort() + "/rest/build-status";
@@ -96,10 +93,9 @@ class BitBucketPPRNotificationSenderTest {
   }
 
   @Test
-  void sendBearerRejectsTrustedCertificateWithMismatchedHostname(@TempDir Path tmp)
+  void sendBearerRejectsTrustedCertificateWithMismatchedHostname()
       throws Exception {
-    Path keystore = tmp.resolve("keystore.p12");
-    TlsTestSupport.generateSelfSignedKeystore(keystore, "CN=bitbucket.test", "dns:bitbucket.test");
+    Path keystore = TlsTestSupport.mismatchedHostKeystore();
     server = TlsTestSupport.startHttpsServer(keystore);
 
     String url = "https://localhost:" + server.getAddress().getPort() + "/rest/build-status";
@@ -115,10 +111,8 @@ class BitBucketPPRNotificationSenderTest {
   }
 
   @Test
-  void sendBasicAuthHonoursJvmDefaultTlsConfiguration(@TempDir Path tmp) throws Exception {
-    Path keystore = tmp.resolve("keystore.p12");
-    TlsTestSupport.generateSelfSignedKeystore(keystore, "CN=localhost",
-        "dns:localhost,ip:127.0.0.1");
+  void sendBasicAuthHonoursJvmDefaultTlsConfiguration() throws Exception {
+    Path keystore = TlsTestSupport.localhostKeystore();
     server = TlsTestSupport.startHttpsServer(keystore);
 
     String url = "https://localhost:" + server.getAddress().getPort() + "/rest/build-status";
@@ -136,9 +130,8 @@ class BitBucketPPRNotificationSenderTest {
   }
 
   @Test
-  void sendBasicAuthDeleteCarriesTheAuthHeaders(@TempDir Path tmp) throws Exception {
-    Headers headers = deleteRequestHeaders(tmp,
-        url -> BitBucketPPRNotificationSender.sendBasicAuth(userPassCredentials(), Verb.DELETE,
+  void sendBasicAuthDeleteCarriesTheAuthHeaders() throws Exception {
+    Headers headers = deleteRequestHeaders(url -> BitBucketPPRNotificationSender.sendBasicAuth(userPassCredentials(), Verb.DELETE,
             url, ""));
     assertTrue(headers.getFirst("Authorization").startsWith("Basic "),
         () -> "expected a preemptive Basic Authorization header, got: "
@@ -147,9 +140,8 @@ class BitBucketPPRNotificationSenderTest {
   }
 
   @Test
-  void sendBearerDeleteCarriesTheAuthHeaders(@TempDir Path tmp) throws Exception {
-    Headers headers = deleteRequestHeaders(tmp,
-        url -> BitBucketPPRNotificationSender.sendBearer(tokenCredentials(), Verb.DELETE, url,
+  void sendBearerDeleteCarriesTheAuthHeaders() throws Exception {
+    Headers headers = deleteRequestHeaders(url -> BitBucketPPRNotificationSender.sendBearer(tokenCredentials(), Verb.DELETE, url,
             ""));
     assertTrue(headers.getFirst("Authorization").startsWith("Bearer "),
         () -> "expected a Bearer Authorization header, got: "
@@ -166,10 +158,8 @@ class BitBucketPPRNotificationSenderTest {
   // DELETE is production-reachable (approve revocation on failed builds) and shares the request
   // building with POST: these tests pin that the Authorization and X-Atlassian-Token headers do
   // not drift off the less-exercised verb.
-  private Headers deleteRequestHeaders(Path tmp, DeleteCall call) throws Exception {
-    Path keystore = tmp.resolve("keystore.p12");
-    TlsTestSupport.generateSelfSignedKeystore(keystore, "CN=localhost",
-        "dns:localhost,ip:127.0.0.1");
+  private Headers deleteRequestHeaders(DeleteCall call) throws Exception {
+    Path keystore = TlsTestSupport.localhostKeystore();
     AtomicReference<Headers> requestHeaders = new AtomicReference<>();
     server = TlsTestSupport.startHttpsServer(keystore, requestHeaders);
 

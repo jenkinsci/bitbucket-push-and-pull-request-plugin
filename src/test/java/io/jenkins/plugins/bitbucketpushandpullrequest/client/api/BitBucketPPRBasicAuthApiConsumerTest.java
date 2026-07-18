@@ -36,7 +36,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -46,8 +45,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
  * configuration of the Jenkins JVM (so a Bitbucket instance using a private CA works on both
  * authentication paths) and must keep validating certificate chains.
  *
- * <p>The warning for non-https URLs is emitted at the visitor layer, see
- * {@code BitBucketPPRUtilsTest}.
+ * <p>The warning for non-https URLs is emitted at the dispatch layer
+ * ({@code DefaultBitBucketPPRClient}), see {@code BitBucketPPRUtilsTest}.
  */
 @ExtendWith(MockitoExtension.class)
 class BitBucketPPRBasicAuthApiConsumerTest {
@@ -70,10 +69,8 @@ class BitBucketPPRBasicAuthApiConsumerTest {
   }
 
   @Test
-  void sendHonoursJvmDefaultTlsConfiguration(@TempDir Path tmp) throws Exception {
-    Path keystore = tmp.resolve("keystore.p12");
-    TlsTestSupport.generateSelfSignedKeystore(keystore, "CN=localhost",
-        "dns:localhost,ip:127.0.0.1");
+  void sendHonoursJvmDefaultTlsConfiguration() throws Exception {
+    Path keystore = TlsTestSupport.localhostKeystore();
     server = TlsTestSupport.startHttpsServer(keystore);
 
     String url = "https://localhost:" + server.getAddress().getPort() + "/rest/build-status";
@@ -93,10 +90,8 @@ class BitBucketPPRBasicAuthApiConsumerTest {
   }
 
   @Test
-  void sendRejectsUntrustedCertificate(@TempDir Path tmp) throws Exception {
-    Path keystore = tmp.resolve("keystore.p12");
-    TlsTestSupport.generateSelfSignedKeystore(keystore, "CN=localhost",
-        "dns:localhost,ip:127.0.0.1");
+  void sendRejectsUntrustedCertificate() throws Exception {
+    Path keystore = TlsTestSupport.localhostKeystore();
     server = TlsTestSupport.startHttpsServer(keystore);
 
     String url = "https://localhost:" + server.getAddress().getPort() + "/rest/build-status";

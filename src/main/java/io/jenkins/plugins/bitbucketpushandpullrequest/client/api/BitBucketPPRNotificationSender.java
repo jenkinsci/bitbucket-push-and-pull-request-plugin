@@ -89,6 +89,11 @@ public final class BitBucketPPRNotificationSender {
       try (Response response = service.execute(request)) {
         return BitBucketPPRApiResponse.from(response);
       }
+    } catch (InterruptedException e) {
+      // Restored next to the blocking calls, so every caller of this sender inherits the
+      // invariant: the thread keeps its interrupted status.
+      Thread.currentThread().interrupt();
+      throw e;
     }
   }
 
