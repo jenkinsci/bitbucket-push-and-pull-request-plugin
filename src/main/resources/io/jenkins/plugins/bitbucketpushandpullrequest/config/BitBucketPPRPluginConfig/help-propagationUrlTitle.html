@@ -1,6 +1,9 @@
 <div>
-    <p>Optional endpoint used to propagate statuses.</p>
-    <p>It is mandatory in the case that your bitbucket repository supports only ssh cloning</p>
+    <p>Base URL of the Bitbucket Server that receives build-status notifications, including any
+       context path (for example <code>https://bitbucket.example.com</code> or
+       <code>https://bitbucket.example.com/bitbucket</code>). Required for Bitbucket Server and used
+       together with a credential: a notification is sent only when both are configured, here or on a
+       job trigger.</p>
     <p>Use an https URL: over plain http the credentials of the build status notifications
        travel unencrypted. An http URL is still accepted, for setups where TLS is terminated
        by a trusted proxy in front of Bitbucket, but the form shows a warning.</p>

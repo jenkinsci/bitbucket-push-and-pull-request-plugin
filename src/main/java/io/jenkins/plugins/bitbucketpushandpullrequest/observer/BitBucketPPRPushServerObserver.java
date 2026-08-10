@@ -26,6 +26,8 @@ import java.util.Map;
 import java.util.logging.Logger;
 import hudson.model.Result;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
+import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRActionAbstract;
+import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRServerNotificationConfig;
 import io.jenkins.plugins.bitbucketpushandpullrequest.client.BitBucketPPRClientType;
 import io.jenkins.plugins.bitbucketpushandpullrequest.event.BitBucketPPREvent;
 
@@ -48,6 +50,9 @@ public class BitBucketPPRPushServerObserver extends BitBucketPPRHandlerTemplate
   @Override
   public void setBuildStatusOnFinished() throws MalformedURLException {
     BitBucketPPRAction bitbucketAction = context.getAction();
+    BitBucketPPRServerNotificationConfig config = context.getNotificationConfig();
+    ((BitBucketPPRActionAbstract) bitbucketAction).setPropagationUrl(config.baseUrl());
+    
     Result result = context.getRun().getResult();
     String state = result == Result.SUCCESS || result == Result.UNSTABLE
         ? "SUCCESSFUL" : result == Result.ABORTED ? "STOPPED" : "FAILED";
@@ -63,6 +68,9 @@ public class BitBucketPPRPushServerObserver extends BitBucketPPRHandlerTemplate
   @Override
   public void setBuildStatusInProgress() throws MalformedURLException {
     BitBucketPPRAction bitbucketAction = context.getAction();
+    BitBucketPPRServerNotificationConfig config = context.getNotificationConfig();
+    ((BitBucketPPRActionAbstract) bitbucketAction).setPropagationUrl(config.baseUrl());
+
     Map<String, String> map = new HashMap<>();
     map.put("key", computeBitBucketBuildKey(context));
     map.put("url", context.getAbsoluteUrl());

@@ -45,12 +45,6 @@ public class BitBucketPPRActionAbstract extends InvisibleAction {
     return value;
   }
 
-  public BitBucketPPRActionAbstract() {
-    if (!isEmpty(getGlobalConfig().propagationUrl)) {
-      this.setPropagationUrl(getGlobalConfig().propagationUrl);
-    }
-  }
-
   // Resolved per call, not pinned in a static field: a static would capture whichever config
   // instance exists when this class is first loaded and go stale for every later caller in the
   // same JVM, an order dependency that bites tests mocking getInstance() (same reasoning as the

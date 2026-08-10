@@ -1,7 +1,7 @@
 /*******************************************************************************
  * The MIT License
  *
- * Copyright (C) 2018-2025, Christian Del Monte.
+ * Copyright (C) 2018-2026, Christian Del Monte.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -22,22 +22,21 @@
 package io.jenkins.plugins.bitbucketpushandpullrequest.action;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
-import io.jenkins.plugins.bitbucketpushandpullrequest.config.BitBucketPPRPluginConfig;
 import io.jenkins.plugins.bitbucketpushandpullrequest.exception.BitBucketPPRPayloadPropertyNotFoundException;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRHookEvent;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.server.BitBucketPPRServerClone;
 
-import edu.umd.cs.findbugs.annotations.NonNull;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
+import org.apache.commons.lang3.StringUtils;
+
 import static io.jenkins.plugins.bitbucketpushandpullrequest.common.BitBucketPPRConst.PULL_REQUEST_SERVER_MERGED;
 import static java.util.Objects.isNull;
-import static org.apache.commons.lang3.ObjectUtils.isEmpty;
 
 public class BitBucketPPRPullRequestServerAction extends BitBucketPPRActionAbstract
     implements BitBucketPPRAction {
@@ -46,7 +45,6 @@ public class BitBucketPPRPullRequestServerAction extends BitBucketPPRActionAbstr
       Logger.getLogger(BitBucketPPRPullRequestServerAction.class.getName());
 
   private final @NonNull BitBucketPPRPayload payload;
-  private URL baseUrl;
   private List<String> scmUrls = new ArrayList<>(2);
   private String repositoryUuid;
   private final BitBucketPPRHookEvent bitbucketEvent;
@@ -88,12 +86,9 @@ public class BitBucketPPRPullRequestServerAction extends BitBucketPPRActionAbstr
       if ("http".equalsIgnoreCase(cloneName) || "https".equalsIgnoreCase(cloneName)) {
         String cloneHref = requirePayloadProperty(
             clone.getHref(), "pullRequest.toRef.repository.links.clone[].href");
-        try {
-          this.baseUrl = new URL(cloneHref);
-          this.scmUrls.add(cloneHref);
-        } catch (MalformedURLException e) {
-          throw new RuntimeException(e);
-        }
+        
+        this.scmUrls.add(cloneHref);
+        
       } else if ("ssh".equalsIgnoreCase(cloneName)) {
         this.scmUrls.add(clone.getHref());
       }
@@ -112,14 +107,6 @@ public class BitBucketPPRPullRequestServerAction extends BitBucketPPRActionAbstr
         if (!this.scmUrls.contains(href)) {
           this.scmUrls.add(href);
         }
-      }
-    }
-
-    if (getGlobalConfig().isPropagationUrlSet()) {
-      try {
-        this.baseUrl = new URL(getGlobalConfig().getPropagationUrl());
-      } catch (MalformedURLException e) {
-        throw new RuntimeException(e);
       }
     }
 
@@ -152,8 +139,8 @@ public class BitBucketPPRPullRequestServerAction extends BitBucketPPRActionAbstr
   }
 
   @Override
-  public String getPullRequestApiUrl() {
-    return baseUrl.toString();
+  public String getPullRequestApiUrl() throws MalformedURLException {
+    return getBaseUrl().toString();
   }
 
   @Override
@@ -260,13 +247,12 @@ public class BitBucketPPRPullRequestServerAction extends BitBucketPPRActionAbstr
   }
 
   private String getBaseUrl() throws MalformedURLException {
-    URL baseCommitLink =
-        isEmpty(this.getPropagationUrl()) ? baseUrl : new URL(this.getPropagationUrl());
-    int port = baseCommitLink.getPort();
-    // URL.getPort() is -1 when the URL carries no explicit port: appending it verbatim would
-    // produce an unroutable "host:-1" authority.
-    return baseCommitLink.getProtocol() + "://" + baseCommitLink.getHost()
-        + (port == -1 ? "" : ":" + port);
+    if (StringUtils.isBlank(this.getPropagationUrl())) {
+      throw new RuntimeException("Propagation url not set");
+    }
+    
+    String baseCommitLink = new URL(this.getPropagationUrl()).toString();
+    return baseCommitLink.endsWith("/")? baseCommitLink.substring(0, baseCommitLink.length() - 1) : baseCommitLink;
   }
 
   @Override
@@ -274,12 +260,4 @@ public class BitBucketPPRPullRequestServerAction extends BitBucketPPRActionAbstr
     return "BitBucketPPRPullRequestServerAction";
   }
 
-  public String setBaseUrl(String url) {
-    try {
-      this.baseUrl = new URL(url);
-    } catch (MalformedURLException e) {
-      throw new RuntimeException(e);
-    }
-    return url;
-  }
 }

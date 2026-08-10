@@ -183,10 +183,12 @@ in the __Jenkins Global Configurations__:
 | HTTP access token   | -        | X         | Secret Text            | [learn more about HTTP tokens](https://confluence.atlassian.com/bitbucketserver/http-access-tokens-939515499.html) |
 | OAuth consumers     | X        | -         | Secret Text            | [Oauth Consumers example config](./docs/oauth_config.md)                                                           |
 
-1. you can set globally the credentials used by the plugin for the state notification
-2. you can set for each job the credentials used by the plugin for the state notification, overwriting the global
-   credentials
-3. you you don't set nothing the plugin will try to use the credentials used by the git plugin
+- **Bitbucket Server**: set both a **propagation URL** (the server base URL, including any context
+  path) and a **credential**, together. Configure them on the job trigger, or globally. The trigger
+  is used when it sets both; otherwise the global configuration is used; if neither sets both, no
+  notification is sent.
+- **Bitbucket Cloud**: only the credential is needed (the API endpoint is fixed); set it on the job
+  trigger, or globally.
 
 ## Bitbucket Events supported by the plugin
 

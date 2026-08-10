@@ -22,6 +22,7 @@
 package io.jenkins.plugins.bitbucketpushandpullrequest.action;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -32,6 +33,7 @@ import static org.mockito.Mockito.when;
 import io.jenkins.plugins.bitbucketpushandpullrequest.config.BitBucketPPRPluginConfig;
 import io.jenkins.plugins.bitbucketpushandpullrequest.exception.BitBucketPPRPayloadPropertyNotFoundException;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRPayload;
+import io.jenkins.plugins.bitbucketpushandpullrequest.model.server.BitBucketPPRServerChange;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.server.BitBucketPPRServerClone;
 import java.util.ArrayList;
 import java.util.List;
@@ -67,8 +69,6 @@ class BitBucketPPRServerRepositoryActionTest {
         BitBucketPPRPluginConfig.class)) {
       BitBucketPPRPluginConfig c = mock(BitBucketPPRPluginConfig.class);
       config.when(BitBucketPPRPluginConfig::getInstance).thenReturn(c);
-      when(c.getPropagationUrl()).thenReturn(
-          "https://example.org/scm/some-namespace/some-repo.git");
 
       BitBucketPPRPayload payloadMock = mock(BitBucketPPRPayload.class, RETURNS_DEEP_STUBS);
       List<BitBucketPPRServerClone> clones = new ArrayList<>();
@@ -81,6 +81,8 @@ class BitBucketPPRServerRepositoryActionTest {
           clones);
       BitBucketPPRServerRepositoryAction bitBucketPPRServerRepositoryAction = new BitBucketPPRServerRepositoryAction(
           payloadMock);
+      // The resolved notification base is set on the action at the sink; simulate that here.
+      bitBucketPPRServerRepositoryAction.setPropagationUrl("https://example.org");
 
       assertDoesNotThrow(bitBucketPPRServerRepositoryAction::getCommitLinks);
     }
@@ -103,10 +105,8 @@ class BitBucketPPRServerRepositoryActionTest {
 
       BitBucketPPRServerRepositoryAction action = new BitBucketPPRServerRepositoryAction(payloadMock);
 
-      assertDoesNotThrow(() -> {
-        List<String> links = action.getCommitLinks();
-        assertTrue(links.isEmpty());
-      });
+      assertThrows(RuntimeException.class,
+        action::getCommitLinks);
     }
   }
 
@@ -152,6 +152,49 @@ class BitBucketPPRServerRepositoryActionTest {
       BitBucketPPRServerRepositoryAction action = new BitBucketPPRServerRepositoryAction(payloadMock);
 
       assertNull(action.getOPT2CloneUrl());
+    }
+  }
+
+  @Test
+  void getCommitLinksPreserveTheConfiguredContextPath() throws Exception {
+    // The REST path is appended to the configured base including its context path (reverse proxy),
+    // not to the bare origin.
+    assertEquals(
+        List.of("https://bitbucket.example.com/bitbucket/rest/build-status/1.0/commits/123456"),
+        commitLinksFor("https://bitbucket.example.com/bitbucket"));
+  }
+
+  @Test
+  void getCommitLinksNormaliseATrailingSlashOnTheConfiguredBase() throws Exception {
+    assertEquals(
+        List.of("https://bitbucket.example.com/bitbucket/rest/build-status/1.0/commits/123456"),
+        commitLinksFor("https://bitbucket.example.com/bitbucket/"));
+  }
+
+  private static List<String> commitLinksFor(String propagationUrl) throws Exception {
+    try (MockedStatic<BitBucketPPRPluginConfig> config = Mockito.mockStatic(
+        BitBucketPPRPluginConfig.class)) {
+      BitBucketPPRPluginConfig c = mock(BitBucketPPRPluginConfig.class);
+      config.when(BitBucketPPRPluginConfig::getInstance).thenReturn(c);
+
+      BitBucketPPRPayload payload = mock(BitBucketPPRPayload.class, RETURNS_DEEP_STUBS);
+      List<BitBucketPPRServerClone> clones = new ArrayList<>();
+      BitBucketPPRServerClone sshClone = mock(BitBucketPPRServerClone.class);
+      when(sshClone.getName()).thenReturn("ssh");
+      when(sshClone.getHref()).thenReturn("ssh://git@example.org/ns/repo.git");
+      clones.add(sshClone);
+      when(payload.getServerRepository().getLinks().getCloneProperty()).thenReturn(clones);
+
+      List<BitBucketPPRServerChange> changes = new ArrayList<>();
+      BitBucketPPRServerChange change = mock(BitBucketPPRServerChange.class, RETURNS_DEEP_STUBS);
+      when(change.getRefId()).thenReturn("refs/heads/main");
+      when(change.getToHash()).thenReturn("123456");
+      changes.add(change);
+      when(payload.getServerChanges()).thenReturn(changes);
+
+      BitBucketPPRServerRepositoryAction action = new BitBucketPPRServerRepositoryAction(payload);
+      action.setPropagationUrl(propagationUrl);
+      return action.getCommitLinks();
     }
   }
 }

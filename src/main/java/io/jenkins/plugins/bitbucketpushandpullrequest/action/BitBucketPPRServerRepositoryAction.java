@@ -30,7 +30,6 @@ import io.jenkins.plugins.bitbucketpushandpullrequest.model.server.BitBucketPPRS
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.server.BitBucketPPRServerRef;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.server.BitBucketPPRServerRepository;
 
-import edu.umd.cs.findbugs.annotations.NonNull;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -38,14 +37,13 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static org.apache.commons.lang3.ObjectUtils.isEmpty;
+import org.apache.commons.lang3.StringUtils;
 
 public class BitBucketPPRServerRepositoryAction extends BitBucketPPRActionAbstract
     implements BitBucketPPRAction {
   private static final Logger logger = Logger.getLogger(BitBucketPPRAction.class.getName());
 
   private final @NonNull BitBucketPPRPayload payload;
-  private URL baseUrl;
   private List<String> scmUrls = new ArrayList<>(2);
   private String targetBranchName = null;
   private String targetBranchRefId = null;
@@ -73,12 +71,7 @@ public class BitBucketPPRServerRepositoryAction extends BitBucketPPRActionAbstra
       if ("http".equalsIgnoreCase(cloneName) || "https".equalsIgnoreCase(cloneName)) {
         String cloneHref =
             requirePayloadProperty(clone.getHref(), "repository.links.clone[].href");
-        try {
-          this.baseUrl = new URL(cloneHref);
           this.scmUrls.add(cloneHref);
-        } catch (MalformedURLException e) {
-          throw new RuntimeException(e);
-        }
       } else if ("ssh".equalsIgnoreCase(cloneName)) {
         this.scmUrls.add(clone.getHref());
       }
@@ -187,14 +180,12 @@ public class BitBucketPPRServerRepositoryAction extends BitBucketPPRActionAbstra
     // returns:
     // /rest/build-status/1.0/commits/{commitId}
 
-    URL baseCommitLink =
-        isEmpty(this.getPropagationUrl()) ? baseUrl : new URL(this.getPropagationUrl());
-
-    if (baseCommitLink == null) {
-      logger.log(Level.WARNING,
-          "No HTTP(S) clone URL or propagation URL configured. Cannot generate commit links.");
-      return new ArrayList<>();
+    if (StringUtils.isBlank(this.getPropagationUrl())) {
+      throw new RuntimeException("Propagation url not set");
     }
+
+    String baseCommitLink = new URL(this.getPropagationUrl()).toString();
+    baseCommitLink = baseCommitLink.endsWith("/") ? baseCommitLink.substring(0, baseCommitLink.length() - 1) : baseCommitLink;
 
     List<BitBucketPPRServerChange> changes = payload.getServerChanges();
     List<String> links = new ArrayList<>();

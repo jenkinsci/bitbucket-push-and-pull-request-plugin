@@ -70,8 +70,21 @@ public class DefaultBitBucketPPRClient implements BitBucketPPRClient {
   @Override
   public void send(Verb verb, String url, String payload) throws Exception {
     BitBucketPPRUtils.warnIfNotHttps(url);
-    StandardCredentials credentials = context.getStandardCredentials();
+    // On Server the destination is the configured Bitbucket endpoint, so the credential is resolved
+    // against it. On Cloud the destination is the fixed API host (api.bitbucket.org) while a
+    // domain-scoped credential is typically bound to the repository host; resolving against the
+    // configured SCM URL there keeps such credentials matching, as they did before this change.
+    
+    StandardCredentials credentials;
 
+    if (type == BitBucketPPRClientType.CLOUD) {
+      credentials = context.getStandardCredentials(context.getUserRemoteConfig().getUrl());
+    } else {
+      var config = context.getNotificationConfig();
+      credentials = context.getStandardCredentials(config.credentialsId(), config.baseUrl());
+    }
+    
+    
     try {
       BitBucketPPRApiResponse response = switch (credentials) {
         case StandardUsernamePasswordCredentials usernamePasswordCredentials ->

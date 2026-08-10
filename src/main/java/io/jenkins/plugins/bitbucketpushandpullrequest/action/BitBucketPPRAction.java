@@ -1,7 +1,7 @@
 /*******************************************************************************
  * The MIT License
  *
- * Copyright (C) 2018-2025, Christian Del Monte.
+ * Copyright (C) 2018-2026, Christian Del Monte.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -98,7 +98,7 @@ public interface BitBucketPPRAction extends Action {
     return null;
   }
 
-  default String getPullRequestApiUrl() {
+  default String getPullRequestApiUrl() throws MalformedURLException{
     return null;
   }
 

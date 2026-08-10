@@ -27,6 +27,8 @@ import java.util.logging.Logger;
 import com.github.scribejava.core.model.Verb;
 import hudson.model.Result;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
+import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRActionAbstract;
+import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRServerNotificationConfig;
 import io.jenkins.plugins.bitbucketpushandpullrequest.client.BitBucketPPRClientType;
 import io.jenkins.plugins.bitbucketpushandpullrequest.event.BitBucketPPREvent;
 
@@ -56,6 +58,9 @@ public class BitBucketPPRPullRequestServerObserver extends BitBucketPPRHandlerTe
     Result result = context.getRun().getResult();
 
     BitBucketPPRAction bitbucketAction = context.getAction();
+    BitBucketPPRServerNotificationConfig config = context.getNotificationConfig();
+    ((BitBucketPPRActionAbstract) bitbucketAction).setPropagationUrl(config.baseUrl());
+
     Map<String, String> map = new HashMap<>();
     String url = null;
 
@@ -79,6 +84,9 @@ public class BitBucketPPRPullRequestServerObserver extends BitBucketPPRHandlerTe
   @Override
   public void setBuildStatusOnFinished() throws MalformedURLException {
     BitBucketPPRAction bitbucketAction = context.getAction();
+    BitBucketPPRServerNotificationConfig config = context.getNotificationConfig();
+    ((BitBucketPPRActionAbstract) bitbucketAction).setPropagationUrl(config.baseUrl());
+
     String url = bitbucketAction.getCommitLink();
     Result result = context.getRun().getResult();
     String state = result == Result.SUCCESS || result == Result.UNSTABLE
@@ -95,6 +103,8 @@ public class BitBucketPPRPullRequestServerObserver extends BitBucketPPRHandlerTe
   @Override
   public void setBuildStatusInProgress() throws MalformedURLException {
     BitBucketPPRAction bitbucketAction = context.getAction();
+    BitBucketPPRServerNotificationConfig config = context.getNotificationConfig();
+    ((BitBucketPPRActionAbstract) bitbucketAction).setPropagationUrl(config.baseUrl());
     String url = bitbucketAction.getCommitLink();
 
     Map<String, String> map = new HashMap<>();

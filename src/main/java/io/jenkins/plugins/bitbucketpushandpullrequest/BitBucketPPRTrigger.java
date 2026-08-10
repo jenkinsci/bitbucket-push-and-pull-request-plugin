@@ -112,6 +112,14 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
     }
   }
 
+  public String getCredentialsId() {
+    return this.credentialsId;
+  }
+
+  public String getPropagationUrl() {
+    return this.propagationUrl;
+  }
+
   /**
    * Called when a POST is made.
    *
@@ -128,8 +136,7 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
       BitBucketPPRObservable observable)
       throws Exception {
     logger.finest(String.format("Called onPost Method for action %s", bitbucketAction));
-    checkLocalPropagationUrl(bitbucketAction);
-
+    
     if (job == null) {
       logger.warning("Error: the job is null");
       return;
@@ -187,19 +194,6 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
 
     } else {
       logger.warning("Triggers are not configured.");
-    }
-  }
-
-  private void checkLocalPropagationUrl(BitBucketPPRAction bitBucketPPRAction) {
-
-    if (bitBucketPPRAction == null) {
-      return;
-    }
-
-    if (!isEmpty(propagationUrl)) {
-      BitBucketPPRActionAbstract bitBucketPPRActionAbstract =
-          (BitBucketPPRActionAbstract) bitBucketPPRAction;
-      bitBucketPPRActionAbstract.setPropagationUrl(propagationUrl);
     }
   }
 

@@ -1,7 +1,7 @@
 /*******************************************************************************
  * The MIT License
  *
- * Copyright (C) 2018-2025, Christian Del Monte.
+ * Copyright (C) 2018-2026, Christian Del Monte.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -31,8 +31,10 @@ import hudson.plugins.git.UserRemoteConfig;
 import hudson.scm.SCM;
 import io.jenkins.plugins.bitbucketpushandpullrequest.BitBucketPPRTrigger;
 import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
+import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRServerNotificationConfig;
 import io.jenkins.plugins.bitbucketpushandpullrequest.config.BitBucketPPRPluginConfig;
 import io.jenkins.plugins.bitbucketpushandpullrequest.filter.BitBucketPPRTriggerFilter;
+
 
 public class BitBucketPPREventContext {
   private SCM scmTrigger;
@@ -40,8 +42,8 @@ public class BitBucketPPREventContext {
   private BitBucketPPRAction action;
   private BitBucketPPRTriggerFilter filter;
   private UserRemoteConfig userRemoteConfig;
-  private String url;
   private BitBucketPPRTrigger trigger;
+  private BitBucketPPRServerNotificationConfig notificationConfig;
 
   public BitBucketPPREventContext(BitBucketPPRTrigger trigger, BitBucketPPRAction action,
       SCM scmTrigger, Run<?, ?> run, BitBucketPPRTriggerFilter filter) {
@@ -50,47 +52,85 @@ public class BitBucketPPREventContext {
     this.run = run;
     this.filter = filter;
     this.userRemoteConfig = getUserRemoteConfigs(scmTrigger);
+    
     this.trigger = trigger;
-    this.url = userRemoteConfig.getUrl();
   }
 
-  public StringCredentials getSecretTextCredentials() throws Exception {
-    final StringCredentials credentials = CredentialsProvider.findCredentialById(getCredentialsId(),
-        StringCredentials.class, run, URIRequirementBuilder.fromUri(url).build());
-    if (credentials != null) {
-      return credentials;
-    }
-    throw new Exception("No Credentials found for run: " + run.getNumber() + " - url: " + url
-        + " - credentialsId: " + getCredentialsId() + " - absolute url : " + run.getAbsoluteUrl());
-  }
-
-  public StandardCredentials getStandardCredentials() throws Exception {
+  // The build URL is sent to Bitbucket in the build-status payload. It is not HTML rendering.
+  @SuppressWarnings("deprecation")
+  public StandardCredentials getStandardCredentials(String url) throws Exception {
+    
     final StandardCredentials credentials =
         CredentialsProvider.findCredentialById(getCredentialsId(), StandardCredentials.class, run,
             URIRequirementBuilder.fromUri(url).build());
+    
+            if (credentials != null) {
+      return credentials;
+    }
+
+    throw new Exception("No Credentials found for run: " + run.getNumber() + " - url: " + url
+        + " - credentialsId: " + getCredentialsId() + " - absolute url : " + run.getAbsoluteUrl());
+  }
+
+  // The build URL is sent to Bitbucket in the build-status payload. It is not HTML rendering.
+  @SuppressWarnings("deprecation")
+  public StandardCredentials getStandardCredentials(String credentialsId, String url) throws Exception {
+    
+    final StandardCredentials credentials =
+        CredentialsProvider.findCredentialById(credentialsId, StandardCredentials.class, run,
+            URIRequirementBuilder.fromUri(url).build());
+    
+            if (credentials != null) {
+      return credentials;
+    }
+
+    throw new Exception("No Credentials found for run: " + run.getNumber() + " - url: " + url
+        + " - credentialsId: " + getCredentialsId() + " - absolute url : " + run.getAbsoluteUrl());
+  }
+
+  /**
+   * @deprecated The Server notification path resolves the credential from the notification config
+   *     pair via {@link #getStandardCredentials(String, String)}; kept for binary compatibility.
+   */
+  @Deprecated
+  @SuppressWarnings("deprecation")
+  public StandardCredentials getStandardCredentials() throws Exception {
+    return getStandardCredentials(getCredentialsId(), getUrl());
+  }
+
+  /**
+   * @deprecated Not used by the notification path; kept for binary compatibility.
+   */
+  @Deprecated
+  @SuppressWarnings("deprecation")
+  public StringCredentials getSecretTextCredentials() throws Exception {
+    final StringCredentials credentials = CredentialsProvider.findCredentialById(getCredentialsId(),
+        StringCredentials.class, run, URIRequirementBuilder.fromUri(getUrl()).build());
     if (credentials != null) {
       return credentials;
     }
-    throw new Exception("No Credentials found for run: " + run.getNumber() + " - url: " + url
-        + " - credentialsId: " + getCredentialsId() + " - absolute url : " + run.getAbsoluteUrl());
+    throw new Exception("No Credentials found for run: " + run.getNumber() + " - credentialsId: "
+        + getCredentialsId());
+  }
+
+  /**
+   * @deprecated SCM URL of the first configured remote; kept for binary compatibility.
+   */
+  @Deprecated
+  public String getUrl() {
+    return userRemoteConfig.getUrl();
   }
 
   protected BitBucketPPRPluginConfig getGlobalConfig() {
     return BitBucketPPRPluginConfig.getInstance();
   }
 
-  public String getUrl() {
-    return url;
-  }
-
   public String getCredentialsId() {
-    if (StringUtils.isNotBlank(trigger.credentialsId))
-      return trigger.credentialsId;
-    if (StringUtils.isNotBlank(getGlobalConfig().credentialsId))
-      return getGlobalConfig().credentialsId;
-    if (StringUtils.isNotBlank(userRemoteConfig.getCredentialsId()))
-      return userRemoteConfig.getCredentialsId();
-    return "";
+    if (StringUtils.isNotBlank(trigger.getCredentialsId()))
+      return trigger.getCredentialsId();
+    if (StringUtils.isNotBlank(getGlobalConfig().getCredentialsId()))
+      return getGlobalConfig().getCredentialsId();
+    throw new RuntimeException("Credentials for propagation are not set.");
   }
 
   public UserRemoteConfig getUserRemoteConfig() {
@@ -109,6 +149,8 @@ public class BitBucketPPREventContext {
     return run;
   }
 
+  // The build URL is sent to Bitbucket in the build-status payload. It is not HTML rendering.
+  @SuppressWarnings("deprecation")
   public String getAbsoluteUrl() {
     return run.getAbsoluteUrl();
   }
@@ -127,10 +169,19 @@ public class BitBucketPPREventContext {
     return config;
   }
 
+  public BitBucketPPRServerNotificationConfig getNotificationConfig() {
+    // Resolved once per event so that the observer (endpoint) and the client (credential) see the
+    // same pair: a concurrent config change cannot split the endpoint from the credential.
+    if (notificationConfig == null) {
+      notificationConfig = BitBucketPPRServerNotificationConfig.resolve(trigger, getGlobalConfig());
+    }
+    return notificationConfig;
+  }
+
   @Override
   public String toString() {
     return "BitBucketPPREventContext [scmTrigger=" + scmTrigger + ", run=" + run + ", action="
-        + action + ", filter=" + filter + ", userRemoteConfig=" + userRemoteConfig + ", url=" + url
+        + action + ", filter=" + filter + ", userRemoteConfig=" + userRemoteConfig + ", url=" + trigger.propagationUrl
         + ", trigger=" + trigger + "]";
   }
 }

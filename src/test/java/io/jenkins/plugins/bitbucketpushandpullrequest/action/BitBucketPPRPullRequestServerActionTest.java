@@ -48,9 +48,6 @@ class BitBucketPPRPullRequestServerActionTest {
         Mockito.mockStatic(BitBucketPPRPluginConfig.class)) {
       BitBucketPPRPluginConfig c = mock(BitBucketPPRPluginConfig.class);
       config.when(BitBucketPPRPluginConfig::getInstance).thenReturn(c);
-      when(c.isPropagationUrlSet()).thenReturn(true);
-      when(c.getPropagationUrl())
-          .thenReturn("https://example.org/scm/some-namespace/some-repo.git");
 
       BitBucketPPRPayload payloadMock = mock(BitBucketPPRPayload.class, RETURNS_DEEP_STUBS);
       List<BitBucketPPRServerClone> clones = new ArrayList<>();
@@ -66,6 +63,8 @@ class BitBucketPPRPullRequestServerActionTest {
       when(bitbucketEvent.getAction()).thenReturn("created");
       BitBucketPPRPullRequestServerAction bitBucketPPRPullRequestServerAction =
           new BitBucketPPRPullRequestServerAction(payloadMock, bitbucketEvent);
+      // The resolved notification base is set on the action at the sink; simulate that here.
+      bitBucketPPRPullRequestServerAction.setPropagationUrl("https://example.org");
 
       assertDoesNotThrow(bitBucketPPRPullRequestServerAction::getCommitLink);
     }
@@ -107,16 +106,30 @@ class BitBucketPPRPullRequestServerActionTest {
 
   @Test
   void getCommitLinkOmitsThePortWhenTheBaseUrlHasNone() throws Exception {
-    // A portless base URL used to produce "host:-1" (URL.getPort() appended verbatim), an
-    // unroutable authority that also defeated the per-origin dedup of the non-https warning.
+    // A portless base URL must not grow a "host:-1" authority; URL.toString() omits the default
+    // port, so the commit link keeps a clean host.
     assertEquals("http://bitbucket.example.org/rest/build-status/1.0/commits/123456",
-        commitLinkFor("http://bitbucket.example.org/scm/some-namespace/some-repo.git"));
+        commitLinkFor("http://bitbucket.example.org"));
   }
 
   @Test
   void getCommitLinkKeepsAnExplicitPort() throws Exception {
     assertEquals("http://bitbucket.example.org:7990/rest/build-status/1.0/commits/123456",
-        commitLinkFor("http://bitbucket.example.org:7990/scm/some-namespace/some-repo.git"));
+        commitLinkFor("http://bitbucket.example.org:7990"));
+  }
+
+  @Test
+  void getCommitLinkPreservesTheConfiguredContextPath() throws Exception {
+    // When the configured Bitbucket base carries a context path (e.g. behind a reverse proxy), the
+    // REST path must be appended to that base, not to the bare origin.
+    assertEquals("https://bitbucket.example.com/bitbucket/rest/build-status/1.0/commits/123456",
+        commitLinkFor("https://bitbucket.example.com/bitbucket"));
+  }
+
+  @Test
+  void getCommitLinkNormalisesATrailingSlashOnTheConfiguredBase() throws Exception {
+    assertEquals("https://bitbucket.example.com/bitbucket/rest/build-status/1.0/commits/123456",
+        commitLinkFor("https://bitbucket.example.com/bitbucket/"));
   }
 
   // Stub the global configuration required while constructing the action; the propagation URL
